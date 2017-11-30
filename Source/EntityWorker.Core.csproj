@@ -1,0 +1,87 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp2.0;netstandard2.0;net461;net451;net46;</TargetFrameworks>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Version>1.0.0</Version>
+    <Authors>Alen Toma</Authors>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageProjectUrl>https://github.com/AlenToma/EntityWorker</PackageProjectUrl>
+    <PackageTags>object-relation mappar LinqToSql alternative-to-entityframework C# System.Reflection generic Microsoft EntityFramework EF Database Data O/RM ADO.NET</PackageTags>
+    <PackageLicenseUrl>https://github.com/AlenToma/LightDataTable.Core/edit/master/LICENSE</PackageLicenseUrl>
+    <Copyright>Copyright (c) 2017 Alen Toma</Copyright>
+    <Description>EntityWorker is an object-relation mapper that enable .NET developers to work with relations data using objects. EntityWorker is an alternative to entityframwork. is more flexible and much faster than entity framework.</Description>
+    <NeutralLanguage />
+    <Platforms>AnyCPU</Platforms>
+    <PackageIconUrl>https://raw.githubusercontent.com/AlenToma/EntityWorker/master/icon.gif</PackageIconUrl>
+  </PropertyGroup>
+
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netcoreapp2.0|AnyCPU'">
+    <DocumentationFile>bin\Release\netcoreapp2.0\EntityWorker.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net461|AnyCPU'">
+    <DocumentationFile>bin\Release\net461\EntityWorker.xml</DocumentationFile>
+  </PropertyGroup>
+
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net451|AnyCPU'">
+    <DocumentationFile>bin\Release\net451\EntityWorker.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net46|AnyCPU'">
+    <DocumentationFile>bin\Release\net46\EntityWorker.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
+    <DocumentationFile>bin\Release\net46\EntityWorker.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp2.0|AnyCPU'">
+    <WarningsAsErrors>NU1605</WarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\FastDeepCloner\FastDeepCloner-New-\FastDeepCloner.csproj" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.4.0" PrivateAssets="all" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.4.0" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="Microsoft.Data.Sqlite">
+      <Version>2.0.0</Version>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
+    <PackageReference Include="System.Data.SQLite.Core">
+      <Version>1.0.106</Version>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net451'">
+    <PackageReference Include="System.Data.SQLite.Core">
+      <Version>1.0.106</Version>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net46'">
+    <PackageReference Include="System.Data.SQLite.Core">
+      <Version>1.0.106</Version>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
+    <PackageReference Include="Microsoft.Data.Sqlite">
+      <Version>2.0.0</Version>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>
