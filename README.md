@@ -1,8 +1,8 @@
 # Introduction EntityWorker.Core
 ## Nuget
-https://www.nuget.org/packages/Generic.LightDataTable/
+there is no nuget package yet
 
-## Generic.LightDataTable in Action
+## EntityWorker.Core in Action
 https://github.com/AlenToma/LightData.CMS
 ## .NET FRAMEWORK SUPPORT 
 1- .NETCoreApp 2.0
