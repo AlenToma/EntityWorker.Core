@@ -260,7 +260,66 @@ EntityWorker.Core has its own Migration methods, so lets se down here how it wor
     }
 
 ```
+## Attributes 
+There is many attributes you could use to make your code better
+```
+/// <summary>
+/// This indicates that the prop will not be saved to the database.
+/// </summary>
+[ExcludeFromAbstract]
 
+/// <summary>
+/// Will be saved to the database as base64string 
+/// and converted back to its original string when its read
+/// </summary>
+[ToBase64String]
+
+/// <summary>
+/// Property is a ForeignKey in the database.
+/// </summary>
+[ForeignKey]
+
+/// <summary>
+/// This attr will tell LightDataTable abstract to not auto Delete this object when deleting parent,
+/// it will however try to create new or update  
+/// </summary>
+[IndependentData]
+
+/// This attribute is most used on properties with type string
+/// in-case we don't want them to be nullable
+/// </summary>
+[NotNullable]
+
+/// <summary>
+/// Property is a primary key
+/// </summary>
+[PrimaryKey]
+
+/// <summary>
+/// Have diffrent Name for the property in the database
+/// </summary>
+[PropertyName]
+
+/// <summary>
+/// Define class rule by adding this attribute
+/// ruleType must inherit from IDbRuleTrigger
+/// ex UserRule : IDbRuleTrigger<User/>
+/// </summary>
+/// <param name="ruleType"></param>
+[Rule]
+
+/// <summary>
+/// Save the property as string in the database
+/// mostly used when we don't want an enum to be saved as integer in the database
+/// </summary>
+[StringFy]
+
+/// <summary>
+/// Define diffrent name for the table
+/// </summary>
+[Table]
+
+```
 
 
 
