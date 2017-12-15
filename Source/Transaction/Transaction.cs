@@ -13,6 +13,7 @@ using EntityWorker.Core.Interface;
 using EntityWorker.Core.InterFace;
 using EntityWorker.Core.Object.Library;
 using FastDeepCloner;
+using System.Runtime.Serialization;
 #if NET461 || NET451 || NET46
 using System.Data.SQLite;
 #elif NETCOREAPP2_0 || NETSTANDARD2_0
@@ -76,6 +77,16 @@ namespace EntityWorker.Core.Transaction
             _tableMigrationCheck = true;
         }
 
+
+        public T Clone<T>(T o, FieldType fieldType = FieldType.PropertyInfo) where T : class
+        {
+            return DeepCloner.Clone(o, new FastDeepClonerSettings()
+            {
+                FieldType = fieldType,
+                OnCreateInstance = new Extensions.CreateInstance(FormatterServices.GetUninitializedObject)
+            });
+        }
+
         /// <summary>
         /// Specifies the migrationConfig which contain a list Migration to migrate
         /// the migration is executed automatic but as long as you have class that inherit from IMigrationConfig
@@ -110,6 +121,12 @@ namespace EntityWorker.Core.Transaction
                 Rollback();
                 throw;
             }
+        }
+
+        private void CloseifPassible()
+        {
+            if (Trans == null)
+                SqlConnection.Close();
         }
 
         /// <summary>
@@ -161,7 +178,9 @@ namespace EntityWorker.Core.Transaction
         public IDataReader ExecuteReader(DbCommand cmd)
         {
             ValidateConnection();
-            return cmd.ExecuteReader();
+            var o = cmd.ExecuteReader();
+            CloseifPassible();
+            return o;
         }
 
         /// <summary>
@@ -172,7 +191,9 @@ namespace EntityWorker.Core.Transaction
         public object ExecuteScalar(DbCommand cmd)
         {
             ValidateConnection();
-            return cmd.ExecuteScalar();
+            var o = cmd.ExecuteScalar();
+            CloseifPassible();
+            return o;
         }
 
         /// <inheritdoc />
@@ -180,7 +201,9 @@ namespace EntityWorker.Core.Transaction
         {
 
             ValidateConnection();
-            return cmd.ExecuteNonQuery();
+            var o = cmd.ExecuteNonQuery();
+            CloseifPassible();
+            return o;
         }
 
         /// <summary>
@@ -316,9 +339,12 @@ namespace EntityWorker.Core.Transaction
             if (objcDbEntity.Id <= 0)
                 throw new NullReferenceException("Id is 0, it cant be attached");
             var key = objcDbEntity.GetEntityKey();
-            if (_attachedObjects.ContainsKey(key))
-                _attachedObjects.Remove(key);
-            _attachedObjects.Add(key, objcDbEntity);
+            lock (_attachedObjects)
+            {
+                if (_attachedObjects.ContainsKey(key))
+                    _attachedObjects.Remove(key);
+                _attachedObjects.Add(key, objcDbEntity);
+            }
         }
 
         /// <summary>
@@ -449,7 +475,7 @@ namespace EntityWorker.Core.Transaction
                 if (actions != null)
                     parames = actions.ConvertExpressionToIncludeList();
                 LoadChildren<T>(item, onlyFirstLevel, actions != null ? parames : null, ignoreList != null && ignoreList.Any() ? ignoreList : null);
-                
+
             });
         }
 

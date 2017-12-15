@@ -131,7 +131,6 @@ namespace EntityWorker.Core.Helper
             foreach (var dic in dicCols)
                 repository.AddInnerParameter(cmd, dic.Key, dic.Value.Item1, dic.Value.Item2);
             return cmd;
-
 #endif
         }
     }

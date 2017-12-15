@@ -38,6 +38,5 @@ namespace EntityWorker.Core
             if (rows.Any())
                 _savedIndexes = rows.GroupBy(x => x[key]).Select(x => x.First()).ToList().FindAll(x => x[key] != null).ToDictionary(x => x[key], x => x);
         }
-
     }
 }

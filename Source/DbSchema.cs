@@ -76,9 +76,6 @@ namespace EntityWorker.Core
         }
 
 
-
-
-
         /// <summary>
         /// Get object by ID
         /// Primary Key attribute must be set
@@ -650,9 +647,7 @@ namespace EntityWorker.Core
                             _repository.ExecuteNonQuery(cmd);
                             CachedObjectColumn.Remove(tType);
                         }
-
                         c--;
-
                     }
                     catch
                     {
@@ -661,9 +656,6 @@ namespace EntityWorker.Core
                 }
             }
         }
-
-
-
 
         #endregion
 

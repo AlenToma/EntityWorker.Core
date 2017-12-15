@@ -3011,26 +3011,18 @@
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
-        "netcoreapp2.0",
-        "netstandard2.0",
-        "net461",
         "net451",
-        "net46"
+        "net46",
+        "net461",
+        "netcoreapp2.0",
+        "netstandard2.0"
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
-        "net46": {
-          "projectReferences": {
-            "D:\\Projects\\FastDeepCloner\\FastDeepCloner-New-\\FastDeepCloner.csproj": {
-              "projectPath": "D:\\Projects\\FastDeepCloner\\FastDeepCloner-New-\\FastDeepCloner.csproj",
-              "privateAssets": "all"
-            }
-          }
-        },
-        "netstandard2.0": {
+        "netcoreapp2.0": {
           "projectReferences": {
             "D:\\Projects\\FastDeepCloner\\FastDeepCloner-New-\\FastDeepCloner.csproj": {
               "projectPath": "D:\\Projects\\FastDeepCloner\\FastDeepCloner-New-\\FastDeepCloner.csproj",
@@ -3046,6 +3038,14 @@
             }
           }
         },
+        "net46": {
+          "projectReferences": {
+            "D:\\Projects\\FastDeepCloner\\FastDeepCloner-New-\\FastDeepCloner.csproj": {
+              "projectPath": "D:\\Projects\\FastDeepCloner\\FastDeepCloner-New-\\FastDeepCloner.csproj",
+              "privateAssets": "all"
+            }
+          }
+        },
         "net461": {
           "projectReferences": {
             "D:\\Projects\\FastDeepCloner\\FastDeepCloner-New-\\FastDeepCloner.csproj": {
@@ -3054,7 +3054,7 @@
             }
           }
         },
-        "netcoreapp2.0": {
+        "netstandard2.0": {
           "projectReferences": {
             "D:\\Projects\\FastDeepCloner\\FastDeepCloner-New-\\FastDeepCloner.csproj": {
               "projectPath": "D:\\Projects\\FastDeepCloner\\FastDeepCloner-New-\\FastDeepCloner.csproj",
@@ -3070,47 +3070,28 @@
       }
     },
     "frameworks": {
-      "net46": {
+      "netcoreapp2.0": {
         "dependencies": {
-          "System.Data.SqlClient": {
-            "suppressParent": "All",
-            "target": "Package",
-            "version": "4.4.0"
-          },
           "Microsoft.CSharp": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "4.4.0"
+            "version": "[4.4.0, )"
           },
-          "System.Data.SQLite.Core": {
-            "suppressParent": "All",
-            "target": "Package",
-            "version": "1.0.106"
-          }
-        }
-      },
-      "netstandard2.0": {
-        "dependencies": {
           "Microsoft.Data.Sqlite": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "2.0.0"
+            "version": "[2.0.0, )"
           },
-          "NETStandard.Library": {
+          "Microsoft.NETCore.App": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "2.0.0",
+            "version": "[2.0.0, )",
             "autoReferenced": true
           },
           "System.Data.SqlClient": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "4.4.0"
-          },
-          "Microsoft.CSharp": {
-            "suppressParent": "All",
-            "target": "Package",
-            "version": "4.4.0"
+            "version": "[4.4.0, )"
           }
         },
         "imports": [
@@ -3121,64 +3102,83 @@
       },
       "net451": {
         "dependencies": {
-          "System.Data.SqlClient": {
-            "suppressParent": "All",
-            "target": "Package",
-            "version": "4.4.0"
-          },
           "Microsoft.CSharp": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "4.4.0"
+            "version": "[4.4.0, )"
           },
           "System.Data.SQLite.Core": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "1.0.106"
+            "version": "[1.0.106, )"
+          },
+          "System.Data.SqlClient": {
+            "suppressParent": "All",
+            "target": "Package",
+            "version": "[4.4.0, )"
+          }
+        }
+      },
+      "net46": {
+        "dependencies": {
+          "Microsoft.CSharp": {
+            "suppressParent": "All",
+            "target": "Package",
+            "version": "[4.4.0, )"
+          },
+          "System.Data.SQLite.Core": {
+            "suppressParent": "All",
+            "target": "Package",
+            "version": "[1.0.106, )"
+          },
+          "System.Data.SqlClient": {
+            "suppressParent": "All",
+            "target": "Package",
+            "version": "[4.4.0, )"
           }
         }
       },
       "net461": {
         "dependencies": {
-          "System.Data.SqlClient": {
-            "suppressParent": "All",
-            "target": "Package",
-            "version": "4.4.0"
-          },
           "Microsoft.CSharp": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "4.4.0"
+            "version": "[4.4.0, )"
           },
           "System.Data.SQLite.Core": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "1.0.106"
+            "version": "[1.0.106, )"
+          },
+          "System.Data.SqlClient": {
+            "suppressParent": "All",
+            "target": "Package",
+            "version": "[4.4.0, )"
           }
         }
       },
-      "netcoreapp2.0": {
+      "netstandard2.0": {
         "dependencies": {
+          "Microsoft.CSharp": {
+            "suppressParent": "All",
+            "target": "Package",
+            "version": "[4.4.0, )"
+          },
           "Microsoft.Data.Sqlite": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "2.0.0"
+            "version": "[2.0.0, )"
           },
-          "Microsoft.NETCore.App": {
+          "NETStandard.Library": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "2.0",
+            "version": "[2.0.0, )",
             "autoReferenced": true
           },
           "System.Data.SqlClient": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "4.4.0"
-          },
-          "Microsoft.CSharp": {
-            "suppressParent": "All",
-            "target": "Package",
-            "version": "4.4.0"
+            "version": "[4.4.0, )"
           }
         },
         "imports": [

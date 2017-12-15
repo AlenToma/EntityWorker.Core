@@ -13,11 +13,11 @@
     <copyright>Copyright (c) 2017 Alen Toma</copyright>
     <tags>object-relation mappar LinqToSql alternative-to-entityframework C# System.Reflection generic Microsoft EntityFramework EF Database Data O/RM ADO.NET</tags>
     <dependencies>
-      <group targetFramework=".NETFramework4.6" />
       <group targetFramework=".NETFramework4.5.1" />
+      <group targetFramework=".NETFramework4.6" />
       <group targetFramework=".NETFramework4.6.1" />
-      <group targetFramework=".NETStandard2.0" />
       <group targetFramework=".NETCoreApp2.0" />
+      <group targetFramework=".NETStandard2.0" />
     </dependencies>
   </metadata>
   <files>

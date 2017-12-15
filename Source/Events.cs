@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace EntityWorker.Core
+﻿namespace EntityWorker.Core
 {
     public abstract class Events
     {
