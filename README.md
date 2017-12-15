@@ -280,7 +280,7 @@ There is many attributes you could use to make your code better
 [ForeignKey]
 
 /// <summary>
-/// This attr will tell LightDataTable abstract to not auto Delete this object when deleting parent,
+/// This attr will tell EntityWorker.Core abstract to not auto Delete this object when deleting parent,
 /// it will however try to create new or update  
 /// </summary>
 [IndependentData]
@@ -320,8 +320,6 @@ There is many attributes you could use to make your code better
 [Table]
 
 ```
-
-
 
 
 ## Issues
