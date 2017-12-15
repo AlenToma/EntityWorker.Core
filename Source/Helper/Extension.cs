@@ -125,14 +125,17 @@ namespace EntityWorker.Core.Helper
         {
             if (CachedActualType.ContainsKey(type))
                 return CachedActualType[type];
-            else if (type.GetTypeInfo().IsArray)
-                CachedActualType.Add(type, type.GetElementType());
-            else if (type.GenericTypeArguments.Any())
-                CachedActualType.Add(type, type.GenericTypeArguments.First());
-            else if (type.FullName?.Contains("List`1") ?? false)
-                CachedActualType.Add(type, type.GetRuntimeProperty("Item").PropertyType);
-            else
-                CachedActualType.Add(type, type);
+            lock (CachedActualType)
+            {
+                if (type.GetTypeInfo().IsArray)
+                    CachedActualType.Add(type, type.GetElementType());
+                else if (type.GenericTypeArguments.Any())
+                    CachedActualType.Add(type, type.GenericTypeArguments.First());
+                else if (type.FullName?.Contains("List`1") ?? false)
+                    CachedActualType.Add(type, type.GetRuntimeProperty("Item").PropertyType);
+                else
+                    CachedActualType.Add(type, type);
+            }
 
             return CachedActualType[type];
         }
