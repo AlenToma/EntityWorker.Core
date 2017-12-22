@@ -1,7 +1,7 @@
 {
   "runtimeTarget": {
     "name": ".NETStandard,Version=v2.0/",
-    "signature": "79b6249d0506a4f7ae2357ed7784210bba7b1504"
+    "signature": "4fbe9443b1da06a379eb2ad672ad918adaabfbfa"
   },
   "compilationOptions": {},
   "targets": {
@@ -10,16 +10,16 @@
       "EntityWorker.Core/1.0.0": {
         "dependencies": {
           "FastDeepCloner": "1.0.21",
-          "Microsoft.CSharp": "4.4.0",
+          "Microsoft.CSharp": "4.4.1",
           "Microsoft.Data.Sqlite": "2.0.0",
           "NETStandard.Library": "2.0.0",
-          "System.Data.SqlClient": "4.4.0"
+          "System.Data.SqlClient": "4.4.2"
         },
         "runtime": {
           "EntityWorker.Core.dll": {}
         }
       },
-      "Microsoft.CSharp/4.4.0": {
+      "Microsoft.CSharp/4.4.1": {
         "runtime": {
           "lib/netstandard2.0/Microsoft.CSharp.dll": {}
         }
@@ -89,7 +89,7 @@
           "System.Runtime": "4.3.0"
         }
       },
-      "System.Data.SqlClient/4.4.0": {
+      "System.Data.SqlClient/4.4.2": {
         "dependencies": {
           "Microsoft.Win32.Registry": "4.4.0",
           "System.Diagnostics.DiagnosticSource": "4.4.1",
@@ -221,12 +221,12 @@
       "serviceable": false,
       "sha512": ""
     },
-    "Microsoft.CSharp/4.4.0": {
+    "Microsoft.CSharp/4.4.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-vvVR/B08YVghQ4jHEloxqw2ZWzEGE1AOA5E0DioUM3ujbXz6FD3AfB/0Jl2ohJPd0nXYGwmPe1En6HTsSriq1A==",
-      "path": "microsoft.csharp/4.4.0",
-      "hashPath": "microsoft.csharp.4.4.0.nupkg.sha512"
+      "sha512": "sha512-A5hI3gk6WpcBI0QGZY6/d5CCaYUxJgi7iENn1uYEng+Olo8RfI5ReGVkjXjeu3VR3srLvVYREATXa2M0X7FYJA==",
+      "path": "microsoft.csharp/4.4.1",
+      "hashPath": "microsoft.csharp.4.4.1.nupkg.sha512"
     },
     "Microsoft.Data.Sqlite/2.0.0": {
       "type": "package",
@@ -319,12 +319,12 @@
       "path": "system.collections/4.3.0",
       "hashPath": "system.collections.4.3.0.nupkg.sha512"
     },
-    "System.Data.SqlClient/4.4.0": {
+    "System.Data.SqlClient/4.4.2": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-fxb9ghn1k1Ua7FFdlvtiBOD4/PsQvD/fk2KnhS+FK7VC6OggEx6P+lP1P0+KMb5V2dqS1+FbR7HCenoqzJMNIA==",
-      "path": "system.data.sqlclient/4.4.0",
-      "hashPath": "system.data.sqlclient.4.4.0.nupkg.sha512"
+      "sha512": "sha512-Bv5J2EBAdP7FSgehKYN4O6iw1AaZrw4rFFqwt9vZSjRvC70FpwP2d9UG4aTaI2wh3vfrBKK+tjewowGM2Y6c1w==",
+      "path": "system.data.sqlclient/4.4.2",
+      "hashPath": "system.data.sqlclient.4.4.2.nupkg.sha512"
     },
     "System.Diagnostics.Debug/4.3.0": {
       "type": "package",

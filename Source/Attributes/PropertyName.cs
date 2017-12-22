@@ -2,6 +2,9 @@
 
 namespace EntityWorker.Core.Attributes
 {
+    /// <summary>
+    /// Have diffrent Name for the property in the database
+    /// </summary>
     [AttributeUsage(AttributeTargets.Property, Inherited = false)]
     public sealed class PropertyName : Attribute
     {

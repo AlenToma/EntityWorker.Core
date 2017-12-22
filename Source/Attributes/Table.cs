@@ -2,6 +2,9 @@
 
 namespace EntityWorker.Core.Attributes
 {
+    /// <summary>
+    /// Define diffrent name for the table
+    /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public sealed class Table : Attribute
     {

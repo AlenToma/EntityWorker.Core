@@ -46,6 +46,8 @@ namespace EntityWorker.Core.Interface
 
         void RemoveAll(Func<T, bool> match);
 
+        void SaveChanges();
+
         ILightDataTable ToTable();
 
         List<TSource> ExecuteAndConvertToType<TSource>() where TSource : class;

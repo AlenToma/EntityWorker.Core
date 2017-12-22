@@ -2,7 +2,7 @@
   "version": 3,
   "targets": {
     ".NETCoreApp,Version=v2.0": {
-      "Microsoft.CSharp/4.4.0": {
+      "Microsoft.CSharp/4.4.1": {
         "type": "package",
         "compile": {
           "ref/netcoreapp2.0/_._": {}
@@ -380,7 +380,7 @@
           "lib/netstandard1.1/SQLitePCLRaw.provider.e_sqlite3.dll": {}
         }
       },
-      "System.Data.SqlClient/4.4.0": {
+      "System.Data.SqlClient/4.4.2": {
         "type": "package",
         "dependencies": {
           "Microsoft.Win32.Registry": "4.4.0",
@@ -480,7 +480,7 @@
       }
     },
     ".NETFramework,Version=v4.5.1": {
-      "Microsoft.CSharp/4.4.0": {
+      "Microsoft.CSharp/4.4.1": {
         "type": "package",
         "frameworkAssemblies": [
           "Microsoft.CSharp"
@@ -505,7 +505,7 @@
           "lib/net451/System.Data.Common.dll": {}
         }
       },
-      "System.Data.SqlClient/4.4.0": {
+      "System.Data.SqlClient/4.4.2": {
         "type": "package",
         "dependencies": {
           "System.Data.Common": "4.3.0"
@@ -551,7 +551,7 @@
       }
     },
     ".NETFramework,Version=v4.6": {
-      "Microsoft.CSharp/4.4.0": {
+      "Microsoft.CSharp/4.4.1": {
         "type": "package",
         "frameworkAssemblies": [
           "Microsoft.CSharp"
@@ -576,7 +576,7 @@
           "lib/net451/System.Data.Common.dll": {}
         }
       },
-      "System.Data.SqlClient/4.4.0": {
+      "System.Data.SqlClient/4.4.2": {
         "type": "package",
         "dependencies": {
           "System.Data.Common": "4.3.0"
@@ -626,7 +626,7 @@
       }
     },
     ".NETFramework,Version=v4.6.1": {
-      "Microsoft.CSharp/4.4.0": {
+      "Microsoft.CSharp/4.4.1": {
         "type": "package",
         "frameworkAssemblies": [
           "Microsoft.CSharp"
@@ -638,7 +638,7 @@
           "lib/net45/_._": {}
         }
       },
-      "System.Data.SqlClient/4.4.0": {
+      "System.Data.SqlClient/4.4.2": {
         "type": "package",
         "frameworkAssemblies": [
           "System.Data",
@@ -686,7 +686,7 @@
       }
     },
     ".NETStandard,Version=v2.0": {
-      "Microsoft.CSharp/4.4.0": {
+      "Microsoft.CSharp/4.4.1": {
         "type": "package",
         "compile": {
           "ref/netstandard2.0/Microsoft.CSharp.dll": {}
@@ -839,7 +839,7 @@
           "ref/netstandard1.3/_._": {}
         }
       },
-      "System.Data.SqlClient/4.4.0": {
+      "System.Data.SqlClient/4.4.2": {
         "type": "package",
         "dependencies": {
           "Microsoft.Win32.Registry": "4.4.0",
@@ -1059,10 +1059,10 @@
     }
   },
   "libraries": {
-    "Microsoft.CSharp/4.4.0": {
-      "sha512": "vvVR/B08YVghQ4jHEloxqw2ZWzEGE1AOA5E0DioUM3ujbXz6FD3AfB/0Jl2ohJPd0nXYGwmPe1En6HTsSriq1A==",
+    "Microsoft.CSharp/4.4.1": {
+      "sha512": "A5hI3gk6WpcBI0QGZY6/d5CCaYUxJgi7iENn1uYEng+Olo8RfI5ReGVkjXjeu3VR3srLvVYREATXa2M0X7FYJA==",
       "type": "package",
-      "path": "microsoft.csharp/4.4.0",
+      "path": "microsoft.csharp/4.4.1",
       "files": [
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
@@ -1081,7 +1081,7 @@
         "lib/xamarinmac20/_._",
         "lib/xamarintvos10/_._",
         "lib/xamarinwatchos10/_._",
-        "microsoft.csharp.4.4.0.nupkg.sha512",
+        "microsoft.csharp.4.4.1.nupkg.sha512",
         "microsoft.csharp.nuspec",
         "ref/MonoAndroid10/_._",
         "ref/MonoTouch10/_._",
@@ -1957,10 +1957,10 @@
         "system.data.common.nuspec"
       ]
     },
-    "System.Data.SqlClient/4.4.0": {
-      "sha512": "fxb9ghn1k1Ua7FFdlvtiBOD4/PsQvD/fk2KnhS+FK7VC6OggEx6P+lP1P0+KMb5V2dqS1+FbR7HCenoqzJMNIA==",
+    "System.Data.SqlClient/4.4.2": {
+      "sha512": "Bv5J2EBAdP7FSgehKYN4O6iw1AaZrw4rFFqwt9vZSjRvC70FpwP2d9UG4aTaI2wh3vfrBKK+tjewowGM2Y6c1w==",
       "type": "package",
-      "path": "system.data.sqlclient/4.4.0",
+      "path": "system.data.sqlclient/4.4.2",
       "files": [
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
@@ -2017,7 +2017,7 @@
         "runtimes/win/lib/net461/System.Data.SqlClient.dll",
         "runtimes/win/lib/netstandard1.3/System.Data.SqlClient.dll",
         "runtimes/win/lib/netstandard2.0/System.Data.SqlClient.dll",
-        "system.data.sqlclient.4.4.0.nupkg.sha512",
+        "system.data.sqlclient.4.4.2.nupkg.sha512",
         "system.data.sqlclient.nuspec",
         "useSharedDesignerContext.txt",
         "version.txt"
@@ -2955,35 +2955,35 @@
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.0": [
       "FastDeepCloner >= 1.0.21",
-      "Microsoft.CSharp >= 4.4.0",
+      "Microsoft.CSharp >= 4.4.1",
       "Microsoft.Data.Sqlite >= 2.0.0",
       "Microsoft.NETCore.App >= 2.0.0",
-      "System.Data.SqlClient >= 4.4.0"
+      "System.Data.SqlClient >= 4.4.2"
     ],
     ".NETFramework,Version=v4.5.1": [
       "FastDeepCloner >= 1.0.21",
-      "Microsoft.CSharp >= 4.4.0",
+      "Microsoft.CSharp >= 4.4.1",
       "System.Data.SQLite.Core >= 1.0.106",
-      "System.Data.SqlClient >= 4.4.0"
+      "System.Data.SqlClient >= 4.4.2"
     ],
     ".NETFramework,Version=v4.6": [
       "FastDeepCloner >= 1.0.21",
-      "Microsoft.CSharp >= 4.4.0",
+      "Microsoft.CSharp >= 4.4.1",
       "System.Data.SQLite.Core >= 1.0.106",
-      "System.Data.SqlClient >= 4.4.0"
+      "System.Data.SqlClient >= 4.4.2"
     ],
     ".NETFramework,Version=v4.6.1": [
       "FastDeepCloner >= 1.0.21",
-      "Microsoft.CSharp >= 4.4.0",
+      "Microsoft.CSharp >= 4.4.1",
       "System.Data.SQLite.Core >= 1.0.106",
-      "System.Data.SqlClient >= 4.4.0"
+      "System.Data.SqlClient >= 4.4.2"
     ],
     ".NETStandard,Version=v2.0": [
       "FastDeepCloner >= 1.0.21",
-      "Microsoft.CSharp >= 4.4.0",
+      "Microsoft.CSharp >= 4.4.1",
       "Microsoft.Data.Sqlite >= 2.0.0",
       "NETStandard.Library >= 2.0.0",
-      "System.Data.SqlClient >= 4.4.0"
+      "System.Data.SqlClient >= 4.4.2"
     ]
   },
   "packageFolders": {
@@ -3075,7 +3075,7 @@
           "Microsoft.CSharp": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "[4.4.0, )"
+            "version": "[4.4.1, )"
           },
           "Microsoft.Data.Sqlite": {
             "suppressParent": "All",
@@ -3091,7 +3091,7 @@
           "System.Data.SqlClient": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "[4.4.0, )"
+            "version": "[4.4.2, )"
           }
         },
         "imports": [
@@ -3105,7 +3105,7 @@
           "Microsoft.CSharp": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "[4.4.0, )"
+            "version": "[4.4.1, )"
           },
           "System.Data.SQLite.Core": {
             "suppressParent": "All",
@@ -3115,7 +3115,7 @@
           "System.Data.SqlClient": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "[4.4.0, )"
+            "version": "[4.4.2, )"
           }
         }
       },
@@ -3124,7 +3124,7 @@
           "Microsoft.CSharp": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "[4.4.0, )"
+            "version": "[4.4.1, )"
           },
           "System.Data.SQLite.Core": {
             "suppressParent": "All",
@@ -3134,7 +3134,7 @@
           "System.Data.SqlClient": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "[4.4.0, )"
+            "version": "[4.4.2, )"
           }
         }
       },
@@ -3143,7 +3143,7 @@
           "Microsoft.CSharp": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "[4.4.0, )"
+            "version": "[4.4.1, )"
           },
           "System.Data.SQLite.Core": {
             "suppressParent": "All",
@@ -3153,7 +3153,7 @@
           "System.Data.SqlClient": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "[4.4.0, )"
+            "version": "[4.4.2, )"
           }
         }
       },
@@ -3162,7 +3162,7 @@
           "Microsoft.CSharp": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "[4.4.0, )"
+            "version": "[4.4.1, )"
           },
           "Microsoft.Data.Sqlite": {
             "suppressParent": "All",
@@ -3178,7 +3178,7 @@
           "System.Data.SqlClient": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "[4.4.0, )"
+            "version": "[4.4.2, )"
           }
         },
         "imports": [

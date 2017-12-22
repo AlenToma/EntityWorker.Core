@@ -198,6 +198,11 @@ namespace EntityWorker.Core.Object.Library
                 base.Remove(item);
         }
 
+        public void SaveChanges()
+        {
+            _repository.SaveChanges();
+        }
+
         public ILightDataTable ToTable()
         {
             return new LightDataTable(Execute());
