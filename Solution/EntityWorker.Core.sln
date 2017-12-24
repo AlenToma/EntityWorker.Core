@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EntityWorker.Core", "..\Sou
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Generic.LightDataTable", "..\..\LightDataTable.Core\source\LightDataTable.Core\Generic.LightDataTable.csproj", "{4999380E-6382-4170-ABC8-867D6C62524E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FastDeepCloner", "..\..\FastDeepCloner\FastDeepCloner-New-\FastDeepCloner.csproj", "{A533E4E4-1AC5-4B53-A617-405298DB047A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FastDeepCloner", "..\..\FastDeepCloner\FastDeepCloner.csproj", "{A533E4E4-1AC5-4B53-A617-405298DB047A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

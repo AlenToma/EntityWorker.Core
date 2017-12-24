@@ -258,9 +258,16 @@ namespace EntityWorker.Core.Transaction
                 type = Nullable.GetUnderlyingType(type);
             if (type.GetTypeInfo().IsEnum)
                 type = typeof(long);
-
-            var param = new SqlParameter("", type.CreateInstance());
-            return param.SqlDbType;
+            try
+            {
+                var param = new SqlParameter("", type == typeof(byte[]) ? new byte[0] : type.CreateInstance());
+                return param.SqlDbType;
+            }
+            catch
+            {
+                var param = new SqlParameter("", new object());
+                return param.SqlDbType;
+            }
         }
 
         /// <summary>

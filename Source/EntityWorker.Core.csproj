@@ -44,7 +44,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\FastDeepCloner\FastDeepCloner-New-\FastDeepCloner.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\..\FastDeepCloner\FastDeepCloner.csproj" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CSharp" Version="4.4.1" PrivateAssets="all" />
     <PackageReference Include="System.Data.SqlClient" Version="4.4.2" PrivateAssets="all" />
   </ItemGroup>

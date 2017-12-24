@@ -334,7 +334,7 @@ namespace EntityWorker.Core
                             _repository.Attach(data);
 
                         var changes = _repository.GetObjectChanges(o as DbEntity);
-                        foreach (var item in props.Where(x => !changes.ContainsKey(x.Name) && x.IsInternalType))
+                        foreach (var item in props.Where(x => x.CanRead && !changes.ContainsKey(x.Name) && x.IsInternalType))
                             item.SetValue(o, item.GetValue(data));
                     }
                 }
@@ -344,7 +344,7 @@ namespace EntityWorker.Core
 
                 o.State = ItemState.Added;// reset State
                 var sql = "UPDATE [" + (o.GetType().GetCustomAttribute<Table>()?.Name ?? o.GetType().Name) + "] SET ";
-                var cols = props.FindAll(x => availableColumns.FindByPrimaryKey<bool>(x.GetPropertyName()) && x.IsInternalType && x.GetCustomAttribute<ExcludeFromAbstract>() == null && x.GetCustomAttribute<PrimaryKey>() == null);
+                var cols = props.FindAll(x => availableColumns.FindByPrimaryKey<bool>(x.GetPropertyName()) && x.IsInternalType && !x.ContainAttribute<ExcludeFromAbstract>() && x.GetCustomAttribute<PrimaryKey>() == null);
                 if (!primaryKey.HasValue)
                 {
                     sql = "INSERT INTO [" + tableName + "](" + string.Join(",", cols.Select(x => "[" + x.GetPropertyName() + "]")) + ") Values(";
@@ -401,7 +401,7 @@ namespace EntityWorker.Core
                     return primaryKey.Value;
                 dbTrigger?.GetType().GetMethod("AfterSave").Invoke(dbTrigger, new List<object>() { _repository, o, primaryKey.Value }.ToArray()); // Check the Rule before save
 
-                foreach (var prop in props.Where(x => !x.IsInternalType && x.GetCustomAttribute<ExcludeFromAbstract>() == null && typeof(IDbEntity).IsAssignableFrom(x.PropertyType.GetActualType())))
+                foreach (var prop in props.Where(x => !x.IsInternalType && !x.ContainAttribute<ExcludeFromAbstract>() && typeof(IDbEntity).IsAssignableFrom(x.PropertyType.GetActualType())))
                 {
                     var independentData = prop.GetCustomAttribute<IndependentData>() != null;
                     var type = prop.PropertyType.GetActualType();

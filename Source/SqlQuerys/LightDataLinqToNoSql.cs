@@ -53,6 +53,7 @@ namespace EntityWorker.Core.SqlQuerys
         {
             get
             {
+                WhereClause.RemoveAll(x => string.IsNullOrEmpty(x));
                 var tableName = typeof(T).GetCustomAttribute<Table>()?.Name ?? typeof(T).Name;
                 var query = "SELECT distinct " + string.Join(",", _columns) + " FROM [" + tableName + "] " + System.Environment.NewLine +
                        string.Join(System.Environment.NewLine, JoinClauses.Values.Select(x => x.Item2)) +

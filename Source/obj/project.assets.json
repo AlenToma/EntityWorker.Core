@@ -2948,8 +2948,8 @@
     },
     "FastDeepCloner/1.0.21": {
       "type": "project",
-      "path": "../../FastDeepCloner/FastDeepCloner-New-/FastDeepCloner.csproj",
-      "msbuildProject": "../../FastDeepCloner/FastDeepCloner-New-/FastDeepCloner.csproj"
+      "path": "../../FastDeepCloner/FastDeepCloner.csproj",
+      "msbuildProject": "../../FastDeepCloner/FastDeepCloner.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -3024,40 +3024,40 @@
       "frameworks": {
         "netcoreapp2.0": {
           "projectReferences": {
-            "D:\\Projects\\FastDeepCloner\\FastDeepCloner-New-\\FastDeepCloner.csproj": {
-              "projectPath": "D:\\Projects\\FastDeepCloner\\FastDeepCloner-New-\\FastDeepCloner.csproj",
+            "D:\\Projects\\FastDeepCloner\\FastDeepCloner.csproj": {
+              "projectPath": "D:\\Projects\\FastDeepCloner\\FastDeepCloner.csproj",
               "privateAssets": "all"
             }
           }
         },
         "net451": {
           "projectReferences": {
-            "D:\\Projects\\FastDeepCloner\\FastDeepCloner-New-\\FastDeepCloner.csproj": {
-              "projectPath": "D:\\Projects\\FastDeepCloner\\FastDeepCloner-New-\\FastDeepCloner.csproj",
+            "D:\\Projects\\FastDeepCloner\\FastDeepCloner.csproj": {
+              "projectPath": "D:\\Projects\\FastDeepCloner\\FastDeepCloner.csproj",
               "privateAssets": "all"
             }
           }
         },
         "net46": {
           "projectReferences": {
-            "D:\\Projects\\FastDeepCloner\\FastDeepCloner-New-\\FastDeepCloner.csproj": {
-              "projectPath": "D:\\Projects\\FastDeepCloner\\FastDeepCloner-New-\\FastDeepCloner.csproj",
+            "D:\\Projects\\FastDeepCloner\\FastDeepCloner.csproj": {
+              "projectPath": "D:\\Projects\\FastDeepCloner\\FastDeepCloner.csproj",
               "privateAssets": "all"
             }
           }
         },
         "net461": {
           "projectReferences": {
-            "D:\\Projects\\FastDeepCloner\\FastDeepCloner-New-\\FastDeepCloner.csproj": {
-              "projectPath": "D:\\Projects\\FastDeepCloner\\FastDeepCloner-New-\\FastDeepCloner.csproj",
+            "D:\\Projects\\FastDeepCloner\\FastDeepCloner.csproj": {
+              "projectPath": "D:\\Projects\\FastDeepCloner\\FastDeepCloner.csproj",
               "privateAssets": "all"
             }
           }
         },
         "netstandard2.0": {
           "projectReferences": {
-            "D:\\Projects\\FastDeepCloner\\FastDeepCloner-New-\\FastDeepCloner.csproj": {
-              "projectPath": "D:\\Projects\\FastDeepCloner\\FastDeepCloner-New-\\FastDeepCloner.csproj",
+            "D:\\Projects\\FastDeepCloner\\FastDeepCloner.csproj": {
+              "projectPath": "D:\\Projects\\FastDeepCloner\\FastDeepCloner.csproj",
               "privateAssets": "all"
             }
           }

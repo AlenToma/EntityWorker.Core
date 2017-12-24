@@ -26,7 +26,7 @@ namespace EntityWorker.Core.Helper
             {typeof(bool), "BIT"},
             {typeof(DateTime), "DATETIME"},
             {typeof(float), "FLOAT"},
-            {typeof(decimal), "DECIMAL(18,0)"},
+            {typeof(decimal), "DECIMAL(18,5)"},
             {typeof(Guid), "UNIQUEIDENTIFIER"},
             {typeof(byte[]), "varbinary(MAX)"},
         };
