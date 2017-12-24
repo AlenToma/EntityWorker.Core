@@ -1,9 +1,10 @@
 # Introduction EntityWorker.Core
 ## Nuget
-there is no nuget package yet
+https://www.nuget.org/packages/EntityWorker.Core/
 
 ## EntityWorker.Core in Action
-https://www.nuget.org/packages/EntityWorker.Core/
+https://github.com/AlenToma/LightData.CMS
+
 ## .NET FRAMEWORK SUPPORT 
 1- .NETCoreApp 2.0
 
