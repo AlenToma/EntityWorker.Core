@@ -427,7 +427,7 @@ namespace EntityWorker.Core
                     Save(o, false);
 
                 o.GetType().GetPrimaryKey().SetValue(o, primaryKey.Value);
-                _repository.Attach(o as DbEntity);
+                _repository.Attach(o as DbEntity, true);
                 return primaryKey.Value;
             }
             catch

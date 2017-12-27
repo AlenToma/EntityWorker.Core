@@ -130,7 +130,7 @@ namespace EntityWorker.Core.InterFace
         /// </summary>
         /// <param name="objcDbEntity"></param>
 
-        void Attach(DbEntity objcDbEntity);
+        void Attach(DbEntity objcDbEntity, bool overwrite = false);
 
         /// <summary>
         /// Get Entity 

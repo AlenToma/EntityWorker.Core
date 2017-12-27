@@ -1,13 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2009
+VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EntityWorker.Core", "..\Source\EntityWorker.Core.csproj", "{8B949BC6-F09C-460E-91F9-590611036B4E}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Generic.LightDataTable", "..\..\LightDataTable.Core\source\LightDataTable.Core\Generic.LightDataTable.csproj", "{4999380E-6382-4170-ABC8-867D6C62524E}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FastDeepCloner", "..\..\FastDeepCloner\FastDeepCloner.csproj", "{A533E4E4-1AC5-4B53-A617-405298DB047A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,22 +21,6 @@ Global
 		{8B949BC6-F09C-460E-91F9-590611036B4E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8B949BC6-F09C-460E-91F9-590611036B4E}.Release|x64.ActiveCfg = Release|Any CPU
 		{8B949BC6-F09C-460E-91F9-590611036B4E}.Release|x64.Build.0 = Release|Any CPU
-		{4999380E-6382-4170-ABC8-867D6C62524E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4999380E-6382-4170-ABC8-867D6C62524E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4999380E-6382-4170-ABC8-867D6C62524E}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{4999380E-6382-4170-ABC8-867D6C62524E}.Debug|x64.Build.0 = Debug|Any CPU
-		{4999380E-6382-4170-ABC8-867D6C62524E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4999380E-6382-4170-ABC8-867D6C62524E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4999380E-6382-4170-ABC8-867D6C62524E}.Release|x64.ActiveCfg = Release|Any CPU
-		{4999380E-6382-4170-ABC8-867D6C62524E}.Release|x64.Build.0 = Release|Any CPU
-		{A533E4E4-1AC5-4B53-A617-405298DB047A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A533E4E4-1AC5-4B53-A617-405298DB047A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A533E4E4-1AC5-4B53-A617-405298DB047A}.Debug|x64.ActiveCfg = Debug|x64
-		{A533E4E4-1AC5-4B53-A617-405298DB047A}.Debug|x64.Build.0 = Debug|x64
-		{A533E4E4-1AC5-4B53-A617-405298DB047A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A533E4E4-1AC5-4B53-A617-405298DB047A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A533E4E4-1AC5-4B53-A617-405298DB047A}.Release|x64.ActiveCfg = Release|x64
-		{A533E4E4-1AC5-4B53-A617-405298DB047A}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

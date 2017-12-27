@@ -1,0 +1,9 @@
+D:\Projects\EntityWorker.Core\Source\bin\Release\netcoreapp2.0\EntityWorker.xml
+D:\Projects\EntityWorker.Core\Source\bin\Release\netcoreapp2.0\EntityWorker.Core.deps.json
+D:\Projects\EntityWorker.Core\Source\bin\Release\netcoreapp2.0\EntityWorker.Core.dll
+D:\Projects\EntityWorker.Core\Source\bin\Release\netcoreapp2.0\EntityWorker.Core.pdb
+D:\Projects\EntityWorker.Core\Source\obj\Release\netcoreapp2.0\EntityWorker.Core.csproj.CoreCompileInputs.cache
+D:\Projects\EntityWorker.Core\Source\obj\Release\netcoreapp2.0\EntityWorker.Core.AssemblyInfoInputs.cache
+D:\Projects\EntityWorker.Core\Source\obj\Release\netcoreapp2.0\EntityWorker.Core.AssemblyInfo.cs
+D:\Projects\EntityWorker.Core\Source\obj\Release\netcoreapp2.0\EntityWorker.Core.dll
+D:\Projects\EntityWorker.Core\Source\obj\Release\netcoreapp2.0\EntityWorker.Core.pdb

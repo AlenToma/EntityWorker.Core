@@ -339,7 +339,7 @@ namespace EntityWorker.Core.Transaction
         /// Attach object to WorkEntity to track changes
         /// </summary>
         /// <param name="objcDbEntity"></param>
-        public void Attach(DbEntity objcDbEntity)
+        public void Attach(DbEntity objcDbEntity, bool overwrite = false)
         {
             if (objcDbEntity == null)
                 throw new NullReferenceException("DbEntity cant be null");
@@ -349,8 +349,11 @@ namespace EntityWorker.Core.Transaction
             lock (_attachedObjects)
             {
                 if (_attachedObjects.ContainsKey(key))
-                    _attachedObjects.Remove(key);
-                _attachedObjects.Add(key, objcDbEntity);
+                    if (overwrite)
+                        _attachedObjects.Remove(key);
+
+                if (!_attachedObjects.ContainsKey(key))
+                    _attachedObjects.Add(key, objcDbEntity.Clone());
             }
         }
 

@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>EntityWorker.Core</id>
+    <version>1.0.2</version>
+    <authors>Alen Toma</authors>
+    <owners>Alen Toma</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/AlenToma/EntityWorker.Core</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/icon.gif</iconUrl>
+    <description>EntityWorker is an object-relation mapper that enable .NET developers to work with relations data using objects. EntityWorker is an alternative to entityframwork. is more flexible and much faster than entity framework.</description>
+    <copyright>Copyright (c) 2017 Alen Toma</copyright>
+    <tags>object-relation mappar LinqToSql alternative-to-entityframework C# System.Reflection generic Microsoft EntityFramework EF Database Data O/RM ADO.NET</tags>
+    <dependencies>
+      <group targetFramework=".NETFramework4.5.1">
+        <dependency id="FastDeepCloner" version="1.0.22" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.CSharp" version="4.4.1" exclude="Build,Analyzers" />
+        <dependency id="System.Data.SQLite.Core" version="1.0.106" exclude="Build,Analyzers" />
+        <dependency id="System.Data.SqlClient" version="4.4.2" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETFramework4.6">
+        <dependency id="FastDeepCloner" version="1.0.22" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.CSharp" version="4.4.1" exclude="Build,Analyzers" />
+        <dependency id="System.Data.SQLite.Core" version="1.0.106" exclude="Build,Analyzers" />
+        <dependency id="System.Data.SqlClient" version="4.4.2" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETFramework4.6.1">
+        <dependency id="FastDeepCloner" version="1.0.22" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.CSharp" version="4.4.1" exclude="Build,Analyzers" />
+        <dependency id="System.Data.SQLite.Core" version="1.0.106" exclude="Build,Analyzers" />
+        <dependency id="System.Data.SqlClient" version="4.4.2" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETCoreApp2.0">
+        <dependency id="FastDeepCloner" version="1.0.22" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.CSharp" version="4.4.1" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Data.Sqlite" version="2.0.0" exclude="Build,Analyzers" />
+        <dependency id="System.Data.SqlClient" version="4.4.2" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="FastDeepCloner" version="1.0.22" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.CSharp" version="4.4.1" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Data.Sqlite" version="2.0.0" exclude="Build,Analyzers" />
+        <dependency id="System.Data.SqlClient" version="4.4.2" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="D:\Projects\EntityWorker.Core\Source\bin\Release\net451\EntityWorker.Core.dll" target="lib\net451\EntityWorker.Core.dll" />
+    <file src="D:\Projects\EntityWorker.Core\Source\bin\Release\net451\EntityWorker.xml" target="lib\net451\EntityWorker.xml" />
+    <file src="D:\Projects\EntityWorker.Core\Source\bin\Release\net46\EntityWorker.Core.dll" target="lib\net46\EntityWorker.Core.dll" />
+    <file src="D:\Projects\EntityWorker.Core\Source\bin\Release\net46\EntityWorker.xml" target="lib\net46\EntityWorker.xml" />
+    <file src="D:\Projects\EntityWorker.Core\Source\bin\Release\net461\EntityWorker.Core.dll" target="lib\net461\EntityWorker.Core.dll" />
+    <file src="D:\Projects\EntityWorker.Core\Source\bin\Release\net461\EntityWorker.xml" target="lib\net461\EntityWorker.xml" />
+    <file src="D:\Projects\EntityWorker.Core\Source\bin\Release\netcoreapp2.0\EntityWorker.Core.dll" target="lib\netcoreapp2.0\EntityWorker.Core.dll" />
+    <file src="D:\Projects\EntityWorker.Core\Source\bin\Release\netcoreapp2.0\EntityWorker.xml" target="lib\netcoreapp2.0\EntityWorker.xml" />
+    <file src="D:\Projects\EntityWorker.Core\Source\bin\Release\netstandard2.0\EntityWorker.Core.dll" target="lib\netstandard2.0\EntityWorker.Core.dll" />
+    <file src="D:\Projects\EntityWorker.Core\Source\bin\Release\netstandard2.0\EntityWorker.xml" target="lib\netstandard2.0\EntityWorker.xml" />
+  </files>
+</package>
