@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using EntityWorker.Core.Attributes;
 using EntityWorker.Core.Helper;
+using EntityWorker.Core.Object.Library;
 using FastDeepCloner;
 
 namespace EntityWorker.Core.SqlQuerys
@@ -123,10 +124,34 @@ namespace EntityWorker.Core.SqlQuerys
             }
         }
 
+        private object GetValue(MemberExpression member)
+        {
+            var objectMember = Expression.Convert(member, typeof(object));
+
+            var getterLambda = Expression.Lambda<Func<object>>(objectMember);
+
+            var getter = getterLambda.Compile();
+
+            return getter();
+        }
+
+        public string GetInvert()
+        {
+            var key = "NOT ";
+            var str = sb.ToString().Substring(sb.Length - key.Length);
+            if (str == key)
+            {
+                sb = sb.Remove(sb.Length - key.Length, key.Length);
+                return key;
+            }
+            return string.Empty;
+        }
+
         protected override Expression VisitMethodCall(MethodCallExpression m)
         {
             if (m.Method.DeclaringType == typeof(Queryable) || (m.Method.Name == "Any"))
             {
+                var invert = GetInvert();
                 var typecast = m.Arguments.First().Type.GenericTypeArguments.First();
                 var type = typeof(LightDataLinqToNoSql<>).MakeGenericType(typecast);
                 var cl = Activator.CreateInstance(type) as dynamic;
@@ -135,6 +160,8 @@ namespace EntityWorker.Core.SqlQuerys
                 cl.Translate(m.Arguments.Last() as Expression);
                 cl._overridedNodeType = ExpressionType.MemberAccess;
                 cl.Visit(m.Arguments[0]);
+                if (!string.IsNullOrEmpty(invert))
+                    sb.Append(invert);
                 sb.Append(cl.QuaryExist);
                 cl._overridedNodeType = null;
                 _generatedKeys = cl._generatedKeys;
@@ -153,19 +180,25 @@ namespace EntityWorker.Core.SqlQuerys
             else if (m.Method.Name == "Contains")
             {
                 var ex = (((MemberExpression)m.Object).Expression as ConstantExpression);
+                
                 if (ex == null)
                 {
+                    var invert = GetInvert();
                     //(m.Arguments[0] as MemberExpression).Expression as ConstantExpression
                     var value = GetSingleValue(m.Arguments[0]);
                     this.Visit(m.Object);
+                    if (!string.IsNullOrEmpty(invert))
+                        sb.Append(invert);
                     sb.Append(" like ");
                     var v = string.Format("String[%{0}%]", value);
                     sb.Append(v);
                 }
                 else
                 {
-
+                    var invert = GetInvert();
                     this.Visit(m.Arguments[0]);
+                    if (!string.IsNullOrEmpty(invert))
+                        sb.Append(invert);
                     sb.Append(" in ");
                     sb.Append("(");
                     this.Visit(ex);
@@ -178,15 +211,21 @@ namespace EntityWorker.Core.SqlQuerys
                 var ex = (((MemberExpression)m.Object).Expression as ConstantExpression);
                 if (ex == null)
                 {
+                    var invert = GetInvert();
                     var value = GetSingleValue(m.Arguments[0]);
                     this.Visit(m.Object);
+                    if (!string.IsNullOrEmpty(invert))
+                        sb.Append(invert);
                     sb.Append(" like ");
                     var v = string.Format("String[{0}%]", value);
                     sb.Append(v);
                 }
                 else
                 {
+                    var invert = GetInvert();
                     this.Visit(m.Arguments[0]);
+                    if (!string.IsNullOrEmpty(invert))
+                        sb.Append(invert);
                     sb.Append(" like ");
                     var v = string.Format("String[{0}%]", ex.Value.GetType().GetFields().First().GetValue(ex.Value));
                     sb.Append(v);
@@ -199,15 +238,21 @@ namespace EntityWorker.Core.SqlQuerys
                 var ex = (((MemberExpression)m.Object).Expression as ConstantExpression);
                 if (ex == null)
                 {
+                    var invert = GetInvert();
                     var value = GetSingleValue(m.Arguments[0]);
                     this.Visit(m.Object);
+                    if (!string.IsNullOrEmpty(invert))
+                        sb.Append(invert);
                     sb.Append(" like ");
                     var v = string.Format("String[%{0}]", value);
                     sb.Append(v);
                 }
                 else
                 {
+                    var invert = GetInvert();
                     this.Visit(m.Arguments[0]);
+                    if (!string.IsNullOrEmpty(invert))
+                        sb.Append(invert);
                     sb.Append(" like ");
                     var v = string.Format("String[%{0}]", ex.Value.GetType().GetFields().First().GetValue(ex.Value));
                     sb.Append(v);
@@ -241,6 +286,10 @@ namespace EntityWorker.Core.SqlQuerys
                 {
                     return null;
                 }
+            }
+            else if (m.Method.ReturnType.IsInternalType())
+            {
+                sb.Append(ValuetoSql(Expression.Lambda(m).Compile().DynamicInvoke()));
             }
 
             throw new NotSupportedException(string.Format("The method '{0}' is not supported", m.Method.Name));
@@ -457,90 +506,113 @@ namespace EntityWorker.Core.SqlQuerys
 
         protected dynamic VisitMember(MemberExpression m, bool columnOnly)
         {
-            if (m.Expression != null && m.Expression.NodeType == ExpressionType.Constant && (_overridedNodeType == null))
+            try
             {
+                if (m.Expression != null && m.Expression.NodeType == ExpressionType.Constant && (_overridedNodeType == null))
+                {
 
-                VisitConstantFixed(m.Expression as ConstantExpression, m.Member?.Name);
-                return m;
-            }
-            else if (m.Expression != null && m.Expression.NodeType == ExpressionType.Parameter && (_overridedNodeType == null))
-            {
-                _overridedNodeType = null;
-                var cl = m.Expression.Type;
-                var prop = DeepCloner.GetFastDeepClonerProperties(cl).First(x => x.Name == m.Member.Name);
-                var name = prop.GetPropertyName();
-                var table = cl.GetCustomAttribute<Table>()?.Name ?? cl.Name;
-                var columnName = string.Format("[{0}].[{1}]", table, name);
-                if (columnOnly)
-                    return columnName;
-                sb.Append(columnName);
-                return m;
-            }
-            else if (m.Expression != null && (m.Expression.NodeType == ExpressionType.MemberAccess))
-            {
-                _overridedNodeType = null;
-                var key = string.Join("", m.ToString().Split('.').Take(m.ToString().Split('.').Length - 1));
-                var cl = m.Expression.Type;
-                var prop = FastDeepCloner.DeepCloner.GetFastDeepClonerProperties(cl).First(x => x.Name == m.Member.Name);
-                var name = prop.GetPropertyName();
-                var table = cl.GetCustomAttribute<Table>()?.Name ?? cl.Name;
-                var randomTableName = JoinClauses.ContainsKey(key) ? JoinClauses[key].Item1 : RandomKey();
-                var primaryId = FastDeepCloner.DeepCloner.GetFastDeepClonerProperties(cl).First(x => x.ContainAttribute<PrimaryKey>()).GetPropertyName();
-                var columnName = string.Format("[{0}].[{1}]", randomTableName, name);
-                if (columnOnly)
-                    return columnName;
-                sb.Append(columnName);
-                if (JoinClauses.ContainsKey(key))
+                    VisitConstantFixed(m.Expression as ConstantExpression, m.Member?.Name);
                     return m;
-                // Ok lets build inner join 
-                var parentType = (m.Expression as MemberExpression).Expression.Type;
-                var parentTable = parentType.GetCustomAttribute<Table>()?.Name ?? parentType.Name;
-                prop = DeepCloner.GetFastDeepClonerProperties(parentType).FirstOrDefault(x => x.ContainAttribute<ForeignKey>() && x.GetCustomAttribute<ForeignKey>().Type == cl);
-                var v = "";
-                if (prop != null)
-                {
-                    v += string.Format("LEFT JOIN [{0}] {1} ON [{2}].[{3}] = [{4}].[{5}]", table, randomTableName, randomTableName, primaryId, parentTable, prop.GetPropertyName());
                 }
-                else
+                else if (m.Expression != null && m.Expression.NodeType == ExpressionType.Parameter && (_overridedNodeType == null))
                 {
-                    prop = DeepCloner.GetFastDeepClonerProperties(cl).FirstOrDefault(x => x.ContainAttribute<ForeignKey>() && x.GetCustomAttribute<ForeignKey>().Type == parentType);
+                    _overridedNodeType = null;
+                    var cl = m.Expression.Type;
+                    var prop = DeepCloner.GetFastDeepClonerProperties(cl).First(x => x.Name == m.Member.Name);
+                    var name = prop.GetPropertyName();
+                    var table = cl.GetCustomAttribute<Table>()?.Name ?? cl.Name;
+                    var columnName = string.Format("[{0}].[{1}]", table, name);
+                    if (columnOnly)
+                        return columnName;
+                    sb.Append(columnName);
+                    return m;
+                }
+                else if (m.Expression != null && (m.Expression.NodeType == ExpressionType.MemberAccess))
+                {
+                    _overridedNodeType = null;
+                    var key = string.Join("", m.ToString().Split('.').Take(m.ToString().Split('.').Length - 1));
+                    var cl = m.Expression.Type;
+                    var prop = FastDeepCloner.DeepCloner.GetFastDeepClonerProperties(cl).First(x => x.Name == m.Member.Name);
+                    var name = prop.GetPropertyName();
+                    var table = cl.GetCustomAttribute<Table>()?.Name ?? cl.Name;
+                    var randomTableName = JoinClauses.ContainsKey(key) ? JoinClauses[key].Item1 : RandomKey();
+                    var primaryId = FastDeepCloner.DeepCloner.GetFastDeepClonerProperties(cl).First(x => x.ContainAttribute<PrimaryKey>()).GetPropertyName();
+                    var columnName = string.Format("[{0}].[{1}]", randomTableName, name);
+                    if (columnOnly)
+                        return columnName;
+                    sb.Append(columnName);
+                    if (JoinClauses.ContainsKey(key))
+                        return m;
+                    // Ok lets build inner join 
+                    var parentType = (m.Expression as MemberExpression).Expression.Type;
+                    var parentTable = parentType.GetCustomAttribute<Table>()?.Name ?? parentType.Name;
+                    prop = DeepCloner.GetFastDeepClonerProperties(parentType).FirstOrDefault(x => x.ContainAttribute<ForeignKey>() && x.GetCustomAttribute<ForeignKey>().Type == cl);
+                    var v = "";
                     if (prop != null)
-                        v += string.Format("LEFT JOIN [{0}] {1} ON [{2}].[{3}] = [{4}].[{5}]", table, randomTableName, randomTableName, prop.GetPropertyName(), parentTable, primaryId);
-                }
+                    {
+                        v += string.Format("LEFT JOIN [{0}] {1} ON [{2}].[{3}] = [{4}].[{5}]", table, randomTableName, randomTableName, primaryId, parentTable, prop.GetPropertyName());
+                    }
+                    else
+                    {
+                        prop = DeepCloner.GetFastDeepClonerProperties(cl).FirstOrDefault(x => x.ContainAttribute<ForeignKey>() && x.GetCustomAttribute<ForeignKey>().Type == parentType);
+                        if (prop != null)
+                            v += string.Format("LEFT JOIN [{0}] {1} ON [{2}].[{3}] = [{4}].[{5}]", table, randomTableName, randomTableName, prop.GetPropertyName(), parentTable, primaryId);
+                    }
 
-                JoinClauses.Add(key, new Tuple<string, string>(randomTableName, v));
-                return m;
-            }
-            else if (m.Expression != null && _overridedNodeType == ExpressionType.MemberAccess)
-            {
-                _overridedNodeType = null;
-                var key = string.Join("", m.ToString().Split('.').Take(m.ToString().Split('.').Length - 1));
-                var cl = m.Expression.Type;
-                var prop = FastDeepCloner.DeepCloner.GetFastDeepClonerProperties(cl).First(x => x.Name == m.Member.Name);
-                var table = cl.GetCustomAttribute<Table>()?.Name ?? cl.Name;
-                var randomTableName = JoinClauses.ContainsKey(key) ? JoinClauses[key].Item1 : RandomKey();
-                var primaryId = FastDeepCloner.DeepCloner.GetFastDeepClonerProperties(cl).First(x => x.ContainAttribute<PrimaryKey>()).GetPropertyName();
-                if (JoinClauses.ContainsKey(key))
+                    if (string.IsNullOrEmpty(v))
+                    {
+                        sb = sb.Remove(sb.Length - columnName.Length, columnName.Length);
+                        sb.Append(ValuetoSql(GetValue(m)));
+                    }
+                    else
+                    {
+                        JoinClauses.Add(key, new Tuple<string, string>(randomTableName, v));
+                    }
+
+
                     return m;
-                // Ok lets build inner join 
-                var parentType = (m as MemberExpression).Type.GetActualType();
-                var parentTable = parentType.GetCustomAttribute<Table>()?.Name ?? parentType.Name;
-                prop = DeepCloner.GetFastDeepClonerProperties(parentType).FirstOrDefault(x => x.ContainAttribute<ForeignKey>() && x.GetCustomAttribute<ForeignKey>().Type == cl);
-                var v = "";
-                if (prop != null)
-                {
-                    v += string.Format("INNER JOIN [{0}] {1} ON [{2}].[{3}] = [{4}].[{5}]", parentTable, randomTableName, table, primaryId, randomTableName, prop.GetPropertyName());
                 }
-                else
+                else if (m.Expression != null && _overridedNodeType == ExpressionType.MemberAccess)
                 {
-                    throw new NotSupportedException(string.Format("CLASS STRUCTURE IS NOT SUPPORTED MEMBER{0}", m.Member.Name));
+                    _overridedNodeType = null;
+                    var key = string.Join("", m.ToString().Split('.').Take(m.ToString().Split('.').Length - 1));
+                    var cl = m.Expression.Type;
+                    var prop = FastDeepCloner.DeepCloner.GetFastDeepClonerProperties(cl).First(x => x.Name == m.Member.Name);
+                    var table = cl.GetCustomAttribute<Table>()?.Name ?? cl.Name;
+                    var randomTableName = JoinClauses.ContainsKey(key) ? JoinClauses[key].Item1 : RandomKey();
+                    var primaryId = FastDeepCloner.DeepCloner.GetFastDeepClonerProperties(cl).First(x => x.ContainAttribute<PrimaryKey>()).GetPropertyName();
+                    if (JoinClauses.ContainsKey(key))
+                        return m;
+                    // Ok lets build inner join 
+                    var parentType = (m as MemberExpression).Type.GetActualType();
+                    var parentTable = parentType.GetCustomAttribute<Table>()?.Name ?? parentType.Name;
+                    prop = DeepCloner.GetFastDeepClonerProperties(parentType).FirstOrDefault(x => x.ContainAttribute<ForeignKey>() && x.GetCustomAttribute<ForeignKey>().Type == cl);
+                    var v = "";
+                    if (prop != null)
+                    {
+                        v += string.Format("INNER JOIN [{0}] {1} ON [{2}].[{3}] = [{4}].[{5}]", parentTable, randomTableName, table, primaryId, randomTableName, prop.GetPropertyName());
+                    }
+                    else
+                    {
+                        throw new NotSupportedException(string.Format("CLASS STRUCTURE IS NOT SUPPORTED MEMBER{0}", m.Member.Name));
+                    }
+
+                    if (!string.IsNullOrEmpty(v))
+                        JoinClauses.Add(key, new Tuple<string, string>(randomTableName, v));
+                    return m;
                 }
 
-                if (!string.IsNullOrEmpty(v))
-                    JoinClauses.Add(key, new Tuple<string, string>(randomTableName, v));
-                return m;
+            }
+            catch
+            {
+                throw new NotSupportedException(string.Format("Expression '{0}' is not supported", m.ToString()));
             }
 
+            if (m.Type.IsInternalType() && m.Expression.NodeType == ExpressionType.Call)
+            {
+                sb.Append(ValuetoSql(Expression.Lambda(m).Compile().DynamicInvoke()));
+                return m;
+            }
             throw new NotSupportedException(string.Format("The member '{0}' is not supported", m.Member.Name));
         }
 
@@ -562,7 +634,7 @@ namespace EntityWorker.Core.SqlQuerys
             var unary = expression.Arguments[1] as UnaryExpression;
             var lambdaExpression = (LambdaExpression)unary?.Operand;
 
-            lambdaExpression = (LambdaExpression)Evaluator.PartialEval(lambdaExpression ?? (expression.Arguments[1]) as LambdaExpression);
+            lambdaExpression = (LambdaExpression)Evaluator.Eval(lambdaExpression ?? (expression.Arguments[1]) as LambdaExpression);
 
             var body = lambdaExpression.Body as MemberExpression;
             if (body == null) return false;
