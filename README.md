@@ -113,7 +113,6 @@ let's start building our models, lets build a simple models User
 
         public void AfterSave(IRepository repository, User itemDbEntity, long objectId)
         {
-            itemDbEntity.ClearPropertChanges();// clear all changes.
             // lets do some changes here, when the item have updated..
             itemDbEntity.Password = MethodHelper.EncodeStringToBase64(itemDbEntity.Password);
             // and now we want to save this change to the database 
