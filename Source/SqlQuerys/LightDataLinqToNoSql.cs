@@ -5,9 +5,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using EntityWorker.Core.Attributes;
 using EntityWorker.Core.Helper;
-using EntityWorker.Core.Object.Library;
 using FastDeepCloner;
 
 namespace EntityWorker.Core.SqlQuerys
@@ -17,7 +17,9 @@ namespace EntityWorker.Core.SqlQuerys
         private StringBuilder sb;
         private ExpressionType? _overridedNodeType;
         private readonly List<string> _columns;
-
+        private const string stringyFy = "<StringFy>[#]</StringFy>";
+        private Regex stringyFyExp = new Regex(@"<StringFy>\[.*?\]</StringFy>");
+        private static Dictionary<string, Type> SavedTypes = new Dictionary<string, Type>();
         public Dictionary<string, Tuple<string, string>> JoinClauses { get; private set; } = new Dictionary<string, Tuple<string, string>>();
 
         public int Skip { get; set; }
@@ -137,12 +139,14 @@ namespace EntityWorker.Core.SqlQuerys
 
         public string GetInvert()
         {
+            if (sb.Length <= 4)
+                return string.Empty;
             var key = "NOT ";
             var str = sb.ToString().Substring(sb.Length - key.Length);
             if (str == key)
             {
                 sb = sb.Remove(sb.Length - key.Length, key.Length);
-                return key;
+                return " " + key;
             }
             return string.Empty;
         }
@@ -169,22 +173,24 @@ namespace EntityWorker.Core.SqlQuerys
             }
             else if (m.Method.Name == "IsNullOrEmpty")
             {
-                sb.Append("(IIF(");
+                var invert = sb.ToString().EndsWith("NOT ");
+                sb.Append("((case when");
                 this.Visit(m.Arguments[0]);
-                sb.Append(" IS NULL ,1,IIF(");
+                sb.Append(" IS NULL then " + (!invert ? 1 : 0) + " else case when");
                 this.Visit(m.Arguments[0]);
-                sb.Append(" = '', 1,0))");
-                sb.Append(") {IsNullOrEmpty}");
+                sb.Append(" = '' then " + (!invert ? 1 : 0) + " else " + (!invert ? 0 : 1) + " end end)");
+                sb.Append(")");
+                if (!invert)
+                    sb.Append("{IsNullOrEmpty}");
                 return m;
             }
             else if (m.Method.Name == "Contains")
             {
                 var ex = (((MemberExpression)m.Object).Expression as ConstantExpression);
-                
+
                 if (ex == null)
                 {
                     var invert = GetInvert();
-                    //(m.Arguments[0] as MemberExpression).Expression as ConstantExpression
                     var value = GetSingleValue(m.Arguments[0]);
                     this.Visit(m.Object);
                     if (!string.IsNullOrEmpty(invert))
@@ -201,7 +207,25 @@ namespace EntityWorker.Core.SqlQuerys
                         sb.Append(invert);
                     sb.Append(" in ");
                     sb.Append("(");
-                    this.Visit(ex);
+                    try
+                    {
+                        var stringFy = (m.Arguments[0] as MemberExpression).Member as PropertyInfo != null ? ((m.Arguments[0] as MemberExpression).Member as PropertyInfo).GetCustomAttributes<StringFy>() != null : false;
+                        var value = (((MemberExpression)m.Object).Member as FieldInfo) != null ? (((MemberExpression)m.Object).Member as FieldInfo)?.GetValue(ex.Value) : (((MemberExpression)m.Object).Member as PropertyInfo)?.GetValue(ex.Value);
+                        if (value == null)
+                            this.Visit(ex);
+                        else
+                        {
+                            var v = ValuetoSql(value, stringFy);
+                            if (string.IsNullOrEmpty(v))
+                                v = ValuetoSql(string.Format("DefaultValueForEmptyArray({0})", Guid.NewGuid().ToString()), stringFy);
+
+                            sb.Append(v);
+                        }
+                    }
+                    catch
+                    {
+                        this.Visit(ex);
+                    }
                     sb.Append(")");
                 }
                 return m;
@@ -300,8 +324,8 @@ namespace EntityWorker.Core.SqlQuerys
             switch (u.NodeType)
             {
                 case ExpressionType.Not:
-                    if (!u.ToString().Contains("IsNullOrEmpty"))
-                        sb.Append(" NOT ");
+                    //if (!u.ToString().Contains("IsNullOrEmpty"))
+                    sb.Append(" NOT ");
                     this.Visit(u.Operand);
                     if (u.ToString().Contains("IsNullOrEmpty"))
                     {
@@ -309,9 +333,7 @@ namespace EntityWorker.Core.SqlQuerys
                             sb.ToString().Substring(sb.ToString().Length - "{IsNullOrEmpty}".Length) == "{IsNullOrEmpty}"
                             && sb.ToString().Contains("{IsNullOrEmpty}"))
                             sb = new StringBuilder(sb.ToString().Substring(0, sb.ToString().Length - "{IsNullOrEmpty}".Length));
-                        sb.Append(" = 0 ");
-
-
+                        sb.Append(" = 1 ");
                     }
                     break;
                 case ExpressionType.Convert:
@@ -323,6 +345,23 @@ namespace EntityWorker.Core.SqlQuerys
             return u;
         }
 
+        private string CleanText(string replaceWith = null)
+        {
+            //<StringFy>\[.*?\]</StringFy>
+            MatchCollection matches = null;
+            var result = "";
+            while ((matches = stringyFyExp.Matches(sb.ToString())).Count > 0)
+            {
+                var exp = matches[0];
+
+                result = exp.Value.Replace("</StringFy>", "").TrimEnd(']').Substring(@"<StringFy>\[".Length - 1);
+                sb = sb.Remove(exp.Index, exp.Value.Length);
+                if (replaceWith != null)
+                    sb = sb.Insert(exp.Index, replaceWith);
+
+            }
+            return result;
+        }
 
         /// <summary>
         /// 
@@ -342,6 +381,14 @@ namespace EntityWorker.Core.SqlQuerys
                 b.NodeType == ExpressionType.And
                 ))
                 sb = new StringBuilder(sb.ToString().Substring(0, sb.ToString().Length - "{IsNullOrEmpty}".Length));
+            var stringFyText = stringyFyExp.Matches(sb.ToString()).Cast<Match>().FirstOrDefault();
+            var isEnum = stringFyText != null;
+            if ((b.Left.NodeType == ExpressionType.MemberAccess || b.Left.NodeType == ExpressionType.Not)
+                && b.NodeType != ExpressionType.Equal
+                && b.NodeType != ExpressionType.NotEqual && b.Left.Type == typeof(bool))
+                if (b.Left.NodeType != ExpressionType.Not)
+                    sb.Append(" = 1");
+                else sb.Append(" = 0");
 
             switch (b.NodeType)
             {
@@ -364,22 +411,52 @@ namespace EntityWorker.Core.SqlQuerys
                 case ExpressionType.Equal:
                     if (IsNullConstant(b.Right))
                     {
-                        sb.Append(" IS ");
+                        if (isEnum)
+                        {
+                            CleanText();
+                            sb.Append(" IS ");
+                            sb.Append(stringFyText);
+                        }
+                        else
+                            sb.Append(" IS ");
                     }
                     else
                     {
-                        sb.Append(" = ");
+                        if (isEnum)
+                        {
+                            CleanText();
+                            sb.Append(" = ");
+                            sb.Append(stringFyText);
+                        }
+                        else
+                            sb.Append(" = ");
                     }
                     break;
 
                 case ExpressionType.NotEqual:
                     if (IsNullConstant(b.Right))
                     {
-                        sb.Append(" IS NOT ");
+                        if (isEnum)
+                        {
+                            CleanText();
+                            sb.Append(" IS NOT ");
+                            sb.Append(stringFyText);
+                        }
+                        else
+                            sb.Append(" IS NOT ");
+
                     }
                     else
                     {
-                        sb.Append(" <> ");
+                        if (isEnum)
+                        {
+                            CleanText();
+                            sb.Append(" <> ");
+                            sb.Append(stringFyText);
+                        }
+                        else
+                            sb.Append(" <> ");
+
                     }
                     break;
 
@@ -410,33 +487,57 @@ namespace EntityWorker.Core.SqlQuerys
         }
 
 
-        private string ValuetoSql(object value)
+        private string ValuetoSql(object value, bool singleValueToString = false)
         {
+            CleanText();
             if (value == null)
-                return "";
+                return "NULL";
             var type = value.GetType();
             if (type == typeof(string))
                 return string.Format("String[{0}]", value);
             if (type == typeof(DateTime) || type == typeof(DateTime?) || type == typeof(TimeSpan) || type == typeof(TimeSpan?))
-                return string.Format("Date[{0}]", value);
+            {
+                if (!singleValueToString)
+                    return string.Format("Date[{0}]", value);
+                else return string.Format("String[{0}]", value);
+            }
 
             if (value is IEnumerable && !value.GetType().IsInternalType())
             {
                 var tValue = "";
                 foreach (var v in value as IEnumerable)
-                    tValue += ValuetoSql(v) + ",";
+                {
+                    if (type.IsEnum && !singleValueToString)
+                        tValue += ValuetoSql(((int)v).ToString(), singleValueToString) + ",";
+
+                    else
+                        tValue += ValuetoSql(v, singleValueToString) + ",";
+
+                }
                 return tValue.TrimEnd(',');
             }
             else
-                return string.Format("{0}", value);
+            {
+                if (!singleValueToString)
+                {
+                    if (type.IsEnum)
+                        return string.Format("{0}", (int)value);
 
-            return string.Empty;
+                    return string.Format("{0}", value);
+                }
+                else return string.Format("String[{0}]", value);
+            }
+
         }
 
         protected Expression VisitConstantFixed(ConstantExpression c, string memName = "")
         {
             IQueryable q = c.Value as IQueryable;
-
+            var stringFyText = stringyFyExp.Matches(sb.ToString()).Cast<Match>().FirstOrDefault();
+            var isEnum = stringFyText != null;
+            string type = null;
+            if (isEnum)
+                type = CleanText();
             if (q == null && c.Value == null)
             {
                 sb.Append("NULL");
@@ -468,12 +569,17 @@ namespace EntityWorker.Core.SqlQuerys
 
                         if (value == null)
                             break;
-
-
-                        sb.Append(ValuetoSql(value));
+                        sb.Append(ValuetoSql(value, isEnum));
                         break;
                     default:
-                        sb.Append(c.Value);
+                        if (isEnum && SavedTypes.ContainsKey(type))
+                        {
+                            var enumtype = SavedTypes[type];
+                            var v = c.Value.ConvertValue(enumtype);
+                            sb.Append(ValuetoSql(v, isEnum));
+                            break;
+                        }
+                        sb.Append(ValuetoSql(c.Value, isEnum));
                         break;
                 }
             }
@@ -514,16 +620,36 @@ namespace EntityWorker.Core.SqlQuerys
                     VisitConstantFixed(m.Expression as ConstantExpression, m.Member?.Name);
                     return m;
                 }
-                else if (m.Expression != null && m.Expression.NodeType == ExpressionType.Parameter && (_overridedNodeType == null))
+                else if (m.Expression != null && (m.Expression.NodeType == ExpressionType.Parameter || (m.ToString().EndsWith(".HasValue") && m.Expression.NodeType == ExpressionType.MemberAccess)) && (_overridedNodeType == null))
                 {
+                    var hasValueAttr = m.ToString().EndsWith(".HasValue");
+
                     _overridedNodeType = null;
-                    var cl = m.Expression.Type;
-                    var prop = DeepCloner.GetFastDeepClonerProperties(cl).First(x => x.Name == m.Member.Name);
+                    var cl = hasValueAttr ? (m.Expression as MemberExpression).Expression.Type : m.Expression.Type;
+                    var prop = DeepCloner.GetFastDeepClonerProperties(cl).First(x => x.Name == (hasValueAttr ? (m.Expression as MemberExpression).Member.Name : m.Member.Name));
                     var name = prop.GetPropertyName();
                     var table = cl.GetCustomAttribute<Table>()?.Name ?? cl.Name;
                     var columnName = string.Format("[{0}].[{1}]", table, name);
                     if (columnOnly)
                         return columnName;
+
+                    bool isNot = sb.ToString().EndsWith("NOT ");
+                    if (prop.PropertyType.IsEnum && prop.ContainAttribute<StringFy>())
+                    {
+                        if (!SavedTypes.ContainsKey(prop.FullName))
+                            SavedTypes.Add(prop.FullName, prop.PropertyType);
+                        columnName += stringyFy.Replace("#", prop.FullName);
+                    }
+                    if (isNot)
+                    {
+                        if (!hasValueAttr)
+                            columnName = "(case when " + columnName + " = 0 then 1 else 0 end)";
+                        else columnName = "(case when " + columnName + " IS NULL then 1 else 0 end)";
+                    }
+                    else if (hasValueAttr)
+                    {
+                        columnName = "(case when " + columnName + " IS NULL then 0 else 1 end)";
+                    }
                     sb.Append(columnName);
                     return m;
                 }
@@ -577,10 +703,10 @@ namespace EntityWorker.Core.SqlQuerys
                     _overridedNodeType = null;
                     var key = string.Join("", m.ToString().Split('.').Take(m.ToString().Split('.').Length - 1));
                     var cl = m.Expression.Type;
-                    var prop = FastDeepCloner.DeepCloner.GetFastDeepClonerProperties(cl).First(x => x.Name == m.Member.Name);
+                    var prop = DeepCloner.GetFastDeepClonerProperties(cl).First(x => x.Name == m.Member.Name);
                     var table = cl.GetCustomAttribute<Table>()?.Name ?? cl.Name;
                     var randomTableName = JoinClauses.ContainsKey(key) ? JoinClauses[key].Item1 : RandomKey();
-                    var primaryId = FastDeepCloner.DeepCloner.GetFastDeepClonerProperties(cl).First(x => x.ContainAttribute<PrimaryKey>()).GetPropertyName();
+                    var primaryId = DeepCloner.GetFastDeepClonerProperties(cl).First(x => x.ContainAttribute<PrimaryKey>()).GetPropertyName();
                     if (JoinClauses.ContainsKey(key))
                         return m;
                     // Ok lets build inner join 
