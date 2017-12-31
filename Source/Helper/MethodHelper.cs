@@ -16,13 +16,15 @@ using Microsoft.Data.Sqlite;
 
 namespace EntityWorker.Core.Helper
 {
+    /// <summary>
+    /// UseFull Methods 
+    /// </summary>
     public static class MethodHelper
     {
 
         /// <summary>
         ///  get All types that inherit DbEntity
         /// </summary>
-        /// <param name="nameSpace"></param>
         /// <param name="assembly"></param>
         /// <returns></returns>
         public static List<Type> GetDbEntitys(Assembly assembly)

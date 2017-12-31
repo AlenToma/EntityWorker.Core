@@ -14,6 +14,9 @@ using FastDeepCloner;
 
 namespace EntityWorker.Core.Helper
 {
+    /// <summary>
+    /// UseFull Extension, that work with EntityWorker.Core
+    /// </summary>
     public static class Extension
     {
         private static readonly Dictionary<IFastDeepClonerProperty, string> CachedPropertyNames = new Dictionary<IFastDeepClonerProperty, string>();
@@ -31,11 +34,82 @@ namespace EntityWorker.Core.Helper
             {typeof(byte[]), "varbinary(MAX)"},
         };
 
+        /// <summary>
+        /// Clear all ids
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="item"></param>
+        /// <param name="includeIndependedData"> Clear all ids of object that contains IndependedData attributes</param>
+        public static T ClearAllIdsHierarchy<T>(this T item, bool includeIndependedData = false) where T : IDbEntity
+        {
+           return (T)ClearAllIdsHierarchy(item as object, includeIndependedData);
+        }
+
+        /// <summary>
+        /// Clear all ids
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="item"></param>
+        /// <param name="includeIndependedData"> Clear all ids of object that contains IndependedData attributes</param>
+        public static List<T> ClearAllIdsHierarchy<T>(List<T> item, bool includeIndependedData = false) where T : IDbEntity
+        {
+          return (List<T>)ClearAllIdsHierarchy(item as object, includeIndependedData);
+        }
+
+        /// <summary>
+        /// Clear all ids
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="item"></param>
+        /// <param name="includeIndependedData"> Clear all ids of object that contains IndependedData attributes</param>
+        public static object ClearAllIdsHierarchy(object item, bool includeIndependedData = false)
+        {
+            if (item == null)
+                return item;
+            if (item is IList)
+            {
+                foreach (var tm in item as IList)
+                    ClearAllIdsHierarchy(tm);
+            }
+            else
+            {
+                var props = DeepCloner.GetFastDeepClonerProperties(item.GetType());
+                foreach (var p in props)
+                {
+                    if (p.ContainAttribute<IndependentData>() && !includeIndependedData)
+                        continue;
+                    if (!p.IsInternalType)
+                    {
+                        ClearAllIdsHierarchy(p.GetValue(item), includeIndependedData);
+                        continue;
+                    }
+                    else if (p.ContainAttribute<PrimaryKey>() || p.ContainAttribute<ForeignKey>())
+                        p.SetValue(item, MethodHelper.ConvertValue(null, p.PropertyType));
+
+                }
+            }
+
+            return item;
+        }
+
+        /// <summary>
+        /// TrimEnd with string
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static string TrimEnd(this string source, string value)
         {
             return !source.EndsWith(value) ? source : source.Remove(source.LastIndexOf(value, StringComparison.Ordinal));
         }
 
+        /// <summary>
+        /// Try and insert Last
+        /// </summary>
+        /// <param name="str">Source string</param>
+        /// <param name="text"> string to insert</param>
+        /// <param name="ch">insert after a specific char, count is from last</param>
+        /// <returns></returns>
         public static string InsertLast(this string str, string text, char ch)
         {
             str = str.Trim();
@@ -55,6 +129,11 @@ namespace EntityWorker.Core.Helper
             return str;
         }
 
+        /// <summary>
+        /// GetDbEntity Identifire. must contain a PrimaryKey
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         public static string GetEntityKey(this IDbEntity entity)
         {
             return string.Format("{0}&{1}", entity.GetType().FullName, entity.Id);
@@ -110,6 +189,13 @@ namespace EntityWorker.Core.Helper
             return DeepCloner.GetFastDeepClonerProperties(type).FirstOrDefault(x => x.ContainAttribute<PrimaryKey>());
         }
 
+        /// <summary>
+        /// Create Instance
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="uninitializedObject"> true for FormatterServices.GetUninitializedObject and false for Activator.CreateInstance </param>
+        /// <returns></returns>
+
         public static object CreateInstance(this Type type, bool uninitializedObject = true)
         {
             return uninitializedObject ? FormatterServices.GetUninitializedObject(type) : Activator.CreateInstance(type);
@@ -121,6 +207,12 @@ namespace EntityWorker.Core.Helper
         /// <param name="type"></param>
         /// <returns></returns>
         private static readonly Dictionary<Type, Type> CachedActualType = new Dictionary<Type, Type>();
+
+        /// <summary>
+        /// Get Internal type of IList
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static Type GetActualType(this Type type)
         {
             if (CachedActualType.ContainsKey(type))

@@ -22,23 +22,38 @@ using Microsoft.Data.Sqlite;
 
 namespace EntityWorker.Core.Transaction
 {
+    /// <summary>
+    /// EntityWorker.Core Repository
+    /// </summary>
     public class Transaction : IRepository
     {
+        private static object MigrationLocker = new object();
 
         private readonly DbSchema _dbSchema;
 
         private readonly Dictionary<string, object> _attachedObjects;
-
+        /// <summary>
+        /// DataBase FullConnectionString
+        /// </summary>
         public readonly string ConnectionString;
 
+        /// <summary>
+        /// DataBase Type
+        /// </summary>
         public DataBaseTypes DataBaseTypes { get; private set; }
 
         internal DbTransaction Trans { get; private set; }
 
+        /// <summary>
+        /// DataBase Connection
+        /// </summary>
         protected DbConnection SqlConnection { get; private set; }
 
         private static bool _tableMigrationCheck;
 
+        /// <summary>
+        /// Enable migrations
+        /// </summary>
         protected bool EnableMigration { get; private set; }
 
         /// <summary>
@@ -65,19 +80,28 @@ namespace EntityWorker.Core.Transaction
 
             if (!_tableMigrationCheck && EnableMigration)
             {
-                this.CreateTable<DBMigration>(false);
-                this.SaveChanges();
-                var ass = this.GetType().Assembly;
-                IMigrationConfig config;
-                if (ass.DefinedTypes.Any(a => typeof(IMigrationConfig).IsAssignableFrom(a)))
-                    config = Activator.CreateInstance(ass.DefinedTypes.First(a => typeof(IMigrationConfig).IsAssignableFrom(a))) as IMigrationConfig;
-                else throw new Exception("EnableMigration is true but EntityWorker could not find IMigrationConfig in the current Assembly " + ass.GetName());
-                MigrationConfig(config);
+                lock (MigrationLocker)
+                {
+                    this.CreateTable<DBMigration>(false);
+                    this.SaveChanges();
+                    var ass = this.GetType().Assembly;
+                    IMigrationConfig config;
+                    if (ass.DefinedTypes.Any(a => typeof(IMigrationConfig).IsAssignableFrom(a)))
+                        config = Activator.CreateInstance(ass.DefinedTypes.First(a => typeof(IMigrationConfig).IsAssignableFrom(a))) as IMigrationConfig;
+                    else throw new Exception("EnableMigration is enabled but EntityWorker.Core could not find IMigrationConfig in the current Assembly " + ass.GetName());
+                    MigrationConfig(config);
+                }
             }
             _tableMigrationCheck = true;
         }
 
-
+        /// <summary>
+        /// Clone Items
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="o"></param>
+        /// <param name="fieldType"></param>
+        /// <returns></returns>
         public T Clone<T>(T o, FieldType fieldType = FieldType.PropertyInfo) where T : class
         {
             return DeepCloner.Clone(o, new FastDeepClonerSettings()
@@ -103,8 +127,7 @@ namespace EntityWorker.Core.Transaction
                 foreach (var migration in migrations)
                 {
                     var name = migration.GetType().FullName + migration.MigrationIdentifier;
-                    var dbMigration = Get<DBMigration>().Where(x => x.Name == name).Execute();
-                    if (dbMigration.Any())
+                    if (Get<DBMigration>().Where(x => x.Name == name).ExecuteAny())
                         continue;
                     var item = new DBMigration
                     {
@@ -235,6 +258,9 @@ namespace EntityWorker.Core.Transaction
             }
         }
 
+        /// <summary>
+        /// Dispose the connection
+        /// </summary>
         public virtual void Dispose()
         {
             _attachedObjects.Clear();
@@ -406,6 +432,11 @@ namespace EntityWorker.Core.Transaction
 
         #region DataBase calls
 
+        /// <summary>
+        /// Remove Row
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         public async Task DeleteAsync(IDbEntity entity)
         {
             await Task.Run(() =>
@@ -414,6 +445,10 @@ namespace EntityWorker.Core.Transaction
             });
         }
 
+        /// <summary>
+        /// Remove Row
+        /// </summary>
+        /// <param name="entity"></param>
         public void Delete(IDbEntity entity)
         {
             _dbSchema.DeleteAbstract(entity);

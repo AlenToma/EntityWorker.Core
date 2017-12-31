@@ -6,16 +6,29 @@ using EntityWorker.Core.InterFace;
 
 namespace EntityWorker.Core.Interface
 {
+    /// <summary>
+    /// quaryProvider for EntityWorker.Core
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public interface ISqlQueryable<T> where T : class, IDbEntity
     {
-
         /// <summary>
         /// Result of LightDataTable LinqToSql
         /// </summary>
         string ParsedLinqToSql { get; }
 
+        /// <summary>
+        /// Add Items
+        /// </summary>
+        /// <param name="items"></param>
+        /// <returns></returns>
         ISqlQueryable<T> AddRange(List<T> items);
 
+        /// <summary>
+        /// Add Item
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
         ISqlQueryable<T> Add(T item);
 
         /// <summary>
@@ -48,12 +61,32 @@ namespace EntityWorker.Core.Interface
         /// <returns></returns>
         ISqlQueryable<T> Where(Expression<Predicate<T>> match);
 
+        /// <summary>
+        /// Take only the selected rows 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         ISqlQueryable<T> Take(int value);
 
+        /// <summary>
+        /// Skip rows
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         ISqlQueryable<T> Skip(int value);
 
+        /// <summary>
+        /// Order By Column
+        /// </summary>
+        /// <param name="exp"></param>
+        /// <returns></returns>
         ISqlQueryable<T> OrderBy(Expression<Func<T, object>> exp);
 
+        /// <summary>
+        /// OrderByDescending Column
+        /// </summary>
+        /// <param name="exp"></param>
+        /// <returns></returns>
         ISqlQueryable<T> OrderByDescending(Expression<Func<T, object>> exp);
 
         /// <summary>
@@ -67,6 +100,18 @@ namespace EntityWorker.Core.Interface
         /// </summary>
         /// <returns></returns>
         Task<List<T>> ExecuteAsync();
+
+        /// <summary>
+        /// Return the count of the executed quary
+        /// </summary>
+        /// <returns></returns>
+        int ExecuteCount();
+
+        /// <summary>
+        /// Return the Any of the executed quary
+        /// </summary>
+        /// <returns></returns>
+        bool ExecuteAny();
 
         /// <summary>
         /// Save All Changes. 
@@ -96,6 +141,9 @@ namespace EntityWorker.Core.Interface
         /// <returns></returns>
         void RemoveAll(Func<T, bool> match);
 
+        /// <summary>
+        /// Commit Changes
+        /// </summary>
         void SaveChanges();
 
         /// <summary>

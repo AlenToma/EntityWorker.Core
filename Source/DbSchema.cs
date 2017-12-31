@@ -362,7 +362,7 @@ namespace EntityWorker.Core
                 foreach (var col in cols)
                 {
                     var v = col.GetValue(o);
-
+                    var defaultOnEmpty = col.GetCustomAttribute<DefaultOnEmpty>();
                     if (col.ContainAttribute<ForeignKey>() && v?.ConvertValue<long?>() == 0)
                     {
                         var ob = props.FirstOrDefault(x => x.PropertyType == col.GetCustomAttribute<ForeignKey>().Type && (string.IsNullOrEmpty(col.GetCustomAttribute<ForeignKey>().PropertyName) || col.GetCustomAttribute<ForeignKey>().PropertyName == x.Name));
@@ -387,8 +387,13 @@ namespace EntityWorker.Core
                     if (col.ContainAttribute<StringFy>())
                         v = v?.ConvertValue<string>();
 
-                    if (col.ContainAttribute<NotNullable>() && v == null)
+                    if (col.ContainAttribute<NotNullable>() && v == null && defaultOnEmpty == null)
                         throw new NoNullAllowedException(string.Format("Property {0} dose not allow null.", col.FullName));
+
+                    if (defaultOnEmpty != null && defaultOnEmpty.Value != null && defaultOnEmpty.Value.GetType() != col.PropertyType)
+                        throw new NoNullAllowedException(string.Format("Property {0} Contain wrong type of value inside DefaultOnEmpty attribute .", col.FullName));
+                    if (v == null && defaultOnEmpty != null)
+                        v = defaultOnEmpty.Value;
 
                     _repository.AddInnerParameter(cmd, col.GetPropertyName(), v, (col.ContainAttribute<StringFy>() ? _repository.GetSqlType(typeof(string)) : _repository.GetSqlType(col.PropertyType)));
                 }

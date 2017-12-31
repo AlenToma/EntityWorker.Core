@@ -10,14 +10,17 @@ using EntityWorker.Core.Object.Library;
 
 namespace EntityWorker.Core.InterFace
 {
+    /// <summary>
+    /// EntityWorker.Core Repository
+    /// </summary>
     public interface IRepository : IDisposable
     {
-
         /// <summary>
         /// Clone Object
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="o"></param>
+        /// <param name="fieldType"></param>
         /// <returns></returns>
         T Clone<T>(T o, FastDeepCloner.FieldType fieldType = FastDeepCloner.FieldType.PropertyInfo) where T : class;
 
@@ -129,7 +132,7 @@ namespace EntityWorker.Core.InterFace
         /// Attach an object to entityWorker.
         /// </summary>
         /// <param name="objcDbEntity"></param>
-
+        /// <param name="overwrite"> override if exist</param>
         void Attach(DbEntity objcDbEntity, bool overwrite = false);
 
         /// <summary>
@@ -137,7 +140,6 @@ namespace EntityWorker.Core.InterFace
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-
         ISqlQueryable<T> Get<T>() where T : class, IDbEntity;
 
         /// <summary>
@@ -145,9 +147,13 @@ namespace EntityWorker.Core.InterFace
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-
         IList<T> GetAll<T>() where T : class, IDbEntity;
 
+        /// <summary>
+        /// Get all 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         Task<IList<T>> GetAllAsync<T>() where T : class, IDbEntity;
 
         /// <summary>

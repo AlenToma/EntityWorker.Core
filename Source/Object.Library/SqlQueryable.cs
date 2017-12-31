@@ -10,7 +10,11 @@ using EntityWorker.Core.Helper;
 
 namespace EntityWorker.Core.Object.Library
 {
-    public class SqlQueryable<T> : List<T>, ISqlQueryable<T> where T : class, IDbEntity
+    /// <summary>
+    /// quaryProvider for EntityWorker.Core
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public sealed class SqlQueryable<T> : List<T>, ISqlQueryable<T> where T : class, IDbEntity
     {
         private readonly IRepository _repository;
         private readonly List<string> _ignoreActions = new List<string>();
@@ -21,7 +25,6 @@ namespace EntityWorker.Core.Object.Library
         private bool? _landholderOnlyFirstLevel;
         private readonly List<Expression> _matches = new List<Expression>();
 
-
         internal SqlQueryable(List<T> items, IRepository repository)
         {
             _repository = repository;
@@ -31,9 +34,16 @@ namespace EntityWorker.Core.Object.Library
             items.RemoveAll(x => x == null);
             base.AddRange(items);
         }
-
+        /// <summary>
+        /// Result of LightDataTable LinqToSql
+        /// </summary>
         public string ParsedLinqToSql { get; private set; }
 
+        /// <summary>
+        /// Add Item
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
         public new ISqlQueryable<T> Add(T item)
         {
             if (item != null)
@@ -41,6 +51,11 @@ namespace EntityWorker.Core.Object.Library
             return this;
         }
 
+        /// <summary>
+        /// Add Items
+        /// </summary>
+        /// <param name="items"></param>
+        /// <returns></returns>
         public ISqlQueryable<T> AddRange(List<T> items)
         {
             if (items == null)
@@ -49,6 +64,12 @@ namespace EntityWorker.Core.Object.Library
             return this;
         }
 
+        /// <summary>
+        /// Ignore loading some children eg ignore Person
+        /// IgnoreChildren(x=> x.User.Person)
+        /// </summary>
+        /// <param name="ignoreActions"></param>
+        /// <returns></returns>
         public ISqlQueryable<T> IgnoreChildren(params Expression<Func<T, object>>[] ignoreActions)
         {
             if (ignoreActions != null)
@@ -56,13 +77,22 @@ namespace EntityWorker.Core.Object.Library
 
             return this;
         }
-
+        /// <summary>
+        /// LoadChildren, will load all children herarkie if onlyFirstLevel is not true
+        /// </summary>
+        /// <param name="onlyFirstLevel"></param>
+        /// <returns></returns>
         public ISqlQueryable<T> LoadChildren(bool onlyFirstLevel = false)
         {
             _landholderOnlyFirstLevel = onlyFirstLevel;
             return this;
         }
 
+        /// <summary>
+        /// LoadChildren, will load all selected children herarkie eg
+        /// LoadChildren(x=> x.User, x=> x.Adress.Select(a=> a.Country)
+        /// </summary>
+        /// <returns></returns>
         public ISqlQueryable<T> LoadChildren(params Expression<Func<T, object>>[] actions)
         {
             if (actions != null)
@@ -70,24 +100,44 @@ namespace EntityWorker.Core.Object.Library
             return this;
         }
 
+        /// <summary>
+        /// Search 
+        /// </summary>
+        /// <param name="match"></param>
+        /// <returns></returns>
         public ISqlQueryable<T> Where(Expression<Predicate<T>> match)
         {
             _matches.Add(match);
             return this;
         }
 
+        /// <summary>
+        /// Take only the selected rows 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public ISqlQueryable<T> Take(int value)
         {
             _expression.Take = value;
             return this;
         }
 
+        /// <summary>
+        /// Skip rows
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public ISqlQueryable<T> Skip(int value)
         {
             _expression.Skip = value;
             return this;
         }
 
+        /// <summary>
+        /// Order By Column
+        /// </summary>
+        /// <param name="exp"></param>
+        /// <returns></returns>
         public ISqlQueryable<T> OrderBy(Expression<Func<T, object>> exp)
         {
             var list = Expression.Parameter(typeof(IEnumerable<T>), "list");
@@ -96,6 +146,11 @@ namespace EntityWorker.Core.Object.Library
             return this;
         }
 
+        /// <summary>
+        /// OrderByDescending Column
+        /// </summary>
+        /// <param name="exp"></param>
+        /// <returns></returns>
         public ISqlQueryable<T> OrderByDescending(Expression<Func<T, object>> exp)
         {
             var list = Expression.Parameter(typeof(IEnumerable<T>), "list");
@@ -104,6 +159,10 @@ namespace EntityWorker.Core.Object.Library
             return this;
         }
 
+        /// <summary>
+        /// Execute the search Command
+        /// </summary>
+        /// <returns></returns>
         public async Task<List<T>> ExecuteAsync()
         {
             if (_executed)
@@ -132,6 +191,11 @@ namespace EntityWorker.Core.Object.Library
             return this.ToList<T>();
         }
 
+
+        /// <summary>
+        /// Execute the search Command
+        /// </summary>
+        /// <returns></returns>
         public List<T> Execute()
         {
             if (_executed)
@@ -160,7 +224,34 @@ namespace EntityWorker.Core.Object.Library
             return this.ToList<T>();
         }
 
+        /// <summary>
+        /// Return the count of the executed quary
+        /// </summary>
+        /// <returns></returns>
+        public int ExecuteCount()
+        {
+            _expression.DataBaseTypes = _repository.DataBaseTypes;
+            foreach (var exp in _matches)
+                _expression.Translate(exp);
+            ParsedLinqToSql = _expression.Count;
+            var cmd = _repository.GetSqlCommand(ParsedLinqToSql);
+            return _repository.ExecuteScalar(cmd).ConvertValue<int>();
+        }
 
+        /// <summary>
+        /// Return the Any of the executed quary
+        /// </summary>
+        /// <returns></returns>
+        public bool ExecuteAny()
+        {
+            return ExecuteCount() > 0;
+        }
+
+        /// <summary>
+        /// Save All Changes. 
+        /// You have to trigger SaveChanges() to commit
+        /// </summary>
+        /// <returns></returns>
         public ISqlQueryable<T> Save()
         {
 
@@ -169,8 +260,11 @@ namespace EntityWorker.Core.Object.Library
             return this;
         }
 
-
-
+        /// <summary>
+        /// Save All Changes. 
+        /// You have to trigger SaveChanges() to commit
+        /// </summary>
+        /// <returns></returns>
         public ISqlQueryable<T> SaveAll(Func<T, bool> match)
         {
 
@@ -179,6 +273,11 @@ namespace EntityWorker.Core.Object.Library
             return this;
         }
 
+        /// <summary>
+        /// Remove All objects herarkie. 
+        /// You have to trigger SaveChanges() to commit
+        /// </summary>
+        /// <returns></returns>
         public void Remove()
         {
             foreach (var item in Execute())
@@ -186,7 +285,11 @@ namespace EntityWorker.Core.Object.Library
             this.Clear();
         }
 
-
+        /// <summary>
+        /// Remove All objects herarkie. 
+        /// You have to trigger SaveChanges() to commit
+        /// </summary>
+        /// <returns></returns>
         public void RemoveAll(Func<T, bool> match)
         {
             foreach (var item in Execute().Where(match))
@@ -198,21 +301,37 @@ namespace EntityWorker.Core.Object.Library
                 base.Remove(item);
         }
 
+        /// <summary>
+        /// Commit Changes
+        /// </summary>
         public void SaveChanges()
         {
             _repository.SaveChanges();
         }
 
+        /// <summary>
+        /// Convert to LightDataTable
+        /// </summary>
+        /// <returns></returns>
         public ILightDataTable ToTable()
         {
             return new LightDataTable(Execute());
         }
 
+        /// <summary>
+        /// Convert Object of type a to b 
+        /// all properties of B have to be mapped using attribute PropertyName or the propertName of A = B eg a."UserId" = b."UserId" 
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <returns></returns>
         public List<TSource> ExecuteAndConvertToType<TSource>() where TSource : class
         {
             return Execute().ToType<List<TSource>>();
         }
 
+        /// <summary>
+        /// Dispose the repository
+        /// </summary>
         public void Dispose()
         {
             _repository?.Dispose();

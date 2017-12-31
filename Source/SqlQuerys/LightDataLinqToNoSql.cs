@@ -18,7 +18,11 @@ namespace EntityWorker.Core.SqlQuerys
         private ExpressionType? _overridedNodeType;
         private readonly List<string> _columns;
         private const string stringyFy = "<StringFy>[#]</StringFy>";
-        private Regex stringyFyExp = new Regex(@"<StringFy>\[.*?\]</StringFy>");
+        private Regex StringyFyExp = new Regex(@"<StringFy>\[.*?\]</StringFy>");
+        private const string boolString = "<bool>[#]</bool>";
+        private Regex BoolExp = new Regex(@"<bool>\[.*?\]</bool>");
+        private string _primaryId;
+
         private static Dictionary<string, Type> SavedTypes = new Dictionary<string, Type>();
         public Dictionary<string, Tuple<string, string>> JoinClauses { get; private set; } = new Dictionary<string, Tuple<string, string>>();
 
@@ -38,7 +42,7 @@ namespace EntityWorker.Core.SqlQuerys
             {
                "["+ (typeof(T).GetCustomAttribute<Table>()?.Name ?? typeof(T).Name) + "].*"
             };
-            OrderBy = typeof(T).GetPrimaryKey()?.GetPropertyName();
+            _primaryId = OrderBy = typeof(T).GetPrimaryKey()?.GetPropertyName();
 
         }
 
@@ -74,6 +78,20 @@ namespace EntityWorker.Core.SqlQuerys
             }
         }
 
+        public string Count
+        {
+            get
+            {
+                WhereClause.RemoveAll(x => string.IsNullOrEmpty(x));
+                var tableName = typeof(T).GetCustomAttribute<Table>()?.Name ?? typeof(T).Name;
+                var query = "SELECT count(distinct [" + tableName + "]." + _primaryId + ") as items FROM [" + tableName + "] " + System.Environment.NewLine +
+                       string.Join(System.Environment.NewLine, JoinClauses.Values.Select(x => x.Item2)) +
+                       System.Environment.NewLine + (WhereClause.Any() ? "WHERE " : string.Empty) + string.Join(" AND ", WhereClause.ToArray());
+                query = query.TrimEnd(" AND ").TrimEnd(" OR ");
+                return query;
+            }
+        }
+
         public string QuaryExist
         {
             get
@@ -89,8 +107,7 @@ namespace EntityWorker.Core.SqlQuerys
         {
             this.sb = new StringBuilder();
             this.Visit(expression);
-            if (sb.ToString().Contains("{IsNullOrEmpty}"))
-                sb = new StringBuilder(sb.ToString().Replace("{IsNullOrEmpty}", " = 1 "));
+            validateBinaryExpression(null, null);
             WhereClause.Add(this.sb.ToString());
         }
 
@@ -173,15 +190,16 @@ namespace EntityWorker.Core.SqlQuerys
             }
             else if (m.Method.Name == "IsNullOrEmpty")
             {
+
                 var invert = sb.ToString().EndsWith("NOT ");
-                sb.Append("((case when");
+                GetInvert();
+                sb.Append("((case when ");
                 this.Visit(m.Arguments[0]);
-                sb.Append(" IS NULL then " + (!invert ? 1 : 0) + " else case when");
+                sb.Append(" IS NULL then 1 else case when");
                 this.Visit(m.Arguments[0]);
-                sb.Append(" = '' then " + (!invert ? 1 : 0) + " else " + (!invert ? 0 : 1) + " end end)");
+                sb.Append(" = '' then 1 else 0 end end)");
                 sb.Append(")");
-                if (!invert)
-                    sb.Append("{IsNullOrEmpty}");
+                sb.Append(boolString.Replace("#", invert ? "0" : "1"));
                 return m;
             }
             else if (m.Method.Name == "Contains")
@@ -324,17 +342,8 @@ namespace EntityWorker.Core.SqlQuerys
             switch (u.NodeType)
             {
                 case ExpressionType.Not:
-                    //if (!u.ToString().Contains("IsNullOrEmpty"))
                     sb.Append(" NOT ");
                     this.Visit(u.Operand);
-                    if (u.ToString().Contains("IsNullOrEmpty"))
-                    {
-                        if (sb.ToString().Length >= "{IsNullOrEmpty}".Length &&
-                            sb.ToString().Substring(sb.ToString().Length - "{IsNullOrEmpty}".Length) == "{IsNullOrEmpty}"
-                            && sb.ToString().Contains("{IsNullOrEmpty}"))
-                            sb = new StringBuilder(sb.ToString().Substring(0, sb.ToString().Length - "{IsNullOrEmpty}".Length));
-                        sb.Append(" = 1 ");
-                    }
                     break;
                 case ExpressionType.Convert:
                     this.Visit(u.Operand);
@@ -347,10 +356,9 @@ namespace EntityWorker.Core.SqlQuerys
 
         private string CleanText(string replaceWith = null)
         {
-            //<StringFy>\[.*?\]</StringFy>
             MatchCollection matches = null;
             var result = "";
-            while ((matches = stringyFyExp.Matches(sb.ToString())).Count > 0)
+            while ((matches = StringyFyExp.Matches(sb.ToString())).Count > 0)
             {
                 var exp = matches[0];
 
@@ -363,6 +371,42 @@ namespace EntityWorker.Core.SqlQuerys
             return result;
         }
 
+        private void validateBinaryExpression(BinaryExpression b, Expression exp)
+        {
+
+
+
+            if (b != null && exp != null)
+            {
+
+                var stringFyText = StringyFyExp.Matches(sb.ToString()).Cast<Match>().FirstOrDefault();
+                var isEnum = stringFyText != null;
+                if ((exp.NodeType == ExpressionType.MemberAccess || exp.NodeType == ExpressionType.Not)
+                    && b.NodeType != ExpressionType.Equal
+                    && b.NodeType != ExpressionType.NotEqual && (exp.Type == typeof(bool) || exp.Type == typeof(bool?)))
+                    if (exp.NodeType != ExpressionType.Not)
+                        sb.Append(" = 1");
+                    else sb.Append(" = 0");
+            }
+            else
+            {
+                MatchCollection matches = null;
+                var result = "";
+                while ((matches = BoolExp.Matches(sb.ToString())).Count > 0)
+                {
+                    var m = matches[0];
+                    result = m.Value.Replace("</bool>", "").TrimEnd(']').Substring(@"<bool>\[".Length - 1);
+                    var addValue = m.Index + boolString.Length + 3 <= sb.Length ? sb.ToString().Substring(m.Index, boolString.Length + 3) : string.Empty;
+                    sb = sb.Remove(m.Index, m.Value.Length);
+                    if (!addValue.Contains("="))
+                    {
+                        sb = sb.Insert(m.Index, " = " + result);
+                    }
+                }
+            }
+
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -372,24 +416,9 @@ namespace EntityWorker.Core.SqlQuerys
         {
             sb.Append("(");
             this.Visit(b.Left);
-            if (sb.ToString().Length >= "{IsNullOrEmpty}".Length &&
-                sb.ToString().Substring(sb.ToString().Length - "{IsNullOrEmpty}".Length) == "{IsNullOrEmpty}" &&
-                sb.ToString().Contains("{IsNullOrEmpty}") && !(b.NodeType == ExpressionType.Or ||
-                b.NodeType == ExpressionType.OrElse ||
-                b.NodeType == ExpressionType.And ||
-                b.NodeType == ExpressionType.AndAlso ||
-                b.NodeType == ExpressionType.And
-                ))
-                sb = new StringBuilder(sb.ToString().Substring(0, sb.ToString().Length - "{IsNullOrEmpty}".Length));
-            var stringFyText = stringyFyExp.Matches(sb.ToString()).Cast<Match>().FirstOrDefault();
+            var stringFyText = StringyFyExp.Matches(sb.ToString()).Cast<Match>().FirstOrDefault();
             var isEnum = stringFyText != null;
-            if ((b.Left.NodeType == ExpressionType.MemberAccess || b.Left.NodeType == ExpressionType.Not)
-                && b.NodeType != ExpressionType.Equal
-                && b.NodeType != ExpressionType.NotEqual && b.Left.Type == typeof(bool))
-                if (b.Left.NodeType != ExpressionType.Not)
-                    sb.Append(" = 1");
-                else sb.Append(" = 0");
-
+            validateBinaryExpression(b, b.Left);
             switch (b.NodeType)
             {
                 case ExpressionType.And:
@@ -482,6 +511,7 @@ namespace EntityWorker.Core.SqlQuerys
             }
 
             this.Visit(b.Right);
+            validateBinaryExpression(b, b.Right);
             sb.Append(")");
             return b;
         }
@@ -493,6 +523,10 @@ namespace EntityWorker.Core.SqlQuerys
             if (value == null)
                 return "NULL";
             var type = value.GetType();
+
+            if (type == typeof(bool) || type == typeof(bool?))
+                return value.ConvertValue<bool>() ? "1" : "0";
+
             if (type == typeof(string))
                 return string.Format("String[{0}]", value);
             if (type == typeof(DateTime) || type == typeof(DateTime?) || type == typeof(TimeSpan) || type == typeof(TimeSpan?))
@@ -533,7 +567,7 @@ namespace EntityWorker.Core.SqlQuerys
         protected Expression VisitConstantFixed(ConstantExpression c, string memName = "")
         {
             IQueryable q = c.Value as IQueryable;
-            var stringFyText = stringyFyExp.Matches(sb.ToString()).Cast<Match>().FirstOrDefault();
+            var stringFyText = StringyFyExp.Matches(sb.ToString()).Cast<Match>().FirstOrDefault();
             var isEnum = stringFyText != null;
             string type = null;
             if (isEnum)
@@ -643,13 +677,15 @@ namespace EntityWorker.Core.SqlQuerys
                     if (isNot)
                     {
                         if (!hasValueAttr)
-                            columnName = "(case when " + columnName + " = 0 then 1 else 0 end)";
-                        else columnName = "(case when " + columnName + " IS NULL then 1 else 0 end)";
+                            columnName = "(case when " + columnName + " = 0 then 1 else 0 end)" + boolString.Replace("#", "0");
+                        else columnName = "(case when " + columnName + " IS NULL then 1 else 0 end)" + boolString.Replace("#", "0");
                     }
                     else if (hasValueAttr)
                     {
-                        columnName = "(case when " + columnName + " IS NULL then 0 else 1 end)";
+                        columnName = "(case when " + columnName + " IS NULL then 0 else 1 end)" + boolString.Replace("#", "1");
                     }
+                    else if (prop.PropertyType == typeof(bool) || prop.PropertyType == typeof(bool?))
+                        columnName = columnName + boolString.Replace("#", "1");
                     sb.Append(columnName);
                     return m;
                 }
