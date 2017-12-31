@@ -322,6 +322,11 @@ There is many attributes you could use to make your code better
 /// </summary>
 [Table]
 
+/// <summary>
+/// Assign Default Value when Property is null
+/// </summary>
+[DefaultOnEmpty]
+
 ```
 
 
