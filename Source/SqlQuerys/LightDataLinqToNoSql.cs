@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using EntityWorker.Core.Attributes;
 using EntityWorker.Core.Helper;
+using EntityWorker.Core.Object.Library;
 using FastDeepCloner;
 
 namespace EntityWorker.Core.SqlQuerys
@@ -21,6 +22,9 @@ namespace EntityWorker.Core.SqlQuerys
         private Regex StringyFyExp = new Regex(@"<StringFy>\[.*?\]</StringFy>");
         private const string boolString = "<bool>[#]</bool>";
         private Regex BoolExp = new Regex(@"<bool>\[.*?\]</bool>");
+
+        private const string dataEncodeString = "<DataEncode>[#]</DataEncode>";
+        private Regex DataEncodeExp = new Regex(@"<DataEncode>\[.*?\]</DataEncode>");
         private string _primaryId;
 
         private static Dictionary<string, Type> SavedTypes = new Dictionary<string, Type>();
@@ -195,8 +199,10 @@ namespace EntityWorker.Core.SqlQuerys
                 GetInvert();
                 sb.Append("((case when ");
                 this.Visit(m.Arguments[0]);
+                CleanDecoder("");
                 sb.Append(" IS NULL then 1 else case when");
                 this.Visit(m.Arguments[0]);
+                CleanDecoder("");
                 sb.Append(" = '' then 1 else 0 end end)");
                 sb.Append(")");
                 sb.Append(boolString.Replace("#", invert ? "0" : "1"));
@@ -212,19 +218,18 @@ namespace EntityWorker.Core.SqlQuerys
                     var value = GetSingleValue(m.Arguments[0]);
                     this.Visit(m.Object);
                     if (!string.IsNullOrEmpty(invert))
-                        sb.Append(invert);
-                    sb.Append(" like ");
+                        InsertBeforeDecoder(invert);
+                    InsertBeforeDecoder(" like ");
                     var v = string.Format("String[%{0}%]", value);
-                    sb.Append(v);
+                    CleanDecoder(v);
                 }
                 else
                 {
                     var invert = GetInvert();
                     this.Visit(m.Arguments[0]);
                     if (!string.IsNullOrEmpty(invert))
-                        sb.Append(invert);
-                    sb.Append(" in ");
-                    sb.Append("(");
+                        InsertBeforeDecoder(invert);
+                    InsertBeforeDecoder(" in (");
                     try
                     {
                         var stringFy = (m.Arguments[0] as MemberExpression).Member as PropertyInfo != null ? ((m.Arguments[0] as MemberExpression).Member as PropertyInfo).GetCustomAttributes<StringFy>() != null : false;
@@ -235,9 +240,13 @@ namespace EntityWorker.Core.SqlQuerys
                         {
                             var v = ValuetoSql(value, stringFy);
                             if (string.IsNullOrEmpty(v))
-                                v = ValuetoSql(string.Format("DefaultValueForEmptyArray({0})", Guid.NewGuid().ToString()), stringFy);
+                            {
+                                if (stringFy)
+                                    v = ValuetoSql(string.Format("DefaultValueForEmptyArray({0})", Guid.NewGuid().ToString()), stringFy);
+                                else v = ValuetoSql(-1, stringFy);
+                            }
 
-                            sb.Append(v);
+                            CleanDecoder(v);
                         }
                     }
                     catch
@@ -257,20 +266,20 @@ namespace EntityWorker.Core.SqlQuerys
                     var value = GetSingleValue(m.Arguments[0]);
                     this.Visit(m.Object);
                     if (!string.IsNullOrEmpty(invert))
-                        sb.Append(invert);
-                    sb.Append(" like ");
+                        InsertBeforeDecoder(invert);
+                    InsertBeforeDecoder(" like ");
                     var v = string.Format("String[{0}%]", value);
-                    sb.Append(v);
+                    CleanDecoder(v);
                 }
                 else
                 {
                     var invert = GetInvert();
                     this.Visit(m.Arguments[0]);
                     if (!string.IsNullOrEmpty(invert))
-                        sb.Append(invert);
-                    sb.Append(" like ");
+                        InsertBeforeDecoder(invert);
+                    InsertBeforeDecoder(" like ");
                     var v = string.Format("String[{0}%]", ex.Value.GetType().GetFields().First().GetValue(ex.Value));
-                    sb.Append(v);
+                    CleanDecoder(v);
                 }
                 return m;
             }
@@ -284,20 +293,20 @@ namespace EntityWorker.Core.SqlQuerys
                     var value = GetSingleValue(m.Arguments[0]);
                     this.Visit(m.Object);
                     if (!string.IsNullOrEmpty(invert))
-                        sb.Append(invert);
-                    sb.Append(" like ");
+                        InsertBeforeDecoder(invert);
+                    InsertBeforeDecoder(" like ");
                     var v = string.Format("String[%{0}]", value);
-                    sb.Append(v);
+                    CleanDecoder(v);
                 }
                 else
                 {
                     var invert = GetInvert();
                     this.Visit(m.Arguments[0]);
                     if (!string.IsNullOrEmpty(invert))
-                        sb.Append(invert);
-                    sb.Append(" like ");
+                        InsertBeforeDecoder(invert);
+                    InsertBeforeDecoder(" like ");
                     var v = string.Format("String[%{0}]", ex.Value.GetType().GetFields().First().GetValue(ex.Value));
-                    sb.Append(v);
+                    CleanDecoder(v);
                 }
                 return m;
             }
@@ -371,6 +380,60 @@ namespace EntityWorker.Core.SqlQuerys
             return result;
         }
 
+        public bool EndWithDecoder()
+        {
+            return sb.ToString().Trim().EndsWith("</DataEncode>");
+        }
+
+        public void InsertBeforeDecoder(string text)
+        {
+            if (EndWithDecoder())
+                sb = sb.InsertBefore(text, "<DataEncode>");
+            else sb.Append(text);
+        }
+
+        internal void CleanDecoder(string replaceWith)
+        {
+            if (!EndWithDecoder())
+                sb.Append(replaceWith);
+            else
+            {
+                MatchCollection matches = null;
+                var result = "";
+                while ((matches = DataEncodeExp.Matches(sb.ToString())).Count > 0)
+                {
+                    var m = matches[0];
+                    result = m.Value.Replace("</DataEncode>", "").TrimEnd(']').Substring(@"<DataEncode>\[".Length - 1); // get the key
+                    sb = sb.Remove(m.Index, m.Value.Length);
+                    if (replaceWith.Contains("String["))
+                    {
+                        var xValue = replaceWith.Trim().Replace("String[", "").TrimEnd("]");
+                        var rValue = xValue.TrimStart('%').TrimEnd("%");
+                        var codedValue = new DataCipher(result).Encrypt(rValue);
+                        if (xValue.StartsWith("%"))
+                            codedValue = "%" + codedValue;
+                        if (xValue.EndsWith("%"))
+                            codedValue += "%";
+                        sb.Insert(m.Index, "String[" + codedValue + "]");
+                    }
+                    else if (replaceWith.Contains("Date["))
+                    {
+                        var xValue = replaceWith.Trim().Replace("Date[", "").TrimEnd("]");
+                        var rValue = xValue.TrimStart('%').TrimEnd("%");
+                        var codedValue = new DataCipher(result).Encrypt(rValue);
+                        if (xValue.StartsWith("%"))
+                            codedValue = "%" + codedValue;
+                        if (xValue.EndsWith("%"))
+                            codedValue += "%";
+                        sb.Insert(m.Index, "Date[" + codedValue + "]");
+                    }
+                    else
+                        sb = sb.Insert(m.Index, new DataCipher(result).Encrypt(replaceWith));
+
+                }
+            }
+        }
+
         private void validateBinaryExpression(BinaryExpression b, Expression exp)
         {
 
@@ -430,9 +493,6 @@ namespace EntityWorker.Core.SqlQuerys
                     break;
 
                 case ExpressionType.Or:
-                    sb.Append(" OR ");
-                    break;
-
                 case ExpressionType.OrElse:
                     sb.Append(" OR ");
                     break;
@@ -443,22 +503,22 @@ namespace EntityWorker.Core.SqlQuerys
                         if (isEnum)
                         {
                             CleanText();
-                            sb.Append(" IS ");
-                            sb.Append(stringFyText);
+                            InsertBeforeDecoder(" IS ");
+                            InsertBeforeDecoder(stringFyText.ToString());
                         }
                         else
-                            sb.Append(" IS ");
+                            CleanDecoder(" IS ");
                     }
                     else
                     {
                         if (isEnum)
                         {
                             CleanText();
-                            sb.Append(" = ");
-                            sb.Append(stringFyText);
+                            InsertBeforeDecoder(" = ");
+                            InsertBeforeDecoder(stringFyText.ToString());
                         }
                         else
-                            sb.Append(" = ");
+                            InsertBeforeDecoder(" = ");
                     }
                     break;
 
@@ -468,11 +528,11 @@ namespace EntityWorker.Core.SqlQuerys
                         if (isEnum)
                         {
                             CleanText();
-                            sb.Append(" IS NOT ");
-                            sb.Append(stringFyText);
+                            InsertBeforeDecoder(" IS NOT ");
+                            InsertBeforeDecoder(stringFyText.ToString());
                         }
                         else
-                            sb.Append(" IS NOT ");
+                            InsertBeforeDecoder(" IS NOT ");
 
                     }
                     else
@@ -480,29 +540,29 @@ namespace EntityWorker.Core.SqlQuerys
                         if (isEnum)
                         {
                             CleanText();
-                            sb.Append(" <> ");
-                            sb.Append(stringFyText);
+                            InsertBeforeDecoder(" <> ");
+                            InsertBeforeDecoder(stringFyText.ToString());
                         }
                         else
-                            sb.Append(" <> ");
+                            InsertBeforeDecoder(" <> ");
 
                     }
                     break;
 
                 case ExpressionType.LessThan:
-                    sb.Append(" < ");
+                    InsertBeforeDecoder(" < ");
                     break;
 
                 case ExpressionType.LessThanOrEqual:
-                    sb.Append(" <= ");
+                    InsertBeforeDecoder(" <= ");
                     break;
 
                 case ExpressionType.GreaterThan:
-                    sb.Append(" > ");
+                    InsertBeforeDecoder(" > ");
                     break;
 
                 case ExpressionType.GreaterThanOrEqual:
-                    sb.Append(" >= ");
+                    InsertBeforeDecoder(" >= ");
                     break;
 
                 default:
@@ -585,11 +645,11 @@ namespace EntityWorker.Core.SqlQuerys
                         break;
 
                     case TypeCode.String:
-                        sb.Append(string.Format("String[{0}]", c.Value));
+                        CleanDecoder(string.Format("String[{0}]", c.Value));
                         break;
 
                     case TypeCode.DateTime:
-                        sb.Append(string.Format("Date[{0}]", c.Value));
+                        CleanDecoder(string.Format("Date[{0}]", c.Value));
                         break;
 
                     case TypeCode.Object:
@@ -603,17 +663,17 @@ namespace EntityWorker.Core.SqlQuerys
 
                         if (value == null)
                             break;
-                        sb.Append(ValuetoSql(value, isEnum));
+                        CleanDecoder(ValuetoSql(value, isEnum));
                         break;
                     default:
                         if (isEnum && SavedTypes.ContainsKey(type))
                         {
                             var enumtype = SavedTypes[type];
                             var v = c.Value.ConvertValue(enumtype);
-                            sb.Append(ValuetoSql(v, isEnum));
+                            CleanDecoder(ValuetoSql(v, isEnum));
                             break;
                         }
-                        sb.Append(ValuetoSql(c.Value, isEnum));
+                        CleanDecoder(ValuetoSql(c.Value, isEnum));
                         break;
                 }
             }
@@ -664,6 +724,7 @@ namespace EntityWorker.Core.SqlQuerys
                     var name = prop.GetPropertyName();
                     var table = cl.GetCustomAttribute<Table>()?.Name ?? cl.Name;
                     var columnName = string.Format("[{0}].[{1}]", table, name);
+                    var dataEncode = prop.GetCustomAttribute<DataEncode>();
                     if (columnOnly)
                         return columnName;
 
@@ -686,6 +747,9 @@ namespace EntityWorker.Core.SqlQuerys
                     }
                     else if (prop.PropertyType == typeof(bool) || prop.PropertyType == typeof(bool?))
                         columnName = columnName + boolString.Replace("#", "1");
+
+                    if (dataEncode != null)
+                        columnName = columnName + dataEncodeString.Replace("#", dataEncode.Key);
                     sb.Append(columnName);
                     return m;
                 }

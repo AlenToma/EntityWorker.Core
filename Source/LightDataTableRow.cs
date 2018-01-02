@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using EntityWorker.Core.Attributes;
 using EntityWorker.Core.Helper;
+using EntityWorker.Core.Object.Library;
 
 namespace EntityWorker.Core
 {
@@ -467,6 +468,12 @@ namespace EntityWorker.Core
                         value = MethodHelper.DecodeStringFromBase64(value.ConvertValue<string>());
                     }
                 }
+                else if (value != null && pr.ContainAttribute<DataEncode>())
+                {
+
+                    value = new DataCipher(pr.GetCustomAttribute<DataEncode>().Key).Decrypt(value.ConvertValue<string>());
+
+                }
 
                 TypeValidation(ref value, pr.PropertyType, true);
                 try
@@ -513,6 +520,9 @@ namespace EntityWorker.Core
                         value = MethodHelper.DecodeStringFromBase64(value.ConvertValue<string>());
                     }
                 }
+                else if (value != null && pr.ContainAttribute<DataEncode>())
+                    value = new DataCipher(pr.GetCustomAttribute<DataEncode>().Key).Decrypt(value.ConvertValue<string>());
+
                 TypeValidation(ref value, pr.PropertyType, true);
                 try
                 {

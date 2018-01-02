@@ -7,6 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Text;
 using EntityWorker.Core.Attributes;
 using EntityWorker.Core.Interface;
 using EntityWorker.Core.InterFace;
@@ -42,7 +43,7 @@ namespace EntityWorker.Core.Helper
         /// <param name="includeIndependedData"> Clear all ids of object that contains IndependedData attributes</param>
         public static T ClearAllIdsHierarchy<T>(this T item, bool includeIndependedData = false) where T : IDbEntity
         {
-           return (T)ClearAllIdsHierarchy(item as object, includeIndependedData);
+            return (T)ClearAllIdsHierarchy(item as object, includeIndependedData);
         }
 
         /// <summary>
@@ -53,7 +54,7 @@ namespace EntityWorker.Core.Helper
         /// <param name="includeIndependedData"> Clear all ids of object that contains IndependedData attributes</param>
         public static List<T> ClearAllIdsHierarchy<T>(List<T> item, bool includeIndependedData = false) where T : IDbEntity
         {
-          return (List<T>)ClearAllIdsHierarchy(item as object, includeIndependedData);
+            return (List<T>)ClearAllIdsHierarchy(item as object, includeIndependedData);
         }
 
         /// <summary>
@@ -108,24 +109,57 @@ namespace EntityWorker.Core.Helper
         /// </summary>
         /// <param name="str">Source string</param>
         /// <param name="text"> string to insert</param>
-        /// <param name="ch">insert after a specific char, count is from last</param>
+        /// <param name="identifier"></param>
+        /// <param name="insertLastIfNotFound">insert after a specific string, count is from last</param>
         /// <returns></returns>
-        public static string InsertLast(this string str, string text, char ch)
+        public static string InsertAfter(this string str, string text, string identifier, bool insertLastIfNotFound = true)
         {
-            str = str.Trim();
-            if (string.IsNullOrEmpty(ch.ToString()))
-                str = str.Insert(str.Length - 1, text);
-            else
+            var txt = "";
+            var found = false;
+            for (var j = str.Length - 1; j >= 0; j--)
             {
-                var i = str.Length - 1;
-                for (var j = str.Length - 1; j >= 0; j--)
+                txt = str[j] + txt;
+                if (txt == identifier)
                 {
-                    if (str[j] == ch) continue;
-                    i = j + 1;
+                    str = str.Insert(j, text);
+                    found = true;
                     break;
                 }
-                str = str.Insert(i, text);
+                else if (txt.Length >= identifier.Length || txt.Last() != identifier.Last() || (txt.Length >= 2 && identifier.Length >= 2 && txt[txt.Length - 2] != identifier[identifier.Length - 2]))
+                    txt = "";
             }
+
+            if (!found && insertLastIfNotFound)
+                str += text;
+            return str;
+        }
+
+        public static string InsertBefore(this string str, string text, string identifier, bool insertLastIfNotFound = true)
+        {
+            var txt = "";
+            var found = false;
+            for (var j = str.Length - 1; j >= 0; j--)
+            {
+                txt = str[j] + txt;
+                if (txt == identifier)
+                {
+                    str = str.Insert(j, text);
+                    found = true;
+                    break;
+                }
+                else if (txt.Length >= identifier.Length || txt.Last() != identifier.Last() || (txt.Length >= 2 && identifier.Length >= 2 && txt[txt.Length - 2] != identifier[identifier.Length - 2]))
+                    txt = "";
+            }
+            if (!found && insertLastIfNotFound)
+                str += text;
+
+            return str;
+        }
+
+
+        public static StringBuilder InsertBefore(this StringBuilder str, string text, string identifier, bool insertLastIfNotFound = true)
+        {
+            str = new StringBuilder(str.ToString().InsertBefore(text, identifier, insertLastIfNotFound));
             return str;
         }
 

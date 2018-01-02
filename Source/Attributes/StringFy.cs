@@ -7,7 +7,7 @@ namespace EntityWorker.Core.Attributes
     /// mostly used when we don't want an enum to be saved as integer in the database
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
-    public sealed class StringFy : Attribute
+    public class StringFy : Attribute
     {
     }
 }

@@ -275,11 +275,37 @@ namespace EntityWorker.Core
             try
             {
                 _repository.CreateTransaction();
-                // begin deleting all object that refer to the requested object
-                for (var i = sql.Count - 1; i >= 0; i--)
+
+                var i = sql.Count - 1;
+                var exceptionCount = 0;
+                Exception firstChanceExcepion = null;
+
+                while (sql.Count > 0 && exceptionCount <= 10)
                 {
-                    var cmd = _repository.GetSqlCommand(sql[i]);
-                    cmd.ExecuteNonQuery();
+                    try
+                    {
+                        if (i < 0)
+                            i = sql.Count - 1;
+
+                        var cmd = _repository.GetSqlCommand(sql[i]);
+                        cmd.ExecuteNonQuery();
+                        sql.RemoveAt(i);
+                        i--;
+
+                    }
+                    catch (Exception e)
+                    {
+                        firstChanceExcepion = e;
+                        exceptionCount++;
+                        i--;
+                    }
+
+
+                }
+
+                if (exceptionCount >= 10)
+                {
+                    throw firstChanceExcepion;
                 }
             }
             catch
@@ -384,8 +410,16 @@ namespace EntityWorker.Core
                         }
                     }
 
-                    if (col.ContainAttribute<StringFy>())
+                    if (col.ContainAttribute<StringFy>() || col.ContainAttribute<DataEncode>())
                         v = v?.ConvertValue<string>();
+
+                    if (col.ContainAttribute<DataEncode>())
+                    {
+                        if (col.PropertyType != typeof(string))
+                            throw new NoNullAllowedException(string.Format("Property {0} Contain DataEncode. PropertyType must be of type String .", col.FullName));
+                        v = new DataCipher(col.GetCustomAttribute<DataEncode>().Key).Encrypt(v.ToString());
+
+                    }
 
                     if (col.ContainAttribute<NotNullable>() && v == null && defaultOnEmpty == null)
                         throw new NoNullAllowedException(string.Format("Property {0} dose not allow null.", col.FullName));
@@ -395,7 +429,7 @@ namespace EntityWorker.Core
                     if (v == null && defaultOnEmpty != null)
                         v = defaultOnEmpty.Value;
 
-                    _repository.AddInnerParameter(cmd, col.GetPropertyName(), v, (col.ContainAttribute<StringFy>() ? _repository.GetSqlType(typeof(string)) : _repository.GetSqlType(col.PropertyType)));
+                    _repository.AddInnerParameter(cmd, col.GetPropertyName(), v, (col.ContainAttribute<StringFy>() || col.ContainAttribute<DataEncode>() || col.ContainAttribute<ToBase64String>() ? _repository.GetSqlType(typeof(string)) : _repository.GetSqlType(col.PropertyType)));
                 }
 
                 if (!primaryKey.HasValue)
@@ -484,7 +518,7 @@ namespace EntityWorker.Core
                     var propName = string.Format("[{0}]", prop.GetPropertyName());
                     sql.Append(propName + " ");
 
-                    if (prop.ContainAttribute<StringFy>())
+                    if (prop.ContainAttribute<StringFy>() || prop.ContainAttribute<DataEncode>() || prop.ContainAttribute<ToBase64String>())
                         dbType = typeof(string).GetDbTypeByType();
 
                     if (!prop.ContainAttribute<PrimaryKey>() || _repository.DataBaseTypes == DataBaseTypes.Mssql)
