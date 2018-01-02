@@ -216,19 +216,21 @@ namespace EntityWorker.Core.SqlQuerys
                 {
                     var invert = GetInvert();
                     var value = GetSingleValue(m.Arguments[0]);
+                    sb.Append("(case when ");
                     this.Visit(m.Object);
-                    if (!string.IsNullOrEmpty(invert))
-                        InsertBeforeDecoder(invert);
                     InsertBeforeDecoder(" like ");
                     var v = string.Format("String[%{0}%]", value);
                     CleanDecoder(v);
+                    sb.Append(" then 1 else 0 end) ");
+                    sb.Append(boolString.Replace("#", !string.IsNullOrEmpty(invert) ? "0" : "1"));
                 }
                 else
                 {
                     var invert = GetInvert();
+                    sb.Append("(case when ");
                     this.Visit(m.Arguments[0]);
-                    if (!string.IsNullOrEmpty(invert))
-                        InsertBeforeDecoder(invert);
+                    //if (!string.IsNullOrEmpty(invert))
+                    //    InsertBeforeDecoder(invert);
                     InsertBeforeDecoder(" in (");
                     try
                     {
@@ -253,7 +255,8 @@ namespace EntityWorker.Core.SqlQuerys
                     {
                         this.Visit(ex);
                     }
-                    sb.Append(")");
+                    sb.Append(") then 1 else 0 end) ");
+                    sb.Append(boolString.Replace("#", !string.IsNullOrEmpty(invert) ? "0" : "1"));
                 }
                 return m;
             }
@@ -264,22 +267,28 @@ namespace EntityWorker.Core.SqlQuerys
                 {
                     var invert = GetInvert();
                     var value = GetSingleValue(m.Arguments[0]);
+                    sb.Append("(case when ");
                     this.Visit(m.Object);
-                    if (!string.IsNullOrEmpty(invert))
-                        InsertBeforeDecoder(invert);
                     InsertBeforeDecoder(" like ");
                     var v = string.Format("String[{0}%]", value);
                     CleanDecoder(v);
+                    sb.Append(" then 1 else 0 end) ");
+                    sb.Append(boolString.Replace("#", !string.IsNullOrEmpty(invert) ? "0" : "1"));
+
                 }
                 else
                 {
+
                     var invert = GetInvert();
+                    sb.Append("(case when ");
                     this.Visit(m.Arguments[0]);
-                    if (!string.IsNullOrEmpty(invert))
-                        InsertBeforeDecoder(invert);
                     InsertBeforeDecoder(" like ");
-                    var v = string.Format("String[{0}%]", ex.Value.GetType().GetFields().First().GetValue(ex.Value));
+                    var value = (((MemberExpression)m.Object).Member as FieldInfo) != null ? (((MemberExpression)m.Object).Member as FieldInfo)?.GetValue(ex.Value) : (((MemberExpression)m.Object).Member as PropertyInfo)?.GetValue(ex.Value);
+                    var v = string.Format("String[{0}%]", value);
                     CleanDecoder(v);
+                    sb.Append(" then 1 else 0 end) ");
+                    sb.Append(boolString.Replace("#", !string.IsNullOrEmpty(invert) ? "0" : "1"));
+
                 }
                 return m;
             }
@@ -291,22 +300,28 @@ namespace EntityWorker.Core.SqlQuerys
                 {
                     var invert = GetInvert();
                     var value = GetSingleValue(m.Arguments[0]);
+                    sb.Append("(case when ");
                     this.Visit(m.Object);
-                    if (!string.IsNullOrEmpty(invert))
-                        InsertBeforeDecoder(invert);
                     InsertBeforeDecoder(" like ");
                     var v = string.Format("String[%{0}]", value);
                     CleanDecoder(v);
+                    sb.Append(" then 1 else 0 end) ");
+                    sb.Append(boolString.Replace("#", !string.IsNullOrEmpty(invert) ? "0" : "1"));
+
                 }
                 else
                 {
+
                     var invert = GetInvert();
+                    sb.Append("(case when ");
                     this.Visit(m.Arguments[0]);
-                    if (!string.IsNullOrEmpty(invert))
-                        InsertBeforeDecoder(invert);
                     InsertBeforeDecoder(" like ");
-                    var v = string.Format("String[%{0}]", ex.Value.GetType().GetFields().First().GetValue(ex.Value));
+                    var value = (((MemberExpression)m.Object).Member as FieldInfo) != null ? (((MemberExpression)m.Object).Member as FieldInfo)?.GetValue(ex.Value) : (((MemberExpression)m.Object).Member as PropertyInfo)?.GetValue(ex.Value);
+                    var v = string.Format("String[%{0}]", value);
                     CleanDecoder(v);
+                    sb.Append(" then 1 else 0 end) ");
+                    sb.Append(boolString.Replace("#", !string.IsNullOrEmpty(invert) ? "0" : "1"));
+
                 }
                 return m;
             }
@@ -407,25 +422,37 @@ namespace EntityWorker.Core.SqlQuerys
                     sb = sb.Remove(m.Index, m.Value.Length);
                     if (replaceWith.Contains("String["))
                     {
-                        var xValue = replaceWith.Trim().Replace("String[", "").TrimEnd("]");
-                        var rValue = xValue.TrimStart('%').TrimEnd("%");
-                        var codedValue = new DataCipher(result).Encrypt(rValue);
-                        if (xValue.StartsWith("%"))
-                            codedValue = "%" + codedValue;
-                        if (xValue.EndsWith("%"))
-                            codedValue += "%";
-                        sb.Insert(m.Index, "String[" + codedValue + "]");
+                        var spt = replaceWith.Split(new string[] { "]," }, StringSplitOptions.None).Where(x => !string.IsNullOrEmpty(x));
+                        var isFirst = true;
+                        foreach (var str in spt)
+                        {
+                            var xValue = str.Trim().Replace("String[", "").TrimEnd("]");
+                            var rValue = xValue.TrimStart('%').TrimEnd("%");
+                            var codedValue = new DataCipher(result).Encrypt(rValue);
+                            if (xValue.StartsWith("%"))
+                                codedValue = "%" + codedValue;
+                            if (xValue.EndsWith("%"))
+                                codedValue += "%";
+                            sb.Insert(m.Index, (!isFirst ? "," : "") + "String[" + codedValue + "]");
+                            isFirst = false;
+                        }
                     }
                     else if (replaceWith.Contains("Date["))
                     {
-                        var xValue = replaceWith.Trim().Replace("Date[", "").TrimEnd("]");
-                        var rValue = xValue.TrimStart('%').TrimEnd("%");
-                        var codedValue = new DataCipher(result).Encrypt(rValue);
-                        if (xValue.StartsWith("%"))
-                            codedValue = "%" + codedValue;
-                        if (xValue.EndsWith("%"))
-                            codedValue += "%";
-                        sb.Insert(m.Index, "Date[" + codedValue + "]");
+                        var spt = replaceWith.Split(new string[] { "]," }, StringSplitOptions.None).Where(x => !string.IsNullOrEmpty(x));
+                        var isFirst = true;
+                        foreach (var str in spt)
+                        {
+                            var xValue = str.Trim().Replace("Date[", "").TrimEnd("]");
+                            var rValue = xValue.TrimStart('%').TrimEnd("%");
+                            var codedValue = new DataCipher(result).Encrypt(rValue);
+                            if (xValue.StartsWith("%"))
+                                codedValue = "%" + codedValue;
+                            if (xValue.EndsWith("%"))
+                                codedValue += "%";
+                            sb.Insert(m.Index, (!isFirst ? "," : "") + "Date[" + codedValue + "]");
+                            isFirst = false;
+                        }
                     }
                     else
                         sb = sb.Insert(m.Index, new DataCipher(result).Encrypt(replaceWith));
@@ -447,9 +474,11 @@ namespace EntityWorker.Core.SqlQuerys
                 if ((exp.NodeType == ExpressionType.MemberAccess || exp.NodeType == ExpressionType.Not)
                     && b.NodeType != ExpressionType.Equal
                     && b.NodeType != ExpressionType.NotEqual && (exp.Type == typeof(bool) || exp.Type == typeof(bool?)))
+                {
                     if (exp.NodeType != ExpressionType.Not)
                         sb.Append(" = 1");
                     else sb.Append(" = 0");
+                }
             }
             else
             {
