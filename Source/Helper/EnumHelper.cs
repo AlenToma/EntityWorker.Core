@@ -27,4 +27,10 @@
         Password,
         CheckBox
     }
+
+    public enum DataCipherKeySize
+    {
+        Key_128 = 128,
+        Key_256 = 256
+    }
 }

@@ -19,8 +19,8 @@ namespace EntityWorker.Core
             Columns = new ColumnsCollections<string>();
             ColumnsWithIndexKey = new ColumnsCollections<int>();
             RoundingSettings = new RoundingSettings();
-            ValidateCulture();
             Culture = cultureInfo ?? new CultureInfo("en");
+            ValidateCulture();
         }
 
         public LightDataTableShared()
@@ -28,8 +28,8 @@ namespace EntityWorker.Core
             Columns = new ColumnsCollections<string>();
             ColumnsWithIndexKey = new ColumnsCollections<int>();
             RoundingSettings = new RoundingSettings();
-            ValidateCulture();
             Culture = new CultureInfo("en");
+            ValidateCulture();
         }
 
 
@@ -97,7 +97,7 @@ namespace EntityWorker.Core
         {
             try
             {
-                if (System.Threading.Thread.CurrentThread.CurrentCulture.Name != Culture.Name) // vi behöver sätta det första gången bara. detta snabbar upp applikationen ta inte bort detta.
+                if (Culture != null && System.Threading.Thread.CurrentThread.CurrentCulture.Name != Culture.Name) // vi behöver sätta det första gången bara. detta snabbar upp applikationen ta inte bort detta.
                     System.Threading.Thread.CurrentThread.CurrentCulture = Culture;
             }
             catch
@@ -201,7 +201,7 @@ namespace EntityWorker.Core
                 {
                     if (value is int || value is long)
                     {
-                        if (Enum.IsDefined(dataType,Convert.ToInt32(value)))
+                        if (Enum.IsDefined(dataType, Convert.ToInt32(value)))
                             value = Enum.ToObject(dataType, Convert.ToInt32(value));
                     }
                     else if (Enum.IsDefined(dataType, value))

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EntityWorker.Core.Helper;
+using System;
 
 namespace EntityWorker.Core.Attributes
 {
@@ -14,15 +15,20 @@ namespace EntityWorker.Core.Attributes
     [AttributeUsage(AttributeTargets.Property)]
     public class DataEncode : Attribute
     {
-        internal string Key { get; set; } = "EntityWorker.Default.Key.Pass";
+        internal string Key { get; set; }
+
+        internal DataCipherKeySize KeySize { get; set; }
         /// <summary>
         /// Encode Key or leave it empty to use a EntityWorker.Core Defult Key
         /// </summary>
         /// <param name="key"></param>
-        public DataEncode(string key = null)
+        /// <param name="keySize"> NetCore 2 can only handle 128.  128 || 256 </param>
+        /// <param name=""></param>
+        public DataEncode(string key = null, DataCipherKeySize keySize = DataCipherKeySize.Key_128)
         {
             if (!string.IsNullOrEmpty(key))
                 Key = key;
+            KeySize = keySize;
         }
     }
 }

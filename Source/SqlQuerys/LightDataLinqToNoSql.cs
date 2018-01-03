@@ -414,11 +414,11 @@ namespace EntityWorker.Core.SqlQuerys
             else
             {
                 MatchCollection matches = null;
-                var result = "";
+                var result = new string[0];
                 while ((matches = DataEncodeExp.Matches(sb.ToString())).Count > 0)
                 {
                     var m = matches[0];
-                    result = m.Value.Replace("</DataEncode>", "").TrimEnd(']').Substring(@"<DataEncode>\[".Length - 1); // get the key
+                    result = m.Value.Replace("</DataEncode>", "").TrimEnd(']').Substring(@"<DataEncode>\[".Length - 1).Split('|'); // get the key
                     sb = sb.Remove(m.Index, m.Value.Length);
                     if (replaceWith.Contains("String["))
                     {
@@ -428,7 +428,7 @@ namespace EntityWorker.Core.SqlQuerys
                         {
                             var xValue = str.Trim().Replace("String[", "").TrimEnd("]");
                             var rValue = xValue.TrimStart('%').TrimEnd("%");
-                            var codedValue = new DataCipher(result).Encrypt(rValue);
+                            var codedValue = new DataCipher(result.First(), result.Last().ConvertValue<int>().ConvertValue<DataCipherKeySize>()).Encrypt(rValue);
                             if (xValue.StartsWith("%"))
                                 codedValue = "%" + codedValue;
                             if (xValue.EndsWith("%"))
@@ -445,7 +445,7 @@ namespace EntityWorker.Core.SqlQuerys
                         {
                             var xValue = str.Trim().Replace("Date[", "").TrimEnd("]");
                             var rValue = xValue.TrimStart('%').TrimEnd("%");
-                            var codedValue = new DataCipher(result).Encrypt(rValue);
+                            var codedValue = new DataCipher(result.First(), result.Last().ConvertValue<int>().ConvertValue<DataCipherKeySize>()).Encrypt(rValue);
                             if (xValue.StartsWith("%"))
                                 codedValue = "%" + codedValue;
                             if (xValue.EndsWith("%"))
@@ -455,7 +455,7 @@ namespace EntityWorker.Core.SqlQuerys
                         }
                     }
                     else
-                        sb = sb.Insert(m.Index, new DataCipher(result).Encrypt(replaceWith));
+                        sb = sb.Insert(m.Index, new DataCipher(result.First(), result.Last().ConvertValue<int>().ConvertValue<DataCipherKeySize>()).Encrypt(replaceWith));
 
                 }
             }
@@ -778,7 +778,7 @@ namespace EntityWorker.Core.SqlQuerys
                         columnName = columnName + boolString.Replace("#", "1");
 
                     if (dataEncode != null)
-                        columnName = columnName + dataEncodeString.Replace("#", dataEncode.Key);
+                        columnName = columnName + dataEncodeString.Replace("#", dataEncode.Key + "|" + ((int)dataEncode.KeySize).ToString());
                     sb.Append(columnName);
                     return m;
                 }

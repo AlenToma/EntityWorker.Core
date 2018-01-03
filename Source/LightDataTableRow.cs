@@ -471,7 +471,7 @@ namespace EntityWorker.Core
                 else if (value != null && pr.ContainAttribute<DataEncode>())
                 {
 
-                    value = new DataCipher(pr.GetCustomAttribute<DataEncode>().Key).Decrypt(value.ConvertValue<string>());
+                    value = new DataCipher(pr.GetCustomAttribute<DataEncode>().Key, pr.GetCustomAttribute<DataEncode>().KeySize).Decrypt(value.ConvertValue<string>());
 
                 }
 
@@ -521,7 +521,7 @@ namespace EntityWorker.Core
                     }
                 }
                 else if (value != null && pr.ContainAttribute<DataEncode>())
-                    value = new DataCipher(pr.GetCustomAttribute<DataEncode>().Key).Decrypt(value.ConvertValue<string>());
+                    value = new DataCipher(pr.GetCustomAttribute<DataEncode>().Key, pr.GetCustomAttribute<DataEncode>().KeySize).Decrypt(value.ConvertValue<string>());
 
                 TypeValidation(ref value, pr.PropertyType, true);
                 try

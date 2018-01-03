@@ -86,7 +86,7 @@ namespace EntityWorker.Core
         /// <returns></returns>
         public object GetById(long id, Type type)
         {
-            var k = type.FullName;
+            var k = type.FullName + _repository.DataBaseTypes.ToString();
             if (!CachedSql.ContainsKey(k))
             {
                 var key = type.GetActualType().GetPrimaryKey().GetPropertyName();
@@ -109,7 +109,7 @@ namespace EntityWorker.Core
         /// <returns></returns>
         public IList GetSqlAll(Type type)
         {
-            var k = type.FullName;
+            var k = type.FullName + _repository.DataBaseTypes.ToString();
             if (!CachedSql.ContainsKey(k))
                 CachedSql.Add(k, Querys.Select(type, _repository.DataBaseTypes).Execute());
             return _repository.GetLightDataTable(_repository.GetSqlCommand(CachedSql[k])).Rows.ToObject(type, _repository);
@@ -128,7 +128,7 @@ namespace EntityWorker.Core
         /// <returns></returns>
         public object GetByColumn(long id, string column, Type type)
         {
-            var k = type.FullName + column;
+            var k = type.FullName + column + _repository.DataBaseTypes.ToString();
             if (!CachedSql.ContainsKey(k))
                 CachedSql.Add(k, Querys.Select(type, _repository.DataBaseTypes).Where.Column<long>(column).Equal("@ID", true).Execute());
 
@@ -417,7 +417,7 @@ namespace EntityWorker.Core
                     {
                         if (col.PropertyType != typeof(string))
                             throw new NoNullAllowedException(string.Format("Property {0} Contain DataEncode. PropertyType must be of type String .", col.FullName));
-                        v = new DataCipher(col.GetCustomAttribute<DataEncode>().Key).Encrypt(v.ToString());
+                        v = new DataCipher(col.GetCustomAttribute<DataEncode>().Key, col.GetCustomAttribute<DataEncode>().KeySize).Encrypt(v.ToString());
 
                     }
 
@@ -504,7 +504,7 @@ namespace EntityWorker.Core
                 var tableName = tableType.GetCustomAttribute<Table>()?.Name ?? tableType.Name;
                 var sql = new StringBuilder("CREATE TABLE " + (_repository.DataBaseTypes == DataBaseTypes.Mssql ? "[dbo]." : "") + "[" + tableName + "](");
                 var isPrimaryKey = "";
-                foreach (var prop in props.Where(x => (x.PropertyType.GetDbTypeByType() != null || !x.IsInternalType) && !x.ContainAttribute<ExcludeFromAbstract>()).GroupBy(x => x.Name).Select(x => x.First()))
+                foreach (var prop in props.Where(x => (x.PropertyType.GetDbTypeByType(_repository.DataBaseTypes) != null || !x.IsInternalType) && !x.ContainAttribute<ExcludeFromAbstract>()).GroupBy(x => x.Name).Select(x => x.First()))
                 {
                     if (!prop.IsInternalType)
                     {
@@ -514,12 +514,12 @@ namespace EntityWorker.Core
                     }
                     isPrimaryKey = prop.ContainAttribute<PrimaryKey>() ? prop.GetPropertyName() : isPrimaryKey;
                     var foreignKey = prop.GetCustomAttribute<ForeignKey>();
-                    var dbType = prop.PropertyType.GetDbTypeByType();
+                    var dbType = prop.PropertyType.GetDbTypeByType(_repository.DataBaseTypes);
                     var propName = string.Format("[{0}]", prop.GetPropertyName());
                     sql.Append(propName + " ");
 
                     if (prop.ContainAttribute<StringFy>() || prop.ContainAttribute<DataEncode>() || prop.ContainAttribute<ToBase64String>())
-                        dbType = typeof(string).GetDbTypeByType();
+                        dbType = typeof(string).GetDbTypeByType(_repository.DataBaseTypes);
 
                     if (!prop.ContainAttribute<PrimaryKey>() || _repository.DataBaseTypes == DataBaseTypes.Mssql)
                         sql.Append(dbType + " ");

@@ -353,10 +353,10 @@ namespace EntityWorker.Core.Transaction
         {
             var returnList = new List<ILightDataTable>();
             var reader = ExecuteReader(cmd);
-            returnList.Add(new LightDataTable().ReadData(reader, primaryKeyId));
+            returnList.Add(new LightDataTable().ReadData(DataBaseTypes, reader, primaryKeyId));
 
             while (reader.NextResult())
-                returnList.Add(new LightDataTable().ReadData(reader, primaryKeyId));
+                returnList.Add(new LightDataTable().ReadData(DataBaseTypes, reader, primaryKeyId));
             reader.Close();
             return returnList;
         }
@@ -427,7 +427,7 @@ namespace EntityWorker.Core.Transaction
         {
             ValidateConnection();
             var reader = cmd.ExecuteReader();
-            return new LightDataTable().ReadData(reader, primaryKey, cmd.CommandText);
+            return new LightDataTable().ReadData(DataBaseTypes, reader, primaryKey, cmd.CommandText);
         }
 
         #region DataBase calls
@@ -539,7 +539,6 @@ namespace EntityWorker.Core.Transaction
         /// use it wisely
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="repository"></param>
         /// <param name="force"> remove and recreate all</param>
 
         public void CreateTable<T>(bool force = false) where T : class, IDbEntity
@@ -552,7 +551,6 @@ namespace EntityWorker.Core.Transaction
         /// use it wisely
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="repository"></param>
         /// <param name="force"> remove and recreate all</param>
 
         public void CreateTable(Type type, bool force = false)
@@ -564,7 +562,6 @@ namespace EntityWorker.Core.Transaction
         /// This will remove the table and if it has a ForeignKey to other tables it will also remove those table to
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="repository"></param>
         public void RemoveTable<T>() where T : class, IDbEntity
         {
             _dbSchema.RemoveTable(typeof(T));
@@ -574,7 +571,6 @@ namespace EntityWorker.Core.Transaction
         /// This will remove the table and if it has a ForeignKey to other tables it will also remove those table to
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="repository"></param>
         /// <param name="type"></param>
         public void RemoveTable(Type type)
         {

@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <TargetFrameworks>netcoreapp2.0;netstandard2.0;net461;net451;net46;</TargetFrameworks>
-    <AssemblyVersion>1.0.1.6</AssemblyVersion>
-    <FileVersion>1.0.1.6</FileVersion>
-    <Version>1.1.6</Version>
+    <AssemblyVersion>1.0.1.8</AssemblyVersion>
+    <FileVersion>1.0.1.8</FileVersion>
+    <Version>1.1.8</Version>
     <Authors>Alen Toma</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageProjectUrl>https://github.com/AlenToma/EntityWorker.Core</PackageProjectUrl>
@@ -14,9 +14,17 @@
     <Description>EntityWorker is an object-relation mapper that enable .NET developers to work with relations data using objects. EntityWorker is an alternative to entityframwork. is more flexible and much faster than entity framework.</Description>
     <NeutralLanguage />
     <Platforms>AnyCPU</Platforms>
-    <PackageIconUrl>https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/icon.gif</PackageIconUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/icon.gif</PackageIconUrl>    
   </PropertyGroup>
-
+  <ItemGroup>
+    <Content Include="contentFiles/**/*.*" copyToOutput="true">
+      <IncludeInPackage>true</IncludeInPackage>
+      <CopyToOutput>true</CopyToOutput>
+      <BuildAction>Content</BuildAction>
+      <copyToOutput>true</copyToOutput>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netcoreapp2.0|AnyCPU'">
     <DocumentationFile>bin\Release\netcoreapp2.0\EntityWorker.xml</DocumentationFile>
@@ -55,8 +63,8 @@
 
   <ItemGroup>
     <PackageReference Include="FastDeepCloner" Version="1.0.22" />
-    <PackageReference Include="Microsoft.CSharp" Version="4.4.1" />
     <PackageReference Include="System.Data.SqlClient" Version="4.4.2" />
+    <!--<PackageReference Include="Microsoft.CSharp" Version="4.4.1" />-->
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
@@ -66,27 +74,42 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
-    <PackageReference Include="System.Data.SQLite.Core">
+    <Reference Include="System.Data.SQLite">
+      <HintPath>contentFiles\System.Data.SQLite.Core.1.0.106.0\lib\net46\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <!--<PackageReference Include="System.Data.SQLite.Core">
       <Version>1.0.106</Version>
-    </PackageReference>
+    </PackageReference>-->
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net451'">
-    <PackageReference Include="System.Data.SQLite.Core">
+    <Reference Include="System.Data.SQLite">
+      <HintPath>contentFiles\System.Data.SQLite.Core.1.0.106.0\lib\net451\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <!--<PackageReference Include="System.Data.SQLite.Core">
       <Version>1.0.106</Version>
-    </PackageReference>
+    </PackageReference>-->
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net46'">
-    <PackageReference Include="System.Data.SQLite.Core">
+    <Reference Include="System.Data.SQLite">
+      <HintPath>contentFiles\System.Data.SQLite.Core.1.0.106.0\lib\net46\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <!--<PackageReference Include="System.Data.SQLite.Core">
       <Version>1.0.106</Version>
-    </PackageReference>
+    </PackageReference>-->
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
     <PackageReference Include="Microsoft.Data.Sqlite">
       <Version>2.0.0</Version>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp">
+      <HintPath>contentFiles\Microsoft.CSharp.4.4.1\lib\netstandard2.0\Microsoft.CSharp.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

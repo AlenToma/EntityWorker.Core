@@ -11,16 +11,17 @@ namespace EntityWorker.Core.Object.Library
     {
         // This constant is used to determine the keysize of the encryption algorithm in bits.
         // We divide this by 8 within the code below to get the equivalent number of bytes.
-        private const int Keysize = 256;
+        private int _Keysize = 128;
 
         // This constant determines the number of iterations for the password bytes generation function.
         private const int DerivationIterations = 1000;
         private string _passPhrase = "EntityWorker.Default.Key.Pass";
 
-        public DataCipher(string passPhrase = null)
+        public DataCipher(string passPhrase = null, DataCipherKeySize keySize = DataCipherKeySize.Key_128)
         {
-            if (string.IsNullOrEmpty(passPhrase))
+            if (!string.IsNullOrEmpty(passPhrase?.Trim()))
                 _passPhrase = passPhrase;
+            _Keysize = keySize == DataCipherKeySize.Key_128 ? 128 : 256;
         }
 
         public string Encrypt(string plainText)
@@ -29,16 +30,16 @@ namespace EntityWorker.Core.Object.Library
                 return plainText;
             // Salt and IV is randomly generated each time, but is preprended to encrypted cipher text
             // so that the same Salt and IV values can be used when decrypting.  
-            var saltStringBytes = Encoding.UTF8.GetBytes("ss12225sasdasdasdaasdasdasdaasdd");
+            var saltStringBytes = _Keysize == 128 ? Encoding.UTF8.GetBytes("kljsdkkdlo4454GG") : Encoding.UTF8.GetBytes("kljsdkkdlo4454GG00155sajuklmbkdl");
             //Generate256BitsOfRandomEntropy();
-            var ivStringBytes = Encoding.UTF8.GetBytes("kikas552223335465465465489336482");
+            var ivStringBytes = _Keysize == 128 ? Encoding.UTF8.GetBytes("SSljsdkkdlo4454M") : Encoding.UTF8.GetBytes("SSljsdkkdlo4454Maakikjhsd55GaRTP");
             var plainTextBytes = Encoding.UTF8.GetBytes(plainText);
             using (var password = new Rfc2898DeriveBytes(_passPhrase, saltStringBytes, DerivationIterations))
             {
-                var keyBytes = password.GetBytes(Keysize / 8);
+                var keyBytes = password.GetBytes(_Keysize / 8);
                 using (var symmetricKey = new RijndaelManaged())
                 {
-                    symmetricKey.BlockSize = 256;
+                    symmetricKey.BlockSize = _Keysize;
                     symmetricKey.Mode = CipherMode.CBC;
                     symmetricKey.Padding = PaddingMode.PKCS7;
                     using (var encryptor = symmetricKey.CreateEncryptor(keyBytes, ivStringBytes))
@@ -71,20 +72,21 @@ namespace EntityWorker.Core.Object.Library
             // [32 bytes of Salt] + [32 bytes of IV] + [n bytes of CipherText]
             var cipherTextBytesWithSaltAndIv = Convert.FromBase64String(cipherText);
             // Get the saltbytes by extracting the first 32 bytes from the supplied cipherText bytes.
-            var saltStringBytes = cipherTextBytesWithSaltAndIv.Take(Keysize / 8).ToArray();
+            var saltStringBytes = cipherTextBytesWithSaltAndIv.Take(_Keysize / 8).ToArray();
             // Get the IV bytes by extracting the next 32 bytes from the supplied cipherText bytes.
-            var ivStringBytes = cipherTextBytesWithSaltAndIv.Skip(Keysize / 8).Take(Keysize / 8).ToArray();
+            var ivStringBytes = cipherTextBytesWithSaltAndIv.Skip(_Keysize / 8).Take(_Keysize / 8).ToArray();
             // Get the actual cipher text bytes by removing the first 64 bytes from the cipherText string.
-            var cipherTextBytes = cipherTextBytesWithSaltAndIv.Skip((Keysize / 8) * 2).Take(cipherTextBytesWithSaltAndIv.Length - ((Keysize / 8) * 2)).ToArray();
+            var cipherTextBytes = cipherTextBytesWithSaltAndIv.Skip((_Keysize / 8) * 2).Take(cipherTextBytesWithSaltAndIv.Length - ((_Keysize / 8) * 2)).ToArray();
 
             using (var password = new Rfc2898DeriveBytes(_passPhrase, saltStringBytes, DerivationIterations))
             {
-                var keyBytes = password.GetBytes(Keysize / 8);
+                var keyBytes = password.GetBytes(_Keysize / 8);
                 using (var symmetricKey = new RijndaelManaged())
                 {
-                    symmetricKey.BlockSize = 256;
                     symmetricKey.Mode = CipherMode.CBC;
                     symmetricKey.Padding = PaddingMode.PKCS7;
+                    symmetricKey.BlockSize = _Keysize;
+
                     using (var decryptor = symmetricKey.CreateDecryptor(keyBytes, ivStringBytes))
                     {
                         using (var memoryStream = new MemoryStream(cipherTextBytes))
@@ -101,17 +103,6 @@ namespace EntityWorker.Core.Object.Library
                     }
                 }
             }
-        }
-
-        private static byte[] Generate256BitsOfRandomEntropy()
-        {
-            var randomBytes = new byte[32]; // 32 Bytes will give us 256 bits.
-            using (var rngCsp = new RNGCryptoServiceProvider())
-            {
-                // Fill the array with cryptographically secure random bytes.
-                rngCsp.GetBytes(randomBytes);
-            }
-            return randomBytes;
         }
     }
 }
