@@ -10,10 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ModuleFiles
-      Include="$(TargetDir)*.dll"
-      Exclude="$(TargetDir)System*.dll;$(TargetDir)Microsoft*.dll"
-      DestinationPath="$(SolutionDir)src\MyProject\Modules\MyModule\%(Filename)%(Extension)">
+    <ModuleFiles Include="$(TargetDir)*.dll" Exclude="$(TargetDir)System*.dll;$(TargetDir)Microsoft*.dll" DestinationPath="$(SolutionDir)src\MyProject\Modules\MyModule\%(Filename)%(Extension)">
     </ModuleFiles>
   </ItemGroup>
 
@@ -36,5 +33,10 @@
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
     <PackageReference Include="Microsoft.NETCore.Platforms" Version="2.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <DnxInvisibleFolder Include="bin\" />
+    <DnxInvisibleFolder Include="obj\" />
   </ItemGroup>
 </Project>
