@@ -1952,7 +1952,7 @@ namespace System.Data.SQLite
                             }
                             str5 = SQLiteConnection.FindKey(strs, "Synchronous", SQLiteSynchronousEnum.Default.ToString());
                             obj = SQLiteConnection.TryParseEnum(typeof(SQLiteSynchronousEnum), str5, true);
-                            if (obj as SQLiteSynchronousEnum? == SQLiteSynchronousEnum.Off || (SQLiteSynchronousEnum)obj != SQLiteSynchronousEnum.Default)
+                            if (obj as SQLiteSynchronousEnum? == SQLiteSynchronousEnum.Off || ((SQLiteSynchronousEnum?)obj != null && (SQLiteSynchronousEnum)obj != SQLiteSynchronousEnum.Default))
                             {
                                 CultureInfo invariantCulture3 = CultureInfo.InvariantCulture;
                                 object[] objArray9 = new object[] { str5 };
@@ -1970,7 +1970,7 @@ namespace System.Data.SQLite
                             }
                             str5 = SQLiteConnection.FindKey(strs, "Journal Mode", SQLiteJournalModeEnum.Default.ToString());
                             obj = SQLiteConnection.TryParseEnum(typeof(SQLiteJournalModeEnum), str5, true);
-                            if (obj as SQLiteJournalModeEnum? == SQLiteJournalModeEnum.Delete || (SQLiteJournalModeEnum)obj != SQLiteJournalModeEnum.Default)
+                            if (obj as SQLiteJournalModeEnum? == SQLiteJournalModeEnum.Delete || ((SQLiteJournalModeEnum?)obj != null && (SQLiteJournalModeEnum)obj != SQLiteJournalModeEnum.Default))
                             {
                                 string str6 = "PRAGMA journal_mode={0}";
                                 CultureInfo invariantCulture4 = CultureInfo.InvariantCulture;

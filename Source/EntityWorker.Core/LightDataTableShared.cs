@@ -238,5 +238,15 @@ namespace EntityWorker.Core
             return row;
         }
 
+        public LightDataTableRow NewRow(object[] items)
+        {
+            var row = new LightDataTableRow(ColumnLength, Columns, ColumnsWithIndexKey, Culture)
+            {
+                RoundingSettings = this.RoundingSettings,
+                _itemArray = items
+            };
+            return row;
+        }
+
     }
 }

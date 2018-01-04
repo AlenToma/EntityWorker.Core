@@ -172,7 +172,7 @@ namespace System.Data.SQLite
 			string str = "error";
 			if (errorCode as SQLiteErrorCode? != SQLiteErrorCode.Ok || errorCode is int)
 			{
-				SQLiteErrorCode sQLiteErrorCode = (SQLiteErrorCode)((int)errorCode);
+				SQLiteErrorCode sQLiteErrorCode = (SQLiteErrorCode)((int)(errorCode ?? -1));
 				sQLiteErrorCode &= SQLiteErrorCode.NonExtendedMask;
 				if (sQLiteErrorCode == SQLiteErrorCode.Ok)
 				{

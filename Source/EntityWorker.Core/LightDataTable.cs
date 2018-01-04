@@ -14,7 +14,7 @@ namespace EntityWorker.Core
     {
         internal PrimaryKeyIndex PrimaryKeyIndex = new PrimaryKeyIndex();
         private string _tablePrimaryKey;
-        private int _pageNumber = 1; 
+        private int _pageNumber = 1;
         private int _setsPerPage = 20;
         private LightDataRowCollection _rows = new LightDataRowCollection();
         public string TableName { get; set; }
@@ -319,8 +319,6 @@ namespace EntityWorker.Core
         /// <param name="ignoreTypeValidation"></param>
         public LightDataTable(object obj, bool execludeClasses = false, Type overdedDataType = null, bool ignoreTypeValidation = false) : base()
         {
-     
-
             this.IgnoreTypeValidation = ignoreTypeValidation;
             if (obj == null)
                 return;
@@ -356,16 +354,13 @@ namespace EntityWorker.Core
                     AddColumn(col.ColumnName, overdedDataType ?? col.DataType, col.DefaultValue);
 
                 foreach (DataRow row in tb.Rows)
-                {
-                    var r = NewRow();
-                    r.ItemArray = row.ItemArray;
-                    AddRow(r);
-                }
+                    AddRow(NewRow(row.ItemArray));
+
             }
             else if ((obj as IDictionary<string, object>) != null)
             {
                 var dictionary = (IDictionary<string, object>)obj;
-                foreach(string key in dictionary.Keys)
+                foreach (string key in dictionary.Keys)
                     AddColumn(key, dictionary[key].GetType(), null);
                 AddRow(NewRow().MergeUnKnownObject(obj));
             }
@@ -379,7 +374,7 @@ namespace EntityWorker.Core
             }
         }
 
-        public LightDataTable():base()
+        public LightDataTable() : base()
         {
         }
     }

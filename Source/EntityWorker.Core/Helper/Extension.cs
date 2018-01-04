@@ -11,6 +11,7 @@ using System.Text;
 using EntityWorker.Core.Attributes;
 using EntityWorker.Core.Interface;
 using EntityWorker.Core.InterFace;
+using EntityWorker.Core.Object.Library;
 using FastDeepCloner;
 
 namespace EntityWorker.Core.Helper
@@ -417,7 +418,7 @@ namespace EntityWorker.Core.Helper
 
         private static readonly Dictionary<string, Exception> CachedSqlException = new Dictionary<string, Exception>();
         private static readonly Dictionary<string, LightDataTable> CachedGetSchemaTable = new Dictionary<string, LightDataTable>();
-        internal static ILightDataTable ReadData(this ILightDataTable data, DataBaseTypes dbType, IDataReader reader, string primaryKey = null, string command = null)
+        internal static ILightDataTable ReadData(this ILightDataTable data, DataBaseTypes dbType, IDataReader reader, DbCommandExtended command, string primaryKey = null)
         {
             var i = 0;
             if (reader.FieldCount <= 0)
@@ -432,22 +433,18 @@ namespace EntityWorker.Core.Helper
             }
             try
             {
-                var getSchemaTableSupported = true;
-                if (dbType == DataBaseTypes.Sqllight)
+                var key = command?.TableType != null ? command.TableType.FullName : command.Command.CommandText;
+                if (!CachedSqlException.ContainsKey(command.Command.CommandText))
                 {
-#if NETCOREAPP2_0 || NETSTANDARD2_0
-                    getSchemaTableSupported = false;
-#endif
-                }
-
-                if (getSchemaTableSupported && !CachedSqlException.ContainsKey(command))
-                {
-                    if (!CachedGetSchemaTable.ContainsKey(command))
-                        CachedGetSchemaTable.Add(command, new LightDataTable(reader.GetSchemaTable()));
-                    foreach (var item in CachedGetSchemaTable[command].Rows)
+                    if (!CachedGetSchemaTable.ContainsKey(key))
                     {
-                        //var isKey = Converter<bool>.Parse(item["IsKey"]);
-                        var columnName = item["ColumnName"].ToString();
+                        CachedGetSchemaTable.Add(key, new LightDataTable(reader.GetSchemaTable()));
+
+                    }
+                    foreach (var item in CachedGetSchemaTable[key].Rows)
+                    {
+                        var columnName = item.Value<string>("ColumnName");
+                        data.TablePrimaryKey = data.TablePrimaryKey == null && item.Columns.ContainsKey("IsKey") && item.TryValueAndConvert<bool>("IsKey", false) ? columnName : data.TablePrimaryKey;
                         var dataType = TypeByTypeAndDbIsNull(item["DataType"] as Type,
                             item.TryValueAndConvert<bool>("AllowDBNull", true));
                         if (data.Columns.ContainsKey(columnName))
@@ -466,21 +463,21 @@ namespace EntityWorker.Core.Helper
                         if (data.Columns.ContainsKey(columnName))
                             columnName = columnName + i;
                         data.AddColumn(columnName, dataType);
-
+                        i++;
                     }
                 }
             }
             catch (Exception e)
             {
-                if (!string.IsNullOrEmpty(command))
-                    CachedSqlException.Add(command, e);
-                return ReadData(data,dbType, reader, primaryKey, command);
+                if (!string.IsNullOrEmpty(command.Command.CommandText))
+                    CachedSqlException.Add(command.Command.CommandText, e);
+                return ReadData(data,dbType, reader, command, primaryKey);
             }
 
             while (reader.Read())
             {
                 var row = data.NewRow();
-                reader.GetValues(row.ItemArray);
+                reader.GetValues(row._itemArray);
                 data.AddRow(row);
             }
 

@@ -9,6 +9,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using EntityWorker.Core.InterFace;
 using System.Data.SQLite;
+using EntityWorker.Core.Object.Library;
 //#if NET461 || NET451 || NET46
 //using System.Data.SQLite;
 //#elif NETCOREAPP2_0  || NETSTANDARD2_0
@@ -89,7 +90,7 @@ namespace EntityWorker.Core.Helper
             return Encoding.UTF8.GetString(Convert.FromBase64String(stringToDecode));
         }
 
-        internal static DbCommand ProcessSql(this IRepository repository, IDbConnection connection, IDbTransaction tran, string sql)
+        internal static DbCommandExtended ProcessSql(this IRepository repository, IDbConnection connection, IDbTransaction tran, string sql, Type type)
         {
 
             var stringExp = new Regex(@"String\[.*?\]|String\[.?\]");
@@ -121,29 +122,15 @@ namespace EntityWorker.Core.Helper
 
             DbCommand cmd = null;
             if (repository.DataBaseTypes == Helper.DataBaseTypes.Mssql)
-                cmd = tran != null ? new SqlCommand(sql, connection as SqlConnection, tran as SqlTransaction) : new SqlCommand(sql, connection as SqlConnection);
+                cmd = tran != null ?  new SqlCommand(sql, connection as SqlConnection, tran as SqlTransaction) : new SqlCommand(sql, connection as SqlConnection);
             else cmd = tran == null ? new SQLiteCommand(sql, connection as SQLiteConnection) : new SQLiteCommand(sql, connection as SQLiteConnection, tran as SQLiteTransaction);
+            var dbCommandExtended= new DbCommandExtended(cmd, type);
             foreach (var dic in dicCols)
-                repository.AddInnerParameter(cmd, dic.Key, dic.Value.Item1, dic.Value.Item2);
-            return cmd;
+                repository.AddInnerParameter(dbCommandExtended, dic.Key, dic.Value.Item1, dic.Value.Item2);
 
-            //#if NET461 || NET451 || NET46
-            //            if (repository.DataBaseTypes == Helper.DataBaseTypes.Mssql)
-            //                            cmd = tran != null ? new SqlCommand(sql, connection as SqlConnection, tran as SqlTransaction) : new SqlCommand(sql, connection as SqlConnection);
-            //                        else cmd = tran == null ? new SQLiteCommand(sql, connection as SQLiteConnection) : new SQLiteCommand(sql, connection as SQLiteConnection, tran as SQLiteTransaction);
-            //                        foreach (var dic in dicCols)
-            //                            repository.AddInnerParameter(cmd, dic.Key, dic.Value.Item1, dic.Value.Item2);
-            //                        return cmd;
-            //#elif NETSTANDARD2_0 || NETCOREAPP2_0
-            //            if (repository.DataBaseTypes == Helper.DataBaseTypes.Mssql)
-            //            {
-            //                cmd = tran != null ? new SqlCommand(sql, connection as SqlConnection, tran as SqlTransaction) : new SqlCommand(sql, connection as SqlConnection);
-            //            }
-            //            else cmd = tran == null ? new SqliteCommand(sql, connection as SqliteConnection) : new SqliteCommand(sql, connection as SqliteConnection, tran as SqliteTransaction);
-            //            foreach (var dic in dicCols)
-            //                repository.AddInnerParameter(cmd, dic.Key, dic.Value.Item1, dic.Value.Item2);
-            //            return cmd;
-            //#endif
+            return dbCommandExtended;
+
+
         }
     }
 }

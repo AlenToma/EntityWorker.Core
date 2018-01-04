@@ -42,7 +42,7 @@ namespace EntityWorker.Core
             var cmd = _repository.GetSqlCommand(_repository.DataBaseTypes == DataBaseTypes.Mssql
                 ? "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = N'" + table +
                   "'"
-                : "SELECT name as COLUMN_NAME, type as DATA_TYPE  FROM pragma_table_info('" + table + "');");
+                : "SELECT name as COLUMN_NAME, type as DATA_TYPE  FROM pragma_table_info('" + table + "');", type);
             var data = _repository.GetLightDataTable(cmd, "COLUMN_NAME");
             if (data.Rows.Any())
             {
@@ -72,7 +72,7 @@ namespace EntityWorker.Core
                     query = Querys.Select(type, _repository.DataBaseTypes).Execute();
                 CachedSql.Add(query, query);
             }
-            return _repository.GetLightDataTable(_repository.GetSqlCommand(CachedSql[query])).Rows.ToObject<T>(_repository);
+            return _repository.GetLightDataTable(_repository.GetSqlCommand(CachedSql[query], typeof(T))).Rows.ToObject<T>(_repository);
         }
 
 
@@ -92,7 +92,7 @@ namespace EntityWorker.Core
                 var key = type.GetActualType().GetPrimaryKey().GetPropertyName();
                 CachedSql.Add(k, Querys.Select(type.GetActualType(), _repository.DataBaseTypes).Where.Column<long>(key).Equal("@ID", true).Execute());
             }
-            var cmd = _repository.GetSqlCommand(CachedSql[k]);
+            var cmd = _repository.GetSqlCommand(CachedSql[k], type);
             _repository.AddInnerParameter(cmd, "@ID", id, System.Data.SqlDbType.BigInt);
             return type.GetActualType() != type ? _repository.GetLightDataTable(cmd).Rows.ToObject(type, _repository) : _repository.GetLightDataTable(cmd).Rows.FirstOrDefault()?.ToObject(type);
         }
@@ -112,7 +112,7 @@ namespace EntityWorker.Core
             var k = type.FullName + _repository.DataBaseTypes.ToString();
             if (!CachedSql.ContainsKey(k))
                 CachedSql.Add(k, Querys.Select(type, _repository.DataBaseTypes).Execute());
-            return _repository.GetLightDataTable(_repository.GetSqlCommand(CachedSql[k])).Rows.ToObject(type, _repository);
+            return _repository.GetLightDataTable(_repository.GetSqlCommand(CachedSql[k], type)).Rows.ToObject(type, _repository);
         }
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace EntityWorker.Core
             if (!CachedSql.ContainsKey(k))
                 CachedSql.Add(k, Querys.Select(type, _repository.DataBaseTypes).Where.Column<long>(column).Equal("@ID", true).Execute());
 
-            var cmd = _repository.GetSqlCommand(CachedSql[k]);
+            var cmd = _repository.GetSqlCommand(CachedSql[k], type);
             _repository.AddInnerParameter(cmd, "@ID", id, SqlDbType.BigInt);
             return type.GetActualType() != type ? _repository.GetLightDataTable(cmd).Rows.ToObject(type, _repository) : _repository.GetLightDataTable(cmd).Rows.FirstOrDefault()?.ToObject(type);
         }
@@ -288,7 +288,7 @@ namespace EntityWorker.Core
                             i = sql.Count - 1;
 
                         var cmd = _repository.GetSqlCommand(sql[i]);
-                        cmd.ExecuteNonQuery();
+                        cmd.Command.ExecuteNonQuery();
                         sql.RemoveAt(i);
                         i--;
 

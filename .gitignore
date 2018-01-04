@@ -4,3 +4,9 @@
 *.ide-wal
 /Source/bin
 /Source/obj
+/Solution/.vs/EntityWorker.Core/v15/Server/sqlite3
+/Solution/.vs/EntityWorker.Core/v15
+/Source/EntityWorker.Core/bin
+/Source/EntityWorker.Core/obj
+/Source/System.Data.Sqlite.Core/bin
+/Source/System.Data.Sqlite.Core/obj

@@ -36,14 +36,15 @@ namespace EntityWorker.Core.InterFace
         /// <param name="primaryKey"></param>
         /// <returns></returns>
 
-        ILightDataTable GetLightDataTable(DbCommand cmd, string primaryKey = null);
+        ILightDataTable GetLightDataTable(DbCommandExtended cmd, string primaryKey = null);
 
         /// <summary>
         /// Get SqlCommand by sql string
         /// </summary>
         /// <param name="sql"></param>
+        /// <param name="type"> Set for faster loading </param>
         /// <returns></returns>
-        DbCommand GetSqlCommand(string sql);
+        DbCommandExtended GetSqlCommand(string sql, Type type = null);
 
         /// <summary>
         /// Add Parameter to sqlCommand
@@ -53,7 +54,7 @@ namespace EntityWorker.Core.InterFace
         /// <param name="value"></param>
         /// <param name="dbType"></param>
 
-        void AddInnerParameter(DbCommand cmd, string attrName, object value, SqlDbType dbType = SqlDbType.NVarChar);
+        void AddInnerParameter(DbCommandExtended cmd, string attrName, object value, SqlDbType dbType = SqlDbType.NVarChar);
 
         /// <summary>
         /// Get SqlDbType By system Type
@@ -68,7 +69,7 @@ namespace EntityWorker.Core.InterFace
         /// <param name="cmd"></param>
         /// <returns></returns>
 
-        object ExecuteScalar(DbCommand cmd);
+        object ExecuteScalar(DbCommandExtended cmd);
 
         /// <summary>
         /// Execute Quary
@@ -76,7 +77,7 @@ namespace EntityWorker.Core.InterFace
         /// <param name="cmd"></param>
         /// <returns></returns>
 
-        int ExecuteNonQuery(DbCommand cmd);
+        int ExecuteNonQuery(DbCommandExtended cmd);
 
         /// <summary>
         /// Create Transaction

@@ -202,7 +202,7 @@ namespace EntityWorker.Core.SqlQuerys
                 sb.Append("((case when ");
                 this.Visit(m.Arguments[0]);
                 CleanDecoder("");
-                sb.Append(" IS NULL then 1 else case when");
+                sb.Append(" IS NULL then 1 else case when ");
                 this.Visit(m.Arguments[0]);
                 CleanDecoder("");
                 sb.Append(" = '' then 1 else 0 end end)");

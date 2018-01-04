@@ -12,7 +12,7 @@
     <Copyright>Copyright (c) 2017 Alen Toma</Copyright>
     <Description>EntityWorker is an object-relation mapper that enable .NET developers to work with relations data using objects. EntityWorker is an alternative to entityframwork. is more flexible and much faster than entity framework.</Description>
     <NeutralLanguage />
-    <Platforms>AnyCPU</Platforms>
+    <Platforms>AnyCPU;x86</Platforms>
     <PackageIconUrl>https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/icon.gif</PackageIconUrl>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeP2POutput</TargetsForTfmSpecificBuildOutput>
@@ -27,7 +27,15 @@
     <DocumentationFile>bin\Release\netcoreapp2.0\EntityWorker.xml</DocumentationFile>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netcoreapp2.0|x86'">
+    <DocumentationFile>bin\Release\netcoreapp2.0\EntityWorker.xml</DocumentationFile>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net461|AnyCPU'">
+    <DocumentationFile>bin\Release\net461\EntityWorker.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net461|x86'">
     <DocumentationFile>bin\Release\net461\EntityWorker.xml</DocumentationFile>
   </PropertyGroup>
 
@@ -36,11 +44,24 @@
     <DocumentationFile>bin\Release\net451\EntityWorker.xml</DocumentationFile>
   </PropertyGroup>
 
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net451|x86'">
+    <DocumentationFile>bin\Release\net451\EntityWorker.xml</DocumentationFile>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net46|AnyCPU'">
     <DocumentationFile>bin\Release\net46\EntityWorker.xml</DocumentationFile>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net46|x86'">
+    <DocumentationFile>bin\Release\net46\EntityWorker.xml</DocumentationFile>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
+    <DocumentationFile>bin\Release\net46\EntityWorker.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|x86'">
     <DocumentationFile>bin\Release\net46\EntityWorker.xml</DocumentationFile>
   </PropertyGroup>
 
@@ -49,31 +70,18 @@
     <DocumentationFile>bin\Debug\netcoreapp2.0\EntityWorker.Core.xml</DocumentationFile>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp2.0|x86'">
+    <WarningsAsErrors>NU1605</WarningsAsErrors>
+    <DocumentationFile>bin\Debug\netcoreapp2.0\EntityWorker.Core.xml</DocumentationFile>
+  </PropertyGroup>
 
   <ItemGroup>
-    <DnxInvisibleFolder Include="bin\" />
-    <DnxInvisibleFolder Include="obj\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="SQLite.Interop.dll" />
-  </ItemGroup>
-
-  <!--<ItemGroup>
-    <Content Include="Framework Build\netcoreapp2.0\System.Data.SQLite.Core.targets" />
-    <Content Include="Framework Build\netcoreapp2.0\x64\SQLite.Interop.dll" />
-    <Content Include="Framework Build\netcoreapp2.0\x86\SQLite.Interop.dll" />
-    <Content Include="Framework Build\netstandard2.0\System.Data.SQLite.Core.targets" />
-    <Content Include="Framework Build\netstandard2.0\x64\SQLite.Interop.dll" />
-    <Content Include="Framework Build\netstandard2.0\x86\SQLite.Interop.dll" />
-  </ItemGroup>-->
-
-  <!--<ItemGroup>
-    <Content Include="SQLite.Interop.dll" PrivateAssets="None">
+    <Content Include="SQLite.Interop.dll">
       <PackagePath>build/</PackagePath>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>-->
+  </ItemGroup>
 
 
   <ItemGroup>
@@ -98,7 +106,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\System.Data.Sqlite.Core\System.Data.SQLite.csproj" PrivateAssets="All" />
+    <ProjectReference Include="..\System.Data.Sqlite.Core\System.Data.SQLite.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -106,7 +114,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="System.Data.SqlClient" PrivateAssets="All">
+    <Reference Include="System.Data.SqlClient">
       <HintPath>C:\Users\Alen.Toma\.nuget\packages\system.data.sqlclient\4.4.2\ref\netstandard2.0\System.Data.SqlClient.dll</HintPath>
     </Reference>
   </ItemGroup>

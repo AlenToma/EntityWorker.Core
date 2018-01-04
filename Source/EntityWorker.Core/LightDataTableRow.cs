@@ -17,7 +17,7 @@ namespace EntityWorker.Core
     {
         public ItemState RowState { get; set; }
 
-        private object[] _itemArray;
+        internal object[] _itemArray;
         public object[] ItemArray
         {
             get => _itemArray;

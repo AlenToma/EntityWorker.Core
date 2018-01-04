@@ -164,13 +164,6 @@ namespace EntityWorker.Core.Transaction
                 {
                     if (SqlConnection == null)
                         SqlConnection = new SQLiteConnection(ConnectionString);
-//#if NET461 || NET451 || NET46 
-//                    if (SqlConnection == null)
-//                        SqlConnection = new SQLiteConnection(ConnectionString);
-//#elif NETSTANDARD2_0 || NETCOREAPP2_0
-//                    if (SqlConnection == null)
-//                        SqlConnection = new SqliteConnection(ConnectionString);
-//#endif
                 }
                 else
                 {
@@ -201,10 +194,10 @@ namespace EntityWorker.Core.Transaction
         /// </summary>
         /// <param name="cmd"></param>
         /// <returns></returns>
-        public IDataReader ExecuteReader(DbCommand cmd)
+        public IDataReader ExecuteReader(DbCommandExtended cmd)
         {
             ValidateConnection();
-            var o = cmd.ExecuteReader();
+            var o = cmd.Command.ExecuteReader();
             CloseifPassible();
             return o;
         }
@@ -214,20 +207,20 @@ namespace EntityWorker.Core.Transaction
         /// </summary>
         /// <param name="cmd"></param>
         /// <returns></returns>
-        public object ExecuteScalar(DbCommand cmd)
+        public object ExecuteScalar(DbCommandExtended cmd)
         {
             ValidateConnection();
-            var o = cmd.ExecuteScalar();
+            var o = cmd.Command.ExecuteScalar();
             CloseifPassible();
             return o;
         }
 
         /// <inheritdoc />
-        public int ExecuteNonQuery(DbCommand cmd)
+        public int ExecuteNonQuery(DbCommandExtended cmd)
         {
 
             ValidateConnection();
-            var o = cmd.ExecuteNonQuery();
+            var o = cmd.Command.ExecuteNonQuery();
             CloseifPassible();
             return o;
         }
@@ -306,7 +299,7 @@ namespace EntityWorker.Core.Transaction
         /// <param name="attrName"></param>
         /// <param name="value"></param>
         /// <param name="dbType"></param>
-        public void AddInnerParameter(DbCommand cmd, string attrName, object value, SqlDbType dbType = SqlDbType.NVarChar)
+        public void AddInnerParameter(DbCommandExtended cmd, string attrName, object value, SqlDbType dbType = SqlDbType.NVarChar)
         {
             if (attrName != null && attrName[0] != '@')
                 attrName = "@" + attrName;
@@ -323,16 +316,11 @@ namespace EntityWorker.Core.Transaction
                     Value = sqlDbTypeValue,
                     ParameterName = attrName
                 };
-                cmd.Parameters.Add(param);
+                cmd.Command.Parameters.Add(param);
             }
             else
             {
-                (cmd as SQLiteCommand).Parameters.AddWithValue(attrName, value);
-//#if NET461 || NET451 || NET46
-//                (cmd as SQLiteCommand).Parameters.AddWithValue(attrName, value);
-//#elif NETSTANDARD2_0 || NETCOREAPP2_0
-//                (cmd as SqliteCommand).Parameters.AddWithValue(attrName, value);
-//#endif
+                (cmd.Command as SQLiteCommand).Parameters.AddWithValue(attrName, value);
             }
         }
 
@@ -340,11 +328,13 @@ namespace EntityWorker.Core.Transaction
         /// Return SqlCommand that already contain SQLConnection
         /// </summary>
         /// <param name="sql"></param>
+        /// <param name="type">set for faster loading of sql</param>
         /// <returns></returns>
-        public DbCommand GetSqlCommand(string sql)
+        public DbCommandExtended GetSqlCommand(string sql, Type type= null)
         {
             ValidateConnection();
-            return this.ProcessSql(SqlConnection, Trans, sql);
+            var cmd= this.ProcessSql(SqlConnection, Trans, sql, type);
+            return cmd;
         }
 
         /// <summary>
@@ -353,14 +343,14 @@ namespace EntityWorker.Core.Transaction
         /// <param name="cmd">sqlCommand that are create from GetSqlCommand</param>
         /// <param name="primaryKeyId"> Table primaryKeyId, so LightDataTable.FindByPrimaryKey could be used </param>
         /// <returns></returns>
-        protected List<ILightDataTable> GetLightDataTableList(DbCommand cmd, string primaryKeyId = null)
+        protected List<ILightDataTable> GetLightDataTableList(DbCommandExtended cmd, string primaryKeyId = null)
         {
             var returnList = new List<ILightDataTable>();
             var reader = ExecuteReader(cmd);
-            returnList.Add(new LightDataTable().ReadData(DataBaseTypes, reader, primaryKeyId));
+            returnList.Add(new LightDataTable().ReadData(DataBaseTypes, reader, cmd, primaryKeyId));
 
             while (reader.NextResult())
-                returnList.Add(new LightDataTable().ReadData(DataBaseTypes, reader, primaryKeyId));
+                returnList.Add(new LightDataTable().ReadData(DataBaseTypes, reader, cmd, primaryKeyId));
             reader.Close();
             return returnList;
         }
@@ -369,6 +359,7 @@ namespace EntityWorker.Core.Transaction
         /// Attach object to WorkEntity to track changes
         /// </summary>
         /// <param name="objcDbEntity"></param>
+        /// <param name="overwrite"></param>
         public void Attach(DbEntity objcDbEntity, bool overwrite = false)
         {
             if (objcDbEntity == null)
@@ -427,11 +418,11 @@ namespace EntityWorker.Core.Transaction
         /// <param name="cmd">sqlCommand that are create from GetSqlCommand</param>
         /// <param name="primaryKey">Table primaryKeyId, so LightDataTable.FindByPrimaryKey could be used </param>
         /// <returns></returns>
-        public ILightDataTable GetLightDataTable(DbCommand cmd, string primaryKey = null)
+        public ILightDataTable GetLightDataTable(DbCommandExtended cmd, string primaryKey = null)
         {
             ValidateConnection();
-            var reader = cmd.ExecuteReader();
-            return new LightDataTable().ReadData(DataBaseTypes, reader, primaryKey, cmd.CommandText);
+            var reader = cmd.Command.ExecuteReader();
+            return new LightDataTable().ReadData(DataBaseTypes, reader, cmd, primaryKey);
         }
 
         #region DataBase calls
