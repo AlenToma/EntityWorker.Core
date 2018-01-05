@@ -32,6 +32,6 @@ namespace EntityWorker.Core.InterFace
         /// </summary>
         /// <param name="fieldType"></param>
         /// <returns></returns>
-        IDbEntity Clone(FieldType fieldType = FieldType.PropertyInfo);
+        IDbEntity Clone(CloneLevel cloneLevel = CloneLevel.Hierarki, FieldType fieldType = FieldType.PropertyInfo);
     }
 }

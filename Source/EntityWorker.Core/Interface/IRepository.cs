@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -273,6 +274,23 @@ namespace EntityWorker.Core.InterFace
         /// <typeparam name="T"></typeparam>
 
         void RemoveTable(Type type);
+
+        /// <summary>
+        /// Convert DbCommandExtended to List of Type T
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        List<T> DataReaderConverter<T>(DbCommandExtended command) where T : class, IDbEntity;
+
+        /// <summary>
+        /// Convert DbCommandExtended to list of System.Type
+        /// </summary>
+        /// <param name="repository"></param>
+        /// <param name="command"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        IList DataReaderConverter(DbCommandExtended command, Type type);
 
     }
 }

@@ -1,9 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netcoreapp2.0;netstandard2.0;net461;net451;net46;</TargetFrameworks>
-    <AssemblyVersion>1.0.1.10</AssemblyVersion>
-    <FileVersion>1.0.1.10</FileVersion>
-    <Version>1.2.0-beta</Version>
+    <PackageId>EntityWorker.Core</PackageId>
+    <AssemblyName>EntityWorker.Core</AssemblyName>
+    <AssemblyVersion>1.0.2.2</AssemblyVersion>
+    <FileVersion>1.0.2.2</FileVersion>
+    <Version>1.2.2</Version>
     <Authors>Alen Toma</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageProjectUrl>https://github.com/AlenToma/EntityWorker.Core</PackageProjectUrl>
@@ -12,85 +14,31 @@
     <Copyright>Copyright (c) 2017 Alen Toma</Copyright>
     <Description>EntityWorker is an object-relation mapper that enable .NET developers to work with relations data using objects. EntityWorker is an alternative to entityframwork. is more flexible and much faster than entity framework.</Description>
     <NeutralLanguage />
-    <Platforms>AnyCPU;x86</Platforms>
     <PackageIconUrl>https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/icon.gif</PackageIconUrl>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeP2POutput</TargetsForTfmSpecificBuildOutput>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeP2POutput;</TargetsForTfmSpecificBuildOutput>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);CustomContentTarget</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
-  
-  <ItemGroup>
-    <Content Include="build/**" PackagePath="build/" CopyToPublishDirectory="Always" />
-    <Content Include="Framework Build/**" PackagePath="lib/" CopyToPublishDirectory="Always" />
+
+  <ItemGroup Condition="'$(Configuration)'=='Release'">
+    <Content Include="NetFramwork Build/**" PackagePath="build/" CopyToPublishDirectory="Always" />
+    <Content Include="NetCore Build/**" PackagePath="lib/" CopyToPublishDirectory="Always" />
   </ItemGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netcoreapp2.0|AnyCPU'">
-    <DocumentationFile>bin\Release\netcoreapp2.0\EntityWorker.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netcoreapp2.0|x86'">
-    <DocumentationFile>bin\Release\netcoreapp2.0\EntityWorker.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net461|AnyCPU'">
-    <DocumentationFile>bin\Release\net461\EntityWorker.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net461|x86'">
-    <DocumentationFile>bin\Release\net461\EntityWorker.xml</DocumentationFile>
-  </PropertyGroup>
-
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net451|AnyCPU'">
-    <DocumentationFile>bin\Release\net451\EntityWorker.xml</DocumentationFile>
-  </PropertyGroup>
-
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net451|x86'">
-    <DocumentationFile>bin\Release\net451\EntityWorker.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net46|AnyCPU'">
-    <DocumentationFile>bin\Release\net46\EntityWorker.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net46|x86'">
-    <DocumentationFile>bin\Release\net46\EntityWorker.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
-    <DocumentationFile>bin\Release\net46\EntityWorker.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|x86'">
-    <DocumentationFile>bin\Release\net46\EntityWorker.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp2.0|AnyCPU'">
-    <WarningsAsErrors>NU1605</WarningsAsErrors>
-    <DocumentationFile>bin\Debug\netcoreapp2.0\EntityWorker.Core.xml</DocumentationFile>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <DocumentationFile>bin\Release\$(TargetFramework)\EntityWorker.xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp2.0|x86'">
     <WarningsAsErrors>NU1605</WarningsAsErrors>
-    <DocumentationFile>bin\Debug\netcoreapp2.0\EntityWorker.Core.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="SQLite.Interop.dll">
-      <PackagePath>build/</PackagePath>
-      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-
-  <ItemGroup>
-    <PackageReference Include="FastDeepCloner" Version="1.0.22" />
     <PackageReference Include="System.Data.SqlClient" Version="4.4.2" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="Microsoft.CSharp" Version="4.4.1" />  
+    <PackageReference Include="Microsoft.CSharp" Version="4.4.1" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
@@ -105,27 +53,46 @@
 
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\System.Data.Sqlite.Core\System.Data.SQLite.csproj" />
+  <ItemGroup Condition="'$(Configuration)'=='Debug'">
+    <Content Include="SQLite.Interop.dll">
+      <PackagePath>build/</PackagePath>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="build\" />
+    <ProjectReference Include="..\..\..\FastDeepCloner\source\FastDeepCloner.csproj">
+      <PrivateAssets>all</PrivateAssets>
+    </ProjectReference>
+    <ProjectReference Include="..\EntityWorker.SQLite\EntityWorker.SQLite.csproj">
+      <PrivateAssets>all</PrivateAssets>
+    </ProjectReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="System.Data.SqlClient">
-      <HintPath>C:\Users\Alen.Toma\.nuget\packages\system.data.sqlclient\4.4.2\ref\netstandard2.0\System.Data.SqlClient.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  
   <Target Name="IncludeP2POutput">
-    <ItemGroup>
-      <BuildOutputInPackage Include="..\System.Data.Sqlite.Core\bin\Release\$(TargetFramework)\System.Data.SQLite.dll" />
-      <BuildOutputInPackage Include="..\System.Data.Sqlite.Core\bin\Release\netcoreapp2.0\System.Data.SQLite.dll.config" />
-      <!--<ProjectReference Include="..\System.Data.Sqlite.Core\System.Data.SQLite.csproj" />-->
+    <ItemGroup Condition="'$(Configuration)'=='Release'">
+      <BuildOutputInPackage Include="..\EntityWorker.SQLite\bin\Release\$(TargetFramework)\EntityWorker.SQLite.dll" />
+      <BuildOutputInPackage Include="..\EntityWorker.SQLite\bin\Release\$(TargetFramework)\EntityWorker.SQLite.xml" />
+      <BuildOutputInPackage Condition="Exists('..\EntityWorker.SQLite\bin\Release\$(TargetFramework)\EntityWorker.SQLite.dll.config')" Include="..\EntityWorker.SQLite\bin\Release\$(TargetFramework)\EntityWorker.SQLite.dll.config" />
+      <BuildOutputInPackage Condition="Exists('..\EntityWorker.SQLite\bin\Release\$(TargetFramework)\EntityWorker.SQLite.deps.json')" Include="..\EntityWorker.SQLite\bin\Release\$(TargetFramework)\EntityWorker.SQLite.deps.json" />
+
+
+      <BuildOutputInPackage Include="..\..\..\FastDeepCloner\source\bin\Release\$(TargetFramework)\FastDeepCloner.dll" />
+      <BuildOutputInPackage Include="..\..\..\FastDeepCloner\source\bin\Release\$(TargetFramework)\FastDeepCloner.xml" />
+      <BuildOutputInPackage Condition="Exists('..\..\..\FastDeepCloner\source\bin\Release\$(TargetFramework)\FastDeepCloner.dll.config')" Include="..\..\..\FastDeepCloner\source\bin\Release\$(TargetFramework)\FastDeepCloner.dll.config" />
+      <BuildOutputInPackage Condition="Exists('..\..\..\FastDeepCloner\source\bin\Release\$(TargetFramework)\FastDeepCloner.deps.json')" Include="..\..\..\FastDeepCloner\source\bin\Release\$(TargetFramework)\FastDeepCloner.deps.json" />
     </ItemGroup>
   </Target>
+
+  <Target Name="CustomContentTarget">
+    <ItemGroup Condition="'$(Configuration)'=='Release'">
+      <TfmSpecificPackageFile Condition="Exists('..\EntityWorker.SQLite\bin\Release\$(TargetFramework)\SR\EntityWorker.SQLite.resources.dll')" Include="..\EntityWorker.SQLite\bin\Release\$(TargetFramework)\SR\EntityWorker.SQLite.resources.dll">
+        <PackagePath>lib\$(TargetFramework)\SR\EntityWorker.SQLite.resources.dll</PackagePath>
+      </TfmSpecificPackageFile>
+    </ItemGroup>
+  </Target>
+
 
 
 </Project>

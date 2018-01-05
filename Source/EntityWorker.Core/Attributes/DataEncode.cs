@@ -21,14 +21,16 @@ namespace EntityWorker.Core.Attributes
         /// <summary>
         /// Encode Key or leave it empty to use a EntityWorker.Core Defult Key
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="keySize"> NetCore 2 can only handle 128.  128 || 256 </param>
+        /// <param name="key">Default =  GlobalConfiguration.DataEncode_Key</param>
+        /// <param name="keySize"> NETCOREAPP2.0 can only handle 128.  128 || 256 Default = GlobalConfiguration.DataEncode_Key_Size  </param>
         /// <param name=""></param>
-        public DataEncode(string key = null, DataCipherKeySize keySize = DataCipherKeySize.Key_128)
+        public DataEncode(string key = null, DataCipherKeySize keySize = DataCipherKeySize.Default)
         {
             if (!string.IsNullOrEmpty(key))
                 Key = key;
-            KeySize = keySize;
+            if (keySize != DataCipherKeySize.Default)
+                KeySize = keySize;
+            else keySize = GlobalConfiguration.DataEncode_Key_Size;
         }
     }
 }

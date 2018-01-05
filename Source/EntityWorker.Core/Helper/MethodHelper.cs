@@ -8,13 +8,8 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using EntityWorker.Core.InterFace;
-using System.Data.SQLite;
+using EntityWorker.SQLite;
 using EntityWorker.Core.Object.Library;
-//#if NET461 || NET451 || NET46
-//using System.Data.SQLite;
-//#elif NETCOREAPP2_0  || NETSTANDARD2_0
-//using Microsoft.Data.Sqlite;
-//#endif
 
 namespace EntityWorker.Core.Helper
 {
@@ -67,7 +62,7 @@ namespace EntityWorker.Core.Helper
             var data = new LightDataTable();
             data.AddColumn("value", toType, value);
             data.AddRow(new object[1] { value });
-            return data.Rows.First().TryValueAndConvert(toType, 0, true);
+            return data.Rows.First().TryValueAndConvert(toType, "value", true);
         }
 
         /// <summary>

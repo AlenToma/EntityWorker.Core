@@ -39,11 +39,12 @@ namespace EntityWorker.Core.Object.Library
         /// </summary>
         /// <param name="fieldType"></param>
         /// <returns></returns>
-        public IDbEntity Clone(FieldType fieldType = FieldType.PropertyInfo)
+        public IDbEntity Clone(CloneLevel cloneLevel = CloneLevel.Hierarki, FieldType fieldType = FieldType.PropertyInfo)
         {
             return DeepCloner.Clone(this, new FastDeepClonerSettings()
             {
                 FieldType = fieldType,
+                CloneLevel = cloneLevel,
                 OnCreateInstance = new Extensions.CreateInstance(FormatterServices.GetUninitializedObject)
             });
         }

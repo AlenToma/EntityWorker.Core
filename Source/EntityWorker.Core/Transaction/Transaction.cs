@@ -14,12 +14,8 @@ using EntityWorker.Core.InterFace;
 using EntityWorker.Core.Object.Library;
 using FastDeepCloner;
 using System.Runtime.Serialization;
-using System.Data.SQLite;
-//#if NET461 || NET451 || NET46
-//using System.Data.SQLite;
-//#elif NETCOREAPP2_0 || NETSTANDARD2_0
-//using Microsoft.Data.Sqlite;
-//#endif
+using EntityWorker.SQLite;
+using System.Collections;
 
 namespace EntityWorker.Core.Transaction
 {
@@ -189,17 +185,31 @@ namespace EntityWorker.Core.Transaction
             return Trans;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cmd"></param>
-        /// <returns></returns>
-        public IDataReader ExecuteReader(DbCommandExtended cmd)
+
+        public List<T> DataReaderConverter<T>(DbCommandExtended command) where T : class, IDbEntity
         {
+            return ((List<T>)DataReaderConverter(command, typeof(T)));
+        }
+
+        public IList DataReaderConverter(DbCommandExtended command, Type type)
+        {
+            IList result;
             ValidateConnection();
-            var o = cmd.Command.ExecuteReader();
-            CloseifPassible();
-            return o;
+            try
+            {
+                var o = command.Command.ExecuteReader();
+                result = Extension.DataReaderConverter(this, o, command, type);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                CloseifPassible();
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -330,10 +340,10 @@ namespace EntityWorker.Core.Transaction
         /// <param name="sql"></param>
         /// <param name="type">set for faster loading of sql</param>
         /// <returns></returns>
-        public DbCommandExtended GetSqlCommand(string sql, Type type= null)
+        public DbCommandExtended GetSqlCommand(string sql, Type type = null)
         {
             ValidateConnection();
-            var cmd= this.ProcessSql(SqlConnection, Trans, sql, type);
+            var cmd = this.ProcessSql(SqlConnection, Trans, sql, type);
             return cmd;
         }
 
@@ -346,12 +356,13 @@ namespace EntityWorker.Core.Transaction
         protected List<ILightDataTable> GetLightDataTableList(DbCommandExtended cmd, string primaryKeyId = null)
         {
             var returnList = new List<ILightDataTable>();
-            var reader = ExecuteReader(cmd);
-            returnList.Add(new LightDataTable().ReadData(DataBaseTypes, reader, cmd, primaryKeyId));
+            var reader = cmd.Command.ExecuteReader();
+            returnList.Add(new LightDataTable().ReadData(DataBaseTypes, reader, cmd, primaryKeyId, false));
 
             while (reader.NextResult())
-                returnList.Add(new LightDataTable().ReadData(DataBaseTypes, reader, cmd, primaryKeyId));
+                returnList.Add(new LightDataTable().ReadData(DataBaseTypes, reader, cmd, primaryKeyId, false));
             reader.Close();
+            reader.Dispose();
             return returnList;
         }
 
@@ -374,7 +385,30 @@ namespace EntityWorker.Core.Transaction
                         _attachedObjects.Remove(key);
 
                 if (!_attachedObjects.ContainsKey(key))
-                    _attachedObjects.Add(key, objcDbEntity.Clone());
+                    _attachedObjects.Add(key, objcDbEntity.Clone(CloneLevel.FirstLevelOnly));
+            }
+        }
+
+        /// <summary>
+        /// Attach object to WorkEntity to track changes
+        /// </summary>
+        /// <param name="objcDbEntity"></param>
+        /// <param name="overwrite"></param>
+        internal void AttachNew(DbEntity objcDbEntity, bool overwrite = false)
+        {
+            if (objcDbEntity == null)
+                throw new NullReferenceException("DbEntity cant be null");
+            if (objcDbEntity.Id <= 0)
+                throw new NullReferenceException("Id is 0, it cant be attached");
+            var key = objcDbEntity.GetEntityKey();
+            lock (_attachedObjects)
+            {
+                if (_attachedObjects.ContainsKey(key))
+                    if (overwrite)
+                        _attachedObjects.Remove(key);
+
+                if (!_attachedObjects.ContainsKey(key))
+                    _attachedObjects.Add(key, objcDbEntity);
             }
         }
 

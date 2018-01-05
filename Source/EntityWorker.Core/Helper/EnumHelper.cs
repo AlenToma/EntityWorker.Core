@@ -28,8 +28,12 @@
         CheckBox
     }
 
+    /// <summary>
+    /// Default = GlobalConfiguration.DataEncode_Key_Size
+    /// </summary>
     public enum DataCipherKeySize
     {
+        Default,
         Key_128 = 128,
         Key_256 = 256
     }

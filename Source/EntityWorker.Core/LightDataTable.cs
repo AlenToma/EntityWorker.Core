@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.Serialization;
+using EntityWorker.Core.Attributes;
 using EntityWorker.Core.Helper;
 using EntityWorker.Core.Interface;
 
@@ -317,7 +318,7 @@ namespace EntityWorker.Core
         /// <param name="execludeClasses"></param>
         /// <param name="overdedDataType"></param>
         /// <param name="ignoreTypeValidation"></param>
-        public LightDataTable(object obj, bool execludeClasses = false, Type overdedDataType = null, bool ignoreTypeValidation = false) : base()
+        public LightDataTable(object obj, bool execludeClasses = false, Type overdedDataType = null, bool ignoreTypeValidation = false, bool structureOnly = false) : base()
         {
             this.IgnoreTypeValidation = ignoreTypeValidation;
             if (obj == null)
@@ -334,14 +335,15 @@ namespace EntityWorker.Core
             else if (obj is IList)
             {
                 var oList = obj as IList;
-                var T = FormatterServices.GetUninitializedObject(oList.GetType().GetActualType());
+                var T = oList.GetType().GetActualType().CreateInstance();
                 foreach (var item in FastDeepCloner.DeepCloner.GetFastDeepClonerProperties(T.GetType()))
                     if (!execludeClasses || item.IsInternalType)
                         AddColumn(item.Name, item.PropertyType, null);
-                foreach (var o in oList)
-                {
-                    AddRow(NewRow().MergeUnKnownObject(o));
-                }
+                if (!structureOnly)
+                    foreach (var o in oList)
+                    {
+                        AddRow(NewRow().MergeUnKnownObject(o));
+                    }
             }
             else if (obj is DataTable)
             {
@@ -353,8 +355,9 @@ namespace EntityWorker.Core
                 foreach (DataColumn col in tb.Columns)
                     AddColumn(col.ColumnName, overdedDataType ?? col.DataType, col.DefaultValue);
 
-                foreach (DataRow row in tb.Rows)
-                    AddRow(NewRow(row.ItemArray));
+                if (!structureOnly)
+                    foreach (DataRow row in tb.Rows)
+                        AddRow(NewRow(row.ItemArray));
 
             }
             else if ((obj as IDictionary<string, object>) != null)
@@ -362,15 +365,22 @@ namespace EntityWorker.Core
                 var dictionary = (IDictionary<string, object>)obj;
                 foreach (string key in dictionary.Keys)
                     AddColumn(key, dictionary[key].GetType(), null);
-                AddRow(NewRow().MergeUnKnownObject(obj));
+
+                if (!structureOnly)
+                    AddRow(NewRow().MergeUnKnownObject(obj));
             }
             else
             {
                 foreach (var item in FastDeepCloner.DeepCloner.GetFastDeepClonerProperties(obj.GetType()))
                     if (!execludeClasses || item.IsInternalType)
+                    {
+                        if (item.ContainAttribute<PrimaryKey>() && string.IsNullOrEmpty(TablePrimaryKey))
+                            TablePrimaryKey = item.Name;
                         AddColumn(item.Name, item.PropertyType, null);
 
-                AddRow(NewRow().MergeUnKnownObject(obj));
+                    }
+                if (!structureOnly)
+                    AddRow(NewRow().MergeUnKnownObject(obj));
             }
         }
 

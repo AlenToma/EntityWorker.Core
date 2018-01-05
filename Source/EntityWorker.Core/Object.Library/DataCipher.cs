@@ -11,28 +11,28 @@ namespace EntityWorker.Core.Object.Library
     {
         // This constant is used to determine the keysize of the encryption algorithm in bits.
         // We divide this by 8 within the code below to get the equivalent number of bytes.
-        private int _Keysize = 128;
+        private int _Keysize = (int)GlobalConfiguration.DataEncode_Key_Size;
 
+        private byte[] saltStringBytes;
+
+        private byte[] ivStringBytes;
         // This constant determines the number of iterations for the password bytes generation function.
         private const int DerivationIterations = 1000;
-        private string _passPhrase = "EntityWorker.Default.Key.Pass";
+        private string _passPhrase = GlobalConfiguration.DataEncode_Key;
 
         public DataCipher(string passPhrase = null, DataCipherKeySize keySize = DataCipherKeySize.Key_128)
         {
             if (!string.IsNullOrEmpty(passPhrase?.Trim()))
                 _passPhrase = passPhrase;
-            _Keysize = keySize == DataCipherKeySize.Key_128 ? 128 : 256;
+            _Keysize = keySize == DataCipherKeySize.Key_256 ? 256 : 128;
+            saltStringBytes = _Keysize == 256 ? Encoding.UTF8.GetBytes("kljsdkkdlo4454GG00155sajuklmbkdl") : Encoding.UTF8.GetBytes("kljsdkkdlo4454GG");
+            ivStringBytes = _Keysize == 256 ? Encoding.UTF8.GetBytes("SSljsdkkdlo4454Maakikjhsd55GaRTP") : Encoding.UTF8.GetBytes("SSljsdkkdlo4454M");
         }
 
         public string Encrypt(string plainText)
         {
             if (string.IsNullOrEmpty(plainText))
                 return plainText;
-            // Salt and IV is randomly generated each time, but is preprended to encrypted cipher text
-            // so that the same Salt and IV values can be used when decrypting.  
-            var saltStringBytes = _Keysize == 128 ? Encoding.UTF8.GetBytes("kljsdkkdlo4454GG") : Encoding.UTF8.GetBytes("kljsdkkdlo4454GG00155sajuklmbkdl");
-            //Generate256BitsOfRandomEntropy();
-            var ivStringBytes = _Keysize == 128 ? Encoding.UTF8.GetBytes("SSljsdkkdlo4454M") : Encoding.UTF8.GetBytes("SSljsdkkdlo4454Maakikjhsd55GaRTP");
             var plainTextBytes = Encoding.UTF8.GetBytes(plainText);
             using (var password = new Rfc2898DeriveBytes(_passPhrase, saltStringBytes, DerivationIterations))
             {
@@ -72,9 +72,9 @@ namespace EntityWorker.Core.Object.Library
             // [32 bytes of Salt] + [32 bytes of IV] + [n bytes of CipherText]
             var cipherTextBytesWithSaltAndIv = Convert.FromBase64String(cipherText);
             // Get the saltbytes by extracting the first 32 bytes from the supplied cipherText bytes.
-            var saltStringBytes = cipherTextBytesWithSaltAndIv.Take(_Keysize / 8).ToArray();
-            // Get the IV bytes by extracting the next 32 bytes from the supplied cipherText bytes.
-            var ivStringBytes = cipherTextBytesWithSaltAndIv.Skip(_Keysize / 8).Take(_Keysize / 8).ToArray();
+            //var saltStringBytes = cipherTextBytesWithSaltAndIv.Take(_Keysize / 8).ToArray();
+            //// Get the IV bytes by extracting the next 32 bytes from the supplied cipherText bytes.
+            //var ivStringBytes = cipherTextBytesWithSaltAndIv.Skip(_Keysize / 8).Take(_Keysize / 8).ToArray();
             // Get the actual cipher text bytes by removing the first 64 bytes from the cipherText string.
             var cipherTextBytes = cipherTextBytesWithSaltAndIv.Skip((_Keysize / 8) * 2).Take(cipherTextBytesWithSaltAndIv.Length - ((_Keysize / 8) * 2)).ToArray();
 

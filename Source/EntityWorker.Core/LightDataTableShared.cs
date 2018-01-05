@@ -19,7 +19,7 @@ namespace EntityWorker.Core
             Columns = new ColumnsCollections<string>();
             ColumnsWithIndexKey = new ColumnsCollections<int>();
             RoundingSettings = new RoundingSettings();
-            Culture = cultureInfo ?? new CultureInfo("en");
+            Culture = cultureInfo ?? GlobalConfiguration.cultureInfo;
             ValidateCulture();
         }
 
@@ -28,7 +28,7 @@ namespace EntityWorker.Core
             Columns = new ColumnsCollections<string>();
             ColumnsWithIndexKey = new ColumnsCollections<int>();
             RoundingSettings = new RoundingSettings();
-            Culture = new CultureInfo("en");
+            Culture = GlobalConfiguration.cultureInfo;
             ValidateCulture();
         }
 

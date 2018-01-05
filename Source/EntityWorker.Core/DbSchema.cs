@@ -42,7 +42,7 @@ namespace EntityWorker.Core
             var cmd = _repository.GetSqlCommand(_repository.DataBaseTypes == DataBaseTypes.Mssql
                 ? "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = N'" + table +
                   "'"
-                : "SELECT name as COLUMN_NAME, type as DATA_TYPE  FROM pragma_table_info('" + table + "');", type);
+                : "SELECT name as COLUMN_NAME, type as DATA_TYPE  FROM pragma_table_info('" + table + "');");
             var data = _repository.GetLightDataTable(cmd, "COLUMN_NAME");
             if (data.Rows.Any())
             {
@@ -72,7 +72,7 @@ namespace EntityWorker.Core
                     query = Querys.Select(type, _repository.DataBaseTypes).Execute();
                 CachedSql.Add(query, query);
             }
-            return _repository.GetLightDataTable(_repository.GetSqlCommand(CachedSql[query], typeof(T))).Rows.ToObject<T>(_repository);
+            return _repository.DataReaderConverter<T>(_repository.GetSqlCommand(CachedSql[query]));
         }
 
 
@@ -92,9 +92,9 @@ namespace EntityWorker.Core
                 var key = type.GetActualType().GetPrimaryKey().GetPropertyName();
                 CachedSql.Add(k, Querys.Select(type.GetActualType(), _repository.DataBaseTypes).Where.Column<long>(key).Equal("@ID", true).Execute());
             }
-            var cmd = _repository.GetSqlCommand(CachedSql[k], type);
+            var cmd = _repository.GetSqlCommand(CachedSql[k]);
             _repository.AddInnerParameter(cmd, "@ID", id, System.Data.SqlDbType.BigInt);
-            return type.GetActualType() != type ? _repository.GetLightDataTable(cmd).Rows.ToObject(type, _repository) : _repository.GetLightDataTable(cmd).Rows.FirstOrDefault()?.ToObject(type);
+            return type.GetActualType() != type ? _repository.DataReaderConverter(cmd, type) : _repository.DataReaderConverter(cmd, type).Cast<object>().FirstOrDefault();
         }
 
 
@@ -112,7 +112,7 @@ namespace EntityWorker.Core
             var k = type.FullName + _repository.DataBaseTypes.ToString();
             if (!CachedSql.ContainsKey(k))
                 CachedSql.Add(k, Querys.Select(type, _repository.DataBaseTypes).Execute());
-            return _repository.GetLightDataTable(_repository.GetSqlCommand(CachedSql[k], type)).Rows.ToObject(type, _repository);
+            return _repository.DataReaderConverter(_repository.GetSqlCommand(CachedSql[k]), type);
         }
 
         /// <summary>
@@ -132,9 +132,9 @@ namespace EntityWorker.Core
             if (!CachedSql.ContainsKey(k))
                 CachedSql.Add(k, Querys.Select(type, _repository.DataBaseTypes).Where.Column<long>(column).Equal("@ID", true).Execute());
 
-            var cmd = _repository.GetSqlCommand(CachedSql[k], type);
+            var cmd = _repository.GetSqlCommand(CachedSql[k]);
             _repository.AddInnerParameter(cmd, "@ID", id, SqlDbType.BigInt);
-            return type.GetActualType() != type ? _repository.GetLightDataTable(cmd).Rows.ToObject(type, _repository) : _repository.GetLightDataTable(cmd).Rows.FirstOrDefault()?.ToObject(type);
+            return type.GetActualType() != type ? _repository.DataReaderConverter(cmd, type) : _repository.DataReaderConverter(cmd, type).Cast<object>().FirstOrDefault();
         }
 
 
@@ -286,8 +286,8 @@ namespace EntityWorker.Core
                     {
                         if (i < 0)
                             i = sql.Count - 1;
-
-                        var cmd = _repository.GetSqlCommand(sql[i]);
+                        var s = sql[i];
+                        var cmd = _repository.GetSqlCommand(s);
                         cmd.Command.ExecuteNonQuery();
                         sql.RemoveAt(i);
                         i--;
@@ -399,6 +399,7 @@ namespace EntityWorker.Core
                             v = obValue.GetType().GetPrimaryKey().GetValue(obValue)?.ConvertValue<long>() <= 0 ?
                                 Save(obValue, independentData) :
                                 obValue.GetType().GetPrimaryKey().GetValue(obValue)?.ConvertValue<long>();
+                            col.SetValue(o, v);
                         }
                     }
 
