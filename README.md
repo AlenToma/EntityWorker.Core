@@ -1,12 +1,10 @@
-# Introduction EntityWorker.Core
-## Nuget
-https://www.nuget.org/packages/EntityWorker.Core/
+# Introduction [EntityWorker.Core](https://www.nuget.org/packages/EntityWorker.Core/)
 
 ## CodeProject
-https://www.codeproject.com/Tips/1222424/EntityWorker-Core-An-Alternative-to-Entity-Framewo
+[EntityWorker-Core-An-Alternative-to-Entity-Framewo](https://www.codeproject.com/Tips/1222424/EntityWorker-Core-An-Alternative-to-Entity-Framewo)
 
 ## EntityWorker.Core in Action
-https://github.com/AlenToma/LightData.CMS
+[LightData.CMS](https://github.com/AlenToma/LightData.CMS)
 
 ## .NET FRAMEWORK SUPPORT 
 1- .NETCoreApp 2.0
