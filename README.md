@@ -39,10 +39,14 @@ let's start by creating the dbContext, lets call it Repository
         // then true or false for migration
         public Repository() : base(GetConnectionString(), true, DataBaseTypes.Mssql) { }
 
-        // get the full connection string from the web-config
+        // get the full connection string
         public static string GetConnectionString()
         {
-            return ConfigurationManager.ConnectionStrings["Db-connection"].ConnectionString;
+        return dbType == DataBaseTypes.Mssql ? @"Server=.\SQLEXPRESS; Database=CMS; User Id=root; Password=root;" 
+        : 
+        @"Data Source=D:\Projects\CMS\source\App_Data\CMS.db";
+        
+            //return ConfigurationManager.ConnectionStrings["Db-connection"].ConnectionString;
         }
 
     }
