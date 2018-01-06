@@ -30,7 +30,7 @@ EndWith Containe and so on
 Se Code Example for more info.
 ## Code Example
 let's start by creating the dbContext, lets call it Repository
-```
+```csharp
     // Here we inherit from Transaction which contains the database logic for handling the transaction.
     // well thats all we need right now.
     public class Repository : Transaction
