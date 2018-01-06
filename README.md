@@ -37,10 +37,13 @@ let's start by creating the dbContext, lets call it Repository
     {
         // there is two databases types mssql and Sqllight
         // then true or false for migration
-        public Repository() : base(GetConnectionString(), true, DataBaseTypes.Mssql) { }
+        public Repository(DataBaseTypes dbType = DataBaseTypes.Mssql) : base(GetConnectionString(dbType), true, dbType) 
+        { 
+        
+        }
 
         // get the full connection string
-        public static string GetConnectionString()
+        public static string GetConnectionString(DataBaseTypes dbType)
         {
         return dbType == DataBaseTypes.Mssql ? @"Server=.\SQLEXPRESS; Database=CMS; User Id=root; Password=root;" 
         : 
