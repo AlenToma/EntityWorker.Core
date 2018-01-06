@@ -35,7 +35,8 @@ let's start by creating the dbContext, lets call it Repository
     {
         // there is two databases types mssql and Sqllight
         // then true or false for migration
-        public Repository(DataBaseTypes dbType = DataBaseTypes.Mssql) : base(GetConnectionString(dbType), true, dbType) 
+        public Repository(DataBaseTypes dbType = DataBaseTypes.Mssql) : 
+        base(GetConnectionString(dbType), true, dbType) 
         { 
         
         }
