@@ -43,11 +43,10 @@ let's start by creating the dbContext, lets call it Repository
         // get the full connection string
         public static string GetConnectionString(DataBaseTypes dbType)
         {
-        return dbType == DataBaseTypes.Mssql ? @"Server=.\SQLEXPRESS; Database=CMS; User Id=root; Password=root;" 
-        : 
-        @"Data Source=D:\Projects\CMS\source\App_Data\CMS.db";
-        
-            //return ConfigurationManager.ConnectionStrings["Db-connection"].ConnectionString;
+         if (dbType == DataBaseTypes.Mssql)
+            return  @"Server=.\SQLEXPRESS; Database=CMS; User Id=root; Password=root;";
+          else
+            return  @"Data Source=D:\Projects\CMS\source\App_Data\CMS.db";
         }
 
     }
