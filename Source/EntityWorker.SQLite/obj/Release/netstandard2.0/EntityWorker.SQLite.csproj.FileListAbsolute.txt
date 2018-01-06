@@ -1,4 +1,3 @@
-D:\Projects\EntityWorker.Core\Source\EntityWorker.SQLite\bin\Release\netstandard2.0\EntityWorker.SQLite.xml
 D:\Projects\EntityWorker.Core\Source\EntityWorker.SQLite\bin\Release\netstandard2.0\EntityWorker.SQLite.deps.json
 D:\Projects\EntityWorker.Core\Source\EntityWorker.SQLite\bin\Release\netstandard2.0\EntityWorker.SQLite.dll
 D:\Projects\EntityWorker.Core\Source\EntityWorker.SQLite\bin\Release\netstandard2.0\EntityWorker.SQLite.pdb

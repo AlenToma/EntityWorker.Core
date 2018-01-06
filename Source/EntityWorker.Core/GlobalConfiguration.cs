@@ -24,5 +24,6 @@ namespace EntityWorker.Core
         /// Default is EN;
         /// </summary>
         public static CultureInfo cultureInfo { get; set; } = new CultureInfo("en");
+
     }
 }

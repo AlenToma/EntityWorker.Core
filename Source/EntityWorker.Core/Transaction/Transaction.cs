@@ -377,7 +377,7 @@ namespace EntityWorker.Core.Transaction
                 throw new NullReferenceException("DbEntity cant be null");
             if (objcDbEntity.Id <= 0)
                 throw new NullReferenceException("Id is 0, it cant be attached");
-            var key = objcDbEntity.EntityKey;
+            var key = objcDbEntity.EntityKey();
             lock (_attachedObjects)
             {
                 if (_attachedObjects.ContainsKey(key))
@@ -400,7 +400,7 @@ namespace EntityWorker.Core.Transaction
                 throw new NullReferenceException("DbEntity cant be null");
             if (objcDbEntity.Id <= 0)
                 throw new NullReferenceException("Id is 0, it cant be attached");
-            var key = objcDbEntity.EntityKey;
+            var key = objcDbEntity.EntityKey();
             lock (_attachedObjects)
             {
                 if (_attachedObjects.ContainsKey(key))
@@ -420,7 +420,7 @@ namespace EntityWorker.Core.Transaction
         public Dictionary<string, object> GetObjectChanges(DbEntity entity)
         {
             var changes = new Dictionary<string, object>();
-            var originalObject = _attachedObjects[entity.EntityKey];
+            var originalObject = _attachedObjects[entity.EntityKey()];
             if (originalObject == null)
                 throw new Exception("Object need to be attached");
             foreach (var prop in DeepCloner.GetFastDeepClonerProperties(entity.GetType()))
@@ -443,7 +443,7 @@ namespace EntityWorker.Core.Transaction
         /// <returns> primaryId >0 is mandatory </returns>
         public bool IsAttached(DbEntity entity)
         {
-            return _attachedObjects.ContainsKey(entity.EntityKey);
+            return _attachedObjects.ContainsKey(entity.EntityKey());
         }
 
         /// <summary>

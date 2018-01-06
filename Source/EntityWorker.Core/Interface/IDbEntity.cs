@@ -1,15 +1,15 @@
 ﻿using EntityWorker.Core.Attributes;
 using EntityWorker.Core.Helper;
 using FastDeepCloner;
+using System;
 
 namespace EntityWorker.Core.InterFace
 {
+    /// <summary>
+    /// IDbEntity
+    /// </summary>
     public interface IDbEntity
     {
-        /// <summary>
-        /// Object Identifiere
-        /// </summary>
-        string EntityKey { get; }
         /// <summary>
         /// Triggered when primary id changed
         /// </summary>

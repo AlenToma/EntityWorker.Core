@@ -3,23 +3,25 @@ using EntityWorker.Core.Attributes;
 using EntityWorker.Core.Helper;
 using EntityWorker.Core.InterFace;
 using FastDeepCloner;
+using System;
 
 namespace EntityWorker.Core.Object.Library
 {
+    /// <summary>
+    /// All Tables Should inherit from this class
+    /// </summary>
     public class DbEntity : IDbEntity
     {
+        /// <summary>
+        /// Notify when Id has been changed
+        /// </summary>
         public event Events.IdChanged OnIdChanged;
 
         private long _id;
 
-        public string EntityKey
-        {
-            get
-            {
-                return this.ToString() + Id;
-            }
-        }
-
+        /// <summary>
+        /// Entity PrimaryKey
+        /// </summary>
         [PrimaryKey]
         public virtual long Id
         {
@@ -34,9 +36,16 @@ namespace EntityWorker.Core.Object.Library
             }
         }
 
+        /// <summary>
+        /// This should only be used IDbRuleTrigger
+        /// Se https://github.com/AlenToma/EntityWorker.Core for full documentation
+        /// </summary>
         [ExcludeFromAbstract]
         public virtual ItemState State { get; set; }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public DbEntity() { }
 
         /// <inheritdoc />

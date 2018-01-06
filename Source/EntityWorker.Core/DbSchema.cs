@@ -35,7 +35,6 @@ namespace EntityWorker.Core
 
         public ILightDataTable ObjectColumns(Type type)
         {
-
             if (CachedObjectColumn.ContainsKey(type))
                 return CachedObjectColumn[type];
             var table = type.GetCustomAttribute<Table>()?.Name ?? type.Name;

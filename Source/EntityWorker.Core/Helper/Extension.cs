@@ -179,6 +179,8 @@ namespace EntityWorker.Core.Helper
             return str;
         }
 
+        public static string EntityKey(this object entity) => entity.GetType().FullName + entity.GetPrimaryKeyValue()?.ToString();
+
 
         public static StringBuilder InsertBefore(this StringBuilder str, string text, string identifier, bool insertLastIfNotFound = true)
         {
@@ -237,6 +239,16 @@ namespace EntityWorker.Core.Helper
         public static IFastDeepClonerProperty GetPrimaryKey(this Type type)
         {
             return DeepCloner.GetFastDeepClonerProperties(type).FirstOrDefault(x => x.ContainAttribute<PrimaryKey>());
+        }
+
+        /// <summary>
+        /// Get the Primary key Value
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public static object GetPrimaryKeyValue(this object item)
+        {
+            return DeepCloner.GetFastDeepClonerProperties(item.GetType()).FirstOrDefault(x => x.ContainAttribute<PrimaryKey>()).GetValue(item);
         }
 
         /// <summary>
