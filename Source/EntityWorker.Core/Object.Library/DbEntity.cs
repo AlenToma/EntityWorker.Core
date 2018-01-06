@@ -12,6 +12,14 @@ namespace EntityWorker.Core.Object.Library
 
         private long _id;
 
+        public string EntityKey
+        {
+            get
+            {
+                return this.ToString() + Id;
+            }
+        }
+
         [PrimaryKey]
         public virtual long Id
         {
@@ -23,8 +31,6 @@ namespace EntityWorker.Core.Object.Library
                     _id = value;
                     OnIdChanged?.Invoke(_id);
                 }
-                else
-                    _id = value;
             }
         }
 
@@ -37,6 +43,7 @@ namespace EntityWorker.Core.Object.Library
         /// <summary>
         /// Clone the object
         /// </summary>
+        /// <param name="cloneLevel"></param>
         /// <param name="fieldType"></param>
         /// <returns></returns>
         public IDbEntity Clone(CloneLevel cloneLevel = CloneLevel.Hierarki, FieldType fieldType = FieldType.PropertyInfo)

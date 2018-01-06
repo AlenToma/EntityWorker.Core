@@ -1,24 +1,36 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
+    <TargetFrameworks>netcoreapp2.0;netstandard2.0;net461;net451;net46;</TargetFrameworks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>EntityWorker.SQLite</PackageId>
+    <AssemblyName>EntityWorker.SQLite</AssemblyName>
+    <AssemblyVersion>1.0.0.1</AssemblyVersion>
+    <FileVersion>1.0.0.1</FileVersion>
+    <Version>1.0.1</Version>
+    <Authors>Alen Toma</Authors>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageProjectUrl>https://github.com/AlenToma/EntityWorker.Core</PackageProjectUrl>
+    <PackageTags>sqlite database ado.net provider interop</PackageTags>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/LICENSE</PackageLicenseUrl>
+    <Copyright>Copyright (c) 2017 Alen Toma</Copyright>
+    <Description>The official SQLite database engine for both x86 and x64 along with the ADO.NET provider.  This package includes support for LINQ and Entity Framework 6.</Description>
+    <NeutralLanguage />
+    <PackageIconUrl>https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/icon.gif</PackageIconUrl>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
-    <TargetFrameworks>netcoreapp2.0;netstandard2.0;net461;net451;net46;</TargetFrameworks>
-    <Platforms>AnyCPU;x86</Platforms>
+  
   </PropertyGroup>
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
 
   <ItemGroup>
     <ModuleFiles Include="$(TargetDir)*.dll" Exclude="$(TargetDir)System*.dll;$(TargetDir)Microsoft*.dll" DestinationPath="$(SolutionDir)src\MyProject\Modules\MyModule\%(Filename)%(Extension)">
     </ModuleFiles>
   </ItemGroup>
 
-  <PropertyGroup>
-    <DocumentationFile>bin\Release\$(TargetFramework)\EntityWorker.SQLite.xml</DocumentationFile>
-  </PropertyGroup>
-
+  <ItemGroup Condition="'$(Configuration)'=='Release'">
+    <Content Include="NetFramwork Build/**" PackagePath="build/" CopyToPublishDirectory="Always" />
+    <Content Include="NetCore Build/**" PackagePath="lib/" CopyToPublishDirectory="Always" />
+  </ItemGroup>
+  
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netcoreapp2.0|AnyCPU'">
     <Optimize>true</Optimize>
   </PropertyGroup>

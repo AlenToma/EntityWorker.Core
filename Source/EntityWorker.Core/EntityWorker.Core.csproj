@@ -3,9 +3,9 @@
     <TargetFrameworks>netcoreapp2.0;netstandard2.0;net461;net451;net46;</TargetFrameworks>
     <PackageId>EntityWorker.Core</PackageId>
     <AssemblyName>EntityWorker.Core</AssemblyName>
-    <AssemblyVersion>1.0.2.2</AssemblyVersion>
-    <FileVersion>1.0.2.2</FileVersion>
-    <Version>1.2.2</Version>
+    <AssemblyVersion>1.0.2.3</AssemblyVersion>
+    <FileVersion>1.0.2.3</FileVersion>
+    <Version>1.2.3</Version>
     <Authors>Alen Toma</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageProjectUrl>https://github.com/AlenToma/EntityWorker.Core</PackageProjectUrl>
@@ -16,13 +16,18 @@
     <NeutralLanguage />
     <PackageIconUrl>https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/icon.gif</PackageIconUrl>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeP2POutput;</TargetsForTfmSpecificBuildOutput>
-    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);CustomContentTarget</TargetsForTfmSpecificContentInPackage>
+    <!--<TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeP2POutput;</TargetsForTfmSpecificBuildOutput>-->
+    <!--<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);CustomContentTarget</TargetsForTfmSpecificContentInPackage>-->
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(Configuration)'=='Release'">
+  <!--<ItemGroup Condition="'$(Configuration)'=='Release'">
     <Content Include="NetFramwork Build/**" PackagePath="build/" CopyToPublishDirectory="Always" />
     <Content Include="NetCore Build/**" PackagePath="lib/" CopyToPublishDirectory="Always" />
+  </ItemGroup>-->
+
+  <ItemGroup>
+    <PackageReference Include="FastDeepCloner" Version="1.0.23" />
+    <PackageReference Include="EntityWorker.SQLite" Version="1.0.1" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
@@ -53,24 +58,15 @@
 
   </ItemGroup>
 
-  <ItemGroup Condition="'$(Configuration)'=='Debug'">
+  <!--<ItemGroup Condition="'$(Configuration)'=='Debug'">
     <Content Include="SQLite.Interop.dll">
       <PackagePath>build/</PackagePath>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
+  </ItemGroup>-->
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\FastDeepCloner\source\FastDeepCloner.csproj">
-      <PrivateAssets>all</PrivateAssets>
-    </ProjectReference>
-    <ProjectReference Include="..\EntityWorker.SQLite\EntityWorker.SQLite.csproj">
-      <PrivateAssets>all</PrivateAssets>
-    </ProjectReference>
-  </ItemGroup>
-
-  <Target Name="IncludeP2POutput">
+  <!--<Target Name="IncludeP2POutput">
     <ItemGroup Condition="'$(Configuration)'=='Release'">
       <BuildOutputInPackage Include="..\EntityWorker.SQLite\bin\Release\$(TargetFramework)\EntityWorker.SQLite.dll" />
       <BuildOutputInPackage Include="..\EntityWorker.SQLite\bin\Release\$(TargetFramework)\EntityWorker.SQLite.xml" />
@@ -91,7 +87,7 @@
         <PackagePath>lib\$(TargetFramework)\SR\EntityWorker.SQLite.resources.dll</PackagePath>
       </TfmSpecificPackageFile>
     </ItemGroup>
-  </Target>
+  </Target>-->
 
 
 

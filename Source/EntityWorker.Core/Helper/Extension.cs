@@ -2,8 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlTypes;
-using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -31,10 +29,12 @@ namespace EntityWorker.Core.Helper
             {typeof(string), "NVARCHAR(4000)"},
             {typeof(bool), "BIT"},
             {typeof(DateTime), "DATETIME"},
+            {typeof(TimeSpan), "DATETIME"},
             {typeof(float), "FLOAT"},
             {typeof(decimal), "DECIMAL(18,5)"},
             {typeof(Guid), "UNIQUEIDENTIFIER"},
             {typeof(byte[]), "varbinary(MAX)"},
+            {typeof(char), "NVARCHAR(10)"},
         };
 
         private static readonly Dictionary<Type, string> DbSQLiteMapper = new Dictionary<Type, string>()
@@ -44,10 +44,12 @@ namespace EntityWorker.Core.Helper
             {typeof(string), "NVARCHAR(4000)"},
             {typeof(bool), "BIT"},
             {typeof(DateTime), "DATETIME"},
+             {typeof(TimeSpan), "DATETIME"},
             {typeof(float), "FLOAT"},
             {typeof(decimal), "DECIMAL(18,5)"},
             {typeof(Guid), "TEXT"},
             {typeof(byte[]), "BLOB"},
+            {typeof(char), "NVARCHAR(10)"},
         };
 
         /// <summary>
@@ -88,7 +90,6 @@ namespace EntityWorker.Core.Helper
                 {
                     if ((tm as IDbEntity) != null)
                         ClearAllIdsHierarchy(tm, includeIndependedData);
-
                 }
             }
             else
@@ -186,16 +187,6 @@ namespace EntityWorker.Core.Helper
         }
 
         /// <summary>
-        /// GetDbEntity Identifire. must contain a PrimaryKey
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
-        public static string GetEntityKey(this IDbEntity entity)
-        {
-            return string.Format("{0}&{1}", entity.GetType().FullName, entity.Id);
-        }
-
-        /// <summary>
         /// Convert System Type to SqlType
         /// </summary>
         /// <param name="type"></param>
@@ -257,8 +248,9 @@ namespace EntityWorker.Core.Helper
 
         public static object CreateInstance(this Type type, bool uninitializedObject = true)
         {
-            return uninitializedObject ? FormatterServices.GetUninitializedObject(type) : Activator.CreateInstance(type);
+            return uninitializedObject ? FormatterServices.GetUninitializedObject(type) : FastDeepCloner.DeepCloner.CreateInstance(type);
         }
+
 
         /// <summary>
         /// Get IList Actual Type
@@ -406,56 +398,50 @@ namespace EntityWorker.Core.Helper
         }
 
 
-        internal static List<T> DataReaderConverter<T>(EntityWorker.Core.Transaction.Transaction repository, IDataReader reader, DbCommandExtended command)
+        internal static List<T> DataReaderConverter<T>(Transaction.Transaction repository, IDataReader reader, DbCommandExtended command)
         {
             return ((List<T>)DataReaderConverter(repository, reader, command, typeof(T)));
         }
 
-        internal static IList DataReaderConverter(EntityWorker.Core.Transaction.Transaction repository, IDataReader reader, DbCommandExtended command, Type type)
-        {
 
+        internal static IList DataReaderConverter(Transaction.Transaction repository, IDataReader reader, DbCommandExtended command, Type type)
+        {
             var tType = type.GetActualType();
             var baseListType = typeof(List<>);
             var listType = baseListType.MakeGenericType(tType);
-            var iList = Activator.CreateInstance(listType) as IList;
+            var iList = DeepCloner.CreateInstance(listType) as IList;
             var props = DeepCloner.GetFastDeepClonerProperties(tType);
             try
             {
-
-
                 while (reader.Read())
                 {
-                    var item = tType.CreateInstance();
-                    var clItem = tType.CreateInstance() as DbEntity;
-                    for (var col = 0; col < reader.FieldCount; col++)
+                    var item = DeepCloner.CreateInstance(tType);
+                    var clItem = DeepCloner.CreateInstance(tType) as DbEntity;
+                    var col = 0;
+                    while (col < reader.FieldCount)
                     {
                         var columnName = reader.GetName(col);
+                        var value = reader[columnName];
+
                         var prop = DeepCloner.GetProperty(tType, columnName);
 
-                        if (repository.DataBaseTypes == DataBaseTypes.Sqllight)
-                        {
-
-                        }
-
                         if (prop == null)
-                        {
                             prop = props.FirstOrDefault(x => x.GetPropertyName() == columnName);
-                        }
 
-                        if (prop != null)
+                        if (value != null && prop != null && prop.CanRead)
                         {
-                            var value = reader[columnName];
-                            if (prop.ContainAttribute<ToBase64String>())
-                            {
-                                if (value != null && value.ConvertValue<string>().IsBase64String())
-                                {
-                                    value = MethodHelper.DecodeStringFromBase64(value.ConvertValue<string>());
-                                }
-                            }
-                            else if (value != null && prop.ContainAttribute<DataEncode>())
-                                value = new DataCipher(prop.GetCustomAttribute<DataEncode>().Key, prop.GetCustomAttribute<DataEncode>().KeySize).Decrypt(value.ConvertValue<string>());
+                            var dataEncode = prop.GetCustomAttribute<DataEncode>();
+                            var toBase64String = prop.GetCustomAttribute<ToBase64String>();
 
-                            if (value == null || value.GetType() != prop.PropertyType)
+                            if (toBase64String != null)
+                            {
+                                if (value.ConvertValue<string>().IsBase64String())
+                                    value = MethodHelper.DecodeStringFromBase64(value.ConvertValue<string>());
+                            }
+                            else if (dataEncode != null)
+                                value = new DataCipher(dataEncode.Key, dataEncode.KeySize).Decrypt(value.ConvertValue<string>());
+
+                            if (value.GetType() != prop.PropertyType)
                             {
                                 prop.SetValue(item, MethodHelper.ConvertValue(value, prop.PropertyType));
                                 prop.SetValue(clItem, MethodHelper.ConvertValue(value, prop.PropertyType));
@@ -466,6 +452,7 @@ namespace EntityWorker.Core.Helper
                                 prop.SetValue(clItem, value);
                             }
                         }
+                        col++;
                     }
 
                     if (!repository?.IsAttached(clItem) ?? true)
@@ -553,7 +540,6 @@ namespace EntityWorker.Core.Helper
             {
                 foreach (var c in command.DataStructure.Columns.Values)
                     data.AddColumn(c.ColumnName, c.DataType, c.DefaultValue);
-
             }
 
             while (reader.Read())

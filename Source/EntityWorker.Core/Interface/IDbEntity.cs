@@ -7,6 +7,10 @@ namespace EntityWorker.Core.InterFace
     public interface IDbEntity
     {
         /// <summary>
+        /// Object Identifiere
+        /// </summary>
+        string EntityKey { get; }
+        /// <summary>
         /// Triggered when primary id changed
         /// </summary>
         event Events.IdChanged OnIdChanged;
