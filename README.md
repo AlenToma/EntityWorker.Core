@@ -62,7 +62,8 @@ let's start building our models, lets build a simple models User
     public class User : DbEntity
     {
         public string UserName { get; set; }
-
+        
+        [DataEncode]
         public string Password { get; set; }
         
         // Here we indicate that this attribute its a ForeignKey to object Role.
