@@ -55,7 +55,7 @@ let's start by creating the dbContext, lets call it Repository
     }
 ```
 let's start building our models, lets build a simple models User
-```
+```csharp
     // Table attribute indicate that the object Name differ from the database table Name
     [Table("Users")]
     [Rule(typeof(UserRule))]
@@ -132,7 +132,7 @@ let's start building our models, lets build a simple models User
 ```
 ## Quarry and Expression
 Lets build some expression here and se how it works
-```   
+```csharp
    using (var rep = new Repository())
    {
         // LoadChildren indicate to load all children herarkie.
@@ -159,7 +159,7 @@ Lets build some expression here and se how it works
 ## Edit, delete and insert
 EntityWorker.Core have only one method for insert and update.
 It depends on primarykey, Id>0 to update and Id<=0 to insert.
-```
+```csharp
    using (var rep = new Repository())
    {
         var users = rep.Get<User>().Where(x => 
@@ -197,7 +197,7 @@ It depends on primarykey, Id>0 to update and Id<=0 to insert.
 ## LinqToSql Result Example
 lets test and se how EntityWorker.Core LinqToSql generator looks like.
 will do a very painful quarry and se how it gets parsed.
-```
+```csharp
             using (var rep = new Repository())
             {
                ISqlQueriable<User> users = rep.Get<User>().Where(x =>
@@ -225,7 +225,7 @@ will do a very painful quarry and se how it gets parsed.
 
 ## Migration
 EntityWorker.Core has its own Migration methods, so lets se down here how it work.
-```
+```csharp
    //Create Class and call it IniMigration and inhert from Migration
    public class IniMigration : Migration
         public IniMigration()
@@ -273,7 +273,7 @@ EntityWorker.Core has its own Migration methods, so lets se down here how it wor
 ```
 ## Attributes 
 There is many attributes you could use to make your code better
-```
+```csharp
 /// <summary>
 /// This indicates that the prop will not be saved to the database.
 /// </summary>
