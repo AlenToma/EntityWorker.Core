@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using EntityWorker.Core.InterFace;
@@ -10,7 +11,7 @@ namespace EntityWorker.Core.Interface
     /// quaryProvider for EntityWorker.Core
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface ISqlQueryable<T> where T : class, IDbEntity
+    public interface ISqlQueryable<T>
     {
         /// <summary>
         /// Result of LightDataTable LinqToSql
@@ -100,6 +101,12 @@ namespace EntityWorker.Core.Interface
         /// </summary>
         /// <returns></returns>
         Task<List<T>> ExecuteAsync();
+
+        /// <summary>
+        /// Select the top 1
+        /// </summary>
+        /// <returns></returns>
+        T ExecuteFirstOrDefault();
 
         /// <summary>
         /// Return the count of the executed quary

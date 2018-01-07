@@ -14,9 +14,9 @@ namespace EntityWorker.Core.Object.Library
     /// quaryProvider for EntityWorker.Core
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public sealed class SqlQueryable<T> : List<T>, ISqlQueryable<T> where T : class, IDbEntity
+    public sealed class SqlQueryable<T> : List<T>, ISqlQueryable<T>, IOrderedQueryable<T>
     {
-        private readonly IRepository _repository;
+        private readonly Transaction.Transaction _repository;
         private readonly List<string> _ignoreActions = new List<string>();
         private readonly LightDataLinqToNoSql _expression = new LightDataLinqToNoSql(typeof(T));
         private bool _executed = false;
@@ -25,7 +25,7 @@ namespace EntityWorker.Core.Object.Library
         private bool? _landholderOnlyFirstLevel;
         private readonly List<Expression> _matches = new List<Expression>();
 
-        internal SqlQueryable(List<T> items, IRepository repository)
+        internal SqlQueryable(Transaction.Transaction repository, List<T> items)
         {
             _repository = repository;
             if (items == null)
@@ -34,10 +34,25 @@ namespace EntityWorker.Core.Object.Library
             items.RemoveAll(x => x == null);
             base.AddRange(items);
         }
+
+
+        internal SqlQueryable(Expression exp, Transaction.Transaction repository)
+        {
+            _repository = repository;
+            if (exp != null)
+                _matches.Add(exp);
+        }
+
+
         /// <summary>
         /// Result of LightDataTable LinqToSql
         /// </summary>
         public string ParsedLinqToSql { get; private set; }
+
+        public Type ElementType => typeof(T);
+
+        public Expression Expression => throw new NotImplementedException();
+
 
         /// <summary>
         /// Add Item
@@ -159,6 +174,11 @@ namespace EntityWorker.Core.Object.Library
             return this;
         }
 
+        public IQueryProvider Provider => _repository;
+
+
+
+
         /// <summary>
         /// Execute the search Command
         /// </summary>
@@ -169,16 +189,17 @@ namespace EntityWorker.Core.Object.Library
                 return this.ToList<T>();
             else
             {
+                var result = new List<T>();
                 _expression.DataBaseTypes = _repository.DataBaseTypes;
                 foreach (var exp in _matches)
                     _expression.Translate(exp);
 
                 ParsedLinqToSql = _expression.Quary;
                 if (!_partExecuted)
-                    this.AddRange(!string.IsNullOrEmpty(_expression.Quary) ? await _repository.SelectAsync<T>(_expression?.Quary) : await _repository.GetAllAsync<T>());
+                    result.AddRange(await _repository.SelectAsync<T>(ParsedLinqToSql));
                 if (_childrenToLoad.Any() || _landholderOnlyFirstLevel.HasValue)
                 {
-                    foreach (var item in this)
+                    foreach (var item in result)
                     {
                         if (_childrenToLoad.Any())
                             await _repository.LoadChildrenAsync(item, false, _ignoreActions, _childrenToLoad.ToArray());
@@ -186,11 +207,17 @@ namespace EntityWorker.Core.Object.Library
                     }
                 }
                 _executed = true;
+                this.AddRange(result);
             }
 
             return this.ToList<T>();
         }
 
+
+        public new IEnumerator<T> GetEnumerator()
+        {
+            return Execute().GetEnumerator();
+        }
 
         /// <summary>
         /// Execute the search Command
@@ -202,16 +229,16 @@ namespace EntityWorker.Core.Object.Library
                 return this.ToList<T>();
             else
             {
+                var result = new List<T>();
                 _expression.DataBaseTypes = _repository.DataBaseTypes;
                 foreach (var exp in _matches)
                     _expression.Translate(exp);
-
                 ParsedLinqToSql = _expression.Quary;
                 if (!_partExecuted)
-                    this.AddRange(!string.IsNullOrEmpty(_expression.Quary) ? _repository.Select<T>(_expression?.Quary) : _repository.GetAll<T>());
+                    result.AddRange(_repository.Select<T>(ParsedLinqToSql));
                 if (_childrenToLoad.Any() || _landholderOnlyFirstLevel.HasValue)
                 {
-                    foreach (var item in this)
+                    foreach (var item in result)
                     {
                         if (_childrenToLoad.Any())
                             _repository.LoadChildren(item, false, _ignoreActions, _childrenToLoad.ToArray());
@@ -219,9 +246,42 @@ namespace EntityWorker.Core.Object.Library
                     }
                 }
                 _executed = true;
+                this.AddRange(result);
             }
 
             return this.ToList<T>();
+        }
+
+        /// <summary>
+        /// Get Only the top 1
+        /// </summary>
+        /// <returns></returns>
+        public T ExecuteFirstOrDefault()
+        {
+            if (_executed)
+                return this.ToList<T>().FirstOrDefault();
+            else
+            {
+                var result = new List<T>();
+                _expression.DataBaseTypes = _repository.DataBaseTypes;
+                foreach (var exp in _matches)
+                    _expression.Translate(exp);
+                ParsedLinqToSql = _expression.QuaryFirst;
+                if (!_partExecuted)
+                    result.AddRange(_repository.Select<T>(ParsedLinqToSql));
+                if (_childrenToLoad.Any() || _landholderOnlyFirstLevel.HasValue)
+                {
+                    foreach (var item in result)
+                    {
+                        if (_childrenToLoad.Any())
+                            _repository.LoadChildren(item, false, _ignoreActions, _childrenToLoad.ToArray());
+                        else _repository.LoadChildren(item, _landholderOnlyFirstLevel.Value, null, _ignoreActions);
+                    }
+                }
+                _executed = true;
+                this.AddRange(result);
+            }
+            return this.ToList<T>().FirstOrDefault();
         }
 
         /// <summary>
@@ -317,6 +377,7 @@ namespace EntityWorker.Core.Object.Library
         {
             return new LightDataTable(Execute());
         }
+
 
         /// <summary>
         /// Convert Object of type a to b 

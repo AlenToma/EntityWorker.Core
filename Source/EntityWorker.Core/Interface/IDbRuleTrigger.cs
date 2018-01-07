@@ -2,7 +2,7 @@
 
 namespace EntityWorker.Core.Interface
 {
-    public interface IDbRuleTrigger<T> where T: class, IDbEntity
+    public interface IDbRuleTrigger<T> where T: class
     {
         /// <summary>
         /// Event triggered before save an item
@@ -17,6 +17,6 @@ namespace EntityWorker.Core.Interface
         /// <param name="repository"></param>
         /// <param name="itemDbEntity"></param>
         /// <param name="objectId"></param>
-        void AfterSave(IRepository repository, T itemDbEntity, long objectId);
+        void AfterSave(IRepository repository, T itemDbEntity, object objectId);
     }
 }

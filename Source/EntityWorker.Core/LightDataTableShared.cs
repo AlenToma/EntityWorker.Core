@@ -19,7 +19,7 @@ namespace EntityWorker.Core
             Columns = new ColumnsCollections<string>();
             ColumnsWithIndexKey = new ColumnsCollections<int>();
             RoundingSettings = new RoundingSettings();
-            Culture = cultureInfo ?? GlobalConfiguration.cultureInfo;
+            Culture = cultureInfo ?? GlobalConfiguration.CultureInfo;
             ValidateCulture();
         }
 
@@ -28,7 +28,7 @@ namespace EntityWorker.Core
             Columns = new ColumnsCollections<string>();
             ColumnsWithIndexKey = new ColumnsCollections<int>();
             RoundingSettings = new RoundingSettings();
-            Culture = GlobalConfiguration.cultureInfo;
+            Culture = GlobalConfiguration.CultureInfo;
             ValidateCulture();
         }
 
@@ -86,6 +86,12 @@ namespace EntityWorker.Core
 
             if (propertyType == typeof(TimeSpan))
                 return new TimeSpan();
+
+            if (propertyType == typeof(Guid?))
+                return new Guid?();
+
+            if (propertyType == typeof(Guid))
+                return new Guid();
 
             if (propertyType == typeof(byte[]))
                 return new byte[0];
@@ -207,11 +213,20 @@ namespace EntityWorker.Core
                     else if (Enum.IsDefined(dataType, value))
                         value = Enum.Parse(dataType, value.ToString(), true);
                 }
-                else if (dataType == typeof(string))
+                else if (dataType == typeof(Guid) || dataType == typeof(Guid?))
+                {
+                    if (Guid.TryParse(value.ToString(), out Guid v))
+                    {
+                        value = v;
+                    }
+
+                }else if (dataType == typeof(string))
                 {
                     value = value.ToString();
 
                 }
+
+
             }
             catch (Exception ex)
             {

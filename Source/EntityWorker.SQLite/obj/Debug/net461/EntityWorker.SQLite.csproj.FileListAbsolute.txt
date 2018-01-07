@@ -1,6 +1,5 @@
 D:\Projects\EntityWorker.Core\Source\EntityWorker.SQLite\bin\Debug\net461\EntityWorker.SQLite.dll
 D:\Projects\EntityWorker.Core\Source\EntityWorker.SQLite\bin\Debug\net461\EntityWorker.SQLite.pdb
-D:\Projects\EntityWorker.Core\Source\EntityWorker.SQLite\bin\Debug\net461\EntityWorker.SQLite.xml
 D:\Projects\EntityWorker.Core\Source\EntityWorker.SQLite\bin\Debug\net461\SR\EntityWorker.SQLite.resources.dll
 D:\Projects\EntityWorker.Core\Source\EntityWorker.SQLite\obj\Debug\net461\EntityWorker.SQLite.csprojResolveAssemblyReference.cache
 D:\Projects\EntityWorker.Core\Source\EntityWorker.SQLite\obj\Debug\net461\EntityWorker.SQLite.EntityWorker.SQLite.SR.resources

@@ -144,7 +144,7 @@ namespace EntityWorker.Core
         /// <typeparam name="TP"></typeparam>
         /// <param name="action"></param>
         /// <returns></returns>
-        public bool ContainKey<T, TP>(Expression<Func<T, TP>> action) where T : class
+        public bool ContainKey<T, TP>(Expression<Func<T, TP>> action)
         {
             var member = (MemberExpression)action.Body;
             var propertyName = member.Member.Name;
@@ -160,7 +160,7 @@ namespace EntityWorker.Core
         /// <param name="action"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public TP SetTValue<T, TP>(Expression<Func<T, TP>> action, TP value) where T : class
+        public TP SetTValue<T, TP>(Expression<Func<T, TP>> action, TP value)
         {
             var member = action.Body is UnaryExpression ? ((MemberExpression)((UnaryExpression)action.Body).Operand) : (action.Body is MethodCallExpression ? ((MemberExpression)((MethodCallExpression)action.Body).Object) : (MemberExpression)action.Body);
             var key = member?.Member.Name;
@@ -198,7 +198,7 @@ namespace EntityWorker.Core
         /// <typeparam name="TP"></typeparam>
         /// <param name="action"></param>
         /// <returns></returns>
-        public TP Value<T, TP>(Expression<Func<T, TP>> action) where T : class
+        public TP Value<T, TP>(Expression<Func<T, TP>> action)
         {
             var member = action.Body is UnaryExpression ? ((MemberExpression)((UnaryExpression)action.Body).Operand) : (action.Body is MethodCallExpression ? ((MemberExpression)((MethodCallExpression)action.Body).Object) : (MemberExpression)action.Body);
             var propertyName = member?.Member.Name;
@@ -336,7 +336,7 @@ namespace EntityWorker.Core
             }
         }
 
-        public TP ValueAndConvert<T, TP>(Expression<Func<T, TP>> action) where T : class
+        public TP ValueAndConvert<T, TP>(Expression<Func<T, TP>> action)
         {
             var member = action.Body is UnaryExpression ? ((MemberExpression)((UnaryExpression)action.Body).Operand) : (action.Body is MethodCallExpression ? ((MemberExpression)((MethodCallExpression)action.Body).Object) : (MemberExpression)action.Body);
             var propertyName = member?.Member.Name;

@@ -25,11 +25,6 @@
     <Content Include="NetCore Build/**" PackagePath="lib/" CopyToPublishDirectory="Always" />
   </ItemGroup>-->
 
-  <ItemGroup>
-    <PackageReference Include="FastDeepCloner" Version="1.0.23" />
-    <PackageReference Include="EntityWorker.SQLite" Version="1.0.1" />
-  </ItemGroup>
-
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <DocumentationFile>bin\Release\$(TargetFramework)\EntityWorker.xml</DocumentationFile>
   </PropertyGroup>
@@ -39,6 +34,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FastDeepCloner" Version="1.0.23" />
     <PackageReference Include="System.Data.SqlClient" Version="4.4.2" />
   </ItemGroup>
 
@@ -56,6 +52,10 @@
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net46'">
 
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EntityWorker.SQLite\EntityWorker.SQLite.csproj" />
   </ItemGroup>
 
   <!--<ItemGroup Condition="'$(Configuration)'=='Debug'">

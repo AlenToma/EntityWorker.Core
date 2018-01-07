@@ -13,9 +13,9 @@ using EntityWorker.Core.Interface;
 using EntityWorker.Core.InterFace;
 using EntityWorker.Core.Object.Library;
 using FastDeepCloner;
-using System.Runtime.Serialization;
 using EntityWorker.SQLite;
 using System.Collections;
+using EntityWorker.Core.SqlQuerys;
 
 namespace EntityWorker.Core.Transaction
 {
@@ -24,6 +24,8 @@ namespace EntityWorker.Core.Transaction
     /// </summary>
     public class Transaction : IRepository
     {
+        internal Dictionary<IDataReader, bool> OpenedDataReaders = new Dictionary<IDataReader, bool>();
+
         private static object MigrationLocker = new object();
 
         private readonly DbSchema _dbSchema;
@@ -99,12 +101,12 @@ namespace EntityWorker.Core.Transaction
         /// <param name="o"></param>
         /// <param name="fieldType"></param>
         /// <returns></returns>
-        public T Clone<T>(T o, FieldType fieldType = FieldType.PropertyInfo) where T : class
+        public T Clone<T>(T o, CloneLevel level, FieldType fieldType = FieldType.PropertyInfo) where T : class
         {
             return DeepCloner.Clone(o, new FastDeepClonerSettings()
             {
                 FieldType = fieldType,
-                OnCreateInstance = new Extensions.CreateInstance(FormatterServices.GetUninitializedObject)
+                CloneLevel = level
             });
         }
 
@@ -145,6 +147,8 @@ namespace EntityWorker.Core.Transaction
 
         private void CloseifPassible()
         {
+            if (OpenedDataReaders.Keys.Any(x => !x.IsClosed))
+                return;
             if (Trans == null)
                 SqlConnection.Close();
         }
@@ -152,7 +156,7 @@ namespace EntityWorker.Core.Transaction
         /// <summary>
         /// Validate Connection is Open or broken
         /// </summary>
-        private void ValidateConnection()
+        public void ValidateConnection()
         {
             if (SqlConnection == null)
             {
@@ -186,7 +190,7 @@ namespace EntityWorker.Core.Transaction
         }
 
 
-        public List<T> DataReaderConverter<T>(DbCommandExtended command) where T : class, IDbEntity
+        public List<T> DataReaderConverter<T>(DbCommandExtended command)
         {
             return ((List<T>)DataReaderConverter(command, typeof(T)));
         }
@@ -198,6 +202,7 @@ namespace EntityWorker.Core.Transaction
             try
             {
                 var o = command.Command.ExecuteReader();
+                OpenedDataReaders.Add(o, true);
                 result = Extension.DataReaderConverter(this, o, command, type);
             }
             catch (Exception e)
@@ -260,7 +265,11 @@ namespace EntityWorker.Core.Transaction
             }
             finally
             {
-                Dispose();
+                OpenedDataReaders.Clear();
+                Trans?.Dispose();
+                SqlConnection?.Dispose();
+                Trans = null;
+                SqlConnection = null;
             }
         }
 
@@ -269,6 +278,7 @@ namespace EntityWorker.Core.Transaction
         /// </summary>
         public virtual void Dispose()
         {
+            OpenedDataReaders.Clear();
             _attachedObjects.Clear();
             Trans?.Dispose();
             SqlConnection?.Dispose();
@@ -317,7 +327,10 @@ namespace EntityWorker.Core.Transaction
             if (value?.GetType().GetTypeInfo().IsEnum ?? false)
                 value = value.ConvertValue<long>();
 
+
+
             var sqlDbTypeValue = value ?? DBNull.Value;
+
             if (DataBaseTypes == DataBaseTypes.Mssql)
             {
                 var param = new SqlParameter
@@ -371,12 +384,12 @@ namespace EntityWorker.Core.Transaction
         /// </summary>
         /// <param name="objcDbEntity"></param>
         /// <param name="overwrite"></param>
-        public void Attach(DbEntity objcDbEntity, bool overwrite = false)
+        public void Attach(object objcDbEntity, bool overwrite = false)
         {
             if (objcDbEntity == null)
                 throw new NullReferenceException("DbEntity cant be null");
-            if (objcDbEntity.Id <= 0)
-                throw new NullReferenceException("Id is 0, it cant be attached");
+            if (Extension.ObjectIsNew(objcDbEntity.GetPrimaryKeyValue()))
+                throw new NullReferenceException("Id is IsNullOrEmpty, it cant be attached");
             var key = objcDbEntity.EntityKey();
             lock (_attachedObjects)
             {
@@ -385,7 +398,7 @@ namespace EntityWorker.Core.Transaction
                         _attachedObjects.Remove(key);
 
                 if (!_attachedObjects.ContainsKey(key))
-                    _attachedObjects.Add(key, objcDbEntity.Clone(CloneLevel.FirstLevelOnly));
+                    _attachedObjects.Add(key, this.Clone(objcDbEntity, CloneLevel.FirstLevelOnly));
             }
         }
 
@@ -394,12 +407,12 @@ namespace EntityWorker.Core.Transaction
         /// </summary>
         /// <param name="objcDbEntity"></param>
         /// <param name="overwrite"></param>
-        internal void AttachNew(DbEntity objcDbEntity, bool overwrite = false)
+        internal void AttachNew(object objcDbEntity, bool overwrite = false)
         {
             if (objcDbEntity == null)
                 throw new NullReferenceException("DbEntity cant be null");
-            if (objcDbEntity.Id <= 0)
-                throw new NullReferenceException("Id is 0, it cant be attached");
+            if (Extension.ObjectIsNew(objcDbEntity.GetPrimaryKeyValue()))
+                throw new NullReferenceException("Id is IsNullOrEmpty, it cant be attached");
             var key = objcDbEntity.EntityKey();
             lock (_attachedObjects)
             {
@@ -417,9 +430,11 @@ namespace EntityWorker.Core.Transaction
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public Dictionary<string, object> GetObjectChanges(DbEntity entity)
+        public List<EntityChanges> GetObjectChanges(object entity)
         {
-            var changes = new Dictionary<string, object>();
+            var changes = new List<EntityChanges>();
+            if (!IsAttached(entity))
+                throw new NullReferenceException("Object is not attached");
             var originalObject = _attachedObjects[entity.EntityKey()];
             if (originalObject == null)
                 throw new Exception("Object need to be attached");
@@ -427,21 +442,57 @@ namespace EntityWorker.Core.Transaction
             {
                 var aValue = prop.GetValue(entity);
                 var bValue = prop.GetValue(originalObject);
-                if (!prop.IsInternalType || prop.ContainAttribute<ExcludeFromAbstract>() || (aValue == null && bValue == null))
+                if (!prop.IsInternalType || prop.ContainAttribute<ExcludeFromAbstract>() || prop.ContainAttribute<PrimaryKey>() || (aValue == null && bValue == null))
                     continue;
                 if ((aValue != null && aValue.Equals(bValue)) || (bValue != null && bValue.Equals(aValue)))
                     continue;
-                changes.Add(prop.Name, prop.GetValue(entity));
+                changes.Add(new EntityChanges
+                {
+                    PropertyName = prop.Name,
+                    NewValue = prop.GetValue(entity),
+                    OldValue = prop.GetValue(originalObject)
+                });
             }
             return changes;
         }
+
+        /// <summary>
+        /// Get object changes
+        /// </summary>
+        /// <param name="entityA"></param>
+        /// <param name="entityB"></param>
+        /// <returns></returns>
+        public List<EntityChanges> GetObjectChanges(object entityA, object entityB)
+        {
+            var changes = new List<EntityChanges>();
+            var originalObject = entityA;
+            if (originalObject == null)
+                throw new Exception("Object need to be attached");
+            foreach (var prop in DeepCloner.GetFastDeepClonerProperties(entityA.GetType()))
+            {
+                var aValue = prop.GetValue(entityB);
+                var bValue = prop.GetValue(originalObject);
+                if (!prop.IsInternalType || prop.ContainAttribute<ExcludeFromAbstract>() || prop.ContainAttribute<PrimaryKey>() || (aValue == null && bValue == null))
+                    continue;
+                if ((aValue != null && aValue.Equals(bValue)) || (bValue != null && bValue.Equals(aValue)))
+                    continue;
+                changes.Add(new EntityChanges
+                {
+                    PropertyName = prop.Name,
+                    NewValue = prop.GetValue(entityA),
+                    OldValue = prop.GetValue(entityB)
+                });
+            }
+            return changes;
+        }
+
 
         /// <summary>
         /// check if object is already attached
         /// </summary>
         /// <param name="entity"></param>
         /// <returns> primaryId >0 is mandatory </returns>
-        public bool IsAttached(DbEntity entity)
+        public bool IsAttached(object entity)
         {
             return _attachedObjects.ContainsKey(entity.EntityKey());
         }
@@ -466,7 +517,7 @@ namespace EntityWorker.Core.Transaction
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task DeleteAsync(IDbEntity entity)
+        public async Task DeleteAsync(object entity)
         {
             await Task.Run(() =>
             {
@@ -478,27 +529,30 @@ namespace EntityWorker.Core.Transaction
         /// Remove Row
         /// </summary>
         /// <param name="entity"></param>
-        public void Delete(IDbEntity entity)
+        public void Delete(object entity)
         {
             _dbSchema.DeleteAbstract(entity);
         }
 
-        public async Task<long> SaveAsync(IDbEntity entity)
+        public async Task SaveAsync(object entity)
         {
-            return await Task.FromResult<long>(_dbSchema.Save(entity));
+            await Task.Run(() =>
+            {
+                _dbSchema.Save(entity);
+            });
         }
 
-        public long Save(IDbEntity entity)
+        public void Save(object entity)
         {
-            return _dbSchema.Save(entity);
+            _dbSchema.Save(entity);
         }
 
-        public async Task<IList<T>> GetAllAsync<T>() where T : class, IDbEntity
+        public async Task<IList<T>> GetAllAsync<T>()
         {
             return await Task.FromResult<IList<T>>(_dbSchema.GetSqlAll(typeof(T)).Cast<T>().ToList());
         }
 
-        public IList<T> GetAll<T>() where T : class, IDbEntity
+        public IList<T> GetAll<T>()
         {
             return _dbSchema.GetSqlAll(typeof(T)).Cast<T>().ToList();
         }
@@ -510,7 +564,7 @@ namespace EntityWorker.Core.Transaction
         /// <typeparam name="T"></typeparam>
         /// <param name="sqlString"></param>
         /// <returns></returns>
-        public async Task<IList<T>> SelectAsync<T>(string sqlString) where T : class, IDbEntity
+        public async Task<IList<T>> SelectAsync<T>(string sqlString)
         {
             return await Task.FromResult<IList<T>>(_dbSchema.Select<T>(sqlString));
         }
@@ -521,12 +575,12 @@ namespace EntityWorker.Core.Transaction
         /// <typeparam name="T"></typeparam>
         /// <param name="sqlString"></param>
         /// <returns></returns>
-        public IList<T> Select<T>(string sqlString) where T : class, IDbEntity
+        public IList<T> Select<T>(string sqlString)
         {
             return _dbSchema.Select<T>(sqlString);
         }
 
-        public async Task LoadChildrenAsync<T>(T item, bool onlyFirstLevel, List<string> classes, List<string> ignoreList) where T : class, IDbEntity
+        public async Task LoadChildrenAsync<T>(T item, bool onlyFirstLevel, List<string> classes, List<string> ignoreList)
         {
             await Task.Run(() =>
             {
@@ -535,13 +589,13 @@ namespace EntityWorker.Core.Transaction
 
         }
 
-        public void LoadChildren<T>(T item, bool onlyFirstLevel, List<string> classes, List<string> ignoreList) where T : class, IDbEntity
+        public void LoadChildren<T>(T item, bool onlyFirstLevel, List<string> classes, List<string> ignoreList)
         {
             _dbSchema.LoadChildren(item, onlyFirstLevel, classes, ignoreList);
         }
 
 
-        public async Task LoadChildrenAsync<T, TP>(T item, bool onlyFirstLevel = false, List<string> ignoreList = null, params Expression<Func<T, TP>>[] actions) where T : class, IDbEntity
+        public async Task LoadChildrenAsync<T, TP>(T item, bool onlyFirstLevel = false, List<string> ignoreList = null, params Expression<Func<T, TP>>[] actions)
         {
             await Task.Run(() =>
             {
@@ -554,7 +608,7 @@ namespace EntityWorker.Core.Transaction
         }
 
 
-        public void LoadChildren<T, TP>(T item, bool onlyFirstLevel = false, List<string> ignoreList = null, params Expression<Func<T, TP>>[] actions) where T : class, IDbEntity
+        public void LoadChildren<T, TP>(T item, bool onlyFirstLevel = false, List<string> ignoreList = null, params Expression<Func<T, TP>>[] actions)
         {
             var parames = new List<string>();
             if (actions != null)
@@ -570,7 +624,7 @@ namespace EntityWorker.Core.Transaction
         /// <typeparam name="T"></typeparam>
         /// <param name="force"> remove and recreate all</param>
 
-        public void CreateTable<T>(bool force = false) where T : class, IDbEntity
+        public void CreateTable<T>(bool force = false)
         {
             _dbSchema.CreateTable(typeof(T), null, true, force);
         }
@@ -591,7 +645,7 @@ namespace EntityWorker.Core.Transaction
         /// This will remove the table and if it has a ForeignKey to other tables it will also remove those table to
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        public void RemoveTable<T>() where T : class, IDbEntity
+        public void RemoveTable<T>()
         {
             _dbSchema.RemoveTable(typeof(T));
         }
@@ -606,9 +660,39 @@ namespace EntityWorker.Core.Transaction
             _dbSchema.RemoveTable(type);
         }
 
-        public ISqlQueryable<T> Get<T>() where T : class, IDbEntity
+        public ISqlQueryable<T> Get<T>()
         {
+            if (typeof(T).GetPrimaryKey() == null)
+                throw new ArgumentNullException("Primary Id not found for object " + typeof(T).FullName);
             return new SqlQueryable<T>(null, this);
+        }
+
+        public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
+        {
+            return new SqlQueryable<TElement>(expression, this) as IQueryable<TElement>;
+        }
+
+        public IQueryable CreateQuery(Expression expression)
+        {
+            throw new NotImplementedException();
+        }
+
+        public object Execute(Expression expression)
+        {
+            var _expression = new LightDataLinqToNoSql(expression.Type);
+            _expression.Translate(expression);
+            return _dbSchema.Select(expression.Type, _expression.Quary);
+
+        }
+
+        public TResult Execute<TResult>(Expression expression)
+        {
+            var isEnumerable = (typeof(TResult).Name == "IEnumerable`1");
+            var _expression = new LightDataLinqToNoSql(typeof(TResult).GetActualType());
+            _expression.Translate(expression);
+            if (!isEnumerable)
+                return Select<TResult>(_expression.Quary).First();
+            else return (TResult)_dbSchema.Select(expression.Type, _expression.Quary);
         }
 
 

@@ -85,6 +85,23 @@ namespace EntityWorker.Core.SqlQuerys
             }
         }
 
+        public string QuaryFirst
+        {
+            get
+            {
+                if (DataBaseTypes == DataBaseTypes.Mssql)
+                {
+                    var quary = "SELECT TOP (1) * from ( " + Quary.TrimEnd(';') + ") AS [RESULT]";
+                    return quary;
+                }
+                else
+                {
+                    var quary = Quary.Substring(0, Quary.LastIndexOf("LIMIT")) + "LIMIT 1";
+                    return quary;
+                }
+            }
+        }
+
         public string Count
         {
             get
@@ -113,6 +130,7 @@ namespace EntityWorker.Core.SqlQuerys
         public void Translate(Expression expression)
         {
             this.sb = new StringBuilder();
+            WhereClause = new List<string>();
             this.Visit(expression);
             validateBinaryExpression(null, null);
             WhereClause.Add(this.sb.ToString());
@@ -205,7 +223,7 @@ namespace EntityWorker.Core.SqlQuerys
                 sb.Append(" IS NULL then 1 else case when ");
                 this.Visit(m.Arguments[0]);
                 CleanDecoder("");
-                sb.Append(" = '' then 1 else 0 end end)");
+                sb.Append(" = String[] then 1 else 0 end end)");
                 sb.Append(")");
                 sb.Append(boolString.Replace("#", invert ? "0" : "1"));
                 return m;
@@ -463,9 +481,6 @@ namespace EntityWorker.Core.SqlQuerys
 
         private void validateBinaryExpression(BinaryExpression b, Expression exp)
         {
-
-
-
             if (b != null && exp != null)
             {
 
@@ -610,7 +625,7 @@ namespace EntityWorker.Core.SqlQuerys
         {
             CleanText();
             if (value == null)
-                return "NULL";
+                return "String[]";
             var type = value.GetType();
 
             if (type == typeof(bool) || type == typeof(bool?))
@@ -618,6 +633,10 @@ namespace EntityWorker.Core.SqlQuerys
 
             if (type == typeof(string))
                 return string.Format("String[{0}]", value);
+
+            if (type == typeof(Guid) || type == typeof(Guid))
+                return string.Format("Guid[{0}]", value);
+
             if (type == typeof(DateTime) || type == typeof(DateTime?) || type == typeof(TimeSpan) || type == typeof(TimeSpan?))
             {
                 if (!singleValueToString)
@@ -632,10 +651,8 @@ namespace EntityWorker.Core.SqlQuerys
                 {
                     if (type.IsEnum && !singleValueToString)
                         tValue += ValuetoSql(((int)v).ToString(), singleValueToString) + ",";
-
                     else
                         tValue += ValuetoSql(v, singleValueToString) + ",";
-
                 }
                 return tValue.TrimEnd(',');
             }
@@ -646,7 +663,9 @@ namespace EntityWorker.Core.SqlQuerys
                     if (type.IsEnum)
                         return string.Format("{0}", (int)value);
 
-                    return string.Format("{0}", value);
+                    if (value.GetType().IsNumeric())
+                        return string.Format("{0}", value);
+                    else return string.Format("String[{0}]", value);
                 }
                 else return string.Format("String[{0}]", value);
             }
@@ -739,14 +758,12 @@ namespace EntityWorker.Core.SqlQuerys
             {
                 if (m.Expression != null && m.Expression.NodeType == ExpressionType.Constant && (_overridedNodeType == null))
                 {
-
                     VisitConstantFixed(m.Expression as ConstantExpression, m.Member?.Name);
                     return m;
                 }
                 else if (m.Expression != null && (m.Expression.NodeType == ExpressionType.Parameter || (m.ToString().EndsWith(".HasValue") && m.Expression.NodeType == ExpressionType.MemberAccess)) && (_overridedNodeType == null))
                 {
                     var hasValueAttr = m.ToString().EndsWith(".HasValue");
-
                     _overridedNodeType = null;
                     var cl = hasValueAttr ? (m.Expression as MemberExpression).Expression.Type : m.Expression.Type;
                     var prop = DeepCloner.GetFastDeepClonerProperties(cl).First(x => x.Name == (hasValueAttr ? (m.Expression as MemberExpression).Member.Name : m.Member.Name));
@@ -787,11 +804,11 @@ namespace EntityWorker.Core.SqlQuerys
                     _overridedNodeType = null;
                     var key = string.Join("", m.ToString().Split('.').Take(m.ToString().Split('.').Length - 1));
                     var cl = m.Expression.Type;
-                    var prop = FastDeepCloner.DeepCloner.GetFastDeepClonerProperties(cl).First(x => x.Name == m.Member.Name);
+                    var prop = DeepCloner.GetFastDeepClonerProperties(cl).First(x => x.Name == m.Member.Name);
                     var name = prop.GetPropertyName();
                     var table = cl.GetCustomAttribute<Table>()?.Name ?? cl.Name;
                     var randomTableName = JoinClauses.ContainsKey(key) ? JoinClauses[key].Item1 : RandomKey();
-                    var primaryId = FastDeepCloner.DeepCloner.GetFastDeepClonerProperties(cl).First(x => x.ContainAttribute<PrimaryKey>()).GetPropertyName();
+                    var primaryId = DeepCloner.GetFastDeepClonerProperties(cl).First(x => x.ContainAttribute<PrimaryKey>()).GetPropertyName();
                     var columnName = string.Format("[{0}].[{1}]", randomTableName, name);
                     if (columnOnly)
                         return columnName;

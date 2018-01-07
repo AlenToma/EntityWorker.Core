@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using EntityWorker.Core.Helper;
@@ -14,16 +15,17 @@ namespace EntityWorker.Core.InterFace
     /// <summary>
     /// EntityWorker.Core Repository
     /// </summary>
-    public interface IRepository : IDisposable
+    public interface IRepository : IQueryProvider, IDisposable
     {
         /// <summary>
         /// Clone Object
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="o"></param>
+        /// <param name="level"></param>
         /// <param name="fieldType"></param>
         /// <returns></returns>
-        T Clone<T>(T o, FastDeepCloner.FieldType fieldType = FastDeepCloner.FieldType.PropertyInfo) where T : class;
+        T Clone<T>(T o, FastDeepCloner.CloneLevel level, FastDeepCloner.FieldType fieldType = FastDeepCloner.FieldType.PropertyInfo) where T : class;
 
         /// <summary>
         /// Database type
@@ -105,14 +107,14 @@ namespace EntityWorker.Core.InterFace
         /// </summary>
         /// <param name="entity"></param>
 
-        void Delete(IDbEntity entity);
+        void Delete(object entity);
         /// <summary>
         /// Delete entity.
         /// SaveChanges is needet after
         /// </summary>
         /// <param name="entity"></param>
         /// 
-        Task DeleteAsync(IDbEntity entity);
+        Task DeleteAsync(object entity);
 
         /// <summary>
         /// Save entity.
@@ -120,7 +122,7 @@ namespace EntityWorker.Core.InterFace
         /// </summary>
         /// <param name="entity"></param>
 
-        long Save(IDbEntity entity);
+        void Save(object entity);
 
         /// <summary>
         /// Save entity.
@@ -128,35 +130,35 @@ namespace EntityWorker.Core.InterFace
         /// </summary>
         /// <param name="entity"></param>
 
-        Task<long> SaveAsync(IDbEntity entity);
+        Task SaveAsync(object entity);
 
         /// <summary>
         /// Attach an object to entityWorker.
         /// </summary>
         /// <param name="objcDbEntity"></param>
         /// <param name="overwrite"> override if exist</param>
-        void Attach(DbEntity objcDbEntity, bool overwrite = false);
+        void Attach(object objcDbEntity, bool overwrite = false);
 
         /// <summary>
         /// Get Entity 
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        ISqlQueryable<T> Get<T>() where T : class, IDbEntity;
+        ISqlQueryable<T> Get<T>();
 
         /// <summary>
         /// Get all 
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        IList<T> GetAll<T>() where T : class, IDbEntity;
+        IList<T> GetAll<T>();
 
         /// <summary>
         /// Get all 
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        Task<IList<T>> GetAllAsync<T>() where T : class, IDbEntity;
+        Task<IList<T>> GetAllAsync<T>();
 
         /// <summary>
         /// load children 
@@ -168,7 +170,20 @@ namespace EntityWorker.Core.InterFace
         /// <param name="onlyFirstLevel"></param>
         /// <param name="ignoreList"></param>
         /// <param name="actions"></param>
-        void LoadChildren<T>(T item, bool onlyFirstLevel = false, List<string> actions = null, List<string> ignoreList = null) where T : class, IDbEntity;
+        void LoadChildren<T>(T item, bool onlyFirstLevel = false, List<string> actions = null, List<string> ignoreList = null);
+
+        /// <summary>
+        /// load children 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TP"></typeparam>
+        /// <param name="repository"></param>
+        /// <param name="item"></param>
+        /// <param name="onlyFirstLevel"></param>
+        /// <param name="classes"></param>
+        /// <param name="ignoreList"></param>
+        /// <param name="actions"></param>
+        Task LoadChildrenAsync<T>(T item, bool onlyFirstLevel, List<string> classes, List<string> ignoreList);
 
         /// <summary>
         /// load children 
@@ -180,7 +195,8 @@ namespace EntityWorker.Core.InterFace
         /// <param name="onlyFirstLevel"></param>
         /// <param name="ignoreList"></param>
         /// <param name="actions"></param>
-        Task LoadChildrenAsync<T>(T item, bool onlyFirstLevel, List<string> classes, List<string> ignoreList) where T : class, IDbEntity;
+
+        Task LoadChildrenAsync<T, TP>(T item, bool onlyFirstLevel = false, List<string> ignoreList = null, params Expression<Func<T, TP>>[] actions);
 
         /// <summary>
         /// load children 
@@ -192,20 +208,7 @@ namespace EntityWorker.Core.InterFace
         /// <param name="onlyFirstLevel"></param>
         /// <param name="ignoreList"></param>
         /// <param name="actions"></param>
-
-        Task LoadChildrenAsync<T, TP>(T item, bool onlyFirstLevel = false, List<string> ignoreList = null, params Expression<Func<T, TP>>[] actions) where T : class, IDbEntity;
-
-        /// <summary>
-        /// load children 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <typeparam name="TP"></typeparam>
-        /// <param name="repository"></param>
-        /// <param name="item"></param>
-        /// <param name="onlyFirstLevel"></param>
-        /// <param name="ignoreList"></param>
-        /// <param name="actions"></param>
-        void LoadChildren<T, TP>(T item, bool onlyFirstLevel = false, List<string> ignoreList = null, params Expression<Func<T, TP>>[] actions) where T : class, IDbEntity;
+        void LoadChildren<T, TP>(T item, bool onlyFirstLevel = false, List<string> ignoreList = null, params Expression<Func<T, TP>>[] actions);
 
         /// <summary>
         /// Get IList by sql
@@ -214,7 +217,7 @@ namespace EntityWorker.Core.InterFace
         /// <param name="sqlString"></param>
         /// <returns></returns>
 
-        IList<T> Select<T>(string sqlString) where T : class, IDbEntity;
+        IList<T> Select<T>(string sqlString);
 
         /// <summary>
         /// Get IList by sql
@@ -223,14 +226,22 @@ namespace EntityWorker.Core.InterFace
         /// <param name="sqlString"></param>
         /// <returns></returns>
 
-        Task<IList<T>> SelectAsync<T>(string sqlString) where T : class, IDbEntity;
+        Task<IList<T>> SelectAsync<T>(string sqlString);
 
         /// <summary>
         /// Get EntityChanges. entity has to be attachet 
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        Dictionary<string, object> GetObjectChanges(DbEntity entity);
+        List<EntityChanges> GetObjectChanges(object entity);
+
+        /// <summary>
+        /// Get object changes
+        /// </summary>
+        /// <param name="entityA"></param>
+        /// <param name="entityB"></param>
+        /// <returns></returns>
+        List<EntityChanges> GetObjectChanges(object entityA, object entityB);
 
         /// <summary>
         /// If enetiy is attached
@@ -238,7 +249,7 @@ namespace EntityWorker.Core.InterFace
         /// <param name="entity"></param>
         /// <returns></returns>
 
-        bool IsAttached(DbEntity entity);
+        bool IsAttached(object entity);
 
         /// <summary>
         /// Create Table by System.Type
@@ -247,7 +258,7 @@ namespace EntityWorker.Core.InterFace
         /// <typeparam name="T"></typeparam>
         /// <param name="force">force recreation if table eg if exist delete then create agen</param>
 
-        void CreateTable<T>(bool force = false) where T : class, IDbEntity;
+        void CreateTable<T>(bool force = false);
 
 
         /// <summary>
@@ -255,6 +266,7 @@ namespace EntityWorker.Core.InterFace
         /// all under tables will be created
         /// </summary>
         /// <typeparam name="T"></typeparam>
+        /// <param name="type"></param>
         /// <param name="force">force recreation if table eg if exist delete then create agen</param>
 
         void CreateTable(Type type, bool force = false);
@@ -265,7 +277,7 @@ namespace EntityWorker.Core.InterFace
         /// </summary>
         /// <typeparam name="T"></typeparam>
 
-        void RemoveTable<T>() where T : class, IDbEntity;
+        void RemoveTable<T>();
 
         /// <summary>
         /// Remove Table
@@ -281,7 +293,7 @@ namespace EntityWorker.Core.InterFace
         /// <typeparam name="T"></typeparam>
         /// <param name="command"></param>
         /// <returns></returns>
-        List<T> DataReaderConverter<T>(DbCommandExtended command) where T : class, IDbEntity;
+        List<T> DataReaderConverter<T>(DbCommandExtended command);
 
         /// <summary>
         /// Convert DbCommandExtended to list of System.Type

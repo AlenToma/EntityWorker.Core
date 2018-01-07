@@ -58,8 +58,8 @@ namespace EntityWorker.Core
             {
                 var tItem = item.ToObject(tType);
                 iList?.Add(tItem);
-                if (!repository?.IsAttached(tItem as DbEntity) ?? true)
-                    repository?.Attach(tItem as DbEntity);
+                if (!repository?.IsAttached(tItem) ?? true)
+                    repository?.Attach(tItem);
             }
             return iList;
         }
@@ -74,8 +74,8 @@ namespace EntityWorker.Core
             {
                 var tItem = item.ToObject(tType);
                 iList?.Add(tItem);
-                if (!repository?.IsAttached(tItem as DbEntity) ?? true)
-                    repository?.Attach(tItem as DbEntity);
+                if (!repository?.IsAttached(tItem) ?? true)
+                    repository?.Attach(tItem);
             }
             return (List<T>)iList;
         }

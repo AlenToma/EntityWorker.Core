@@ -19,14 +19,14 @@ namespace EntityWorker.Core.Helper
     public static class MethodHelper
     {
 
-        /// <summary>
-        ///  get All types that inherit DbEntity
-        /// </summary>
-        /// <param name="assembly"></param>
-        /// <returns></returns>
+        ///// <summary>
+        /////  get All types that containe Property with PrimaryId Attribute
+        ///// </summary>
+        ///// <param name="assembly"></param>
+        ///// <returns></returns>
         public static List<Type> GetDbEntitys(Assembly assembly)
         {
-            return assembly.DefinedTypes.Where(type => typeof(IDbEntity).IsAssignableFrom(type)).Cast<Type>().ToList();
+            return assembly.DefinedTypes.Where(type => type.GetPrimaryKey() != null).Cast<Type>().ToList();
         }
 
         /// <summary>
@@ -90,6 +90,7 @@ namespace EntityWorker.Core.Helper
 
             var stringExp = new Regex(@"String\[.*?\]|String\[.?\]");
             var dateExp = new Regex(@"Date\[.*?\]|Date\[.?\]");
+            var guidExp = new Regex(@"Guid\[.*?\]|Guid\[.?\]");
             var i = 0;
             var dicCols = new Dictionary<string, Tuple<object, SqlDbType>>();
             MatchCollection matches = null;
@@ -115,11 +116,22 @@ namespace EntityWorker.Core.Helper
                 i++;
             }
 
+            while ((matches = guidExp.Matches(sql)).Count > 0)
+            {
+                var exp = matches[0];
+                var col = "@CO" + i + "L";
+                object str = exp.Value.TrimEnd(']').Substring(@"Guid\[".Length - 1);
+                sql = sql.Remove(exp.Index, exp.Value.Length);
+                sql = sql.Insert(exp.Index, col);
+                dicCols.Add(col, new Tuple<object, SqlDbType>(str.ConvertValue<Guid?>(), SqlDbType.UniqueIdentifier));
+                i++;
+            }
+
             DbCommand cmd = null;
-            if (repository.DataBaseTypes == Helper.DataBaseTypes.Mssql)
-                cmd = tran != null ?  new SqlCommand(sql, connection as SqlConnection, tran as SqlTransaction) : new SqlCommand(sql, connection as SqlConnection);
+            if (repository.DataBaseTypes == DataBaseTypes.Mssql)
+                cmd = tran != null ? new SqlCommand(sql, connection as SqlConnection, tran as SqlTransaction) : new SqlCommand(sql, connection as SqlConnection);
             else cmd = tran == null ? new SQLiteCommand(sql, connection as SQLiteConnection) : new SQLiteCommand(sql, connection as SQLiteConnection, tran as SQLiteTransaction);
-            var dbCommandExtended= new DbCommandExtended(cmd, type);
+            var dbCommandExtended = new DbCommandExtended(cmd, repository, type);
             foreach (var dic in dicCols)
                 repository.AddInnerParameter(dbCommandExtended, dic.Key, dic.Value.Item1, dic.Value.Item2);
 

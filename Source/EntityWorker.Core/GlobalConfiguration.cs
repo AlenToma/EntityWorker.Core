@@ -23,7 +23,7 @@ namespace EntityWorker.Core
         /// EntityWorker will Use this CultureInfo to convert the data eg decimal, datetime and so on, from the database 
         /// Default is EN;
         /// </summary>
-        public static CultureInfo cultureInfo { get; set; } = new CultureInfo("en");
+        public static CultureInfo CultureInfo { get; set; } = new CultureInfo("en");
 
     }
 }

@@ -21,6 +21,7 @@ namespace EntityWorker.Core.Helper
     public static class Extension
     {
         private static readonly Dictionary<IFastDeepClonerProperty, string> CachedPropertyNames = new Dictionary<IFastDeepClonerProperty, string>();
+        private static readonly Dictionary<Type, IFastDeepClonerProperty> CachedPrimaryKeys = new Dictionary<Type, IFastDeepClonerProperty>();
 
         private static readonly Dictionary<Type, string> DbMsSqlMapper = new Dictionary<Type, string>()
         {
@@ -47,7 +48,7 @@ namespace EntityWorker.Core.Helper
              {typeof(TimeSpan), "DATETIME"},
             {typeof(float), "FLOAT"},
             {typeof(decimal), "DECIMAL(18,5)"},
-            {typeof(Guid), "TEXT"},
+            {typeof(Guid), "UNIQUEIDENTIFIER"},
             {typeof(byte[]), "BLOB"},
             {typeof(char), "NVARCHAR(10)"},
         };
@@ -58,7 +59,7 @@ namespace EntityWorker.Core.Helper
         /// <typeparam name="T"></typeparam>
         /// <param name="item"></param>
         /// <param name="includeIndependedData"> Clear all ids of object that contains IndependedData attributes</param>
-        public static T ClearAllIdsHierarchy<T>(this T item, bool includeIndependedData = false) where T : IDbEntity
+        public static T ClearAllIdsHierarchy<T>(this T item, bool includeIndependedData = false)
         {
             return (T)ClearAllIdsHierarchy(item as object, includeIndependedData);
         }
@@ -69,7 +70,7 @@ namespace EntityWorker.Core.Helper
         /// <typeparam name="T"></typeparam>
         /// <param name="item"></param>
         /// <param name="includeIndependedData"> Clear all ids of object that contains IndependedData attributes</param>
-        public static List<T> ClearAllIdsHierarchy<T>(List<T> item, bool includeIndependedData = false) where T : IDbEntity
+        public static List<T> ClearAllIdsHierarchy<T>(List<T> item, bool includeIndependedData = false)
         {
             return (List<T>)ClearAllIdsHierarchy(item as object, includeIndependedData);
         }
@@ -88,13 +89,13 @@ namespace EntityWorker.Core.Helper
             {
                 foreach (var tm in item as IList)
                 {
-                    if ((tm as IDbEntity) != null)
+                    if (tm != null)
                         ClearAllIdsHierarchy(tm, includeIndependedData);
                 }
             }
             else
             {
-                if ((item as IDbEntity) == null)
+                if (item == null)
                     return item;
 
                 var props = DeepCloner.GetFastDeepClonerProperties(item.GetType());
@@ -231,6 +232,16 @@ namespace EntityWorker.Core.Helper
             return CachedPropertyNames[prop];
         }
 
+
+
+
+        public static bool IsNumeric(this Type type)
+        {
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+                type = type.GetGenericArguments().FirstOrDefault() ?? type;
+            return type.IsPrimitive && type != typeof(char) && type != typeof(bool);
+        }
+
         /// <summary>
         /// Get the Primary key from type
         /// </summary>
@@ -238,7 +249,26 @@ namespace EntityWorker.Core.Helper
         /// <returns></returns>
         public static IFastDeepClonerProperty GetPrimaryKey(this Type type)
         {
-            return DeepCloner.GetFastDeepClonerProperties(type).FirstOrDefault(x => x.ContainAttribute<PrimaryKey>());
+            if (CachedPrimaryKeys.ContainsKey(type))
+                return CachedPrimaryKeys[type];
+            else
+            {
+                lock (CachedPrimaryKeys)
+                {
+                    CachedPrimaryKeys.Add(type, DeepCloner.GetFastDeepClonerProperties(type).FirstOrDefault(x => x.ContainAttribute<PrimaryKey>()));
+                }
+            }
+            return CachedPrimaryKeys[type];
+        }
+
+        /// <summary>
+        /// Get the Primary key from type
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static IFastDeepClonerProperty GetPrimaryKey(this object item)
+        {
+            return item.GetType().GetPrimaryKey();
         }
 
         /// <summary>
@@ -248,7 +278,34 @@ namespace EntityWorker.Core.Helper
         /// <returns></returns>
         public static object GetPrimaryKeyValue(this object item)
         {
-            return DeepCloner.GetFastDeepClonerProperties(item.GetType()).FirstOrDefault(x => x.ContainAttribute<PrimaryKey>()).GetValue(item);
+            return item.GetPrimaryKey().GetValue(item);
+        }
+
+        /// <summary>
+        /// Validate string and guid and long 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+
+        public static bool ObjectIsNew(this object value)
+        {
+            if (value == null || (value.GetType().IsNumeric() && value.ConvertValue<long>() <= 0))
+                return true;
+            else if (string.IsNullOrEmpty(value.ToString()) || value.ToString() == "00000000-0000-0000-0000-000000000000")
+                return true;
+            return false;
+        }
+
+        /// <summary>
+        /// Set the Primary key Value
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static void SetPrimaryKeyValue(this object item, object value = null)
+        {
+            var prop = DeepCloner.GetFastDeepClonerProperties(item.GetType()).FirstOrDefault(x => x.ContainAttribute<PrimaryKey>());
+            prop.SetValue(item, MethodHelper.ConvertValue(value, prop.PropertyType));
         }
 
         /// <summary>
@@ -320,7 +377,7 @@ namespace EntityWorker.Core.Helper
         /// <typeparam name="T"></typeparam>
         /// <param name="o"></param>
         /// <returns></returns>
-        public static T ToType<T>(this object o) where T : class
+        public static T ToType<T>(this object o)
         {
             object item;
             if (typeof(T) == typeof(IList))
@@ -335,7 +392,7 @@ namespace EntityWorker.Core.Helper
         /// <param name="items"></param>
         /// <param name="fieldType"></param>
         /// <returns></returns>
-        public static List<T> Clone<T>(this List<T> items, FieldType fieldType = FieldType.PropertyInfo) where T : class, IDbEntity
+        public static List<T> Clone<T>(this List<T> items, FieldType fieldType = FieldType.PropertyInfo)
         {
             return DeepCloner.Clone(items, new FastDeepClonerSettings()
             {
@@ -406,6 +463,9 @@ namespace EntityWorker.Core.Helper
             if (propertyType == typeof(bool))
                 return allowDbNull ? typeof(bool?) : typeof(bool);
 
+            if (propertyType == typeof(Guid))
+                return allowDbNull ? typeof(Guid?) : typeof(Guid);
+
             return propertyType == typeof(byte[]) ? typeof(byte[]) : typeof(string);
         }
 
@@ -428,7 +488,7 @@ namespace EntityWorker.Core.Helper
                 while (reader.Read())
                 {
                     var item = DeepCloner.CreateInstance(tType);
-                    var clItem = DeepCloner.CreateInstance(tType) as DbEntity;
+                    var clItem = DeepCloner.CreateInstance(tType);
                     var col = 0;
                     while (col < reader.FieldCount)
                     {
@@ -452,24 +512,19 @@ namespace EntityWorker.Core.Helper
                             }
                             else if (dataEncode != null)
                                 value = new DataCipher(dataEncode.Key, dataEncode.KeySize).Decrypt(value.ConvertValue<string>());
+                            else value = MethodHelper.ConvertValue(value, prop.PropertyType);
 
-                            if (value.GetType() != prop.PropertyType)
-                            {
-                                prop.SetValue(item, MethodHelper.ConvertValue(value, prop.PropertyType));
-                                prop.SetValue(clItem, MethodHelper.ConvertValue(value, prop.PropertyType));
-                            }
-                            else
-                            {
-                                prop.SetValue(item, value);
-                                prop.SetValue(clItem, value);
-                            }
+                            prop.SetValue(item, value);
+                            prop.SetValue(clItem, value);
                         }
                         col++;
                     }
 
                     if (!repository?.IsAttached(clItem) ?? true)
                         repository?.AttachNew(clItem);
+
                     iList.Add(item);
+
                 }
             }
             catch (Exception e)
@@ -480,6 +535,8 @@ namespace EntityWorker.Core.Helper
             {
                 reader.Close();
                 reader.Dispose();
+                if (repository.OpenedDataReaders.ContainsKey(reader))
+                    repository.OpenedDataReaders.Remove(reader);
             }
 
             return iList;
@@ -496,8 +553,11 @@ namespace EntityWorker.Core.Helper
 
             if (reader.FieldCount <= 0)
             {
-                reader.Close();
-                reader.Dispose();
+                if (closeReader)
+                {
+                    reader.Close();
+                    reader.Dispose();
+                }
                 return data;
             }
             if (command.TableType == null)
@@ -509,10 +569,7 @@ namespace EntityWorker.Core.Helper
                     if (!CachedSqlException.ContainsKey(command.Command.CommandText))
                     {
                         if (!CachedGetSchemaTable.ContainsKey(key))
-                        {
                             CachedGetSchemaTable.Add(key, new LightDataTable(reader.GetSchemaTable()));
-
-                        }
 
                         foreach (var item in CachedGetSchemaTable[key].Rows)
                         {
@@ -560,6 +617,7 @@ namespace EntityWorker.Core.Helper
                 reader.GetValues(row._itemArray);
                 data.AddRow(row);
             }
+
             if (closeReader)
             {
                 reader.Close();

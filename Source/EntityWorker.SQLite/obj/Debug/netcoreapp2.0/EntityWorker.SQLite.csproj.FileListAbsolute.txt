@@ -2,7 +2,6 @@ D:\Projects\EntityWorker.Core\Source\EntityWorker.SQLite\bin\Debug\netcoreapp2.0
 D:\Projects\EntityWorker.Core\Source\EntityWorker.SQLite\bin\Debug\netcoreapp2.0\EntityWorker.SQLite.deps.json
 D:\Projects\EntityWorker.Core\Source\EntityWorker.SQLite\bin\Debug\netcoreapp2.0\EntityWorker.SQLite.dll
 D:\Projects\EntityWorker.Core\Source\EntityWorker.SQLite\bin\Debug\netcoreapp2.0\EntityWorker.SQLite.pdb
-D:\Projects\EntityWorker.Core\Source\EntityWorker.SQLite\bin\Debug\netcoreapp2.0\EntityWorker.SQLite.xml
 D:\Projects\EntityWorker.Core\Source\EntityWorker.SQLite\bin\Debug\netcoreapp2.0\SR\EntityWorker.SQLite.resources.dll
 D:\Projects\EntityWorker.Core\Source\EntityWorker.SQLite\obj\Debug\netcoreapp2.0\EntityWorker.SQLite.csprojResolveAssemblyReference.cache
 D:\Projects\EntityWorker.Core\Source\EntityWorker.SQLite\obj\Debug\netcoreapp2.0\EntityWorker.SQLite.dll.config

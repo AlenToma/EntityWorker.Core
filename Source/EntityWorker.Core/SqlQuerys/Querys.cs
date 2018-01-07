@@ -94,15 +94,15 @@ namespace EntityWorker.Core.SqlQuerys
                 col = col.Remove(col.ToLower().IndexOf(" as ", StringComparison.Ordinal));
             var type = typeof(T);
             if (type == typeof(decimal) || type == typeof(double) || type == typeof(float))
-                _sql += DataBaseTypes == DataBaseTypes.Mssql ? " " + "CONVERT(decimal(18,5)," + col + ") " : " Cast(" + col + " AS decimal(18,5)) ";
+                _sql += DataBaseTypes == DataBaseTypes.Mssql ? " " + "CONVERT(decimal(18,5),[" + col + "]) " : " Cast([" + col + "] AS decimal(18,5)) ";
             else if (type == typeof(int) || type == typeof(long))
-                _sql += DataBaseTypes == DataBaseTypes.Mssql ? " " + "CONVERT(decimal(18,5)," + col + ") " : " Cast(" + col + " AS bigint) ";
-            else _sql += DataBaseTypes == DataBaseTypes.Mssql ? " " + "CONVERT(decimal(18,5)," + col + ") " : " Cast(" + col + " AS nvarchar(4000)) ";
+                _sql += DataBaseTypes == DataBaseTypes.Mssql ? " " + "CONVERT(decimal(18,5),[" + col + "]) " : " Cast([" + col + "] AS bigint) ";
+            else _sql += DataBaseTypes == DataBaseTypes.Mssql ? " " + "CONVERT(nvarchar(max),[" + col + "]) " : " Cast([" + col + "] AS nvarchar(4000)) ";
 
             return new QueryConditions(_sql, DataBaseTypes);
         }
 
-        public QueryConditions Column<T, P>(Expression<Func<T, P>> action) where T : class
+        public QueryConditions Column<T, P>(Expression<Func<T, P>> action)
         {
             var member = action.Body is UnaryExpression ? ((MemberExpression)((UnaryExpression)action.Body).Operand) : (action.Body is MethodCallExpression ? ((MemberExpression)((MethodCallExpression)action.Body).Object) : (MemberExpression)action.Body);
             if (member == null) return new QueryConditions(_sql, DataBaseTypes);
@@ -112,10 +112,10 @@ namespace EntityWorker.Core.SqlQuerys
             if (col.ToLower().Contains(" as "))
                 col = col.Remove(col.ToLower().IndexOf(" as ", StringComparison.Ordinal));
             if (type == typeof(decimal) || type == typeof(double) || type == typeof(float))
-                _sql += DataBaseTypes == DataBaseTypes.Mssql ? " " + "CONVERT(decimal(18,5)," + col + ") " : " Cast(" + col + " AS decimal(18,5)) ";
+                _sql += DataBaseTypes == DataBaseTypes.Mssql ? " " + "CONVERT(decimal(18,5),[" + col + "]) " : " Cast([" + col + "] AS decimal(18,5)) ";
             else if (type == typeof(int) || type == typeof(long))
-                _sql += DataBaseTypes == DataBaseTypes.Mssql ? " " + "CONVERT(decimal(18,5)," + col + ") " : " Cast(" + col + " AS bigint) ";
-            else _sql += DataBaseTypes == DataBaseTypes.Mssql ? " " + "CONVERT(decimal(18,5)," + col + ") " : " Cast(" + col + " AS nvarchar(4000)) ";
+                _sql += DataBaseTypes == DataBaseTypes.Mssql ? " " + "CONVERT(decimal(18,5),[" + col + "]) " : " Cast([" + col + "] AS bigint) ";
+            else _sql += DataBaseTypes == DataBaseTypes.Mssql ? " " + "CONVERT(nvarchar(max),[" + col + "]) " : " Cast([" + col + "] AS nvarchar(4000)) ";
             return new QueryConditions(_sql, DataBaseTypes);
         }
 

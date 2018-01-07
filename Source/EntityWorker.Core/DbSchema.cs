@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using EntityWorker.Core.Attributes;
@@ -62,7 +63,7 @@ namespace EntityWorker.Core
         /// <param name="query"></param>
         /// <returns></returns>
 
-        public List<T> Select<T>(string query = null) where T : class, IDbEntity
+        public List<T> Select<T>(string query = null)
         {
             if (query == null || !CachedSql.ContainsKey(query))
             {
@@ -76,6 +77,26 @@ namespace EntityWorker.Core
 
 
         /// <summary>
+        /// Get all by object
+        /// PrimaryKey attr must be set ins Where
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="repository"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
+
+        public IList Select(Type type, string query = null)
+        {
+            if (query == null || !CachedSql.ContainsKey(query))
+            {
+                if (string.IsNullOrEmpty(query))
+                    query = Querys.Select(type, _repository.DataBaseTypes).Execute();
+                CachedSql.Add(query, query);
+            }
+            return _repository.DataReaderConverter(_repository.GetSqlCommand(CachedSql[query]), type);
+        }
+
+        /// <summary>
         /// Get object by ID
         /// Primary Key attribute must be set
         /// </summary>
@@ -83,16 +104,17 @@ namespace EntityWorker.Core
         /// <param name="repository"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public object GetById(long id, Type type)
+        public object GetById(object id, Type type)
         {
             var k = type.FullName + _repository.DataBaseTypes.ToString();
+            var primaryKey = type.GetActualType().GetPrimaryKey();
             if (!CachedSql.ContainsKey(k))
             {
-                var key = type.GetActualType().GetPrimaryKey().GetPropertyName();
-                CachedSql.Add(k, Querys.Select(type.GetActualType(), _repository.DataBaseTypes).Where.Column<long>(key).Equal("@ID", true).Execute());
+                var key = primaryKey.GetPropertyName();
+                CachedSql.Add(k, Querys.Select(type.GetActualType(), _repository.DataBaseTypes).Where.Column(key).Equal("@ID", true).Execute());
             }
             var cmd = _repository.GetSqlCommand(CachedSql[k]);
-            _repository.AddInnerParameter(cmd, "@ID", id, System.Data.SqlDbType.BigInt);
+            _repository.AddInnerParameter(cmd, "@ID", id.ConvertValue(primaryKey.PropertyType), _repository.GetSqlType(primaryKey.PropertyType));
             return type.GetActualType() != type ? _repository.DataReaderConverter(cmd, type) : _repository.DataReaderConverter(cmd, type).Cast<object>().FirstOrDefault();
         }
 
@@ -125,42 +147,42 @@ namespace EntityWorker.Core
         /// <param name="id"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public object GetByColumn(long id, string column, Type type)
+        public object GetByColumn(object id, string column, Type type)
         {
             var k = type.FullName + column + _repository.DataBaseTypes.ToString();
             if (!CachedSql.ContainsKey(k))
-                CachedSql.Add(k, Querys.Select(type, _repository.DataBaseTypes).Where.Column<long>(column).Equal("@ID", true).Execute());
+                CachedSql.Add(k, Querys.Select(type, _repository.DataBaseTypes).Where.Column<string>(column).Equal("@ID", true).Execute());
 
             var cmd = _repository.GetSqlCommand(CachedSql[k]);
-            _repository.AddInnerParameter(cmd, "@ID", id, SqlDbType.BigInt);
+            _repository.AddInnerParameter(cmd, "@ID", id, _repository.GetSqlType(id.GetType()));
             return type.GetActualType() != type ? _repository.DataReaderConverter(cmd, type) : _repository.DataReaderConverter(cmd, type).Cast<object>().FirstOrDefault();
         }
 
 
-        public T LoadChildren<T>(T item, bool onlyFirstLevel = false, List<string> classes = null, List<string> ignoreList = null, Dictionary<long, List<string>> pathLoaded = null, string parentProb = null, long id = 0) where T : class
+        public T LoadChildren<T>(T item, bool onlyFirstLevel = false, List<string> classes = null, List<string> ignoreList = null, Dictionary<string, List<string>> pathLoaded = null, string parentProb = null, string id = null)
         {
             if (pathLoaded == null)
-                pathLoaded = new Dictionary<long, List<string>>();
+                pathLoaded = new Dictionary<string, List<string>>();
+            if (item == null)
+                return default(T);
             switch (item)
             {
-                case null:
-                    return null;
                 case IList _:
                     foreach (var tItem in (IList)item)
                     {
-                        var entity = tItem as IDbEntity;
+                        var entity = tItem;
                         if (entity == null)
                             continue;
-                        LoadChildren(entity, onlyFirstLevel, classes, ignoreList, pathLoaded, parentProb, entity.Id);
+                        LoadChildren(entity, onlyFirstLevel, classes, ignoreList, pathLoaded, parentProb, entity.GetPrimaryKeyValue().ConvertValue<string>());
                     }
                     break;
                 default:
-                    if ((item as IDbEntity) == null)
+                    if ((item) == null)
                         return item;
                     var props = DeepCloner.GetFastDeepClonerProperties(item.GetType());
 
-                    id = (item as IDbEntity).Id;
-                    foreach (var prop in props.Where(x => typeof(IDbEntity).IsAssignableFrom(x.PropertyType.GetActualType()) && !x.IsInternalType && !x.ContainAttribute<ExcludeFromAbstract>()))
+                    id = item.GetPrimaryKeyValue().ToString();
+                    foreach (var prop in props.Where(x => !x.IsInternalType && !x.ContainAttribute<ExcludeFromAbstract>()))
                     {
                         var path = string.Format("{0}.{1}", parentProb ?? "", prop.Name).TrimEnd('.').TrimStart('.');
                         var propCorrectPathName = path?.Split('.').Length >= 2 ? string.Join(".", path.Split('.').Reverse().Take(2).Reverse()) : path;
@@ -193,9 +215,9 @@ namespace EntityWorker.Core
                             var primaryKey = item.GetType().GetPrimaryKey();
                             if (column == null || primaryKey == null)
                                 continue;
-                            var keyValue = primaryKey.GetValue(item).ConvertValue<long?>();
-                            if (!keyValue.HasValue) continue;
-                            var result = GetByColumn(keyValue.Value, column.Name, prop.PropertyType);
+                            var keyValue = primaryKey.GetValue(item);
+                            if (keyValue.ObjectIsNew()) continue;
+                            var result = GetByColumn(keyValue, column.Name, prop.PropertyType);
                             prop.SetValue(item, result);
                             if (result != null && !onlyFirstLevel)
                                 LoadChildren(result, onlyFirstLevel, classes, ignoreList, pathLoaded, propertyName, id);
@@ -203,13 +225,13 @@ namespace EntityWorker.Core
                         else
                         {
                             var isGeneric = prop.PropertyType.GetActualType() != prop.PropertyType;
-                            var keyValue = key.GetValue(item)?.ConvertValue<long?>();
-                            if (!keyValue.HasValue && !isGeneric) continue;
+                            var keyValue = key.GetValue(item);
+                            if (keyValue.ObjectIsNew() && !isGeneric) continue;
                             object result = null;
                             if (isGeneric && key.GetCustomAttribute<ForeignKey>().Type == item.GetType()) // trying to load children 
-                                result = GetByColumn((item as IDbEntity).Id, key.GetPropertyName(), prop.PropertyType);
+                                result = GetByColumn(item.GetPrimaryKeyValue(), key.GetPropertyName(), prop.PropertyType);
                             else
-                                result = GetById(keyValue.Value, prop.PropertyType);
+                                result = GetById(keyValue, prop.PropertyType);
 
                             prop.SetValue(item, result);
                             if (result != null && !onlyFirstLevel)
@@ -226,7 +248,7 @@ namespace EntityWorker.Core
         #region Save Methods
 
 
-        public void DeleteAbstract(IDbEntity o)
+        public void DeleteAbstract(object o)
         {
             lock (ObjectLocker)
             {
@@ -245,7 +267,7 @@ namespace EntityWorker.Core
                 return new List<string>();
             var sql = new List<string>() { "DELETE " + (_repository.DataBaseTypes == DataBaseTypes.Sqllight ? "From " : "") + table + Querys.Where(_repository.DataBaseTypes).Column(primaryKey.GetPropertyName()).Equal(primaryKeyValue).Execute() };
 
-            foreach (var prop in props.Where(x => typeof(IDbEntity).IsAssignableFrom(x.PropertyType.GetActualType()) && !x.IsInternalType && x.GetCustomAttribute<IndependentData>() == null && x.GetCustomAttribute<ExcludeFromAbstract>() == null))
+            foreach (var prop in props.Where(x => !x.IsInternalType && x.GetCustomAttribute<IndependentData>() == null && x.GetCustomAttribute<ExcludeFromAbstract>() == null))
             {
                 var value = prop.GetValue(o);
 
@@ -315,26 +337,31 @@ namespace EntityWorker.Core
             return sql;
         }
 
-        public long Save(IDbEntity o)
+        public void Save(object o)
         {
             lock (ObjectLocker)
             {
-                return Save(o, false);
+                Save(o, false);
             }
         }
 
 
-        private long Save(IDbEntity o, bool isIndependentData)
+        private object Save(object o, bool isIndependentData, bool updateOnly = false)
         {
             try
             {
-                var updateOnly = o.State == ItemState.Changed;
-                o.State = ItemState.Added;// reset State
+                _repository.CreateTransaction();
                 var props = DeepCloner.GetFastDeepClonerProperties(o.GetType());
-                var primaryKey = o.Id > 0 ? (long?)o.Id : null;
+                var primaryKey = o.GetPrimaryKey();
+
+                if (primaryKey == null)
+                    throw new NullReferenceException("Object must have a PrimaryKey");
+
+                var primaryKeyId = !Extension.ObjectIsNew(o.GetPrimaryKeyValue()) ? o.GetPrimaryKeyValue() : null;
                 var availableColumns = ObjectColumns(o.GetType());
                 var objectRules = o.GetType().GetCustomAttribute<Rule>();
                 var tableName = o.GetType().GetCustomAttribute<Table>()?.Name ?? o.GetType().Name;
+
 
                 object dbTrigger = null;
                 if (objectRules != null && !CachedIDbRuleTrigger.ContainsKey(o.GetType()))
@@ -345,59 +372,75 @@ namespace EntityWorker.Core
                 else if (objectRules != null)
                     dbTrigger = CachedIDbRuleTrigger[o.GetType()];
 
-                if (primaryKey.HasValue && !updateOnly) // lets attach the object
+                if (primaryKeyId != null && !updateOnly) // lets attach the object
                 {
-                    var data = GetById(primaryKey.Value, o.GetType()) as DbEntity;
+                    var data = GetById(primaryKeyId, o.GetType());
                     if (data == null)
                     {
-                        primaryKey = null;
-                        o.Id = 0;
+                        primaryKeyId = null;
+                        o.SetPrimaryKeyValue();
                     }
                     else
                     {
-                        if (!_repository.IsAttached(o as DbEntity))
+                        if (!_repository.IsAttached(o))
                             _repository.Attach(data);
 
-                        var changes = _repository.GetObjectChanges(o as DbEntity);
-                        foreach (var item in props.Where(x => x.CanRead && !changes.ContainsKey(x.Name) && x.IsInternalType))
+                        var changes = _repository.GetObjectChanges(o);
+                        foreach (var item in props.Where(x => x.CanRead && !changes.Any(a => a.PropertyName == x.Name) && x.IsInternalType))
                             item.SetValue(o, item.GetValue(data));
                     }
                 }
 
                 if (!updateOnly)
                     dbTrigger?.GetType().GetMethod("BeforeSave").Invoke(dbTrigger, new List<object>() { _repository, o }.ToArray()); // Check the Rule before save
-
-                o.State = ItemState.Added;// reset State
+                object tempPrimaryKey = null;
                 var sql = "UPDATE [" + (o.GetType().GetCustomAttribute<Table>()?.Name ?? o.GetType().Name) + "] SET ";
                 var cols = props.FindAll(x => availableColumns.FindByPrimaryKey<bool>(x.GetPropertyName()) && x.IsInternalType && !x.ContainAttribute<ExcludeFromAbstract>() && x.GetCustomAttribute<PrimaryKey>() == null);
-                if (!primaryKey.HasValue)
+                if (primaryKeyId == null)
                 {
-                    sql = "INSERT INTO [" + tableName + "](" + string.Join(",", cols.Select(x => "[" + x.GetPropertyName() + "]")) + ") Values(";
-                    sql += string.Join(",", cols.Select(x => "@" + x.GetPropertyName())) + ");";
-                    sql += _repository.DataBaseTypes == DataBaseTypes.Sqllight ? " select last_insert_rowid();" : " SELECT IDENT_CURRENT('" + tableName + "');";
+
+                    if (primaryKey.PropertyType.IsNumeric())
+                    {
+                        sql = "INSERT INTO [" + tableName + "](" + string.Join(",", cols.Select(x => "[" + x.GetPropertyName() + "]")) + ") Values(";
+                        sql += string.Join(",", cols.Select(x => "@" + x.GetPropertyName())) + ");";
+                        sql += _repository.DataBaseTypes == DataBaseTypes.Sqllight ? " select last_insert_rowid();" : " SELECT IDENT_CURRENT('" + tableName + "');";
+
+                    }
+                    else
+                    {
+                        var colList = new List<IFastDeepClonerProperty>();
+                        tempPrimaryKey = Guid.NewGuid();
+                        colList.Insert(0, primaryKey);
+                        colList.AddRange(cols);
+                        sql = "INSERT INTO [" + tableName + "](" + string.Join(",", colList.Select(x => "[" + x.GetPropertyName() + "]")) + ") Values(";
+                        sql += string.Join(",", colList.Select(x => "@" + x.GetPropertyName())) + "); select '" + tempPrimaryKey + "'";
+                    }
                 }
                 else
                 {
                     sql += string.Join(",", cols.Select(x => "[" + x.GetPropertyName() + "]" + " = @" + x.GetPropertyName()));
-                    sql += Querys.Where(_repository.DataBaseTypes).Column(o.GetType().GetActualType().GetPrimaryKey().GetPropertyName()).Equal(primaryKey).Execute();
+                    sql += Querys.Where(_repository.DataBaseTypes).Column(o.GetType().GetActualType().GetPrimaryKey().GetPropertyName()).Equal(primaryKeyId).Execute();
                 }
 
                 var cmd = _repository.GetSqlCommand(sql);
+                if (!primaryKey.PropertyType.IsNumeric() && primaryKeyId == null)
+                    _repository.AddInnerParameter(cmd, primaryKey.GetPropertyName(), tempPrimaryKey, _repository.GetSqlType(primaryKey.PropertyType));
+
 
                 foreach (var col in cols)
                 {
                     var v = col.GetValue(o);
                     var defaultOnEmpty = col.GetCustomAttribute<DefaultOnEmpty>();
-                    if (col.ContainAttribute<ForeignKey>() && v?.ConvertValue<long?>() == 0)
+                    if (col.ContainAttribute<ForeignKey>() && (v?.ObjectIsNew() ?? true))
                     {
                         var ob = props.FirstOrDefault(x => x.PropertyType == col.GetCustomAttribute<ForeignKey>().Type && (string.IsNullOrEmpty(col.GetCustomAttribute<ForeignKey>().PropertyName) || col.GetCustomAttribute<ForeignKey>().PropertyName == x.Name));
-                        var obValue = ob?.GetValue(o) as IDbEntity;
+                        var obValue = ob?.GetValue(o);
                         var independentData = ob?.GetCustomAttribute<IndependentData>() != null;
                         if (obValue != null)
                         {
-                            v = obValue.GetType().GetPrimaryKey().GetValue(obValue)?.ConvertValue<long>() <= 0 ?
+                            v = obValue.GetType().GetPrimaryKey().GetValue(obValue)?.ObjectIsNew() ?? true ?
                                 Save(obValue, independentData) :
-                                obValue.GetType().GetPrimaryKey().GetValue(obValue)?.ConvertValue<long>();
+                                obValue.GetType().GetPrimaryKey().GetValue(obValue);
                             col.SetValue(o, v);
                         }
                     }
@@ -432,42 +475,41 @@ namespace EntityWorker.Core
                     _repository.AddInnerParameter(cmd, col.GetPropertyName(), v, (col.ContainAttribute<StringFy>() || col.ContainAttribute<DataEncode>() || col.ContainAttribute<ToBase64String>() ? _repository.GetSqlType(typeof(string)) : _repository.GetSqlType(col.PropertyType)));
                 }
 
-                if (!primaryKey.HasValue)
-                    primaryKey = _repository.ExecuteScalar(cmd).ConvertValue<long>();
+                if (primaryKeyId == null)
+                    primaryKeyId = _repository.ExecuteScalar(cmd).ConvertValue(primaryKey.PropertyType);
                 else _repository.ExecuteNonQuery(cmd);
-
+                var oState = dbTrigger != null ? DeepCloner.Clone(o) : null;
                 if (updateOnly)
-                    return primaryKey.Value;
-                dbTrigger?.GetType().GetMethod("AfterSave").Invoke(dbTrigger, new List<object>() { _repository, o, primaryKey.Value }.ToArray()); // Check the Rule before save
+                    return primaryKeyId;
+                dbTrigger?.GetType().GetMethod("AfterSave").Invoke(dbTrigger, new List<object>() { _repository, o, primaryKeyId }.ToArray()); // Check the Rule before save
 
-                foreach (var prop in props.Where(x => !x.IsInternalType && !x.ContainAttribute<ExcludeFromAbstract>() && typeof(IDbEntity).IsAssignableFrom(x.PropertyType.GetActualType())))
+                foreach (var prop in props.Where(x => !x.IsInternalType && !x.ContainAttribute<ExcludeFromAbstract>()))
                 {
                     var independentData = prop.GetCustomAttribute<IndependentData>() != null;
                     var type = prop.PropertyType.GetActualType();
                     var oValue = prop.GetValue(o);
                     if (oValue == null)
                         continue;
-                    var vList = oValue is IList ? (IList)oValue : new List<IDbEntity>() { oValue as IDbEntity };
+                    var vList = oValue is IList ? (IList)oValue : new List<object>() { oValue };
 
                     foreach (var item in vList)
                     {
                         var foreignKey = DeepCloner.GetFastDeepClonerProperties(item.GetType()).FirstOrDefault(x => x.GetCustomAttribute<ForeignKey>()?.Type == o.GetType() && string.IsNullOrEmpty(x.GetCustomAttribute<ForeignKey>().PropertyName));
-                        foreignKey?.SetValue(item, primaryKey);
-                        var res = Save(item as IDbEntity, independentData);
+                        foreignKey?.SetValue(item, primaryKeyId);
+                        var res = Save(item, independentData);
                         foreignKey = props.FirstOrDefault(x => x.GetCustomAttribute<ForeignKey>()?.Type == type && (x.GetCustomAttribute<ForeignKey>().PropertyName == prop.Name || string.IsNullOrEmpty(x.GetCustomAttribute<ForeignKey>().PropertyName)));
-                        if (foreignKey == null || foreignKey.GetValue(o)?.ConvertValue<long>() > 0) continue;
+                        if (foreignKey == null || !foreignKey.GetValue(o).ObjectIsNew()) continue;
                         if (o.GetType() == foreignKey.GetCustomAttribute<ForeignKey>().Type) continue;
                         foreignKey.SetValue(o, res);
-                        o.State = ItemState.Changed;
                     }
                 }
 
-                if (o.State == ItemState.Changed) // a change has been made outside the function Save
+                if (oState != null && _repository.GetObjectChanges(o, oState).Count > 0) // a change has been made outside the function Save then resave 
                     Save(o, false);
 
-                o.GetType().GetPrimaryKey().SetValue(o, primaryKey.Value);
-                _repository.Attach(o as DbEntity, true);
-                return primaryKey.Value;
+                o.GetType().GetPrimaryKey().SetValue(o, primaryKeyId.ConvertValue(primaryKey.PropertyType));
+                _repository.Attach(o, true);
+                return primaryKeyId;
             }
             catch
             {
@@ -508,7 +550,7 @@ namespace EntityWorker.Core
                 {
                     if (!prop.IsInternalType)
                     {
-                        if (!createdTables.Contains(prop.PropertyType.GetActualType()) && typeof(IDbEntity).IsAssignableFrom(prop.PropertyType.GetActualType()))
+                        if (!createdTables.Contains(prop.PropertyType.GetActualType()))
                             CreateTable(prop.PropertyType.GetActualType(), createdTables, false, force, keys, sqlList);
                         continue;
                     }
@@ -530,7 +572,9 @@ namespace EntityWorker.Core
 
                     if (prop.ContainAttribute<PrimaryKey>())
                     {
-                        sql.Append(_repository.DataBaseTypes == DataBaseTypes.Mssql ? "IDENTITY(1,1) NOT NULL," : " Integer PRIMARY KEY AUTOINCREMENT,");
+                        if (prop.PropertyType.IsNumeric())
+                            sql.Append(_repository.DataBaseTypes == DataBaseTypes.Mssql ? "IDENTITY(1,1) NOT NULL," : " Integer PRIMARY KEY AUTOINCREMENT,");
+                        else sql.Append(_repository.DataBaseTypes == DataBaseTypes.Mssql ? "NOT NULL," : " " + dbType + "  PRIMARY KEY,");
                         continue;
                     }
 

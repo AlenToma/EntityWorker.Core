@@ -68,7 +68,7 @@ namespace EntityWorker.Core.Interface
         /// <typeparam name="P"></typeparam>
         /// <param name="action"></param>
         /// <returns></returns>
-        ILightDataTable RemoveColumn<T, TP>(Expression<Func<T, TP>> action) where T : class;
+        ILightDataTable RemoveColumn<T, TP>(Expression<Func<T, TP>> action);
         /// <summary>
         /// merge two rows, will merge both column and values
         /// </summary>
@@ -118,7 +118,7 @@ namespace EntityWorker.Core.Interface
         /// <param name="action"></param>
         /// <param name="position"></param>
         /// <returns></returns>
-        ILightDataTable OrderBy<T, TP>(Expression<Func<T, TP>> action, bool position) where T : class;
+        ILightDataTable OrderBy<T, TP>(Expression<Func<T, TP>> action, bool position);
         /// <summary>
         /// Reorder by string
         /// </summary>

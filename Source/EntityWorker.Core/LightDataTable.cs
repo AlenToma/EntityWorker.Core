@@ -61,7 +61,7 @@ namespace EntityWorker.Core
         /// <param name="action"></param>
         /// <param name="position"></param>
         /// <returns></returns>
-        public ILightDataTable OrderBy<T, TP>(Expression<Func<T, TP>> action, bool position) where T : class
+        public ILightDataTable OrderBy<T, TP>(Expression<Func<T, TP>> action, bool position)
         {
             var member = (MemberExpression)action.Body;
             var columnName = member.Member.Name;
@@ -172,7 +172,7 @@ namespace EntityWorker.Core
         /// <typeparam name="TP"></typeparam>
         /// <param name="action"></param>
         /// <returns></returns>
-        public ILightDataTable RemoveColumn<T, TP>(Expression<Func<T, TP>> action) where T : class
+        public ILightDataTable RemoveColumn<T, TP>(Expression<Func<T, TP>> action)
         {
             var member = (MemberExpression)action.Body;
             var propertyName = member.Member.Name;
