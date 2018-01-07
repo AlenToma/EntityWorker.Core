@@ -57,8 +57,11 @@ let's start building our models, lets build a simple models User
     // Table attribute indicate that the object Name differ from the database table Name
     [Table("Users")]
     [Rule(typeof(UserRule))]
-    public class User : DbEntity
+    public class User
     {
+        [PrimaryId]
+        public Guid Id { get; set; }
+    
         public string UserName { get; set; }
         
        
@@ -85,15 +88,21 @@ let's start building our models, lets build a simple models User
     }
     
     [Table("Roles")]
-    public class Role : DbEntity
+    public class Role
     {
+        [PrimaryId]
+        public Guid Id { get; set; }
+        
         public string Name { get; set; }
 
         public List<User> Users { get; set; }
     }
     
-    public class Address : DbEntity
+    public class Address
     {
+        [PrimaryId]
+        public Guid Id { get; set; }
+        
         public string AddressName { get; set; }
         // in the User class we have a list of adresses, EntityWorker.Core will do an inner join and load the address 
         // if its included in the quarry
@@ -120,10 +129,10 @@ let's start building our models, lets build a simple models User
         public void AfterSave(IRepository repository, User itemDbEntity, long objectId)
         {
             // lets do some changes here, when the item have updated..
-            itemDbEntity.Password = MethodHelper.EncodeStringToBase64(itemDbEntity.Password);
+              itemDbEntity.Password = MethodHelper.EncodeStringToBase64(itemDbEntity.Password);
             // and now we want to save this change to the database 
-            itemDbEntity.State = ItemState.Changed;
             // the EntityWorker.Core will now know that it need to update the database agen.
+            // it will detect the changes that has been made to the current object
         }
     }
 
@@ -301,6 +310,7 @@ There is many attributes you could use to make your code better
 
 /// <summary>
 /// Property is a primary key
+/// PrimaryId could be System.String, System.Guid or number eg long and int
 /// </summary>
 [PrimaryKey]
 
