@@ -6,6 +6,10 @@
 ## EntityWorker.Core in Action
 [LightData.CMS](https://github.com/AlenToma/LightData.CMS)
 
+## Update in >= 1.2.5
+DbEntity is Removed now, you dont have to inherit from it anymore.
+this is so you could use the object in other project without refering to EntityWorker.Core. 
+
 ## .NET FRAMEWORK SUPPORT 
 1- .NETCoreApp 2.0
 
@@ -201,6 +205,31 @@ It depends on primarykey, Id>0 to update and Id<=0 to insert.
    }
 
 ```
+## ObjectChanges
+lets se how EntityWorker will get the object changes 
+```csharp
+        using (var rep = new Repository())
+            {
+                //var m = rep.Get<User>().
+                var user = rep.Get<User>().LoadChildren().ExecuteFirstOrDefault();
+                user.UserName = "hahahadfsfddfsdfhaha";
+                var changes = rep.GetObjectChanges(person); 
+                var oldValue = changes.First().OldValue;
+                var newValue = changes.First().NewValue;
+                var propertyName = changes.First().PropertyName;
+                rep.Save(user);
+                var changes2 = rep.GetObjectChanges(person);
+                rep.SaveChanges();
+                var changes3 = rep.GetObjectChanges(person);
+            }
+
+
+
+
+
+
+´´´
+
 ## LinqToSql Result Example
 lets test and se how EntityWorker.Core LinqToSql generator looks like.
 will do a very painful quarry and se how it gets parsed.
