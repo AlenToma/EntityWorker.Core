@@ -43,9 +43,7 @@ EntityWorker.Core.GlobalConfiguration.DataEncode_Key = "the key used to Encode t
 
 /// Last set the culture for converting the data
 EntityWorker.Core.GlobalConfiguration.CultureInfo = new CultureInfo("en");
-
 ```
-
 let's start by creating the dbContext, lets call it Repository
 ```csharp
     // Here we inherit from Transaction which contains the database logic for handling the transaction.
@@ -68,7 +66,6 @@ let's start by creating the dbContext, lets call it Repository
           else
             return  @"Data Source=D:\Projects\CMS\source\App_Data\CMS.db";
         }
-
     }
 ```
 let's start building our models, lets build a simple models User
