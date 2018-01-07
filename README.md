@@ -1,12 +1,14 @@
-# Introduction EntityWorker.Core
-## Nuget
-https://www.nuget.org/packages/EntityWorker.Core/
+# Introduction [EntityWorker.Core](https://www.nuget.org/packages/EntityWorker.Core/)
 
 ## CodeProject
-https://www.codeproject.com/Tips/1222424/EntityWorker-Core-An-Alternative-to-Entity-Framewo
+[EntityWorker-Core-An-Alternative-to-Entity-Framewo](https://www.codeproject.com/Tips/1222424/EntityWorker-Core-An-Alternative-to-Entity-Framewo)
 
 ## EntityWorker.Core in Action
-https://github.com/AlenToma/LightData.CMS
+[LightData.CMS](https://github.com/AlenToma/LightData.CMS)
+
+## Update in >= 1.2.5
+DbEntity is Removed now, you dont have to inherit from it anymore.
+this is so you could use the object in other project without refering to EntityWorker.Core. 
 
 ## .NET FRAMEWORK SUPPORT 
 1- .NETCoreApp 2.0
@@ -29,33 +31,56 @@ EntityWorker.Core has its own provider called ISqlQueryable, which could handle 
 EndWith Containe and so on
 Se Code Example for more info.
 ## Code Example
-let's start by creating the dbContext, lets call it Repository
+Configurate GlobalConfiguration. 
+```csharp
+// In Application_Start
+// Those two setting is for DataEnode Attribute
+/// Set the key size for dataEncoding 128 or 256 Default is 128
+EntityWorker.Core.GlobalConfiguration.DataEncode_Key_Size = DataCipherKeySize.Key_128;
+
+/// Set the secret key for encoding Default is "EntityWorker.Default.Key.Pass"
+EntityWorker.Core.GlobalConfiguration.DataEncode_Key = "the key used to Encode the data ";
+
+/// Last set the culture for converting the data
+EntityWorker.Core.GlobalConfiguration.CultureInfo = new CultureInfo("en");
 ```
+let's start by creating the dbContext, lets call it Repository
+```csharp
     // Here we inherit from Transaction which contains the database logic for handling the transaction.
     // well thats all we need right now.
     public class Repository : Transaction
     {
         // there is two databases types mssql and Sqllight
         // then true or false for migration
-        public Repository() : base(GetConnectionString(), true, DataBaseTypes.Mssql) { }
-
-        // get the full connection string from the web-config
-        public static string GetConnectionString()
-        {
-            return ConfigurationManager.ConnectionStrings["Db-connection"].ConnectionString;
+        public Repository(DataBaseTypes dbType = DataBaseTypes.Mssql) : 
+        base(GetConnectionString(dbType), true, dbType) 
+        { 
+        
         }
 
+        // get the full connection string
+        public static string GetConnectionString(DataBaseTypes dbType)
+        {
+          if (dbType == DataBaseTypes.Mssql)
+            return  @"Server=.\SQLEXPRESS; Database=CMS; User Id=root; Password=root;";
+          else
+            return  @"Data Source=D:\Projects\CMS\source\App_Data\CMS.db";
+        }
     }
 ```
 let's start building our models, lets build a simple models User
-```
+```csharp
     // Table attribute indicate that the object Name differ from the database table Name
     [Table("Users")]
     [Rule(typeof(UserRule))]
-    public class User : DbEntity
+    public class User
     {
+        [PrimaryId]
+        public Guid Id { get; set; }
+    
         public string UserName { get; set; }
-
+        
+       
         public string Password { get; set; }
         
         // Here we indicate that this attribute its a ForeignKey to object Role.
@@ -79,15 +104,21 @@ let's start building our models, lets build a simple models User
     }
     
     [Table("Roles")]
-    public class Role : DbEntity
+    public class Role
     {
+        [PrimaryId]
+        public Guid Id { get; set; }
+        
         public string Name { get; set; }
 
         public List<User> Users { get; set; }
     }
     
-    public class Address : DbEntity
+    public class Address
     {
+        [PrimaryId]
+        public Guid Id { get; set; }
+        
         public string AddressName { get; set; }
         // in the User class we have a list of adresses, EntityWorker.Core will do an inner join and load the address 
         // if its included in the quarry
@@ -114,17 +145,17 @@ let's start building our models, lets build a simple models User
         public void AfterSave(IRepository repository, User itemDbEntity, long objectId)
         {
             // lets do some changes here, when the item have updated..
-            itemDbEntity.Password = MethodHelper.EncodeStringToBase64(itemDbEntity.Password);
+              itemDbEntity.Password = MethodHelper.EncodeStringToBase64(itemDbEntity.Password);
             // and now we want to save this change to the database 
-            itemDbEntity.State = ItemState.Changed;
             // the EntityWorker.Core will now know that it need to update the database agen.
+            // it will detect the changes that has been made to the current object
         }
     }
 
 ```
 ## Quarry and Expression
 Lets build some expression here and se how it works
-```   
+```csharp
    using (var rep = new Repository())
    {
         // LoadChildren indicate to load all children herarkie.
@@ -151,7 +182,7 @@ Lets build some expression here and se how it works
 ## Edit, delete and insert
 EntityWorker.Core have only one method for insert and update.
 It depends on primarykey, Id>0 to update and Id<=0 to insert.
-```
+```csharp
    using (var rep = new Repository())
    {
         var users = rep.Get<User>().Where(x => 
@@ -186,10 +217,35 @@ It depends on primarykey, Id>0 to update and Id<=0 to insert.
    }
 
 ```
+## ObjectChanges
+lets se how EntityWorker will get the object changes 
+```csharp
+        using (var rep = new Repository())
+            {
+                //var m = rep.Get<User>().
+                var user = rep.Get<User>().LoadChildren().ExecuteFirstOrDefault();
+                user.UserName = "hahahadfsfddfsdfhaha";
+                var changes = rep.GetObjectChanges(person); 
+                var oldValue = changes.First().OldValue;
+                var newValue = changes.First().NewValue;
+                var propertyName = changes.First().PropertyName;
+                rep.Save(user);
+                var changes2 = rep.GetObjectChanges(person);
+                rep.SaveChanges();
+                var changes3 = rep.GetObjectChanges(person);
+            }
+
+
+
+
+
+
+´´´
+
 ## LinqToSql Result Example
 lets test and se how EntityWorker.Core LinqToSql generator looks like.
 will do a very painful quarry and se how it gets parsed.
-```
+```csharp
             using (var rep = new Repository())
             {
                ISqlQueriable<User> users = rep.Get<User>().Where(x =>
@@ -217,7 +273,7 @@ will do a very painful quarry and se how it gets parsed.
 
 ## Migration
 EntityWorker.Core has its own Migration methods, so lets se down here how it work.
-```
+```csharp
    //Create Class and call it IniMigration and inhert from Migration
    public class IniMigration : Migration
         public IniMigration()
@@ -265,7 +321,7 @@ EntityWorker.Core has its own Migration methods, so lets se down here how it wor
 ```
 ## Attributes 
 There is many attributes you could use to make your code better
-```
+```csharp
 /// <summary>
 /// This indicates that the prop will not be saved to the database.
 /// </summary>
@@ -295,6 +351,7 @@ There is many attributes you could use to make your code better
 
 /// <summary>
 /// Property is a primary key
+/// PrimaryId could be System.String, System.Guid or number eg long and int
 /// </summary>
 [PrimaryKey]
 
@@ -328,9 +385,12 @@ There is many attributes you could use to make your code better
 [DefaultOnEmpty]
 
  /// <summary>
- /// Choose to protect the data in the database so no one could read or decript it without knowing the key
+ /// Choose to protect a property in the database so no one could read or decript it without knowing the key
  /// LinqToSql will also Encode the value when you select a Search
  /// <Example>
+ /// [DataEncode]
+ /// public string Password { get; set;}
+ /// now when we search
  /// .Where(x=> x.Password == "test") Will be equal to .Where(x=> x.Password == Encode("test"))
  /// so no need to worry when you search those column in the dataBase 
  /// you could Encode Adress, bankAccount information and so on with ease
