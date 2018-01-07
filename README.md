@@ -8,7 +8,8 @@
 
 ## Update in >= 1.2.5
 DbEntity is Removed now, you dont have to inherit from it anymore.
-this is so you could use the object in other project without refering to EntityWorker.Core. 
+this is so you could use the objects in other project without refering to EntityWorker.Core. 
+Make also sure to read about GlobalConfiguration
 
 ## .NET FRAMEWORK SUPPORT 
 1- .NETCoreApp 2.0
