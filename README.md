@@ -31,10 +31,10 @@ EntityWorker.Core has its own provider called ISqlQueryable, which could handle 
 EndWith Containe and so on
 Se Code Example for more info.
 ## Code Example
-Configurate GlobalConfiguration
+Configurate GlobalConfiguration. 
 ```csharp
 // In Application_Start
-those setting is for DataEnode Attribute
+// Those two setting is for DataEnode Attribute
 /// Set the key size for dataEncoding 128 or 256 Default is 128
 EntityWorker.Core.GlobalConfiguration.DataEncode_Key_Size = DataCipherKeySize.Key_128;
 
