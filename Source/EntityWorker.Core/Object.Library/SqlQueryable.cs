@@ -4,7 +4,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using EntityWorker.Core.Interface;
-using EntityWorker.Core.InterFace;
 using EntityWorker.Core.SqlQuerys;
 using EntityWorker.Core.Helper;
 
@@ -18,12 +17,14 @@ namespace EntityWorker.Core.Object.Library
     {
         private readonly Transaction.Transaction _repository;
         private readonly List<string> _ignoreActions = new List<string>();
-        private readonly LightDataLinqToNoSql _expression = new LightDataLinqToNoSql(typeof(T));
+        private LightDataLinqToNoSql _expression = new LightDataLinqToNoSql(typeof(T));
         private bool _executed = false;
         private readonly bool _partExecuted = false;
         private readonly List<Expression<Func<T, object>>> _childrenToLoad = new List<Expression<Func<T, object>>>();
         private bool? _landholderOnlyFirstLevel;
         private readonly List<Expression> _matches = new List<Expression>();
+
+        public IQueryProvider Provider => _repository;
 
         internal SqlQueryable(Transaction.Transaction repository, List<T> items)
         {
@@ -174,11 +175,6 @@ namespace EntityWorker.Core.Object.Library
             return this;
         }
 
-        public IQueryProvider Provider => _repository;
-
-
-
-
         /// <summary>
         /// Execute the search Command
         /// </summary>
@@ -230,7 +226,9 @@ namespace EntityWorker.Core.Object.Library
             else
             {
                 var result = new List<T>();
+
                 _expression.DataBaseTypes = _repository.DataBaseTypes;
+
                 foreach (var exp in _matches)
                     _expression.Translate(exp);
                 ParsedLinqToSql = _expression.Quary;
@@ -294,6 +292,7 @@ namespace EntityWorker.Core.Object.Library
             foreach (var exp in _matches)
                 _expression.Translate(exp);
             ParsedLinqToSql = _expression.Count;
+            _expression = new LightDataLinqToNoSql(typeof(T));// reset
             var cmd = _repository.GetSqlCommand(ParsedLinqToSql);
             return _repository.ExecuteScalar(cmd).ConvertValue<int>();
         }
@@ -314,7 +313,6 @@ namespace EntityWorker.Core.Object.Library
         /// <returns></returns>
         public ISqlQueryable<T> Save()
         {
-
             foreach (var item in Execute())
                 _repository.Save(item);
             return this;
@@ -338,11 +336,12 @@ namespace EntityWorker.Core.Object.Library
         /// You have to trigger SaveChanges() to commit
         /// </summary>
         /// <returns></returns>
-        public void Remove()
+        public ISqlQueryable<T> Remove()
         {
             foreach (var item in Execute())
                 _repository.Delete(item);
             this.Clear();
+            return this;
         }
 
         /// <summary>
@@ -350,7 +349,7 @@ namespace EntityWorker.Core.Object.Library
         /// You have to trigger SaveChanges() to commit
         /// </summary>
         /// <returns></returns>
-        public void RemoveAll(Func<T, bool> match)
+        public ISqlQueryable<T> RemoveAll(Func<T, bool> match)
         {
             foreach (var item in Execute().Where(match))
             {
@@ -359,6 +358,8 @@ namespace EntityWorker.Core.Object.Library
             }
             foreach (var item in Execute().Where(match))
                 base.Remove(item);
+
+            return this;
         }
 
         /// <summary>

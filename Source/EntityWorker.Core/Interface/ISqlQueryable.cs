@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using EntityWorker.Core.InterFace;
 
 namespace EntityWorker.Core.Interface
 {
@@ -139,14 +137,14 @@ namespace EntityWorker.Core.Interface
         /// You have to trigger SaveChanges() to commit
         /// </summary>
         /// <returns></returns>
-        void Remove();
+        ISqlQueryable<T> Remove();
 
         /// <summary>
         /// Remove All objects herarkie. 
         /// You have to trigger SaveChanges() to commit
         /// </summary>
         /// <returns></returns>
-        void RemoveAll(Func<T, bool> match);
+        ISqlQueryable<T> RemoveAll(Func<T, bool> match);
 
         /// <summary>
         /// Commit Changes

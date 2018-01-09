@@ -130,7 +130,6 @@ namespace EntityWorker.Core.SqlQuerys
         public void Translate(Expression expression)
         {
             this.sb = new StringBuilder();
-            WhereClause = new List<string>();
             this.Visit(expression);
             validateBinaryExpression(null, null);
             WhereClause.Add(this.sb.ToString());

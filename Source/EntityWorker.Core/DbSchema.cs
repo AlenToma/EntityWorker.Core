@@ -262,8 +262,8 @@ namespace EntityWorker.Core
             var props = DeepCloner.GetFastDeepClonerProperties(type);
             var table = "[" + (type.GetCustomAttribute<Table>()?.Name ?? type.Name) + "]";
             var primaryKey = o.GetType().GetPrimaryKey();
-            var primaryKeyValue = primaryKey.GetValue(o).ConvertValue<long>();
-            if (primaryKeyValue <= 0)
+            var primaryKeyValue = o.GetPrimaryKeyValue();
+            if (primaryKeyValue.ObjectIsNew())
                 return new List<string>();
             var sql = new List<string>() { "DELETE " + (_repository.DataBaseTypes == DataBaseTypes.Sqllight ? "From " : "") + table + Querys.Where(_repository.DataBaseTypes).Column(primaryKey.GetPropertyName()).Equal(primaryKeyValue).Execute() };
 
@@ -366,7 +366,7 @@ namespace EntityWorker.Core
                 object dbTrigger = null;
                 if (objectRules != null && !CachedIDbRuleTrigger.ContainsKey(o.GetType()))
                 {
-                    dbTrigger = objectRules.RuleType.CreateInstance();
+                    dbTrigger = objectRules.RuleType.CreateInstance(true);
                     CachedIDbRuleTrigger.Add(o.GetType(), dbTrigger);
                 }
                 else if (objectRules != null)
@@ -675,6 +675,7 @@ namespace EntityWorker.Core
 
                 }
                 CachedObjectColumn.Clear();
+                Extension.CachedDataRecord.Clear();
             }
             catch
             {
@@ -724,6 +725,8 @@ namespace EntityWorker.Core
                         {
 
                             CachedObjectColumn.Remove(tType);
+                            if (Extension.CachedDataRecord.ContainsKey(tType))
+                                Extension.CachedDataRecord.Remove(tType);
                             var tableName = tType.GetCustomAttribute<Table>()?.Name ?? tType.Name;
                             _repository.ExecuteNonQuery(_repository.GetSqlCommand("DELETE FROM [" + tableName + "];"));
                             var cmd = _repository.GetSqlCommand("DROP TABLE [" + tableName + "];");

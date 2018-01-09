@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Runtime.Serialization;
 using System.Text;
 using EntityWorker.Core.Attributes;
@@ -12,6 +13,8 @@ using EntityWorker.Core.Interface;
 using EntityWorker.Core.InterFace;
 using EntityWorker.Core.Object.Library;
 using FastDeepCloner;
+using Microsoft.CSharp;
+using static EntityWorker.Core.Events;
 
 namespace EntityWorker.Core.Helper
 {
@@ -315,9 +318,9 @@ namespace EntityWorker.Core.Helper
         /// <param name="uninitializedObject"> true for FormatterServices.GetUninitializedObject and false for Activator.CreateInstance </param>
         /// <returns></returns>
 
-        public static object CreateInstance(this Type type, bool uninitializedObject = true)
+        public static object CreateInstance(this Type type, bool uninitializedObject = false)
         {
-            return uninitializedObject ? FormatterServices.GetUninitializedObject(type) : FastDeepCloner.DeepCloner.CreateInstance(type);
+            return uninitializedObject ? FormatterServices.GetUninitializedObject(type) : DeepCloner.CreateInstance(type);
         }
 
 
@@ -475,23 +478,31 @@ namespace EntityWorker.Core.Helper
             return ((List<T>)DataReaderConverter(repository, reader, command, typeof(T)));
         }
 
-
+        internal static Dictionary<Type, DynamicBuilder> CachedDataRecord = new Dictionary<Type, DynamicBuilder>();
         internal static IList DataReaderConverter(Transaction.Transaction repository, IDataReader reader, DbCommandExtended command, Type type)
         {
             var tType = type.GetActualType();
             var baseListType = typeof(List<>);
             var listType = baseListType.MakeGenericType(tType);
             var iList = DeepCloner.CreateInstance(listType) as IList;
+#if (NETSTANDARD2_0 || NETSTANDARD1_3 || NETSTANDARD1_5)
             var props = DeepCloner.GetFastDeepClonerProperties(tType);
+#endif
             try
             {
                 while (reader.Read())
                 {
-                    var item = DeepCloner.CreateInstance(tType);
-                    var clItem = DeepCloner.CreateInstance(tType);
+                    object item = null;
+                    object clItem = null;
+#if (NETSTANDARD2_0 || NETSTANDARD1_3 || NETSTANDARD1_5)
+
+                    item = DeepCloner.CreateInstance(tType);
+                    clItem = DeepCloner.CreateInstance(tType);
                     var col = 0;
+
                     while (col < reader.FieldCount)
                     {
+
                         var columnName = reader.GetName(col);
                         var value = reader[columnName];
 
@@ -519,10 +530,18 @@ namespace EntityWorker.Core.Helper
                         }
                         col++;
                     }
+#else
+                    var cmReader = new DataRecordExtended(reader);
+                    lock (CachedDataRecord)
+                        if (!CachedDataRecord.ContainsKey(tType))
+                            CachedDataRecord.Add(tType, DynamicBuilder.CreateBuilder(cmReader, tType));
+                    var x = CachedDataRecord[tType];
+                    item = x.Build(cmReader);
+                    clItem = !(repository?.IsAttached(item) ?? true) ? x.Build(cmReader) : null;
+#endif
 
-                    if (!repository?.IsAttached(clItem) ?? true)
+                    if (clItem != null && !(repository?.IsAttached(clItem) ?? true))
                         repository?.AttachNew(clItem);
-
                     iList.Add(item);
 
                 }
@@ -623,6 +642,7 @@ namespace EntityWorker.Core.Helper
                 reader.Close();
                 reader.Dispose();
             }
+
             return data;
         }
     }

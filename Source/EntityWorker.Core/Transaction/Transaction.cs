@@ -128,6 +128,7 @@ namespace EntityWorker.Core.Transaction
                     var name = migration.GetType().FullName + migration.MigrationIdentifier;
                     if (Get<DBMigration>().Where(x => x.Name == name).ExecuteAny())
                         continue;
+                   
                     var item = new DBMigration
                     {
                         Name = name,
@@ -135,6 +136,7 @@ namespace EntityWorker.Core.Transaction
                     };
                     migration.ExecuteMigration(this);
                     this.Save(item);
+
                 }
                 SaveChanges();
             }
@@ -156,7 +158,7 @@ namespace EntityWorker.Core.Transaction
         /// <summary>
         /// Validate Connection is Open or broken
         /// </summary>
-        public void ValidateConnection()
+        protected void ValidateConnection()
         {
             if (SqlConnection == null)
             {
@@ -189,12 +191,23 @@ namespace EntityWorker.Core.Transaction
             return Trans;
         }
 
-
+        /// <summary>
+        /// Convert to known object
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="command"></param>
+        /// <returns></returns>
         public List<T> DataReaderConverter<T>(DbCommandExtended command)
         {
             return ((List<T>)DataReaderConverter(command, typeof(T)));
         }
 
+        /// <summary>
+        /// Convert to unknown type
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public IList DataReaderConverter(DbCommandExtended command, Type type)
         {
             IList result;
@@ -302,7 +315,7 @@ namespace EntityWorker.Core.Transaction
                 type = typeof(long);
             try
             {
-                var param = new SqlParameter("", type == typeof(byte[]) ? new byte[0] : type.CreateInstance());
+                var param = new SqlParameter("", type == typeof(byte[]) ? new byte[0] : type.CreateInstance(true));
                 return param.SqlDbType;
             }
             catch
