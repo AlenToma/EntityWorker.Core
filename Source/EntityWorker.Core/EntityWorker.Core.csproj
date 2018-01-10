@@ -3,9 +3,9 @@
     <TargetFrameworks>netcoreapp2.0;netstandard2.0;net461;net451;net46;</TargetFrameworks>
     <PackageId>EntityWorker.Core</PackageId>
     <AssemblyName>EntityWorker.Core</AssemblyName>
-    <AssemblyVersion>1.0.2.7</AssemblyVersion>
-    <FileVersion>1.0.2.7</FileVersion>
-    <Version>1.2.7</Version>
+    <AssemblyVersion>1.0.2.9</AssemblyVersion>
+    <FileVersion>1.0.2.9</FileVersion>
+    <Version>1.2.9</Version>
     <Authors>Alen Toma</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageProjectUrl>https://github.com/AlenToma/EntityWorker.Core</PackageProjectUrl>
@@ -18,7 +18,7 @@
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <!--<TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeP2POutput;</TargetsForTfmSpecificBuildOutput>-->
     <!--<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);CustomContentTarget</TargetsForTfmSpecificContentInPackage>-->
-    <PackageReleaseNotes></PackageReleaseNotes>
+    <PackageReleaseNotes>Smal fixes to Sqlite</PackageReleaseNotes>
   </PropertyGroup>
 
   <!--<ItemGroup Condition="'$(Configuration)'=='Release'">
@@ -50,9 +50,6 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
-    <PackageReference Include="System.CodeDom">
-      <Version>4.4.0</Version>
-    </PackageReference>
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net451'">

@@ -9,7 +9,7 @@ namespace EntityWorker.Core.Object.Library
         private IDataRecord _record;
 
         public int FieldCount => _record.FieldCount;
-        public object this[int index, string dataEnoderKey, string dataEncodeSize, int toBase64, string propertyType, string dbType]
+        public object this[int index, string dataEnoderKey, string dataEncodeSize, int toBase64, string propertyType, string dbType, string propetyTypeFullName]
         {
             get
             {
@@ -23,9 +23,10 @@ namespace EntityWorker.Core.Object.Library
                     }
                     else if (dataEncodeSize != "")
                         value = new DataCipher(dataEnoderKey, dataEncodeSize.ConvertValue<DataCipherKeySize>()).Decrypt(value.ToString());
-                    else if (value is DBNull || propertyType != dbType) value = value.ConvertValue(GetFieldType(index));
+                    else if (value is DBNull || propertyType != dbType)
+                        value = value.ConvertValue(Type.GetType(propetyTypeFullName) ?? GetFieldType(index));
                 }
-                else if (value is DBNull || propertyType != dbType) value = value.ConvertValue(GetFieldType(index));
+                else if (value is DBNull || propertyType != dbType) value = value.ConvertValue(Type.GetType(propetyTypeFullName) ?? GetFieldType(index));
 
                 return value;
             }

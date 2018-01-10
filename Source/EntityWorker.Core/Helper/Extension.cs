@@ -56,6 +56,14 @@ namespace EntityWorker.Core.Helper
             {typeof(char), "NVARCHAR(10)"},
         };
 
+
+
+        public static string GetMemberName<T, TP>(this Expression<Func<T, TP>> action)
+        {
+            var member = action.Body is UnaryExpression ? ((MemberExpression)((UnaryExpression)action.Body).Operand) : (action.Body is MethodCallExpression ? ((MemberExpression)((MethodCallExpression)action.Body).Object) : (MemberExpression)action.Body);
+            return member?.Member.Name;
+        }
+
         /// <summary>
         /// Clear all ids
         /// </summary>
@@ -262,6 +270,11 @@ namespace EntityWorker.Core.Helper
                 }
             }
             return CachedPrimaryKeys[type];
+        }
+
+        public static String TableName<T>()
+        {
+            return typeof(T).GetCustomAttribute<Table>()?.Name ?? typeof(T).Name;
         }
 
         /// <summary>

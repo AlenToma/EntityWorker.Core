@@ -11,7 +11,7 @@ namespace EntityWorker.Core.Object.Library
     internal class DynamicBuilder
     {
 #if !(NETSTANDARD2_0 || NETSTANDARD1_3 || NETSTANDARD1_5)
-        private static readonly MethodInfo getValueMethod = typeof(DataRecordExtended).GetMethod("get_Item", new Type[] { typeof(int), typeof(string), typeof(string), typeof(int), typeof(string), typeof(string) });
+        private static readonly MethodInfo getValueMethod = typeof(DataRecordExtended).GetMethod("get_Item", new Type[] { typeof(int), typeof(string), typeof(string), typeof(int), typeof(string), typeof(string), typeof(string) });
         private delegate object Load(DataRecordExtended dataRecord);
         private Load handler;
 
@@ -69,9 +69,11 @@ namespace EntityWorker.Core.Object.Library
 
                     generator.Emit(OpCodes.Ldstr, dataRecord.GetFieldType(i).ToString());
 
+                    generator.Emit(OpCodes.Ldstr, prop.PropertyType.AssemblyQualifiedName);
+
                     generator.Emit(OpCodes.Callvirt, getValueMethod);
 
-                    generator.Emit(OpCodes.Unbox_Any, dataRecord.GetFieldType(i));
+                    generator.Emit(OpCodes.Unbox_Any, prop.PropertyType);
                     generator.Emit(OpCodes.Callvirt, prop.PropertySetValue);
                 }
             }

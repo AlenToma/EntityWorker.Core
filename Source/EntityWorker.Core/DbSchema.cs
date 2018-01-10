@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using EntityWorker.Core.Attributes;
@@ -19,7 +18,7 @@ namespace EntityWorker.Core
 {
     internal class DbSchema
     {
-        private static readonly Dictionary<Type, ILightDataTable> CachedObjectColumn = new Dictionary<Type, ILightDataTable>();
+        private static readonly Dictionary<string, ILightDataTable> CachedObjectColumn = new Dictionary<string, ILightDataTable>();
 
         private static readonly Dictionary<Type, object> CachedIDbRuleTrigger = new Dictionary<Type, object>();
 
@@ -36,8 +35,9 @@ namespace EntityWorker.Core
 
         public ILightDataTable ObjectColumns(Type type)
         {
-            if (CachedObjectColumn.ContainsKey(type))
-                return CachedObjectColumn[type];
+            var key = type.FullName + _repository.DataBaseTypes.ToString();
+            if (CachedObjectColumn.ContainsKey(key))
+                return CachedObjectColumn[key];
             var table = type.GetCustomAttribute<Table>()?.Name ?? type.Name;
             var cmd = _repository.GetSqlCommand(_repository.DataBaseTypes == DataBaseTypes.Mssql
                 ? "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = N'" + table +
@@ -46,11 +46,11 @@ namespace EntityWorker.Core
             var data = _repository.GetLightDataTable(cmd, "COLUMN_NAME");
             if (data.Rows.Any())
             {
-                if (!CachedObjectColumn.ContainsKey(type))
-                    CachedObjectColumn.Add(type, data);
+                if (!CachedObjectColumn.ContainsKey(key))
+                    CachedObjectColumn.Add(key, data);
             }
             else return data;
-            return CachedObjectColumn[type];
+            return CachedObjectColumn[key];
 
         }
 
@@ -265,7 +265,7 @@ namespace EntityWorker.Core
             var primaryKeyValue = o.GetPrimaryKeyValue();
             if (primaryKeyValue.ObjectIsNew())
                 return new List<string>();
-            var sql = new List<string>() { "DELETE " + (_repository.DataBaseTypes == DataBaseTypes.Sqllight ? "From " : "") + table + Querys.Where(_repository.DataBaseTypes).Column(primaryKey.GetPropertyName()).Equal(primaryKeyValue).Execute() };
+            var sql = new List<string>() { "DELETE " + (_repository.DataBaseTypes == DataBaseTypes.Sqllight ? "From " : "") + table + Querys.Where(_repository.DataBaseTypes).Column(primaryKey.GetPropertyName()).Equal(string.Format("Guid[{0}]", primaryKeyValue), true).Execute() };
 
             foreach (var prop in props.Where(x => !x.IsInternalType && x.GetCustomAttribute<IndependentData>() == null && x.GetCustomAttribute<ExcludeFromAbstract>() == null))
             {
@@ -419,7 +419,7 @@ namespace EntityWorker.Core
                 else
                 {
                     sql += string.Join(",", cols.Select(x => "[" + x.GetPropertyName() + "]" + " = @" + x.GetPropertyName()));
-                    sql += Querys.Where(_repository.DataBaseTypes).Column(o.GetType().GetActualType().GetPrimaryKey().GetPropertyName()).Equal(primaryKeyId).Execute();
+                    sql += Querys.Where(_repository.DataBaseTypes).Column(o.GetType().GetActualType().GetPrimaryKey().GetPropertyName()).Equal(string.Format("Guid[{0}]", primaryKeyId), true).Execute();
                 }
 
                 var cmd = _repository.GetSqlCommand(sql);
@@ -467,10 +467,9 @@ namespace EntityWorker.Core
                     if (col.ContainAttribute<NotNullable>() && v == null && defaultOnEmpty == null)
                         throw new NoNullAllowedException(string.Format("Property {0} dose not allow null.", col.FullName));
 
-                    if (defaultOnEmpty != null && defaultOnEmpty.Value != null && defaultOnEmpty.Value.GetType() != col.PropertyType)
-                        throw new NoNullAllowedException(string.Format("Property {0} Contain wrong type of value inside DefaultOnEmpty attribute .", col.FullName));
+
                     if (v == null && defaultOnEmpty != null)
-                        v = defaultOnEmpty.Value;
+                        v = defaultOnEmpty.Value.ConvertValue(col.PropertyType);
 
                     _repository.AddInnerParameter(cmd, col.GetPropertyName(), v, (col.ContainAttribute<StringFy>() || col.ContainAttribute<DataEncode>() || col.ContainAttribute<ToBase64String>() ? _repository.GetSqlType(typeof(string)) : _repository.GetSqlType(col.PropertyType)));
                 }
@@ -724,14 +723,14 @@ namespace EntityWorker.Core
                         if (ObjectColumns(tType).Rows.Any())
                         {
 
-                            CachedObjectColumn.Remove(tType);
+                            CachedObjectColumn.Remove(tType.FullName + _repository.DataBaseTypes.ToString());
                             if (Extension.CachedDataRecord.ContainsKey(tType))
                                 Extension.CachedDataRecord.Remove(tType);
                             var tableName = tType.GetCustomAttribute<Table>()?.Name ?? tType.Name;
                             _repository.ExecuteNonQuery(_repository.GetSqlCommand("DELETE FROM [" + tableName + "];"));
                             var cmd = _repository.GetSqlCommand("DROP TABLE [" + tableName + "];");
                             _repository.ExecuteNonQuery(cmd);
-                            CachedObjectColumn.Remove(tType);
+                            CachedObjectColumn.Remove(tType.FullName + _repository.DataBaseTypes.ToString());
                         }
                         c--;
                     }

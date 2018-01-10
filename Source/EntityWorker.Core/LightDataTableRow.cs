@@ -162,8 +162,7 @@ namespace EntityWorker.Core
         /// <returns></returns>
         public TP SetTValue<T, TP>(Expression<Func<T, TP>> action, TP value)
         {
-            var member = action.Body is UnaryExpression ? ((MemberExpression)((UnaryExpression)action.Body).Operand) : (action.Body is MethodCallExpression ? ((MemberExpression)((MethodCallExpression)action.Body).Object) : (MemberExpression)action.Body);
-            var key = member?.Member.Name;
+            var key = action.GetMemberName();
             return (TP)(this[key] = value);
 
         }
@@ -200,8 +199,7 @@ namespace EntityWorker.Core
         /// <returns></returns>
         public TP Value<T, TP>(Expression<Func<T, TP>> action)
         {
-            var member = action.Body is UnaryExpression ? ((MemberExpression)((UnaryExpression)action.Body).Operand) : (action.Body is MethodCallExpression ? ((MemberExpression)((MethodCallExpression)action.Body).Object) : (MemberExpression)action.Body);
-            var propertyName = member?.Member.Name;
+            var propertyName = action.GetMemberName();
             var v = this[propertyName];
             TypeValidation(ref v, typeof(TP), true);
             return (TP)v;
@@ -338,8 +336,7 @@ namespace EntityWorker.Core
 
         public TP ValueAndConvert<T, TP>(Expression<Func<T, TP>> action)
         {
-            var member = action.Body is UnaryExpression ? ((MemberExpression)((UnaryExpression)action.Body).Operand) : (action.Body is MethodCallExpression ? ((MemberExpression)((MethodCallExpression)action.Body).Object) : (MemberExpression)action.Body);
-            var propertyName = member?.Member.Name;
+            var propertyName = action.GetMemberName();
             return (TP)ValueAndConvert<TP>(propertyName);
         }
 
@@ -392,7 +389,16 @@ namespace EntityWorker.Core
                     try
                     {
                         var v = property.GetValue(objectToBeMerged);
-                        TypeValidation(ref v, Columns[name].DataType, true);
+                        if (property.IsInternalType)
+                        {
+                            TypeValidation(ref v, Columns[name].DataType, true);
+
+                        }
+                        else if (v != null)
+                        {
+                            v = new LightDataTable(v);
+                        }
+
                         if (name != null && this[name] != v)
                             this[name] = v;
                     }
@@ -431,7 +437,20 @@ namespace EntityWorker.Core
                 try
                 {
                     var v = this[name];
-                    TypeValidation(ref v, prop.PropertyType, true);
+                    if (!(v is LightDataTable))
+                    {
+                        TypeValidation(ref v, prop.PropertyType, true);
+
+                    }
+                    else
+                    {
+                        var table = v as LightDataTable;
+                        if (table == null || !table.Rows.Any())
+                            continue;
+                        v = table.Rows.ToObject(prop.PropertyType);
+                        if (prop.PropertyType != prop.PropertyType.GetActualType())
+                            v = (v as IList)?.Cast<object>().FirstOrDefault();
+                    }
                     prop.SetValue(selectedObject, v);
                 }
                 catch
@@ -459,22 +478,34 @@ namespace EntityWorker.Core
                 if (!Columns.ContainsKey(name) || !pr.CanRead)
                     continue;
                 var value = this[name, true];
-
-                if (value != null && pr.ContainAttribute<ToBase64String>())
+                if (!(value is LightDataTable))
                 {
-                    if (value.ConvertValue<string>().IsBase64String())
+                    if (value != null && pr.ContainAttribute<ToBase64String>())
                     {
-                        value = MethodHelper.DecodeStringFromBase64(value.ConvertValue<string>());
+                        if (value.ConvertValue<string>().IsBase64String())
+                        {
+                            value = MethodHelper.DecodeStringFromBase64(value.ConvertValue<string>());
+                        }
                     }
+                    else if (value != null && pr.ContainAttribute<DataEncode>())
+                    {
+
+                        value = new DataCipher(pr.GetCustomAttribute<DataEncode>().Key, pr.GetCustomAttribute<DataEncode>().KeySize).Decrypt(value.ConvertValue<string>());
+
+                    }
+                    TypeValidation(ref value, pr.PropertyType, true);
                 }
-                else if (value != null && pr.ContainAttribute<DataEncode>())
+                else
                 {
-
-                    value = new DataCipher(pr.GetCustomAttribute<DataEncode>().Key, pr.GetCustomAttribute<DataEncode>().KeySize).Decrypt(value.ConvertValue<string>());
-
+                    var table = value as LightDataTable;
+                    if (table == null || !table.Rows.Any())
+                        continue;
+                    value = table.Rows.ToObject(pr.PropertyType);
+                    if (pr.PropertyType != pr.PropertyType.GetActualType())
+                        value = (value as IList)?.Cast<object>().FirstOrDefault();
                 }
 
-                TypeValidation(ref value, pr.PropertyType, true);
+
                 try
                 {
                     pr.SetValue(obj, value);
@@ -512,17 +543,30 @@ namespace EntityWorker.Core
                 if (!Columns.ContainsKey(name) || !pr.CanRead)
                     continue;
                 var value = this[name, true];
-                if (pr.ContainAttribute<ToBase64String>())
+                if (!(value is LightDataTable))
                 {
-                    if (value != null && value.ConvertValue<string>().IsBase64String())
+                    if (pr.ContainAttribute<ToBase64String>())
                     {
-                        value = MethodHelper.DecodeStringFromBase64(value.ConvertValue<string>());
+                        if (value != null && value.ConvertValue<string>().IsBase64String())
+                        {
+                            value = MethodHelper.DecodeStringFromBase64(value.ConvertValue<string>());
+                        }
                     }
-                }
-                else if (value != null && pr.ContainAttribute<DataEncode>())
-                    value = new DataCipher(pr.GetCustomAttribute<DataEncode>().Key, pr.GetCustomAttribute<DataEncode>().KeySize).Decrypt(value.ConvertValue<string>());
+                    else if (value != null && pr.ContainAttribute<DataEncode>())
+                        value = new DataCipher(pr.GetCustomAttribute<DataEncode>().Key, pr.GetCustomAttribute<DataEncode>().KeySize).Decrypt(value.ConvertValue<string>());
 
-                TypeValidation(ref value, pr.PropertyType, true);
+                    TypeValidation(ref value, pr.PropertyType, true);
+                }
+                else
+                {
+                    var table = value as LightDataTable;
+                    if (table == null || !table.Rows.Any())
+                        continue;
+                    value = table.Rows.ToObject(pr.PropertyType);
+                    if (pr.PropertyType != pr.PropertyType.GetActualType())
+                        value = (value as IList)?.Cast<object>().FirstOrDefault();
+                }
+
                 try
                 {
                     pr.SetValue(obj, value);
