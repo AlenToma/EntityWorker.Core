@@ -239,13 +239,7 @@ lets se how EntityWorker will get the object changes
                 var changes3 = rep.GetObjectChanges(person);
             }
 
-
-
-
-
-
-´´´
-
+```
 ## LinqToSql Result Example
 lets test and se how EntityWorker.Core LinqToSql generator looks like.
 will do a very painful quarry and se how it gets parsed.
