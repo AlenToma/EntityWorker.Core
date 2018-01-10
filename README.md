@@ -323,6 +323,33 @@ EntityWorker.Core has its own Migration methods, so lets se down here how it wor
     }
 
 ```
+## Entity Mappings
+Sometime we want to use diffrent module for database and presentation.
+And we want to be able to mapp and convert from one type to another.
+EntityWorker.Core have simliar functionality that could do just that with few lines.
+lets try casting User to user module with diffrent propertyNames in each classes
+```csharp
+using EntityWorker.Core.Helper;
+public class UserModule {
+/// se here we mapped Name to UserName or we could just call the property UserName,
+/// then we wont need PropertyName Attribute
+[PropertyName("UserName")]
+public string Name { get; set; }
+
+[PropertyName("Password")]
+public string Key { get; set;}
+
+[PropertyName("Role")]
+public RoleModule UserGroup { get; set; }
+}
+
+var user =new List<User>(){ new User { UserName="test", Password="test", Role= new Role() }};
+
+var userModule = user.ToType<List<UserModule>>()
+//or for only first item 
+user.ToType<UserModule>() ;
+
+```
 ## Attributes 
 There is many attributes you could use to make your code better
 ```csharp
