@@ -91,7 +91,7 @@ let's start building our models, lets build a simple models User
         [ForeignKey(type: typeof(Role))]
         public long Role_Id { get; set; }
         
-        // when deleting an object the light database will try and delete all object that are connected to 
+        // when deleting an object the EntityWorker.Core will try and delete all object that are connected to 
         // by adding IndependentData we let the EntityWorker.Core to know that this object should not be automaticlly deleted
         // when we delete a User
         [IndependentData]
