@@ -467,7 +467,7 @@ namespace EntityWorker.Core
         /// <returns></returns>
         public T ToObject<T>()
         {
-            var o = FormatterServices.GetUninitializedObject(typeof(T));
+            var o = FormatterServices.GetUninitializedObject(typeof(T)) is IList ? typeof(T).CreateInstance() : FormatterServices.GetUninitializedObject(typeof(T));
             var obj = o is IList
                 ?
                     o.GetType().GetActualType().CreateInstance()
@@ -501,7 +501,7 @@ namespace EntityWorker.Core
                     if (table == null || !table.Rows.Any())
                         continue;
                     value = table.Rows.ToObject(pr.PropertyType);
-                    if (pr.PropertyType != pr.PropertyType.GetActualType())
+                    if (pr.PropertyType == pr.PropertyType.GetActualType())
                         value = (value as IList)?.Cast<object>().FirstOrDefault();
                 }
 
@@ -563,7 +563,7 @@ namespace EntityWorker.Core
                     if (table == null || !table.Rows.Any())
                         continue;
                     value = table.Rows.ToObject(pr.PropertyType);
-                    if (pr.PropertyType != pr.PropertyType.GetActualType())
+                    if (pr.PropertyType == pr.PropertyType.GetActualType())
                         value = (value as IList)?.Cast<object>().FirstOrDefault();
                 }
 

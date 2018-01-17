@@ -48,7 +48,7 @@ namespace EntityWorker.Core.Transaction
         /// </summary>
         protected DbConnection SqlConnection { get; private set; }
 
-        private static bool _tableMigrationCheck;
+        private static Dictionary<DataBaseTypes, bool> _tableMigrationCheck = new Dictionary<DataBaseTypes, bool>() { { DataBaseTypes.Mssql, false }, { DataBaseTypes.Sqllight, false } };
 
         /// <summary>
         /// Enable migrations
@@ -73,26 +73,88 @@ namespace EntityWorker.Core.Transaction
             DataBaseTypes = dataBaseTypes;
             _dbSchema = new DbSchema(this);
 
-#if DEBUG
-            _tableMigrationCheck = false;
-#endif
-
-            if (!_tableMigrationCheck && EnableMigration)
+            if (!_tableMigrationCheck[DataBaseTypes] && EnableMigration && DataBaseExist())
             {
-                lock (MigrationLocker)
+                IniMigration();
+                _tableMigrationCheck[DataBaseTypes] = true;
+            }
+
+        }
+
+        private void IniMigration()
+        {
+            lock (MigrationLocker)
+            {
+                this.CreateTable<DBMigration>(false);
+                this.SaveChanges();
+                var ass = this.GetType().Assembly;
+                IMigrationConfig config;
+                if (ass.DefinedTypes.Any(a => typeof(IMigrationConfig).IsAssignableFrom(a)))
+                    config = Activator.CreateInstance(ass.DefinedTypes.First(a => typeof(IMigrationConfig).IsAssignableFrom(a))) as IMigrationConfig;
+                else throw new Exception("EnableMigration is enabled but EntityWorker.Core could not find IMigrationConfig in the current Assembly " + ass.GetName());
+                MigrationConfig(config);
+            }
+        }
+
+        /// <summary>
+        /// Validate if database exist 
+        /// </summary>
+        /// <returns></returns>
+        protected bool DataBaseExist()
+        {
+            var sqlBuild = new SqlConnectionStringBuilder(ConnectionString);
+            var dbName = DataBaseTypes == DataBaseTypes.Mssql ? sqlBuild.InitialCatalog : sqlBuild.DataSource;
+            if (string.IsNullOrEmpty(dbName))
+                throw new Exception("InitialCatalog cant be null or empty");
+            if (DataBaseTypes == DataBaseTypes.Mssql)
+            {
+                sqlBuild.InitialCatalog = "master";
+                var tr = new Transaction(sqlBuild.ToString(), false, DataBaseTypes);
+                var cmd = tr.GetSqlCommand("SELECT  CAST(CASE WHEN db_id(String[" + dbName + "]) is not null THEN 1 ELSE 0 END AS BIT)");
+                return tr.ExecuteScalar(cmd).ConvertValue<bool>();
+            }
+            else
+            {
+                try
                 {
-                    this.CreateTable<DBMigration>(false);
-                    this.SaveChanges();
-                    var ass = this.GetType().Assembly;
-                    IMigrationConfig config;
-                    if (ass.DefinedTypes.Any(a => typeof(IMigrationConfig).IsAssignableFrom(a)))
-                        config = Activator.CreateInstance(ass.DefinedTypes.First(a => typeof(IMigrationConfig).IsAssignableFrom(a))) as IMigrationConfig;
-                    else throw new Exception("EnableMigration is enabled but EntityWorker.Core could not find IMigrationConfig in the current Assembly " + ass.GetName());
-                    MigrationConfig(config);
+                    var tr = new Transaction(sqlBuild.ToString(), false, DataBaseTypes);
+                    tr.ValidateConnection();
+                    return true;
+
+                }
+                catch (Exception ex)
+                {
+                    return false;
                 }
             }
-            _tableMigrationCheck = true;
         }
+
+        /// <summary>
+        /// Create DataBase if not exist
+        /// </summary>
+        protected void CreateDataBase()
+        {
+            if (DataBaseExist())
+                return;
+            var sqlBuild = new SqlConnectionStringBuilder(ConnectionString);
+            var dbName = DataBaseTypes == DataBaseTypes.Mssql ? sqlBuild.InitialCatalog : sqlBuild.DataSource;
+            if (string.IsNullOrEmpty(dbName))
+                throw new Exception("InitialCatalog cant be null or empty");
+            if (DataBaseTypes == DataBaseTypes.Mssql)
+            {
+                sqlBuild.InitialCatalog = "master";
+                var tr = new Transaction(sqlBuild.ToString(), false, DataBaseTypes);
+                var cmd = tr.GetSqlCommand("Create DataBase [" + dbName + "]");
+                tr.ExecuteNonQuery(cmd);
+                IniMigration();
+            }
+            else
+            {
+                SQLiteConnection.CreateFile(dbName);
+                IniMigration();
+            }
+        }
+
 
         /// <summary>
         /// Clone Items
@@ -128,7 +190,7 @@ namespace EntityWorker.Core.Transaction
                     var name = migration.GetType().FullName + migration.MigrationIdentifier;
                     if (Get<DBMigration>().Where(x => x.Name == name).ExecuteAny())
                         continue;
-                   
+
                     var item = new DBMigration
                     {
                         Name = name,

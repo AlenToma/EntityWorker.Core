@@ -10,3 +10,4 @@
 /Source/EntityWorker.Core/obj
 /Source/System.Data.Sqlite.Core/bin
 /Source/System.Data.Sqlite.Core/obj
+*.nupkg

@@ -20,12 +20,15 @@ namespace EntityWorker.Core.Object.Library
         private const int DerivationIterations = 1000;
         private string _passPhrase = GlobalConfiguration.DataEncode_Key;
 
+        private const string salt128 = "kljsdkkdlo4454GG";
+        private const string salt256 = "kljsdkkdlo4454GG00155sajuklmbkdl";
+
         public DataCipher(string passPhrase = null, DataCipherKeySize keySize = DataCipherKeySize.Key_128)
         {
             if (!string.IsNullOrEmpty(passPhrase?.Trim()))
                 _passPhrase = passPhrase;
             _Keysize = keySize == DataCipherKeySize.Key_256 ? 256 : 128;
-            saltStringBytes = _Keysize == 256 ? Encoding.UTF8.GetBytes("kljsdkkdlo4454GG00155sajuklmbkdl") : Encoding.UTF8.GetBytes("kljsdkkdlo4454GG");
+            saltStringBytes = _Keysize == 256 ? Encoding.UTF8.GetBytes(salt256) : Encoding.UTF8.GetBytes(salt128);
             ivStringBytes = _Keysize == 256 ? Encoding.UTF8.GetBytes("SSljsdkkdlo4454Maakikjhsd55GaRTP") : Encoding.UTF8.GetBytes("SSljsdkkdlo4454M");
         }
 
@@ -68,15 +71,23 @@ namespace EntityWorker.Core.Object.Library
         {
             if (!cipherText.IsBase64String())
                 return cipherText;
+            var cipherTextBytesWithSaltAndIv = Convert.FromBase64String(cipherText);
+            var v = Encoding.UTF8.GetString(cipherTextBytesWithSaltAndIv.Take(_Keysize / 8).ToArray());
+            if (v != salt256 && v != salt128)
+                return cipherText;
+
             // Get the complete stream of bytes that represent:
             // [32 bytes of Salt] + [32 bytes of IV] + [n bytes of CipherText]
-            var cipherTextBytesWithSaltAndIv = Convert.FromBase64String(cipherText);
+           
             // Get the saltbytes by extracting the first 32 bytes from the supplied cipherText bytes.
-            //var saltStringBytes = cipherTextBytesWithSaltAndIv.Take(_Keysize / 8).ToArray();
+            //var saltStringString = Encoding.UTF8.GetString(cipherTextBytesWithSaltAndIv.Take(_Keysize / 8).ToArray());
             //// Get the IV bytes by extracting the next 32 bytes from the supplied cipherText bytes.
             //var ivStringBytes = cipherTextBytesWithSaltAndIv.Skip(_Keysize / 8).Take(_Keysize / 8).ToArray();
             // Get the actual cipher text bytes by removing the first 64 bytes from the cipherText string.
             var cipherTextBytes = cipherTextBytesWithSaltAndIv.Skip((_Keysize / 8) * 2).Take(cipherTextBytesWithSaltAndIv.Length - ((_Keysize / 8) * 2)).ToArray();
+           
+
+         
 
             using (var password = new Rfc2898DeriveBytes(_passPhrase, saltStringBytes, DerivationIterations))
             {
