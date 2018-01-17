@@ -114,7 +114,7 @@ let's start building our models, lets build a simple models User
     public class Role
     {
         [PrimaryId]
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
         
         public string Name { get; set; }
 
