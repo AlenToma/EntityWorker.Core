@@ -83,7 +83,7 @@ let's start building our models, lets build a simple models User
     public class User
     {
         [PrimaryId]
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
     
         public string UserName { get; set; }
         
@@ -92,7 +92,7 @@ let's start building our models, lets build a simple models User
         
         // Here we indicate that this attribute its a ForeignKey to object Role.
         [ForeignKey(type: typeof(Role))]
-        public long Role_Id { get; set; }
+        public Guid Role_Id { get; set; }
         
         // when deleting an object the EntityWorker.Core will try and delete all object that are connected to 
         // by adding IndependentData we let the EntityWorker.Core to know that this object should not be automaticlly deleted
@@ -124,13 +124,13 @@ let's start building our models, lets build a simple models User
     public class Address
     {
         [PrimaryId]
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
         
         public string AddressName { get; set; }
         // in the User class we have a list of adresses, EntityWorker.Core will do an inner join and load the address 
         // if its included in the quarry
         [ForeignKey(typeof(User))]
-        public long User_Id { get; set; }
+        public Guid User_Id { get; set; }
     }
     
     // EntityWorker.Core has its own way to validate the data.
