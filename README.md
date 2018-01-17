@@ -59,7 +59,10 @@ let's start by creating the dbContext, lets call it Repository
         public Repository(DataBaseTypes dbType = DataBaseTypes.Mssql) : 
         base(GetConnectionString(dbType), true, dbType) 
         { 
-        
+            if (!base.DataBaseExist())
+            {
+                base.CreateDataBase();
+            }
         }
 
         // get the full connection string
@@ -91,7 +94,7 @@ let's start building our models, lets build a simple models User
         [ForeignKey(type: typeof(Role))]
         public long Role_Id { get; set; }
         
-        // when deleting an object the light database will try and delete all object that are connected to 
+        // when deleting an object the EntityWorker.Core will try and delete all object that are connected to 
         // by adding IndependentData we let the EntityWorker.Core to know that this object should not be automaticlly deleted
         // when we delete a User
         [IndependentData]
@@ -239,13 +242,7 @@ lets se how EntityWorker will get the object changes
                 var changes3 = rep.GetObjectChanges(person);
             }
 
-
-
-
-
-
-´´´
-
+```
 ## LinqToSql Result Example
 lets test and se how EntityWorker.Core LinqToSql generator looks like.
 will do a very painful quarry and se how it gets parsed.
@@ -321,6 +318,33 @@ EntityWorker.Core has its own Migration methods, so lets se down here how it wor
             return new List<Migration>(){new IniMigration()};
         }
     }
+
+```
+## Entity Mappings
+Sometime we want to use diffrent module for database and presentation.
+And we want to be able to mapp and convert from one type to another.
+EntityWorker.Core have simliar functionality that could do just that with few lines.
+lets try casting User to user module with diffrent propertyNames in each classes
+```csharp
+using EntityWorker.Core.Helper;
+public class UserModule {
+/// se here we mapped Name to UserName or we could just call the property UserName,
+/// then we wont need PropertyName Attribute
+[PropertyName("UserName")]
+public string Name { get; set; }
+
+[PropertyName("Password")]
+public string Key { get; set;}
+
+[PropertyName("Role")]
+public RoleModule UserGroup { get; set; }
+}
+
+var user =new List<User>(){ new User { UserName="test", Password="test", Role= new Role() }};
+
+var userModule = user.ToType<List<UserModule>>()
+//or for only first item 
+user.ToType<UserModule>() ;
 
 ```
 ## Attributes 
