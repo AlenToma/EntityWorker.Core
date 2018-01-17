@@ -59,7 +59,10 @@ let's start by creating the dbContext, lets call it Repository
         public Repository(DataBaseTypes dbType = DataBaseTypes.Mssql) : 
         base(GetConnectionString(dbType), true, dbType) 
         { 
-        
+            if (!base.DataBaseExist())
+            {
+                base.CreateDataBase();
+            }
         }
 
         // get the full connection string
