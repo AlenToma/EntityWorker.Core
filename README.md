@@ -6,7 +6,7 @@
 ## EntityWorker.Core in Action
 [LightData.CMS](https://github.com/AlenToma/LightData.CMS)
 
-## Update in >= 1.2.5
+## <h1>Update in >= 1.2.5</h1>
 DbEntity is Removed now, you dont have to inherit from it anymore.
 this is so you could use the objects in other project without refering to EntityWorker.Core. 
 
