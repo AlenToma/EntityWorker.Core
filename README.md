@@ -429,4 +429,4 @@ There are many attributes you could use to improve the code
 
 
 ## Issues
-This project is under development and it's not in its final state so please report any bugs or improvement you might find.
+Please report any bugs or improvement you might find.
