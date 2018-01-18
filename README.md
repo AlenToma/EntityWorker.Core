@@ -149,7 +149,7 @@ let's start building our models, lets build a simple models User
             }
         }
 
-        public void AfterSave(IRepository repository, User itemDbEntity, long objectId)
+        public void AfterSave(IRepository repository, User itemDbEntity, Guid objectId)
         {
             // lets do some changes here, when the item have updated..
               itemDbEntity.Password = MethodHelper.EncodeStringToBase64(itemDbEntity.Password);
