@@ -188,7 +188,7 @@ Lets build some expression here and se how it works
 ```
 ## Edit, delete and insert
 EntityWorker.Core have only one method for insert and update.
-It depends on primarykey, Id>0 to update and Id<=0 to insert.
+It depends on primarykey to update and to insert.
 ```csharp
    using (var rep = new Repository())
    {
