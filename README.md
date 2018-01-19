@@ -1,4 +1,4 @@
-# Introduction [EntityWorker.Core](https://www.nuget.org/packages/EntityWorker.Core/)
+# Introduction to [EntityWorker.Core](https://www.nuget.org/packages/EntityWorker.Core/)
 
 ## CodeProject
 [EntityWorker-Core-An-Alternative-to-Entity-Framewo](https://www.codeproject.com/Tips/1222424/EntityWorker-Core-An-Alternative-to-Entity-Framewo)
@@ -6,13 +6,12 @@
 ## EntityWorker.Core in Action
 [LightData.CMS](https://github.com/AlenToma/LightData.CMS)
 
-## Update in >= 1.2.5
-DbEntity is Removed now, you dont have to inherit from it anymore.
-this is so you could use the objects in other project without refering to EntityWorker.Core. 
+## <h1 id="update">Update in >= 1.2.5</h1>
+DbEntity is Removed now, you dont have to inherit from it anymore. This way you can use the objects in other project without refering to EntityWorker.Core.
 
-Make also sure to read about GlobalConfiguration
+Also, make sure to read about GlobalConfiguration
 
-SqlQueryable inherit now from IOrderedQueryable so we could cast it IQueryable<T> later on.
+SqlQueryable now inherits from IOrderedQueryable so we could cast it IQueryable<T> later on.
 
 ## .NET FRAMEWORK SUPPORT 
 1- .NETCoreApp 2.0
@@ -24,26 +23,26 @@ SqlQueryable inherit now from IOrderedQueryable so we could cast it IQueryable<T
 4- .NETFramework 4.6.1
 
 5- .NETStandard 2.0
-## What is EntityWorker.Core
-EntityWorker.Core is an object-relation mappar that enable .NET developers to work with relations data using objects.
-EntityWorker.Core is an alternative to entityframwork. is more flexible and much faster than entity framework.
-## Can i use it to an existing database
-Yes you could easily implement your existing modules and use attributes to map all your Primary Keys and Foreign Key without even
+## What is EntityWorker.Core?
+EntityWorker.Core is an object-relation mappar that enables .NET developers to work with relational data using objects.
+EntityWorker.Core is an alternative to the Entity Framework. It is more flexible and much faster than the Entity Framework.
+## Can I use it to an existing database?
+Yes, you can easily implement your existing modules and use attributes to map all your Primary Keys and Foreign Key without even
 touching the database.
 ## Expression
-EntityWorker.Core has its own provider called ISqlQueryable, which could handle almost every expression like Startwith,
-EndWith Containe and so on
-Se Code Example for more info.
+EntityWorker.Core has its own provider called ISqlQueryable, which can handle almost every expression like Startwith,
+EndWith, Contains and so on
+See Code Example for more info.
 ## Code Example
 Configurate GlobalConfiguration. 
 ```csharp
 // In Application_Start
-// Those two setting is for DataEnode Attribute
+// Those two setting are for DataEnode Attribute
 /// Set the key size for dataEncoding 128 or 256 Default is 128
 EntityWorker.Core.GlobalConfiguration.DataEncode_Key_Size = DataCipherKeySize.Key_128;
 
-/// Set the secret key for encoding Default is "EntityWorker.Default.Key.Pass"
-EntityWorker.Core.GlobalConfiguration.DataEncode_Key = "the key used to Encode the data ";
+/// Set the secret key for encoding. Default is "EntityWorker.Default.Key.Pass"
+EntityWorker.Core.GlobalConfiguration.DataEncode_Key = "the key used to Encode the data";
 
 /// Last set the culture for converting the data
 EntityWorker.Core.GlobalConfiguration.CultureInfo = new CultureInfo("en");
@@ -51,10 +50,10 @@ EntityWorker.Core.GlobalConfiguration.CultureInfo = new CultureInfo("en");
 let's start by creating the dbContext, lets call it Repository
 ```csharp
     // Here we inherit from Transaction which contains the database logic for handling the transaction.
-    // well thats all we need right now.
+    // Thats all we need right now.
     public class Repository : Transaction
     {
-        // there is two databases types mssql and Sqllight
+        // there are two databases types mssql and Sqllight
         // then true or false for migration
         public Repository(DataBaseTypes dbType = DataBaseTypes.Mssql) : 
         base(GetConnectionString(dbType), true, dbType) 
@@ -75,15 +74,15 @@ let's start by creating the dbContext, lets call it Repository
         }
     }
 ```
-let's start building our models, lets build a simple models User
+Let's start building our models, lets build a simple User model
 ```csharp
-    // Table attribute indicate that the object Name differ from the database table Name
+    // Table attribute indicates that the object name differs from the database table name
     [Table("Users")]
     [Rule(typeof(UserRule))]
     public class User
     {
         [PrimaryId]
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
     
         public string UserName { get; set; }
         
@@ -92,19 +91,19 @@ let's start building our models, lets build a simple models User
         
         // Here we indicate that this attribute its a ForeignKey to object Role.
         [ForeignKey(type: typeof(Role))]
-        public long Role_Id { get; set; }
+        public Guid Role_Id { get; set; }
         
-        // when deleting an object the EntityWorker.Core will try and delete all object that are connected to 
-        // by adding IndependentData we let the EntityWorker.Core to know that this object should not be automaticlly deleted
+        // when deleting an object the EntityWorker.Core will try and delete all object that are connected too 
+        // by adding IndependentData we let the EntityWorker.Core know that this object should not be automaticlly deleted
         // when we delete a User
         [IndependentData]
         public Role Role { get; set; }
 
         public List<Address> Address { get; set; }
         
-        //[ExcludeFromAbstract] mean that it should not be included in the DataBase Update or insert.
-        // It aslo mean that it dose not exist in the Table User.
-        // use this attribute to include other property that you only want to use in the code and it should not be 
+        //[ExcludeFromAbstract] means that it should not be included in the DataBase Update or insert.
+        // It also means that it does not exist in the Table User.
+        // use this attribute to include other properties that you only want to use in the code and it should not be 
         // saved to the database
         [ExcludeFromAbstract]
         public string test { get; set; }
@@ -114,7 +113,7 @@ let's start building our models, lets build a simple models User
     public class Role
     {
         [PrimaryId]
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
         
         public string Name { get; set; }
 
@@ -124,13 +123,13 @@ let's start building our models, lets build a simple models User
     public class Address
     {
         [PrimaryId]
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
         
         public string AddressName { get; set; }
         // in the User class we have a list of adresses, EntityWorker.Core will do an inner join and load the address 
-        // if its included in the quarry
+        // if its included in the query
         [ForeignKey(typeof(User))]
-        public long User_Id { get; set; }
+        public Guid User_Id { get; set; }
     }
     
     // EntityWorker.Core has its own way to validate the data.
@@ -149,7 +148,7 @@ let's start building our models, lets build a simple models User
             }
         }
 
-        public void AfterSave(IRepository repository, User itemDbEntity, long objectId)
+        public void AfterSave(IRepository repository, User itemDbEntity, Guid objectId)
         {
             // lets do some changes here, when the item have updated..
               itemDbEntity.Password = MethodHelper.EncodeStringToBase64(itemDbEntity.Password);
@@ -160,14 +159,14 @@ let's start building our models, lets build a simple models User
     }
 
 ```
-## Quarry and Expression
-Lets build some expression here and se how it works
+## Query and Expression
+Lets build a select expression here and see how it works
 ```csharp
    using (var rep = new Repository())
    {
-        // LoadChildren indicate to load all children herarkie.
+        // LoadChildren indicates that it will load the children hierarchy.
         // It has no problem handling circular references.
-        // The quarry dose not call to the database before we invoke Execute or ExecuteAsync
+        // The query does not call to the database before we invoke Execute or ExecuteAsync
         var users = rep.Get<User>().Where(x => 
                 (x.Role.Name.EndsWith("SuperAdmin") &&
                  x.UserName.Contains("alen")) ||
@@ -187,8 +186,8 @@ Lets build some expression here and se how it works
 
 ```
 ## Edit, delete and insert
-EntityWorker.Core have only one method for insert and update.
-It depends on primarykey, Id>0 to update and Id<=0 to insert.
+EntityWorker.Core has only one method for inserts and updates.
+Depending on the primarykey it will either execute an update or insert.
 ```csharp
    using (var rep = new Repository())
    {
@@ -225,7 +224,7 @@ It depends on primarykey, Id>0 to update and Id<=0 to insert.
 
 ```
 ## ObjectChanges
-lets se how EntityWorker will get the object changes 
+lets see how EntityWorker gets the changed objects 
 ```csharp
         using (var rep = new Repository())
             {
@@ -244,8 +243,8 @@ lets se how EntityWorker will get the object changes
 
 ```
 ## LinqToSql Result Example
-lets test and se how EntityWorker.Core LinqToSql generator looks like.
-will do a very painful quarry and se how it gets parsed.
+lets test and see how EntityWorker.Core LinqToSql generator looks like.
+We will execute a complicated query and see how it gets parsed.
 ```csharp
             using (var rep = new Repository())
             {
@@ -259,7 +258,7 @@ will do a very painful quarry and se how it gets parsed.
                 List<User> userList = users.Execute();
                 var sql = users.ParsedLinqToSql;
             }
-            // And here is the generated Sql Quarry
+            // And here is the generated Sql Query
              SELECT distinct Users.* FROM Users 
              left join [Roles] CEjB on CEjB.[Id] = Users.[Role_Id]
              WHERE (([CEjB].[Name] like String[%SuperAdmin] AND [Users].[UserName] like String[%alen%]) 
@@ -273,20 +272,20 @@ will do a very painful quarry and se how it gets parsed.
 ```
 
 ## Migration
-EntityWorker.Core has its own Migration methods, so lets se down here how it work.
+EntityWorker.Core has its own Migration methods, so lets see how it works.
 ```csharp
    //Create Class and call it IniMigration and inhert from Migration
    public class IniMigration : Migration
         public IniMigration()
         {
-           // in the database will be created a migration that contain this Identifier.
+           // in the database a migration will be created that contains this Identifier.
            // it's very important that its unique.
             MigrationIdentifier = "SystemFirstStart"; 
         }
         public override void ExecuteMigration(ICustomRepository repository)
         {
-            // create the table User, Role, Address 
-            // because we have a forgenkeys in user class that refer to address and roles, those will also be
+            // create the tables User, Role, Address 
+            // because we have a foreign keys in user class that refer to address and roles, those will also be
             // created
             repository.CreateTable<User>(true);
             var user = new User()
@@ -308,28 +307,28 @@ EntityWorker.Core has its own Migration methods, so lets se down here how it wor
     {
         /// <summary>
         /// All available Migrations to be executed.
-        // when Migration Is eneabled in Transaction.
+        // when Migration Is enabled in Transaction.
         // this class will be triggered at system start.
         /// </summary>
         public IList<Migration> GetMigrations(ICustomRepository repository)
         {
-            // return all migration that is to be executetd
-            // all already executed migration that do exist in the database will be ignored
+            // return all migrations that are to be executetd
+            // all already executed migrations that do exist in the database will be ignored
             return new List<Migration>(){new IniMigration()};
         }
     }
 
 ```
 ## Entity Mappings
-Sometime we want to use diffrent module for database and presentation.
-And we want to be able to mapp and convert from one type to another.
-EntityWorker.Core have simliar functionality that could do just that with few lines.
-lets try casting User to user module with diffrent propertyNames in each classes
+Sometimes we want to use a different model for database and presentation.
+And we want to be able to map and convert from one type to another.
+EntityWorker.Core has similar functionality that could do just that with few lines.
+lets try casting User to UserModule with diffrent property names in each class.
 ```csharp
 using EntityWorker.Core.Helper;
 public class UserModule {
 /// se here we mapped Name to UserName or we could just call the property UserName,
-/// then we wont need PropertyName Attribute
+/// then we won't need the PropertyName Attribute
 [PropertyName("UserName")]
 public string Name { get; set; }
 
@@ -348,7 +347,7 @@ user.ToType<UserModule>() ;
 
 ```
 ## Attributes 
-There is many attributes you could use to make your code better
+There are many attributes you could use to improve the code
 ```csharp
 /// <summary>
 /// This indicates that the prop will not be saved to the database.
@@ -379,7 +378,7 @@ There is many attributes you could use to make your code better
 
 /// <summary>
 /// Property is a primary key
-/// PrimaryId could be System.String, System.Guid or number eg long and int
+/// PrimaryId could be System.Guid or number eg long and int
 /// </summary>
 [PrimaryKey]
 
@@ -430,5 +429,4 @@ There is many attributes you could use to make your code better
 
 
 ## Issues
-This project is under developing and it's not in its final state so please report any bugs or improvement you might find
-
+Please report any bugs or improvement you might find.
