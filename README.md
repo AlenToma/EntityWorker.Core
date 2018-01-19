@@ -53,7 +53,7 @@ let's start by creating the dbContext, lets call it Repository
     // Thats all we need right now.
     public class Repository : Transaction
     {
-        // there are three databases types mssql, Sqllight and PostgreSql
+        // there are three databases types mssql, Sqlite and PostgreSql
         // then true or false for migration
         public Repository(DataBaseTypes dbType = DataBaseTypes.Mssql) : 
         base(GetConnectionString(dbType), true, dbType) 
