@@ -9,7 +9,8 @@
     public enum DataBaseTypes
     {
         Mssql,
-        Sqllight
+        Sqllight,
+        PostgreSql
     }
 
     public enum RoundingConvention

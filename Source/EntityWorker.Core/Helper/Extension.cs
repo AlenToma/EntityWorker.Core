@@ -5,16 +5,12 @@ using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Reflection.Emit;
 using System.Runtime.Serialization;
 using System.Text;
 using EntityWorker.Core.Attributes;
 using EntityWorker.Core.Interface;
-using EntityWorker.Core.InterFace;
 using EntityWorker.Core.Object.Library;
 using FastDeepCloner;
-using Microsoft.CSharp;
-using static EntityWorker.Core.Events;
 
 namespace EntityWorker.Core.Helper
 {
@@ -48,7 +44,7 @@ namespace EntityWorker.Core.Helper
             {typeof(string), "NVARCHAR(4000)"},
             {typeof(bool), "BIT"},
             {typeof(DateTime), "DATETIME"},
-             {typeof(TimeSpan), "DATETIME"},
+            {typeof(TimeSpan), "DATETIME"},
             {typeof(float), "FLOAT"},
             {typeof(decimal), "DECIMAL(18,5)"},
             {typeof(Guid), "UNIQUEIDENTIFIER"},
@@ -56,7 +52,32 @@ namespace EntityWorker.Core.Helper
             {typeof(char), "NVARCHAR(10)"},
         };
 
+        private static readonly Dictionary<Type, string> DbPostGresqlMapper = new Dictionary<Type, string>()
+        {
+            {typeof(int), "BIGINT"},
+            {typeof(long), "BIGINT"},
+            {typeof(string), "VARCHAR(4000)"},
+            {typeof(bool), "BOOLEAN"},
+            {typeof(DateTime), "TIMESTAMP"},
+            {typeof(TimeSpan), "TIME"},
+            {typeof(float), "FLOAT"},
+            {typeof(decimal), "DECIMAL(18,5)"},
+            {typeof(Guid), "uuid"},
+            {typeof(byte[]), "bytea"},
+            {typeof(char), "VARCHAR(10)"},
+        };
 
+        internal static string GetValidSqlName(this DataBaseTypes dbtype, string col)
+        {
+            return dbtype == DataBaseTypes.PostgreSql ? col : "[" + col + "]";
+        }
+
+        internal static string CleanValidSqlName(this string col, DataBaseTypes dbtype)
+        {
+            if (dbtype == DataBaseTypes.PostgreSql)
+                return col.Replace("[", "").Replace("]", "");
+            return col;
+        }
 
         public static string GetMemberName<T, TP>(this Expression<Func<T, TP>> action)
         {
@@ -215,7 +236,9 @@ namespace EntityWorker.Core.Helper
                 type = Nullable.GetUnderlyingType(type);
             if (dbType == DataBaseTypes.Mssql)
                 return DbMsSqlMapper.ContainsKey(type) ? DbMsSqlMapper[type] : null;
-            else return DbSQLiteMapper.ContainsKey(type) ? DbSQLiteMapper[type] : null;
+            else if (dbType == DataBaseTypes.Sqllight)
+                return DbSQLiteMapper.ContainsKey(type) ? DbSQLiteMapper[type] : null;
+            else return DbPostGresqlMapper.ContainsKey(type) ? DbPostGresqlMapper[type] : null;
         }
 
         /// <summary>
@@ -522,7 +545,7 @@ namespace EntityWorker.Core.Helper
                         var prop = DeepCloner.GetProperty(tType, columnName);
 
                         if (prop == null)
-                            prop = props.FirstOrDefault(x => x.GetPropertyName() == columnName);
+                              prop = props.FirstOrDefault(x => x.GetPropertyName() == columnName || x.Name.ToLower() == columnName || x.GetPropertyName().ToLower() == columnName);
 
                         if (value != null && prop != null && prop.CanRead)
                         {

@@ -16,6 +16,7 @@ using FastDeepCloner;
 using EntityWorker.SQLite;
 using System.Collections;
 using EntityWorker.Core.SqlQuerys;
+using Npgsql;
 
 namespace EntityWorker.Core.Transaction
 {
@@ -48,7 +49,12 @@ namespace EntityWorker.Core.Transaction
         /// </summary>
         protected DbConnection SqlConnection { get; private set; }
 
-        private static Dictionary<DataBaseTypes, bool> _tableMigrationCheck = new Dictionary<DataBaseTypes, bool>() { { DataBaseTypes.Mssql, false }, { DataBaseTypes.Sqllight, false } };
+        private static Dictionary<DataBaseTypes, bool> _tableMigrationCheck = new Dictionary<DataBaseTypes, bool>()
+        {
+            { DataBaseTypes.Mssql, false },
+            { DataBaseTypes.Sqllight, false },
+            { DataBaseTypes.PostgreSql, false }
+        };
 
         /// <summary>
         /// Enable migrations
@@ -102,10 +108,15 @@ namespace EntityWorker.Core.Transaction
         /// <returns></returns>
         protected bool DataBaseExist()
         {
-            var sqlBuild = new SqlConnectionStringBuilder(ConnectionString);
-            var dbName = DataBaseTypes == DataBaseTypes.Mssql ? sqlBuild.InitialCatalog : sqlBuild.DataSource;
-            if (string.IsNullOrEmpty(dbName))
+            var sqlBuild = DataBaseTypes != DataBaseTypes.PostgreSql ? new SqlConnectionStringBuilder(ConnectionString) : null;
+            var npSqlBuilder = DataBaseTypes == DataBaseTypes.PostgreSql ? new NpgsqlConnectionStringBuilder(ConnectionString) : null;
+            var dbName = DataBaseTypes == DataBaseTypes.Mssql ? sqlBuild.InitialCatalog : sqlBuild?.DataSource;
+            if (string.IsNullOrEmpty(dbName) && DataBaseTypes != DataBaseTypes.PostgreSql)
                 throw new Exception("InitialCatalog cant be null or empty");
+
+            if (DataBaseTypes == DataBaseTypes.PostgreSql && string.IsNullOrEmpty(npSqlBuilder.Database))
+                throw new Exception("Database cant be null or empty");
+
             if (DataBaseTypes == DataBaseTypes.Mssql)
             {
                 sqlBuild.InitialCatalog = "master";
@@ -113,7 +124,7 @@ namespace EntityWorker.Core.Transaction
                 var cmd = tr.GetSqlCommand("SELECT  CAST(CASE WHEN db_id(String[" + dbName + "]) is not null THEN 1 ELSE 0 END AS BIT)");
                 return tr.ExecuteScalar(cmd).ConvertValue<bool>();
             }
-            else
+            else if (DataBaseTypes == DataBaseTypes.Sqllight)
             {
                 try
                 {
@@ -127,6 +138,15 @@ namespace EntityWorker.Core.Transaction
                     return false;
                 }
             }
+            else
+            {
+                dbName = npSqlBuilder.Database;
+                npSqlBuilder.Database = "";
+                var tr = new Transaction(npSqlBuilder.ToString(), false, DataBaseTypes);
+                var cmd = tr.GetSqlCommand("SELECT CAST(CASE WHEN datname is not null THEN 1 ELSE 0 END AS BIT) from pg_database WHERE datname = String[" + dbName + "]");
+                return tr.ExecuteScalar(cmd).ConvertValue<bool>();
+
+            }
         }
 
         /// <summary>
@@ -136,21 +156,35 @@ namespace EntityWorker.Core.Transaction
         {
             if (DataBaseExist())
                 return;
-            var sqlBuild = new SqlConnectionStringBuilder(ConnectionString);
-            var dbName = DataBaseTypes == DataBaseTypes.Mssql ? sqlBuild.InitialCatalog : sqlBuild.DataSource;
-            if (string.IsNullOrEmpty(dbName))
+            var sqlBuild = DataBaseTypes != DataBaseTypes.PostgreSql ? new SqlConnectionStringBuilder(ConnectionString) : null;
+            var npSqlBuilder = DataBaseTypes == DataBaseTypes.PostgreSql ? new NpgsqlConnectionStringBuilder(ConnectionString) : null;
+            var dbName = DataBaseTypes == DataBaseTypes.Mssql ? sqlBuild?.InitialCatalog : sqlBuild?.DataSource;
+            if (string.IsNullOrEmpty(dbName) && DataBaseTypes != DataBaseTypes.PostgreSql)
                 throw new Exception("InitialCatalog cant be null or empty");
+
+            if (DataBaseTypes == DataBaseTypes.PostgreSql && string.IsNullOrEmpty(npSqlBuilder.Database))
+                throw new Exception("Database cant be null or empty");
+
             if (DataBaseTypes == DataBaseTypes.Mssql)
             {
                 sqlBuild.InitialCatalog = "master";
                 var tr = new Transaction(sqlBuild.ToString(), false, DataBaseTypes);
-                var cmd = tr.GetSqlCommand("Create DataBase [" + dbName + "]");
+                var cmd = tr.GetSqlCommand("Create DataBase [" + dbName.Trim() + "]");
                 tr.ExecuteNonQuery(cmd);
+                IniMigration();
+            }
+            else if (DataBaseTypes == DataBaseTypes.Sqllight)
+            {
+                SQLiteConnection.CreateFile(dbName.Trim());
                 IniMigration();
             }
             else
             {
-                SQLiteConnection.CreateFile(dbName);
+                dbName = npSqlBuilder.Database;
+                npSqlBuilder.Database = "";
+                var tr = new Transaction(npSqlBuilder.ToString(), false, DataBaseTypes);
+                var cmd = tr.GetSqlCommand("Create DataBase " + dbName.Trim());
+                tr.ExecuteNonQuery(cmd);
                 IniMigration();
             }
         }
@@ -161,6 +195,7 @@ namespace EntityWorker.Core.Transaction
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="o"></param>
+        /// <param name="level"></param>
         /// <param name="fieldType"></param>
         /// <returns></returns>
         public T Clone<T>(T o, CloneLevel level, FieldType fieldType = FieldType.PropertyInfo) where T : class
@@ -229,9 +264,13 @@ namespace EntityWorker.Core.Transaction
                     if (SqlConnection == null)
                         SqlConnection = new SQLiteConnection(ConnectionString);
                 }
-                else
+                else if (DataBaseTypes == DataBaseTypes.Mssql)
                 {
                     SqlConnection = new SqlConnection(ConnectionString);
+                }
+                else
+                {
+                    SqlConnection = new NpgsqlConnection(ConnectionString);
                 }
             }
 
@@ -249,6 +288,10 @@ namespace EntityWorker.Core.Transaction
             ValidateConnection();
             if (Trans?.Connection == null)
                 Trans = SqlConnection.BeginTransaction();
+            else
+            {
+                var test = Trans.GetLifetimeService();
+            }
 
             return Trans;
         }
@@ -416,9 +459,13 @@ namespace EntityWorker.Core.Transaction
                 };
                 cmd.Command.Parameters.Add(param);
             }
+            else if (DataBaseTypes == DataBaseTypes.Sqllight)
+            {
+                (cmd.Command as SQLiteCommand).Parameters.AddWithValue(attrName, value ?? DBNull.Value);
+            }
             else
             {
-                (cmd.Command as SQLiteCommand).Parameters.AddWithValue(attrName, value);
+                (cmd.Command as NpgsqlCommand).Parameters.AddWithValue(attrName, value ?? DBNull.Value);
             }
         }
 

@@ -47,7 +47,7 @@ namespace EntityWorker.Core.SqlQuerys
             _obType = type.GetActualType();
             _columns = new List<string>
             {
-               "["+ (_obType.GetCustomAttribute<Table>()?.Name ?? _obType.Name) + "].*"
+                DataBaseTypes.GetValidSqlName((_obType.GetCustomAttribute<Table>()?.Name ?? _obType.Name)) + ".*"
             };
             _primaryId = OrderBy = _obType.GetPrimaryKey()?.GetPropertyName();
 
@@ -69,7 +69,7 @@ namespace EntityWorker.Core.SqlQuerys
             {
                 WhereClause.RemoveAll(x => string.IsNullOrEmpty(x));
                 var tableName = _obType.GetCustomAttribute<Table>()?.Name ?? _obType.Name;
-                var query = "SELECT distinct " + string.Join(",", _columns) + " FROM [" + tableName + "] " + System.Environment.NewLine +
+                var query = "SELECT distinct " + string.Join(",", _columns) + " FROM " + DataBaseTypes.GetValidSqlName(tableName) + " " + System.Environment.NewLine +
                        string.Join(System.Environment.NewLine, JoinClauses.Values.Select(x => x.Item2)) +
                        System.Environment.NewLine + (WhereClause.Any() ? "WHERE " : string.Empty) + string.Join(" AND ", WhereClause.ToArray());
                 query = query.TrimEnd(" AND ").TrimEnd(" OR ");
@@ -77,7 +77,7 @@ namespace EntityWorker.Core.SqlQuerys
                     query += System.Environment.NewLine + "ORDER BY " + OrderBy;
                 else query += System.Environment.NewLine + "ORDER BY 1 ASC";
 
-                if (DataBaseTypes == DataBaseTypes.Mssql)
+                if (DataBaseTypes == DataBaseTypes.Mssql || DataBaseTypes == DataBaseTypes.PostgreSql)
                     query += System.Environment.NewLine + "OFFSET " + Skip + System.Environment.NewLine + "ROWS FETCH NEXT " + Take + " ROWS ONLY;";
                 else query += System.Environment.NewLine + "LIMIT  " + Skip + System.Environment.NewLine + "," + Take + ";";
 
@@ -96,8 +96,9 @@ namespace EntityWorker.Core.SqlQuerys
                 }
                 else
                 {
-                    var quary = Quary.Substring(0, Quary.LastIndexOf("LIMIT")) + "LIMIT 1";
-                    return quary;
+                    if (DataBaseTypes == DataBaseTypes.Sqllight)
+                    return Quary.Substring(0, Quary.LastIndexOf("LIMIT")) + "LIMIT 1";
+                    else return Quary.Substring(0, Quary.LastIndexOf("OFFSET")) + "LIMIT 1";
                 }
             }
         }
@@ -108,7 +109,7 @@ namespace EntityWorker.Core.SqlQuerys
             {
                 WhereClause.RemoveAll(x => string.IsNullOrEmpty(x));
                 var tableName = _obType.GetCustomAttribute<Table>()?.Name ?? _obType.Name;
-                var query = "SELECT count(distinct [" + tableName + "]." + _primaryId + ") as items FROM [" + tableName + "] " + System.Environment.NewLine +
+                var query = "SELECT count(distinct " + DataBaseTypes.GetValidSqlName(tableName) + "." + _primaryId + ") as items FROM " + DataBaseTypes.GetValidSqlName(tableName) + " " + System.Environment.NewLine +
                        string.Join(System.Environment.NewLine, JoinClauses.Values.Select(x => x.Item2)) +
                        System.Environment.NewLine + (WhereClause.Any() ? "WHERE " : string.Empty) + string.Join(" AND ", WhereClause.ToArray());
                 query = query.TrimEnd(" AND ").TrimEnd(" OR ");
@@ -121,7 +122,7 @@ namespace EntityWorker.Core.SqlQuerys
             get
             {
                 var tableName = _obType.GetCustomAttribute<Table>()?.Name ?? _obType.Name;
-                return " EXISTS (SELECT 1 FROM [" + tableName + "] " + System.Environment.NewLine +
+                return " EXISTS (SELECT 1 FROM " + DataBaseTypes.GetValidSqlName(tableName) + " " + System.Environment.NewLine +
                        string.Join(System.Environment.NewLine, JoinClauses.Values.Select(x => x.Item2)) +
                        System.Environment.NewLine + "WHERE " + string.Join(" AND ", WhereClause.ToArray()) + ")";
             }
@@ -768,7 +769,7 @@ namespace EntityWorker.Core.SqlQuerys
                     var prop = DeepCloner.GetFastDeepClonerProperties(cl).First(x => x.Name == (hasValueAttr ? (m.Expression as MemberExpression).Member.Name : m.Member.Name));
                     var name = prop.GetPropertyName();
                     var table = cl.GetCustomAttribute<Table>()?.Name ?? cl.Name;
-                    var columnName = string.Format("[{0}].[{1}]", table, name);
+                    var columnName = string.Format("[{0}].[{1}]", table, name).CleanValidSqlName(DataBaseTypes);
                     var dataEncode = prop.GetCustomAttribute<DataEncode>();
                     if (columnOnly)
                         return columnName;
@@ -808,7 +809,7 @@ namespace EntityWorker.Core.SqlQuerys
                     var table = cl.GetCustomAttribute<Table>()?.Name ?? cl.Name;
                     var randomTableName = JoinClauses.ContainsKey(key) ? JoinClauses[key].Item1 : RandomKey();
                     var primaryId = DeepCloner.GetFastDeepClonerProperties(cl).First(x => x.ContainAttribute<PrimaryKey>()).GetPropertyName();
-                    var columnName = string.Format("[{0}].[{1}]", randomTableName, name);
+                    var columnName = string.Format("[{0}].[{1}]", randomTableName, name).CleanValidSqlName(DataBaseTypes);
                     if (columnOnly)
                         return columnName;
                     sb.Append(columnName);
@@ -821,13 +822,13 @@ namespace EntityWorker.Core.SqlQuerys
                     var v = "";
                     if (prop != null)
                     {
-                        v += string.Format("LEFT JOIN [{0}] {1} ON [{2}].[{3}] = [{4}].[{5}]", table, randomTableName, randomTableName, primaryId, parentTable, prop.GetPropertyName());
+                        v += string.Format("LEFT JOIN [{0}] {1} ON [{2}].[{3}] = [{4}].[{5}]", table, randomTableName, randomTableName, primaryId, parentTable, prop.GetPropertyName()).CleanValidSqlName(DataBaseTypes);
                     }
                     else
                     {
                         prop = DeepCloner.GetFastDeepClonerProperties(cl).FirstOrDefault(x => x.ContainAttribute<ForeignKey>() && x.GetCustomAttribute<ForeignKey>().Type == parentType);
                         if (prop != null)
-                            v += string.Format("LEFT JOIN [{0}] {1} ON [{2}].[{3}] = [{4}].[{5}]", table, randomTableName, randomTableName, prop.GetPropertyName(), parentTable, primaryId);
+                            v += string.Format("LEFT JOIN [{0}] {1} ON [{2}].[{3}] = [{4}].[{5}]", table, randomTableName, randomTableName, prop.GetPropertyName(), parentTable, primaryId).CleanValidSqlName(DataBaseTypes);
                     }
 
                     if (string.IsNullOrEmpty(v))
@@ -861,7 +862,7 @@ namespace EntityWorker.Core.SqlQuerys
                     var v = "";
                     if (prop != null)
                     {
-                        v += string.Format("INNER JOIN [{0}] {1} ON [{2}].[{3}] = [{4}].[{5}]", parentTable, randomTableName, table, primaryId, randomTableName, prop.GetPropertyName());
+                        v += string.Format("INNER JOIN [{0}] {1} ON [{2}].[{3}] = [{4}].[{5}]", parentTable, randomTableName, table, primaryId, randomTableName, prop.GetPropertyName()).CleanValidSqlName(DataBaseTypes);
                     }
                     else
                     {

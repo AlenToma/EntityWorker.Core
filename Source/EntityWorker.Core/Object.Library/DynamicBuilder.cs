@@ -43,7 +43,7 @@ namespace EntityWorker.Core.Object.Library
                 var prop = DeepCloner.GetProperty(type, columnName);
 
                 if (prop == null)
-                    prop = props.FirstOrDefault(x => x.GetPropertyName() == columnName);
+                    prop = props.FirstOrDefault(x => x.GetPropertyName() == columnName || x.Name.ToLower() == columnName || x.GetPropertyName().ToLower() == columnName);
 
                 if (prop != null && prop.PropertySetValue != null)
                 {

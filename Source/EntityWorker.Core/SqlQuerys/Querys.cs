@@ -14,7 +14,7 @@ namespace EntityWorker.Core.SqlQuerys
             if (value == null)
                 return string.Format("'{0}'", "null");
             var type = value.GetType();
-            if (type == typeof(decimal) || type == typeof(double) || type == typeof(float) || type == typeof(int) || type == typeof(long))
+            if (type == typeof(decimal) || type == typeof(double) || type == typeof(float) || type == typeof(int) || type == typeof(long) || type == typeof(bool))
                 return value.ToString();
             else return string.Format("'{0}'", value);
 
@@ -32,16 +32,16 @@ namespace EntityWorker.Core.SqlQuerys
             return new QueryWhere("Select * from " + (type.GetCustomAttribute<Table>()?.Name ?? type.Name) + " ", dataBaseTypes);
         }
 
-        public static QueryWhere Select(string tableName , DataBaseTypes dataBaseTypes)
+        public static QueryWhere Select(string tableName, DataBaseTypes dataBaseTypes)
         {
             return new QueryWhere("Select * from " + tableName + " ", dataBaseTypes);
         }
 
         public static QueryItem Where(DataBaseTypes dataBaseTypes = DataBaseTypes.Mssql)
         {
-                var item = new QueryItem(" Where ", dataBaseTypes);
-                return item;
- 
+            var item = new QueryItem(" Where ", dataBaseTypes);
+            return item;
+
         }
     }
 
@@ -94,10 +94,10 @@ namespace EntityWorker.Core.SqlQuerys
                 col = col.Remove(col.ToLower().IndexOf(" as ", StringComparison.Ordinal));
             var type = typeof(T);
             if (type == typeof(decimal) || type == typeof(double) || type == typeof(float))
-                _sql += DataBaseTypes == DataBaseTypes.Mssql ? " " + "CONVERT(decimal(18,5),[" + col + "]) " : " Cast([" + col + "] AS decimal(18,5)) ";
+                _sql += DataBaseTypes == DataBaseTypes.Mssql ? " " + "CONVERT(decimal(18,5),[" + col + "]) " : " Cast(" + DataBaseTypes.GetValidSqlName(col) + " AS decimal(18,5)) ";
             else if (type == typeof(int) || type == typeof(long))
-                _sql += DataBaseTypes == DataBaseTypes.Mssql ? " " + "CONVERT(decimal(18,5),[" + col + "]) " : " Cast([" + col + "] AS bigint) ";
-            else _sql += DataBaseTypes == DataBaseTypes.Mssql ? " " + "CONVERT(nvarchar(max),[" + col + "]) " : " Cast([" + col + "] AS nvarchar(4000)) ";
+                _sql += DataBaseTypes == DataBaseTypes.Mssql ? " " + "CONVERT(decimal(18,5),[" + col + "]) " : " Cast(" + DataBaseTypes.GetValidSqlName(col) + " AS bigint) ";
+            else _sql += DataBaseTypes == DataBaseTypes.Mssql ? " " + "CONVERT(nvarchar(max),[" + col + "]) " : (DataBaseTypes == DataBaseTypes.Sqllight ? " Cast(" + DataBaseTypes.GetValidSqlName(col) + " AS nvarchar(4000)) " : " Cast(" + DataBaseTypes.GetValidSqlName(col) + " AS varchar(4000)) ");
 
             return new QueryConditions(_sql, DataBaseTypes);
         }
@@ -112,10 +112,10 @@ namespace EntityWorker.Core.SqlQuerys
             if (col.ToLower().Contains(" as "))
                 col = col.Remove(col.ToLower().IndexOf(" as ", StringComparison.Ordinal));
             if (type == typeof(decimal) || type == typeof(double) || type == typeof(float))
-                _sql += DataBaseTypes == DataBaseTypes.Mssql ? " " + "CONVERT(decimal(18,5),[" + col + "]) " : " Cast([" + col + "] AS decimal(18,5)) ";
+                _sql += DataBaseTypes == DataBaseTypes.Mssql ? " " + "CONVERT(decimal(18,5),[" + col + "]) " : " Cast(" + DataBaseTypes.GetValidSqlName(col) + " AS decimal(18,5)) ";
             else if (type == typeof(int) || type == typeof(long))
-                _sql += DataBaseTypes == DataBaseTypes.Mssql ? " " + "CONVERT(decimal(18,5),[" + col + "]) " : " Cast([" + col + "] AS bigint) ";
-            else _sql += DataBaseTypes == DataBaseTypes.Mssql ? " " + "CONVERT(nvarchar(max),[" + col + "]) " : " Cast([" + col + "] AS nvarchar(4000)) ";
+                _sql += DataBaseTypes == DataBaseTypes.Mssql ? " " + "CONVERT(decimal(18,5),[" + col + "]) " : " Cast(" + DataBaseTypes.GetValidSqlName(col) + " AS bigint) ";
+            else _sql += DataBaseTypes == DataBaseTypes.Mssql ? " " + "CONVERT(nvarchar(max),[" + col + "]) " : (DataBaseTypes == DataBaseTypes.Sqllight ? " Cast(" + DataBaseTypes.GetValidSqlName(col) + " AS nvarchar(4000)) " : " Cast(" + DataBaseTypes.GetValidSqlName(col) + " AS varchar(4000)) ");
             return new QueryConditions(_sql, DataBaseTypes);
         }
 

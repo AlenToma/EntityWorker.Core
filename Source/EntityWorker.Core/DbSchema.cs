@@ -12,6 +12,7 @@ using EntityWorker.Core.InterFace;
 using EntityWorker.Core.Object.Library;
 using EntityWorker.Core.SqlQuerys;
 using FastDeepCloner;
+using Npgsql;
 using Rule = EntityWorker.Core.Attributes.Rule;
 
 namespace EntityWorker.Core
@@ -28,6 +29,8 @@ namespace EntityWorker.Core
 
         private readonly IRepository _repository;
 
+        private static ILightDataTable NotValidkeywords;
+
         public DbSchema(IRepository repository)
         {
             _repository = repository;
@@ -36,23 +39,48 @@ namespace EntityWorker.Core
         public ILightDataTable ObjectColumns(Type type)
         {
             var key = type.FullName + _repository.DataBaseTypes.ToString();
-            if (CachedObjectColumn.ContainsKey(key))
-                return CachedObjectColumn[key];
-            var table = type.GetCustomAttribute<Table>()?.Name ?? type.Name;
-            var cmd = _repository.GetSqlCommand(_repository.DataBaseTypes == DataBaseTypes.Mssql
-                ? "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = N'" + table +
-                  "'"
-                : "SELECT name as COLUMN_NAME, type as DATA_TYPE  FROM pragma_table_info('" + table + "');");
-            var data = _repository.GetLightDataTable(cmd, "COLUMN_NAME");
-            if (data.Rows.Any())
+            try
             {
-                if (!CachedObjectColumn.ContainsKey(key))
-                    CachedObjectColumn.Add(key, data);
+
+                if (CachedObjectColumn.ContainsKey(key))
+                    return CachedObjectColumn[key];
+                var table = type.GetCustomAttribute<Table>()?.Name ?? type.Name;
+                var cmd = _repository.GetSqlCommand(_repository.DataBaseTypes == DataBaseTypes.Mssql || _repository.DataBaseTypes == DataBaseTypes.PostgreSql
+                    ? "SELECT COLUMN_NAME as column_name, data_type FROM INFORMATION_SCHEMA.COLUMNS WHERE LOWER(TABLE_NAME) = LOWER(String[" + table + "])"
+                    : "SELECT name as column_name, type as data_type  FROM pragma_table_info(String[" + table + "]);");
+                var data = _repository.GetLightDataTable(cmd, "column_name");
+                if (data.Rows.Any())
+                {
+                    if (!CachedObjectColumn.ContainsKey(key))
+                        CachedObjectColumn.Add(key, data);
+                }
+                else return data;
             }
-            else return data;
+            catch (NpgsqlException ex)
+            {
+                _repository.SaveChanges();
+                _repository.CreateTransaction();
+                return ObjectColumns(type);
+            }
             return CachedObjectColumn[key];
 
         }
+
+        public bool IsValidName(string column)
+        {
+            if (_repository.DataBaseTypes == DataBaseTypes.PostgreSql)
+            {
+                if (NotValidkeywords == null)
+                    NotValidkeywords = _repository.GetLightDataTable(_repository.GetSqlCommand("select * from pg_get_keywords() where catdesc = String[reserved]"), "word");
+
+                return !NotValidkeywords.FindByPrimaryKey<bool>(column.ToLower());
+            }
+
+            return true;
+        }
+
+
+
 
         /// <summary>
         /// Get all by object
@@ -151,7 +179,7 @@ namespace EntityWorker.Core
         {
             var k = type.FullName + column + _repository.DataBaseTypes.ToString();
             if (!CachedSql.ContainsKey(k))
-                CachedSql.Add(k, Querys.Select(type, _repository.DataBaseTypes).Where.Column<string>(column).Equal("@ID", true).Execute());
+                CachedSql.Add(k, Querys.Select(type, _repository.DataBaseTypes).Where.Column(column).Equal("@ID", true).Execute());
 
             var cmd = _repository.GetSqlCommand(CachedSql[k]);
             _repository.AddInnerParameter(cmd, "@ID", id, _repository.GetSqlType(id.GetType()));
@@ -265,7 +293,7 @@ namespace EntityWorker.Core
             var primaryKeyValue = o.GetPrimaryKeyValue();
             if (primaryKeyValue.ObjectIsNew())
                 return new List<string>();
-            var sql = new List<string>() { "DELETE " + (_repository.DataBaseTypes == DataBaseTypes.Sqllight ? "From " : "") + table + Querys.Where(_repository.DataBaseTypes).Column(primaryKey.GetPropertyName()).Equal(string.Format("Guid[{0}]", primaryKeyValue), true).Execute() };
+            var sql = new List<string>() { "DELETE " + (_repository.DataBaseTypes == DataBaseTypes.Sqllight || _repository.DataBaseTypes == DataBaseTypes.PostgreSql ? "From " : "") + table + Querys.Where(_repository.DataBaseTypes).Column(primaryKey.GetPropertyName()).Equal(string.Format("Guid[{0}]", primaryKeyValue), true).Execute() };
 
             foreach (var prop in props.Where(x => !x.IsInternalType && x.GetCustomAttribute<IndependentData>() == null && x.GetCustomAttribute<ExcludeFromAbstract>() == null))
             {
@@ -395,7 +423,7 @@ namespace EntityWorker.Core
                     dbTrigger?.GetType().GetMethod("BeforeSave").Invoke(dbTrigger, new List<object>() { _repository, o }.ToArray()); // Check the Rule before save
                 object tempPrimaryKey = null;
                 var sql = "UPDATE [" + (o.GetType().GetCustomAttribute<Table>()?.Name ?? o.GetType().Name) + "] SET ";
-                var cols = props.FindAll(x => availableColumns.FindByPrimaryKey<bool>(x.GetPropertyName()) && x.IsInternalType && !x.ContainAttribute<ExcludeFromAbstract>() && x.GetCustomAttribute<PrimaryKey>() == null);
+                var cols = props.FindAll(x => (availableColumns.FindByPrimaryKey<bool>(x.GetPropertyName()) || availableColumns.FindByPrimaryKey<bool>(x.GetPropertyName().ToLower())) && x.IsInternalType && !x.ContainAttribute<ExcludeFromAbstract>() && x.GetCustomAttribute<PrimaryKey>() == null);
                 if (primaryKeyId == null)
                 {
 
@@ -403,7 +431,7 @@ namespace EntityWorker.Core
                     {
                         sql = "INSERT INTO [" + tableName + "](" + string.Join(",", cols.Select(x => "[" + x.GetPropertyName() + "]")) + ") Values(";
                         sql += string.Join(",", cols.Select(x => "@" + x.GetPropertyName())) + ");";
-                        sql += _repository.DataBaseTypes == DataBaseTypes.Sqllight ? " select last_insert_rowid();" : " SELECT IDENT_CURRENT('" + tableName + "');";
+                        sql += _repository.DataBaseTypes == DataBaseTypes.Sqllight ? " select last_insert_rowid();" : (_repository.DataBaseTypes != DataBaseTypes.PostgreSql ? " SELECT IDENT_CURRENT('" + tableName + "');" : " SELECT currval('" + string.Format("{0}_{1}_seq", tableName, primaryKey.GetPropertyName()) + "');");
 
                     }
                     else
@@ -543,8 +571,10 @@ namespace EntityWorker.Core
             {
                 var props = DeepCloner.GetFastDeepClonerProperties(tableType);
                 var tableName = tableType.GetCustomAttribute<Table>()?.Name ?? tableType.Name;
-                var sql = new StringBuilder("CREATE TABLE " + (_repository.DataBaseTypes == DataBaseTypes.Mssql ? "[dbo]." : "") + "[" + tableName + "](");
+                var sql = new StringBuilder("CREATE TABLE " + (_repository.DataBaseTypes == DataBaseTypes.Mssql ? "[dbo]." : "") + _repository.DataBaseTypes.GetValidSqlName(tableName) + "(");
                 var isPrimaryKey = "";
+                if (!IsValidName(tableName))
+                    throw new Exception(tableName + " is not a valid Name for the current provider");
                 foreach (var prop in props.Where(x => (x.PropertyType.GetDbTypeByType(_repository.DataBaseTypes) != null || !x.IsInternalType) && !x.ContainAttribute<ExcludeFromAbstract>()).GroupBy(x => x.Name).Select(x => x.First()))
                 {
                     if (!prop.IsInternalType)
@@ -553,11 +583,15 @@ namespace EntityWorker.Core
                             CreateTable(prop.PropertyType.GetActualType(), createdTables, false, force, keys, sqlList);
                         continue;
                     }
+
                     isPrimaryKey = prop.ContainAttribute<PrimaryKey>() ? prop.GetPropertyName() : isPrimaryKey;
                     var foreignKey = prop.GetCustomAttribute<ForeignKey>();
                     var dbType = prop.PropertyType.GetDbTypeByType(_repository.DataBaseTypes);
                     var propName = string.Format("[{0}]", prop.GetPropertyName());
                     sql.Append(propName + " ");
+                    if (!IsValidName(prop.GetPropertyName()))
+                        throw new Exception(prop.GetPropertyName() + " is not a valid Name for the current provider");
+
 
                     if (prop.ContainAttribute<StringFy>() || prop.ContainAttribute<DataEncode>() || prop.ContainAttribute<ToBase64String>())
                         dbType = typeof(string).GetDbTypeByType(_repository.DataBaseTypes);
@@ -572,7 +606,7 @@ namespace EntityWorker.Core
                     if (prop.ContainAttribute<PrimaryKey>())
                     {
                         if (prop.PropertyType.IsNumeric())
-                            sql.Append(_repository.DataBaseTypes == DataBaseTypes.Mssql ? "IDENTITY(1,1) NOT NULL," : " Integer PRIMARY KEY AUTOINCREMENT,");
+                            sql.Append(_repository.DataBaseTypes == DataBaseTypes.Mssql ? "IDENTITY(1,1) NOT NULL," : (_repository.DataBaseTypes == DataBaseTypes.Sqllight ? " Integer PRIMARY KEY AUTOINCREMENT," : " BIGSERIAL PRIMARY KEY,"));
                         else sql.Append(_repository.DataBaseTypes == DataBaseTypes.Mssql ? "NOT NULL," : " " + dbType + "  PRIMARY KEY,");
                         continue;
                     }
@@ -634,6 +668,7 @@ namespace EntityWorker.Core
                     sqlList.Add(tableType, sql.ToString());
                 sqlList = sqlList.Where(x => !string.IsNullOrEmpty(x.Value)).ToDictionary(x => x.Key, x => x.Value);
                 var c = sqlList.Count;
+                Exception exp = null;
                 while (c > 0)
                 {
 
@@ -645,30 +680,55 @@ namespace EntityWorker.Core
                             if (!ObjectColumns(key).Rows.Any())
                             {
                                 var sSql = sqlList[key];
+                                if (sSql.EndsWith(",)"))
+                                    sSql = sSql.TrimEnd(",)") + ")";
                                 var cmd = _repository.GetSqlCommand(sSql);
                                 _repository.ExecuteNonQuery(cmd);
+                                if (_repository.DataBaseTypes == DataBaseTypes.PostgreSql)
+                                {
+                                    _repository.SaveChanges();
+                                    _repository.CreateTransaction();
+                                }
                             }
                             c--;
                         }
+                        catch (NpgsqlException ex)
+                        {
+                            if (ex.ToString().Contains("already exists"))
+                                c--;
+
+                            _repository.Rollback();
+                            _repository.CreateTransaction();
+
+                            exp = ex;
+                        }
                         catch (Exception ex)
                         {
-                            var test = ex;
+                            if (ex.ToString().Contains("already exists"))
+                                c--;
+                            exp = ex;
                         }
                     }
                 }
+
+
                 sql = new StringBuilder();
 
-                if (keys.Any() && _repository.DataBaseTypes == DataBaseTypes.Mssql)
+                if (keys.Any() && (_repository.DataBaseTypes == DataBaseTypes.Mssql || _repository.DataBaseTypes == DataBaseTypes.PostgreSql))
                 {
                     foreach (var key in keys)
                     {
                         var type = key.Value.Item2.Type.GetActualType();
                         var keyPrimary = type.GetPrimaryKey().GetPropertyName();
                         var tb = type.GetCustomAttribute<Table>()?.Name ?? type.Name;
-                        sql.Append("ALTER TABLE [" + key.Value.Item1 + "] ADD FOREIGN KEY (" + key.Key.Split('-')[0] + ") REFERENCES [" + tb + "](" + keyPrimary + ");");
+                        if (_repository.DataBaseTypes == DataBaseTypes.Mssql)
+                            sql.Append("ALTER TABLE [" + key.Value.Item1 + "] ADD FOREIGN KEY (" + key.Key.Split('-')[0] + ") REFERENCES [" + tb + "](" + keyPrimary + ");");
+                        else sql.Append("ALTER TABLE " + key.Value.Item1 + " ADD CONSTRAINT fk_" + (tb + "_" + key.Key.Split('-')[0]) + " FOREIGN KEY (" + key.Key.Split('-')[0] + ") REFERENCES " + tb + "(" + keyPrimary + ");");
 
                     }
                     var s = sql.ToString();
+                    if (s.EndsWith(",)"))
+                        s = s.TrimEnd(",)") + ")";
                     var cmd = _repository.GetSqlCommand(s);
                     _repository.ExecuteNonQuery(cmd);
 
@@ -687,7 +747,7 @@ namespace EntityWorker.Core
 
         public void RemoveTable(Type tableType, List<Type> tableRemoved = null, bool remove = true)
         {
-            _repository.CreateTransaction();
+
             if (tableRemoved == null)
                 tableRemoved = new List<Type>();
             if (tableRemoved.Any(x => x == tableType))
@@ -713,6 +773,7 @@ namespace EntityWorker.Core
             if (!tableData.Rows.Any())
                 return;
             var c = tableRemoved.Count;
+            _repository.CreateTransaction();
             while (c > 0)
             {
                 for (var i = tableRemoved.Count - 1; i >= 0; i--)
@@ -731,8 +792,20 @@ namespace EntityWorker.Core
                             var cmd = _repository.GetSqlCommand("DROP TABLE [" + tableName + "];");
                             _repository.ExecuteNonQuery(cmd);
                             CachedObjectColumn.Remove(tType.FullName + _repository.DataBaseTypes.ToString());
+                            if (_repository.DataBaseTypes == DataBaseTypes.PostgreSql)
+                            {
+                                _repository.SaveChanges();
+                                _repository.CreateTransaction();
+                            }
                         }
+
+
                         c--;
+                    }
+                    catch (NpgsqlException ex)
+                    {
+                        _repository.Rollback();
+                        _repository.CreateTransaction();
                     }
                     catch
                     {

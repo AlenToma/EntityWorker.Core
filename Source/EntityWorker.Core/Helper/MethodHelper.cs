@@ -10,6 +10,8 @@ using System.Text.RegularExpressions;
 using EntityWorker.Core.InterFace;
 using EntityWorker.SQLite;
 using EntityWorker.Core.Object.Library;
+using Npgsql;
+using EntityWorker.Core.Interface;
 
 namespace EntityWorker.Core.Helper
 {
@@ -85,6 +87,7 @@ namespace EntityWorker.Core.Helper
             return Encoding.UTF8.GetString(Convert.FromBase64String(stringToDecode));
         }
 
+
         internal static DbCommandExtended ProcessSql(this IRepository repository, IDbConnection connection, IDbTransaction tran, string sql, Type type)
         {
 
@@ -127,17 +130,19 @@ namespace EntityWorker.Core.Helper
                 i++;
             }
 
+    
+
+            sql = sql.CleanValidSqlName(repository.DataBaseTypes);
             DbCommand cmd = null;
             if (repository.DataBaseTypes == DataBaseTypes.Mssql)
                 cmd = tran != null ? new SqlCommand(sql, connection as SqlConnection, tran as SqlTransaction) : new SqlCommand(sql, connection as SqlConnection);
-            else cmd = tran == null ? new SQLiteCommand(sql, connection as SQLiteConnection) : new SQLiteCommand(sql, connection as SQLiteConnection, tran as SQLiteTransaction);
+            else if (repository.DataBaseTypes == DataBaseTypes.Sqllight)
+                cmd = tran == null ? new SQLiteCommand(sql, connection as SQLiteConnection) : new SQLiteCommand(sql, connection as SQLiteConnection, tran as SQLiteTransaction);
+            else cmd = tran == null ? new NpgsqlCommand(sql, connection as NpgsqlConnection) : new NpgsqlCommand(sql, connection as NpgsqlConnection, tran as NpgsqlTransaction);
             var dbCommandExtended = new DbCommandExtended(cmd, repository, type);
             foreach (var dic in dicCols)
                 repository.AddInnerParameter(dbCommandExtended, dic.Key, dic.Value.Item1, dic.Value.Item2);
-
             return dbCommandExtended;
-
-
         }
     }
 }
