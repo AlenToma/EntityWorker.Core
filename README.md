@@ -1,5 +1,8 @@
 # Introduction to [EntityWorker.Core](https://www.nuget.org/packages/EntityWorker.Core/)
 
+## EntityFrameWork vs EntityWorker.Core Performance test
+![screenshot](https://github.com/AlenToma/EntityWorker.Core/blob/master/EF_VS_EW.PNG?raw=true)
+
 ## CodeProject
 [EntityWorker-Core-An-Alternative-to-Entity-Framewo](https://www.codeproject.com/Tips/1222424/EntityWorker-Core-An-Alternative-to-Entity-Framewo)
 
@@ -53,7 +56,7 @@ let's start by creating the dbContext, lets call it Repository
     // Thats all we need right now.
     public class Repository : Transaction
     {
-        // there are two databases types mssql and Sqllight
+        // there are three databases types mssql, Sqlite and PostgreSql
         // then true or false for migration
         public Repository(DataBaseTypes dbType = DataBaseTypes.Mssql) : 
         base(GetConnectionString(dbType), true, dbType) 
@@ -69,8 +72,9 @@ let's start by creating the dbContext, lets call it Repository
         {
           if (dbType == DataBaseTypes.Mssql)
             return  @"Server=.\SQLEXPRESS; Database=CMS; User Id=root; Password=root;";
-          else
+          else if (dbType == DataBaseTypes.Sqlite)
             return  @"Data Source=D:\Projects\CMS\source\App_Data\CMS.db";
+          else return "Host=localhost;Username=postgres;Password=root;Database=CMS";
         }
     }
 ```
