@@ -16,6 +16,14 @@ Also, make sure to read about GlobalConfiguration
 
 SqlQueryable now inherits from IOrderedQueryable so we could cast it IQueryable<T> later on.
 
+## Support for Providers
+1- Mssql
+
+2- Sqlite
+
+3- Postgresql
+
+
 ## .NET FRAMEWORK SUPPORT 
 1- .NETCoreApp 2.0
 
