@@ -848,7 +848,7 @@ namespace EntityWorker.Core.Postgres
 
         [ItemCanBeNull]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal async ValueTask<IBackendMessage> ReadMessage(
+        internal async Task<IBackendMessage> ReadMessage(
             bool async,
             DataRowLoadingMode dataRowLoadingMode = DataRowLoadingMode.NonSequential,
             bool readingNotifications = false
@@ -880,7 +880,7 @@ namespace EntityWorker.Core.Postgres
         }
 
         [ItemCanBeNull]
-        async ValueTask<IBackendMessage> DoReadMessage(
+        async Task<IBackendMessage> DoReadMessage(
             bool async,
             DataRowLoadingMode dataRowLoadingMode = DataRowLoadingMode.NonSequential,
             bool readingNotifications = false,
@@ -1077,7 +1077,7 @@ namespace EntityWorker.Core.Postgres
         /// Reads backend messages and discards them, stopping only after a message of the given type has
         /// been seen.
         /// </summary>
-        internal async ValueTask<IBackendMessage> SkipUntil(BackendMessageCode stopAt, bool async)
+        internal async Task<IBackendMessage> SkipUntil(BackendMessageCode stopAt, bool async)
         {
             Debug.Assert(stopAt != BackendMessageCode.DataRow, "Shouldn't be used for rows, doesn't know about sequential");
 
@@ -1097,7 +1097,7 @@ namespace EntityWorker.Core.Postgres
         /// Reads backend messages and discards them, stopping only after a message of the given types has
         /// been seen.
         /// </summary>
-        internal async ValueTask<IBackendMessage> SkipUntil(BackendMessageCode stopAt1, BackendMessageCode stopAt2, bool async)
+        internal async Task<IBackendMessage> SkipUntil(BackendMessageCode stopAt1, BackendMessageCode stopAt2, bool async)
         {
             Debug.Assert(stopAt1 != BackendMessageCode.DataRow, "Shouldn't be used for rows, doesn't know about sequential");
             Debug.Assert(stopAt2 != BackendMessageCode.DataRow, "Shouldn't be used for rows, doesn't know about sequential");
@@ -1117,7 +1117,7 @@ namespace EntityWorker.Core.Postgres
         /// Asynchronous messages (e.g. Notice) are treated and ignored. ErrorResponses raise an
         /// exception but do not cause the connector to break.
         /// </summary>
-        internal async ValueTask<T> ReadExpecting<T>(bool async) where T : class, IBackendMessage
+        internal async Task<T> ReadExpecting<T>(bool async) where T : class, IBackendMessage
         {
             var msg = await ReadMessage(async);
             var asExpected = msg as T;

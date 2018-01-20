@@ -42,7 +42,7 @@ namespace EntityWorker.Core.Postgres.TypeHandling
         /// <param name="async">If I/O is required to read the full length of the value, whether it should be performed synchronously or asynchronously.</param>
         /// <param name="fieldDescription">Additional PostgreSQL information about the type, such as the length in varchar(30).</param>
         /// <returns>The fully-read value.</returns>
-        ValueTask<T> Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription);
+        Task<T> Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription);
 
         /// <summary>
         /// Responsible for validating that a value represents a value of the correct and which can be

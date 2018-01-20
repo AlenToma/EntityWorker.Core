@@ -87,7 +87,7 @@ namespace EntityWorker.Core.Postgres.TypeHandlers
 
         // Note that unlike most type handlers, we have to override Read<T2> and not Read, since we
         // must do array-specific checking etc.
-        protected internal override async ValueTask<TArray> Read<TArray>(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
+        protected internal override async Task<TArray> Read<TArray>(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
         {
             // TODO: Throw SafeReadExceptions
             var t = typeof(TArray);
@@ -109,13 +109,13 @@ namespace EntityWorker.Core.Postgres.TypeHandlers
         internal override object ReadAsObject(NpgsqlReadBuffer buf, int len, FieldDescription fieldDescription)
             => ReadAsObject(buf, len, false, fieldDescription).Result;
 
-        internal override async ValueTask<object> ReadAsObject(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription)
+        internal override async Task<object> ReadAsObject(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription)
             => await Read<TElement>(buf, async);
 
-        public override ValueTask<Array> Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
+        public override Task<Array> Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
             => Read<TElement>(buf, async);
 
-        protected async ValueTask<Array> Read<TElement2>(NpgsqlReadBuffer buf, bool async)
+        protected async Task<Array> Read<TElement2>(NpgsqlReadBuffer buf, bool async)
         {
             await buf.Ensure(12, async);
             var dimensions = buf.ReadInt32();
@@ -350,7 +350,7 @@ namespace EntityWorker.Core.Postgres.TypeHandlers
         internal override object ReadPsvAsObject(NpgsqlReadBuffer buf, int len, FieldDescription fieldDescription)
             => ReadPsvAsObject(buf, len, false, fieldDescription).Result;
 
-        internal override async ValueTask<object> ReadPsvAsObject(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription)
+        internal override async Task<object> ReadPsvAsObject(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription)
             => await Read<TElementPsv>(buf, async);
 
         public ArrayHandlerWithPsv(NpgsqlTypeHandler elementHandler)

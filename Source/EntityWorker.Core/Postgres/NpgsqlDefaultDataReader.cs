@@ -40,9 +40,9 @@ namespace EntityWorker.Core.Postgres
         List<IDisposable> _streams;
 
         internal NpgsqlDefaultDataReader(NpgsqlCommand command, CommandBehavior behavior, List<NpgsqlStatement> statements, Task sendTask)
-            : base(command, behavior, statements, sendTask) {}
+            : base(command, behavior, statements, sendTask) { }
 
-        internal override ValueTask<IBackendMessage> ReadMessage(bool async)
+        internal override Task<IBackendMessage> ReadMessage(bool async)
             => Connector.ReadMessage(async);
 
         protected override Task<bool> Read(bool async)
@@ -71,7 +71,7 @@ namespace EntityWorker.Core.Postgres
                 ? PGUtil.TrueTask : PGUtil.FalseTask;
         }
 
-        protected override Task<bool> NextResult(bool async, bool isConsuming=false)
+        protected override Task<bool> NextResult(bool async, bool isConsuming = false)
         {
             var task = base.NextResult(async, isConsuming);
 
@@ -285,7 +285,7 @@ namespace EntityWorker.Core.Postgres
             return ColumnLen == -1;
         }
 
-        internal override ValueTask<Stream> GetStreamInternal(int column, bool async)
+        internal override Task<Stream> GetStreamInternal(int column, bool async)
         {
             SeekToColumn(column);
             if (ColumnLen == -1)
@@ -295,7 +295,7 @@ namespace EntityWorker.Core.Postgres
             if (_streams == null)
                 _streams = new List<IDisposable>();
             _streams.Add(s);
-            return new ValueTask<Stream>(s);
+            return Task.FromResult<Stream>(s);
         }
 
         void SeekToColumn(int column)

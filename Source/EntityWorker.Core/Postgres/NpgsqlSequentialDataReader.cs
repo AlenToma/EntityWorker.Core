@@ -51,7 +51,7 @@ namespace EntityWorker.Core.Postgres
             Buffer = Connector.ReadBuffer;
         }
 
-        internal override ValueTask<IBackendMessage> ReadMessage(bool async)
+        internal override Task<IBackendMessage> ReadMessage(bool async)
             => Connector.ReadMessage(async, DataRowLoadingMode.Sequential);
 
         internal override void ProcessDataMessage(DataRowMessage dataMsg)
@@ -65,13 +65,13 @@ namespace EntityWorker.Core.Postgres
         {
             cancellationToken.ThrowIfCancellationRequested();
             using (NoSynchronizationContextScope.Enter())
-                return GetFieldValue<T>(ordinal, true).AsTask();
+                return GetFieldValue<T>(ordinal, true);
         }
 
         public override T GetFieldValue<T>(int column)
             => GetFieldValue<T>(column, false).GetAwaiter().GetResult();
 
-        async ValueTask<T> GetFieldValue<T>(int column, bool async)
+        async Task<T> GetFieldValue<T>(int column, bool async)
         {
             CheckRowAndOrdinal(column);
 
@@ -343,7 +343,7 @@ namespace EntityWorker.Core.Postgres
 
         #endregion
 
-        internal override async ValueTask<Stream> GetStreamInternal(int column, bool async)
+        internal override async Task<Stream> GetStreamInternal(int column, bool async)
         {
             CheckRowAndOrdinal(column);
             if (_stream != null)

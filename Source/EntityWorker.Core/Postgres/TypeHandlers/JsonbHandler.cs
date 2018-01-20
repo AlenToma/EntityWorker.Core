@@ -97,7 +97,7 @@ namespace EntityWorker.Core.Postgres.TypeHandlers
 
         #region Read
 
-        public override async ValueTask<string> Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
+        public override async Task<string> Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
         {
             await buf.Ensure(1, async);
             var version = buf.ReadByte();

@@ -78,7 +78,7 @@ namespace EntityWorker.Core.Postgres.TypeHandlers
 
         #region Read
 
-        protected internal override async ValueTask<TAny> Read<TAny>(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
+        protected internal override async Task<TAny> Read<TAny>(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
         {
             if (_resolvedType != typeof(TAny))
                 Map(typeof(TAny));
@@ -102,14 +102,14 @@ namespace EntityWorker.Core.Postgres.TypeHandlers
             return (TAny)result;
         }
 
-        internal override ValueTask<object> ReadAsObject(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
+        internal override Task<object> ReadAsObject(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
             => Read(buf, len, async, fieldDescription);
 
         internal override object ReadAsObject(NpgsqlReadBuffer buf, int len, FieldDescription fieldDescription = null)
             => Read(buf, len, false, fieldDescription).Result;
 
 #pragma warning disable CS1998 // Needless async (for netstandard1.3)
-        public override async ValueTask<object> Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
+        public override async Task<object> Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
 #pragma warning restore CS1998 // Needless async (for netstandard1.3)
         {
 #if NETSTANDARD1_3

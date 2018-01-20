@@ -102,7 +102,7 @@ namespace EntityWorker.Core.Postgres.TypeHandlers
 
         #region Read
 
-        public override async ValueTask<Dictionary<string, string>> Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription)
+        public override async Task<Dictionary<string, string>> Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription)
         {
             await buf.Ensure(4, async);
             var numElements = buf.ReadInt32();
@@ -125,8 +125,7 @@ namespace EntityWorker.Core.Postgres.TypeHandlers
             return hstore;
         }
 
-        ValueTask<IDictionary<string, string>> INpgsqlTypeHandler<IDictionary<string, string>>.Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription)
-            => new ValueTask<IDictionary<string, string>>(Read(buf, len, async, fieldDescription).Result);
+        Task<IDictionary<string, string>> INpgsqlTypeHandler<IDictionary<string, string>>.Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription) => Task.FromResult<IDictionary<string, string>>(Read(buf, len, async, fieldDescription).Result);
 
         #endregion
     }

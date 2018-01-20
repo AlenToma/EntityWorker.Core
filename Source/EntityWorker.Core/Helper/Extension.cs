@@ -19,8 +19,8 @@ namespace EntityWorker.Core.Helper
     /// </summary>
     public static class Extension
     {
-        private static readonly Dictionary<IFastDeepClonerProperty, string> CachedPropertyNames = new Dictionary<IFastDeepClonerProperty, string>();
-        private static readonly Dictionary<Type, IFastDeepClonerProperty> CachedPrimaryKeys = new Dictionary<Type, IFastDeepClonerProperty>();
+        private static readonly Custom_ValueType<IFastDeepClonerProperty, string> CachedPropertyNames = new Custom_ValueType<IFastDeepClonerProperty, string>();
+        private static readonly Custom_ValueType<Type, IFastDeepClonerProperty> CachedPrimaryKeys = new Custom_ValueType<Type, IFastDeepClonerProperty>();
 
         private static readonly Dictionary<Type, string> DbMsSqlMapper = new Dictionary<Type, string>()
         {
@@ -262,8 +262,7 @@ namespace EntityWorker.Core.Helper
         {
             if (CachedPropertyNames.ContainsKey(prop))
                 return CachedPropertyNames[prop];
-            CachedPropertyNames.Add(prop, prop.GetCustomAttribute<PropertyName>()?.Name ?? prop.Name);
-            return CachedPropertyNames[prop];
+            return CachedPropertyNames.GetOrAdd(prop, prop.GetCustomAttribute<PropertyName>()?.Name ?? prop.Name);
         }
 
 
@@ -285,14 +284,8 @@ namespace EntityWorker.Core.Helper
         {
             if (CachedPrimaryKeys.ContainsKey(type))
                 return CachedPrimaryKeys[type];
-            else
-            {
-                lock (CachedPrimaryKeys)
-                {
-                    CachedPrimaryKeys.Add(type, DeepCloner.GetFastDeepClonerProperties(type).FirstOrDefault(x => x.ContainAttribute<PrimaryKey>()));
-                }
-            }
-            return CachedPrimaryKeys[type];
+            return CachedPrimaryKeys.GetOrAdd(type, DeepCloner.GetFastDeepClonerProperties(type).FirstOrDefault(x => x.ContainAttribute<PrimaryKey>()));
+
         }
 
         public static String TableName<T>()
@@ -514,7 +507,7 @@ namespace EntityWorker.Core.Helper
             return ((List<T>)DataReaderConverter(repository, reader, command, typeof(T)));
         }
 
-        internal static Dictionary<Type, DynamicBuilder> CachedDataRecord = new Dictionary<Type, DynamicBuilder>();
+        internal static Custom_ValueType<Type, DynamicBuilder> CachedDataRecord = new Custom_ValueType<Type, DynamicBuilder>();
         internal static IList DataReaderConverter(Transaction.Transaction repository, IDataReader reader, DbCommandExtended command, Type type)
         {
             var tType = type.GetActualType();
@@ -568,9 +561,8 @@ namespace EntityWorker.Core.Helper
                     }
 #else
                     var cmReader = new DataRecordExtended(reader);
-                    lock (CachedDataRecord)
-                        if (!CachedDataRecord.ContainsKey(tType))
-                            CachedDataRecord.Add(tType, DynamicBuilder.CreateBuilder(cmReader, tType));
+                    if (!CachedDataRecord.ContainsKey(tType))
+                        CachedDataRecord.GetOrAdd(tType, DynamicBuilder.CreateBuilder(cmReader, tType));
                     var x = CachedDataRecord[tType];
                     item = x.Build(cmReader);
                     clItem = !(repository?.IsAttached(item) ?? true) ? x.Build(cmReader) : null;

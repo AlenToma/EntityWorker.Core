@@ -59,7 +59,7 @@ namespace EntityWorker.Core.Postgres.TypeHandlers
 
         #region Read
 
-        public override async ValueTask<object[]> Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
+        public override async Task<object[]> Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
         {
             await buf.Ensure(4, async);
             var fieldCount = buf.ReadInt32();

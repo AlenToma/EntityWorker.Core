@@ -45,7 +45,7 @@ namespace EntityWorker.Core.Postgres.TypeHandlers.FullTextSearchHandlers
 
         #region Read
 
-        public override async ValueTask<NpgsqlTsVector> Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
+        public override async Task<NpgsqlTsVector> Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
         {
             await buf.Ensure(4, async);
             var numLexemes = buf.ReadInt32();

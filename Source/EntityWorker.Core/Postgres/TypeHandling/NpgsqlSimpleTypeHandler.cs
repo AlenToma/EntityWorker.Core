@@ -31,6 +31,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using EntityWorker.Core.Postgres.BackendMessages;
+using EntityWorker.Core.Object.Library;
 
 namespace EntityWorker.Core.Postgres.TypeHandling
 {
@@ -51,7 +52,7 @@ namespace EntityWorker.Core.Postgres.TypeHandling
         readonly NonGenericValidateAndGetLength _nonGenericValidateAndGetLength;
         readonly NonGenericWriteWithLength _nonGenericWriteWithLength;
 
-        static readonly ConcurrentDictionary<Type, (NonGenericValidateAndGetLength, NonGenericWriteWithLength) > NonGenericDelegateCache = new ConcurrentDictionary<Type, (NonGenericValidateAndGetLength, NonGenericWriteWithLength)>();
+        static readonly Custom_ValueType<Type, Tuple<NonGenericValidateAndGetLength, NonGenericWriteWithLength>> NonGenericDelegateCache = new Custom_ValueType<Type, Tuple<NonGenericValidateAndGetLength, NonGenericWriteWithLength>>();
 
         /// <summary>
         /// Constructs an <see cref="NpgsqlSimpleTypeHandler{TDefault}"/>.
@@ -59,8 +60,9 @@ namespace EntityWorker.Core.Postgres.TypeHandling
         protected NpgsqlSimpleTypeHandler()
         {
             // Get code-generated delegates for non-generic ValidateAndGetLength/WriteWithLengthInternal
-            (_nonGenericValidateAndGetLength, _nonGenericWriteWithLength) =
-                NonGenericDelegateCache.GetOrAdd(GetType(), t => (GenerateNonGenericValidationMethod(GetType()), GenerateNonGenericWriteMethod(GetType(), typeof(INpgsqlSimpleTypeHandler<>))) );
+            var item = NonGenericDelegateCache.GetOrAdd(GetType(), new Tuple<NonGenericValidateAndGetLength, NonGenericWriteWithLength>(GenerateNonGenericValidationMethod(GetType()), GenerateNonGenericWriteMethod(GetType(), typeof(INpgsqlSimpleTypeHandler<>))));
+            _nonGenericValidateAndGetLength = item.Item1;
+            _nonGenericWriteWithLength = item.Item2;
         }
 
         #region Read
@@ -86,7 +88,7 @@ namespace EntityWorker.Core.Postgres.TypeHandling
         /// <param name="async">If I/O is required to read the full length of the value, whether it should be performed synchronously or asynchronously.</param>
         /// <param name="fieldDescription">Additional PostgreSQL information about the type, such as the length in varchar(30).</param>
         /// <returns>The fully-read value.</returns>
-        public sealed override ValueTask<TDefault> Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
+        public sealed override Task<TDefault> Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
             => Read<TDefault>(buf, len, async, fieldDescription);
 
         /// <summary>
@@ -98,7 +100,7 @@ namespace EntityWorker.Core.Postgres.TypeHandling
         /// <param name="async">If I/O is required to read the full length of the value, whether it should be performed synchronously or asynchronously.</param>
         /// <param name="fieldDescription">Additional PostgreSQL information about the type, such as the length in varchar(30).</param>
         /// <returns>The fully-read value.</returns>
-        protected internal sealed override async ValueTask<TAny> Read<TAny>(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
+        protected internal sealed override async Task<TAny> Read<TAny>(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
         {
             await buf.Ensure(len, async);
             return Read<TAny>(buf, len, fieldDescription);

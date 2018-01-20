@@ -54,7 +54,7 @@ namespace EntityWorker.Core.Postgres.TypeHandlers
 
         #region Read
 
-        protected internal override async ValueTask<TAny> Read<TAny>(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
+        protected internal override async Task<TAny> Read<TAny>(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
         {
             var s = await base.Read(buf, len, async, fieldDescription);
             if (typeof(TAny) == typeof(string))
@@ -70,7 +70,7 @@ namespace EntityWorker.Core.Postgres.TypeHandlers
             return (TAny)(object)value;
         }
 
-        public override ValueTask<string> Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
+        public override Task<string> Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
             => base.Read(buf, len, async, fieldDescription);
 
         #endregion

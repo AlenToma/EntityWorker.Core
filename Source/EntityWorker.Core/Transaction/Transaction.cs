@@ -25,13 +25,13 @@ namespace EntityWorker.Core.Transaction
     /// </summary>
     public class Transaction : IRepository
     {
-        internal Dictionary<IDataReader, bool> OpenedDataReaders = new Dictionary<IDataReader, bool>();
+        internal Custom_ValueType<IDataReader, bool> OpenedDataReaders = new Custom_ValueType<IDataReader, bool>();
 
         private static object MigrationLocker = new object();
 
         private readonly DbSchema _dbSchema;
 
-        private readonly Dictionary<string, object> _attachedObjects;
+        private readonly Custom_ValueType<string, object> _attachedObjects;
         /// <summary>
         /// DataBase FullConnectionString
         /// </summary>
@@ -70,7 +70,7 @@ namespace EntityWorker.Core.Transaction
         public Transaction(string connectionString, bool enableMigration, DataBaseTypes dataBaseTypes)
         {
             EnableMigration = enableMigration;
-            _attachedObjects = new Dictionary<string, object>();
+            _attachedObjects = new Custom_ValueType<string, object>();
             if (string.IsNullOrEmpty(connectionString))
                 if (string.IsNullOrEmpty(connectionString))
                     throw new Exception("connectionString cant be empty");
@@ -285,7 +285,8 @@ namespace EntityWorker.Core.Transaction
             {
                 SqlConnection.Close();
                 SqlConnection.Open();
-            }else
+            }
+            else
             {
                 Trans.Commit();
                 CreateTransaction();
@@ -335,7 +336,7 @@ namespace EntityWorker.Core.Transaction
             try
             {
                 var o = command.Command.ExecuteReader();
-                OpenedDataReaders.Add(o, true);
+                OpenedDataReaders.GetOrAdd(o, true);
                 result = Extension.DataReaderConverter(this, o, command, type);
             }
             catch (Exception e)
@@ -528,15 +529,16 @@ namespace EntityWorker.Core.Transaction
             if (Extension.ObjectIsNew(objcDbEntity.GetPrimaryKeyValue()))
                 throw new NullReferenceException("Id is IsNullOrEmpty, it cant be attached");
             var key = objcDbEntity.EntityKey();
-            lock (_attachedObjects)
-            {
-                if (_attachedObjects.ContainsKey(key))
-                    if (overwrite)
-                        _attachedObjects.Remove(key);
 
-                if (!_attachedObjects.ContainsKey(key))
-                    _attachedObjects.Add(key, this.Clone(objcDbEntity, CloneLevel.FirstLevelOnly));
+            if (_attachedObjects.ContainsKey(key))
+            {
+                if (overwrite)
+                    _attachedObjects.GetOrAdd(key, this.Clone(objcDbEntity, CloneLevel.FirstLevelOnly), true);
+
             }
+            else
+                _attachedObjects.GetOrAdd(key, this.Clone(objcDbEntity, CloneLevel.FirstLevelOnly));
+
         }
 
         /// <summary>
@@ -551,15 +553,14 @@ namespace EntityWorker.Core.Transaction
             if (Extension.ObjectIsNew(objcDbEntity.GetPrimaryKeyValue()))
                 throw new NullReferenceException("Id is IsNullOrEmpty, it cant be attached");
             var key = objcDbEntity.EntityKey();
-            lock (_attachedObjects)
+            if (_attachedObjects.ContainsKey(key))
             {
-                if (_attachedObjects.ContainsKey(key))
-                    if (overwrite)
-                        _attachedObjects.Remove(key);
+                if (overwrite)
+                    _attachedObjects.GetOrAdd(key, objcDbEntity, true);
 
-                if (!_attachedObjects.ContainsKey(key))
-                    _attachedObjects.Add(key, objcDbEntity);
             }
+            else
+                _attachedObjects.GetOrAdd(key, objcDbEntity);
         }
 
         /// <summary>

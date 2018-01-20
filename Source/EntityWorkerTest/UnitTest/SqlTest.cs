@@ -24,6 +24,8 @@ namespace UnitTest
 
         }
 
+
+
         [TestMethod]
         public void GetAllEntityWorker()
         {
@@ -77,6 +79,20 @@ namespace UnitTest
             {
                 var data = repo.Tag.Include(x=> x.Image).ToList();
                 Assert.AreNotEqual(0, data.Count());
+            }
+        }
+
+
+        [TestMethod]
+
+        public void Delete()
+        {
+            using (var repo = new Repository())
+            {
+                repo.Get<Tag>().Execute().ForEach(x => repo.Delete(x));
+                repo.SaveChanges();
+                var count = repo.Get<Tag>().ExecuteCount();
+                Assert.AreEqual(count, 0);
             }
         }
     }

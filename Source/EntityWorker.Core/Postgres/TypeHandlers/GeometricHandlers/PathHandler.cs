@@ -43,7 +43,7 @@ namespace EntityWorker.Core.Postgres.TypeHandlers.GeometricHandlers
     {
         #region Read
 
-        public override async ValueTask<NpgsqlPath> Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
+        public override async Task<NpgsqlPath> Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
         {
             await buf.Ensure(5, async);
             bool open;

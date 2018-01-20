@@ -42,7 +42,7 @@ namespace EntityWorker.Core.Postgres.TypeHandlers.GeometricHandlers
     {
         #region Read
 
-        public override async ValueTask<NpgsqlPolygon> Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
+        public override async Task<NpgsqlPolygon> Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
         {
             await buf.Ensure(4, async);
             var numPoints = buf.ReadInt32();

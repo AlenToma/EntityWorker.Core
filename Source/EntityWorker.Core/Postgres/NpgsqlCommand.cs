@@ -785,7 +785,7 @@ GROUP BY pg_proc.proargnames, pg_proc.proargtypes, pg_proc.proallargtypes, pg_pr
             }
         }
 
-        async ValueTask<NpgsqlDataReader> Execute(CommandBehavior behavior, bool async, CancellationToken cancellationToken)
+        async Task<NpgsqlDataReader> Execute(CommandBehavior behavior, bool async, CancellationToken cancellationToken)
         {
             ValidateParameters();
             if ((behavior & CommandBehavior.SequentialAccess) != 0 && Parameters.HasOutputParameters)
@@ -1154,12 +1154,12 @@ GROUP BY pg_proc.proargnames, pg_proc.proargtypes, pg_proc.proallargtypes, pg_pr
         {
             cancellationToken.ThrowIfCancellationRequested();
             using (NoSynchronizationContextScope.Enter())
-                return ExecuteScalar(true, cancellationToken).AsTask();
+                return ExecuteScalar(true, cancellationToken);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [ItemCanBeNull]
-        async ValueTask<object> ExecuteScalar(bool async, CancellationToken cancellationToken)
+        async Task<object> ExecuteScalar(bool async, CancellationToken cancellationToken)
         {
             var connector = CheckReadyAndGetConnector();
             var behavior = CommandBehavior.SingleRow;
@@ -1206,7 +1206,7 @@ GROUP BY pg_proc.proargnames, pg_proc.proargtypes, pg_proc.proallargtypes, pg_pr
         {
             cancellationToken.ThrowIfCancellationRequested();
             using (NoSynchronizationContextScope.Enter())
-                return ExecuteDbDataReader(behavior, true, cancellationToken).AsTask();
+                return ExecuteDbDataReader(behavior, true, cancellationToken);
         }
 
         /// <summary>
@@ -1216,7 +1216,7 @@ GROUP BY pg_proc.proargnames, pg_proc.proargtypes, pg_proc.proallargtypes, pg_pr
         protected override DbDataReader ExecuteDbDataReader(CommandBehavior behavior) => ExecuteDbDataReader(behavior, false, CancellationToken.None).GetAwaiter().GetResult();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        async ValueTask<DbDataReader> ExecuteDbDataReader(CommandBehavior behavior, bool async, CancellationToken cancellationToken)
+        async Task<DbDataReader> ExecuteDbDataReader(CommandBehavior behavior, bool async, CancellationToken cancellationToken)
         {
             var connector = CheckReadyAndGetConnector();
             connector.StartUserAction(this);

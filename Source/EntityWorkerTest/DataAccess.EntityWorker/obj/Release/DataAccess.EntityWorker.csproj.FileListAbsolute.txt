@@ -6,8 +6,6 @@ D:\Projects\EntityWorker.Core\Source\EntityWorkerTest\DataAccess.EntityWorker\bi
 D:\Projects\EntityWorker.Core\Source\EntityWorkerTest\DataAccess.EntityWorker\bin\Release\EntityWorker.Core.dll
 D:\Projects\EntityWorker.Core\Source\EntityWorkerTest\DataAccess.EntityWorker\bin\Release\ManagedBass.dll
 D:\Projects\EntityWorker.Core\Source\EntityWorkerTest\DataAccess.EntityWorker\bin\Release\System.Data.SqlClient.dll
-D:\Projects\EntityWorker.Core\Source\EntityWorkerTest\DataAccess.EntityWorker\bin\Release\System.Threading.Tasks.Extensions.dll
-D:\Projects\EntityWorker.Core\Source\EntityWorkerTest\DataAccess.EntityWorker\bin\Release\System.ValueTuple.dll
 D:\Projects\EntityWorker.Core\Source\EntityWorkerTest\DataAccess.EntityWorker\bin\Release\EntityWorker.Core.pdb
 D:\Projects\EntityWorker.Core\Source\EntityWorkerTest\DataAccess.EntityWorker\bin\Release\EntityWorker.Core.xml
 D:\Projects\EntityWorker.Core\Source\EntityWorkerTest\DataAccess.EntityWorker\bin\Release\EntityFramework.xml

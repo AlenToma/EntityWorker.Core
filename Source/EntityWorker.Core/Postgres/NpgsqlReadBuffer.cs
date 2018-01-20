@@ -322,7 +322,7 @@ namespace EntityWorker.Core.Postgres
 
         #region Read Complex
 
-        internal async ValueTask<int> ReadAllBytes(byte[] output, int outputOffset, int len, bool readOnce, bool async)
+        internal async Task<int> ReadAllBytes(byte[] output, int outputOffset, int len, bool readOnce, bool async)
         {
             if (len <= ReadBytesLeft)
             {
@@ -355,7 +355,8 @@ namespace EntityWorker.Core.Postgres
                 Connector.Break();
                 throw new NpgsqlException("Exception while reading from stream", e);
             }
-            return len;
+
+            return await Task.FromResult<int>(len);
         }
 
         /// <summary>

@@ -125,7 +125,7 @@ namespace EntityWorker.Core.Postgres
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal ValueTask<NpgsqlConnector> Allocate(NpgsqlConnection conn, NpgsqlTimeout timeout, bool async, CancellationToken cancellationToken)
+        internal Task<NpgsqlConnector> Allocate(NpgsqlConnection conn, NpgsqlTimeout timeout, bool async, CancellationToken cancellationToken)
         {
             Monitor.Enter(this);
 
@@ -139,14 +139,14 @@ namespace EntityWorker.Core.Postgres
                 IncrementBusy();
                 EnsurePruningTimerState();
                 Monitor.Exit(this);
-                return new ValueTask<NpgsqlConnector>(connector);
+                return Task.FromResult<NpgsqlConnector>(connector);
             }
 
             // No idle connectors available. Have to actually open a new connector or wait for one.
             return AllocateLong(conn, timeout, async, cancellationToken);
         }
 
-        internal async ValueTask<NpgsqlConnector> AllocateLong(NpgsqlConnection conn, NpgsqlTimeout timeout, bool async, CancellationToken cancellationToken)
+        internal async Task<NpgsqlConnector> AllocateLong(NpgsqlConnection conn, NpgsqlTimeout timeout, bool async, CancellationToken cancellationToken)
         {
             Debug.Assert(Monitor.IsEntered(this));
             NpgsqlConnector connector;

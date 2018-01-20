@@ -249,11 +249,11 @@ namespace EntityWorker.Core.Postgres
             }
         }
 
-        internal abstract ValueTask<IBackendMessage> ReadMessage(bool async);
+        internal abstract Task<IBackendMessage> ReadMessage(bool async);
         internal abstract void ProcessDataMessage(DataRowMessage dataMsg);
         internal abstract Task SeekToColumn(int column, bool async);
         internal abstract Task SeekInColumn(int posInColumn, bool async);
-        internal abstract ValueTask<Stream> GetStreamInternal(int column, bool async);
+        internal abstract Task<Stream> GetStreamInternal(int column, bool async);
         internal abstract Task ConsumeRow(bool async);
 
         #endregion
@@ -863,10 +863,10 @@ namespace EntityWorker.Core.Postgres
         public Task<Stream> GetStreamAsync(int ordinal)
         {
             using (NoSynchronizationContextScope.Enter())
-                return GetStream(ordinal, true).AsTask();
+                return GetStream(ordinal, true);
         }
 
-        ValueTask<Stream> GetStream(int ordinal, bool async)
+        Task<Stream> GetStream(int ordinal, bool async)
         {
             CheckRowAndOrdinal(ordinal);
 
@@ -967,10 +967,10 @@ namespace EntityWorker.Core.Postgres
         public Task<TextReader> GetTextReaderAsync(int ordinal)
         {
             using (NoSynchronizationContextScope.Enter())
-                return GetTextReader(ordinal, true).AsTask();
+                return GetTextReader(ordinal, true);
         }
 
-        async ValueTask<TextReader> GetTextReader(int ordinal, bool async)
+        async Task<TextReader> GetTextReader(int ordinal, bool async)
         {
             CheckRowAndOrdinal(ordinal);
 

@@ -59,7 +59,7 @@ namespace EntityWorker.Core.Postgres.TypeHandlers
 
         #region Read
 
-        public override async ValueTask<BitArray> Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
+        public override async Task<BitArray> Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
         {
             await buf.Ensure(4, async);
             var numBits = buf.ReadInt32();
@@ -96,7 +96,7 @@ namespace EntityWorker.Core.Postgres.TypeHandlers
             return result;
         }
 
-        async ValueTask<BitVector32> INpgsqlTypeHandler<BitVector32>.Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription)
+        async Task<BitVector32> INpgsqlTypeHandler<BitVector32>.Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription)
         {
             if (len > 4 + 4)
             {
@@ -114,7 +114,7 @@ namespace EntityWorker.Core.Postgres.TypeHandlers
                 : new BitVector32(buf.ReadInt32());
         }
 
-        async ValueTask<bool> INpgsqlTypeHandler<bool>.Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription)
+        async Task<bool> INpgsqlTypeHandler<bool>.Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription)
         {
             await buf.Ensure(5, async);
             var bitLen = buf.ReadInt32();
@@ -129,13 +129,13 @@ namespace EntityWorker.Core.Postgres.TypeHandlers
             return (b & 128) != 0;
         }
 
-        ValueTask<string> INpgsqlTypeHandler<string>.Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription)
+        Task<string> INpgsqlTypeHandler<string>.Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription)
         {
             buf.Skip(len);
             throw new NpgsqlSafeReadException(new NotSupportedException("Only writing string to PostgreSQL bitstring is supported, no reading."));
         }
 
-        internal override async ValueTask<object> ReadAsObject(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
+        internal override async Task<object> ReadAsObject(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
             => fieldDescription?.TypeModifier == 1
                 ? (object)await Read<bool>(buf, len, async, fieldDescription)
                 : await Read<BitArray>(buf, len, async, fieldDescription);
@@ -280,7 +280,7 @@ namespace EntityWorker.Core.Postgres.TypeHandlers
         public BitStringArrayHandler(BitStringHandler elementHandler)
             : base(elementHandler) {}
 
-        protected internal override async ValueTask<TArray> Read<TArray>(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
+        protected internal override async Task<TArray> Read<TArray>(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
         {
             var t = typeof(TArray);
             if (!t.IsArray)
@@ -293,7 +293,7 @@ namespace EntityWorker.Core.Postgres.TypeHandlers
             throw new InvalidCastException($"Can't cast database type {PgDisplayName} to {typeof(TArray).Name}");
         }
 
-        internal override async ValueTask<object> ReadAsObject(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription)
+        internal override async Task<object> ReadAsObject(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription)
             => fieldDescription?.TypeModifier == 1
                 ? await Read<bool>(buf, async)
                 : await Read<BitArray>(buf, async);

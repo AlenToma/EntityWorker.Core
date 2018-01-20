@@ -76,14 +76,14 @@ namespace EntityWorker.Core.Postgres.TypeHandlers
 
         #region Read
 
-        public override ValueTask<string> Read(NpgsqlReadBuffer buf, int byteLen, bool async, FieldDescription fieldDescription = null)
+        public override Task<string> Read(NpgsqlReadBuffer buf, int byteLen, bool async, FieldDescription fieldDescription = null)
         {
             if (buf.ReadBytesLeft >= byteLen)
-                return new ValueTask<string>(buf.ReadString(byteLen));
+                return Task.FromResult<string>(buf.ReadString(byteLen));
             return ReadLong(buf, byteLen, async);
         }
 
-        async ValueTask<string> ReadLong(NpgsqlReadBuffer buf, int byteLen, bool async)
+        async Task<string> ReadLong(NpgsqlReadBuffer buf, int byteLen, bool async)
         {
             if (byteLen <= buf.Size)
             {
@@ -116,7 +116,7 @@ namespace EntityWorker.Core.Postgres.TypeHandlers
             return buf.TextEncoding.GetString(tempBuf);
         }
 
-        async ValueTask<char[]> INpgsqlTypeHandler<char[]>.Read(NpgsqlReadBuffer buf, int byteLen, bool async, FieldDescription fieldDescription)
+        async Task<char[]> INpgsqlTypeHandler<char[]>.Read(NpgsqlReadBuffer buf, int byteLen, bool async, FieldDescription fieldDescription)
         {
             if (byteLen <= buf.Size)
             {
@@ -144,13 +144,13 @@ namespace EntityWorker.Core.Postgres.TypeHandlers
             return buf.TextEncoding.GetChars(tempBuf);
         }
 
-        ValueTask<ArraySegment<char>> INpgsqlTypeHandler<ArraySegment<char>>.Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription)
+        Task<ArraySegment<char>> INpgsqlTypeHandler<ArraySegment<char>>.Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription)
         {
             buf.Skip(len);
             throw new NpgsqlSafeReadException(new NotSupportedException("Only writing ArraySegment<char> to PostgreSQL text is supported, no reading."));
         }
 
-        ValueTask<char> INpgsqlTypeHandler<char>.Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription)
+        Task<char> INpgsqlTypeHandler<char>.Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription)
         {
             buf.Skip(len);
             throw new NpgsqlSafeReadException(new NotSupportedException("Only writing char to PostgreSQL text is supported, no reading."));

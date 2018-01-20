@@ -39,7 +39,7 @@ namespace EntityWorker.Core.Postgres.TypeHandlers
             _wrappedHandler = (UnmappedCompositeHandler)new UnmappedCompositeTypeHandlerFactory(_nameTranslator).Create(PostgresType, _conn);
         }
 
-        public override ValueTask<T> Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
+        public override Task<T> Read(NpgsqlReadBuffer buf, int len, bool async, FieldDescription fieldDescription = null)
         {
             if (_wrappedHandler == null)
                 WrapHandler();

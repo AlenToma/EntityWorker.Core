@@ -3,9 +3,9 @@
     <TargetFrameworks>netcoreapp2.0;netstandard2.0;net451;</TargetFrameworks>
     <PackageId>EntityWorker.Core</PackageId>
     <AssemblyName>EntityWorker.Core</AssemblyName>
-    <AssemblyVersion>1.0.3.3</AssemblyVersion>
-    <FileVersion>1.0.3.3</FileVersion>
-    <Version>1.3.3</Version>
+    <AssemblyVersion>1.0.3.5</AssemblyVersion>
+    <FileVersion>1.0.3.5</FileVersion>
+    <Version>1.3.5</Version>
     <Authors>Alen Toma</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageProjectUrl>https://github.com/AlenToma/EntityWorker.Core</PackageProjectUrl>
@@ -18,7 +18,7 @@
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <!--<TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeP2POutput;</TargetsForTfmSpecificBuildOutput>-->
     <!--<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);CustomContentTarget</TargetsForTfmSpecificContentInPackage>-->
-    <PackageReleaseNotes>Support to postgresql</PackageReleaseNotes>
+    <PackageReleaseNotes></PackageReleaseNotes>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>7.2</LangVersion>
   </PropertyGroup>
@@ -34,7 +34,6 @@
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <DocumentationFile>bin\Release\$(TargetFramework)\EntityWorker.Core.xml</DocumentationFile>
-    
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp2.0|x86'">
@@ -42,10 +41,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!--<PackageReference Include="FastDeepCloner" Version="1.0.25" />-->
     <PackageReference Include="System.Data.SqlClient" Version="4.4.2" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.4.0" />
-    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
@@ -60,7 +56,6 @@
     <Reference Include="System.Transactions"></Reference>
     <Reference Include="System.DirectoryServices" Pack="false" />
     <Reference Include="System.Security" />
-    <PackageReference Include="System.ValueTuple" Version="4.3.1" />
   </ItemGroup>
 
   <ItemGroup>
