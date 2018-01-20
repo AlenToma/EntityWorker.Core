@@ -1,5 +1,8 @@
 # Introduction to [EntityWorker.Core](https://www.nuget.org/packages/EntityWorker.Core/)
 
+## EntityFrameWork vs EntityWorker.Core Performance test
+![screenshot](https://github.com/AlenToma/EntityWorker.Core/blob/master/EF_VS_EW.PNG?raw=true)
+
 ## CodeProject
 [EntityWorker-Core-An-Alternative-to-Entity-Framewo](https://www.codeproject.com/Tips/1222424/EntityWorker-Core-An-Alternative-to-Entity-Framewo)
 
