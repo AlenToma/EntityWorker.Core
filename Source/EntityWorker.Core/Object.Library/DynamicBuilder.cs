@@ -1,6 +1,6 @@
 ﻿using EntityWorker.Core.Attributes;
 using EntityWorker.Core.Helper;
-using FastDeepCloner;
+using EntityWorker.Core.FastDeepCloner;
 using System;
 using System.Linq;
 using System.Reflection;

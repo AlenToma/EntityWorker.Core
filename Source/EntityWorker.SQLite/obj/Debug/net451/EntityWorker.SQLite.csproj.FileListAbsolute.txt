@@ -9,4 +9,3 @@ D:\Projects\EntityWorker.Core\Source\EntityWorker.SQLite\obj\Debug\net451\Entity
 D:\Projects\EntityWorker.Core\Source\EntityWorker.SQLite\obj\Debug\net451\SR\EntityWorker.SQLite.resources.dll
 D:\Projects\EntityWorker.Core\Source\EntityWorker.SQLite\obj\Debug\net451\EntityWorker.SQLite.dll
 D:\Projects\EntityWorker.Core\Source\EntityWorker.SQLite\obj\Debug\net451\EntityWorker.SQLite.pdb
-D:\Projects\EntityWorker.Core\Source\EntityWorker.SQLite\obj\Debug\net451\EntityWorker.SQLite.csprojResolveAssemblyReference.cache

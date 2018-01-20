@@ -1,0 +1,1748 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>EntityWorker.Core</name>
+    </assembly>
+    <members>
+        <member name="T:EntityWorker.Core.Attributes.DataEncode">
+            <summary>
+            Choose to Encode the data in the database so none could read or decript it without knowing the key
+            LinqToSql will also Encode the value when you select a Search
+            <Example>
+            .Where(x=> x.Password == "test") Will be equal to .Where(x=> x.Password == Encode("test"))
+            so no need to worry when you search those column in the dataBase 
+            you could Encode Adress, bankAccount information and so on with ease
+            </Example>
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.Attributes.DataEncode.#ctor(System.String,EntityWorker.Core.Helper.DataCipherKeySize)">
+            <summary>
+            Encode Key or leave it empty to use a EntityWorker.Core Defult Key
+            </summary>
+            <param name="key">Default =  GlobalConfiguration.DataEncode_Key</param>
+            <param name="keySize"> NETCOREAPP2.0 can only handle 128.  128 || 256 Default = GlobalConfiguration.DataEncode_Key_Size  </param>
+            <param name=""></param>
+        </member>
+        <member name="T:EntityWorker.Core.Attributes.DefaultOnEmpty">
+            <summary>
+            Assign Default Value when Property is null
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.Attributes.DefaultOnEmpty.#ctor(System.Object)">
+            <summary>
+            add Default Value when Property is null
+            </summary>
+            <param name="value"></param>
+        </member>
+        <member name="T:EntityWorker.Core.Attributes.ExcludeFromAbstract">
+            <summary>
+            This indicates that the prop will not be saved to the database.
+            </summary>
+        </member>
+        <member name="T:EntityWorker.Core.Attributes.ForeignKey">
+            <inheritdoc />
+            <summary>
+            Property is a ForeignKey in the database.
+            </summary>
+        </member>
+        <member name="P:EntityWorker.Core.Attributes.ForeignKey.Type">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.Attributes.ForeignKey.#ctor">
+            <inheritdoc />
+            <summary>
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.Attributes.ForeignKey.#ctor(System.Type,System.String)">
+            <inheritdoc />
+            <summary>
+            </summary>
+            <param name="type"></param>
+            <param name="propertyName">Map this key to propertyName</param>
+        </member>
+        <member name="T:EntityWorker.Core.Attributes.IndependentData">
+            <inheritdoc />
+            <summary>
+            This attr will tell LightDataTable abstract to not auto Delete this object when deleting parent, it will however try to create new or update  
+            </summary>
+        </member>
+        <member name="T:EntityWorker.Core.Attributes.NotNullable">
+            <summary>
+            This attribute is most used on properties with type string
+            in-case we don't want them to be null able
+            </summary>
+        </member>
+        <member name="T:EntityWorker.Core.Attributes.PrimaryKey">
+            <inheritdoc />
+            <summary>
+            </summary>
+        </member>
+        <member name="T:EntityWorker.Core.Attributes.PropertyName">
+            <summary>
+            Have diffrent Name for the property in the database
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.Attributes.Rule.#ctor(System.Type)">
+            <inheritdoc />
+            <summary>
+            Define class rule by adding this attribute
+            ruleType must inherit from IDbRuleTrigger
+            ex UserRule : IDbRuleTrigger<User/>
+            </summary>
+            <param name="ruleType"></param>
+        </member>
+        <member name="T:EntityWorker.Core.Attributes.StringFy">
+            <summary>
+            Save the property as string in the database
+            mostly used when we don't want an enum to be saved as integer in the database
+            </summary>
+        </member>
+        <member name="T:EntityWorker.Core.Attributes.Table">
+            <summary>
+            Define diffrent name for the table
+            </summary>
+        </member>
+        <member name="T:EntityWorker.Core.Attributes.ToBase64String">
+            <inheritdoc />
+            <summary>
+            Will be saved to the database as base64string 
+            and converted back to its original string when its read
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.DbSchema.Select``1(System.String)">
+            <summary>
+            Get all by object
+            PrimaryKey attr must be set ins Where
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="repository"></param>
+            <param name="query"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.DbSchema.Select(System.Type,System.String)">
+            <summary>
+            Get all by object
+            PrimaryKey attr must be set ins Where
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="repository"></param>
+            <param name="query"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.DbSchema.GetById(System.Object,System.Type)">
+            <summary>
+            Get object by ID
+            Primary Key attribute must be set
+            </summary>
+            <param name="id"></param>
+            <param name="repository"></param>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.DbSchema.GetSqlAll(System.Type)">
+            <summary>
+            Get all by object
+            PrimaryKey attr must be set
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="repository"></param>
+            <param name="quary"></param>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.DbSchema.GetByColumn(System.Object,System.String,System.Type)">
+            <summary>
+            Get all by object
+            Get object by column, as foreignKey
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="column"></param>
+            <param name="repository"></param>
+            <param name="quary"></param>
+            <param name="id"></param>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="T:EntityWorker.Core.GlobalConfiguration">
+            <summary>
+            Set this in Application_Start
+            </summary>
+        </member>
+        <member name="P:EntityWorker.Core.GlobalConfiguration.DataEncode_Key_Size">
+            <summary>
+            Default Value for DataEncode
+            </summary>
+        </member>
+        <member name="P:EntityWorker.Core.GlobalConfiguration.DataEncode_Key">
+            <summary>
+            Default Value for DataEncode
+            </summary>
+        </member>
+        <member name="P:EntityWorker.Core.GlobalConfiguration.CultureInfo">
+            <summary>
+            EntityWorker will Use this CultureInfo to convert the data eg decimal, datetime and so on, from the database 
+            Default is EN;
+            </summary>
+        </member>
+        <member name="T:EntityWorker.Core.Helper.DataCipherKeySize">
+            <summary>
+            Default = GlobalConfiguration.DataEncode_Key_Size
+            </summary>
+        </member>
+        <member name="T:EntityWorker.Core.Helper.Extension">
+            <summary>
+            UseFull Extension, that work with EntityWorker.Core
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.Extension.ClearAllIdsHierarchy``1(``0,System.Boolean)">
+            <summary>
+            Clear all ids
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="item"></param>
+            <param name="includeIndependedData"> Clear all ids of object that contains IndependedData attributes</param>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.Extension.ClearAllIdsHierarchy``1(System.Collections.Generic.List{``0},System.Boolean)">
+            <summary>
+            Clear all ids
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="item"></param>
+            <param name="includeIndependedData"> Clear all ids of object that contains IndependedData attributes</param>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.Extension.ClearAllIdsHierarchy(System.Object,System.Boolean)">
+            <summary>
+            Clear all ids
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="item"></param>
+            <param name="includeIndependedData"> Clear all ids of object that contains IndependedData attributes</param>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.Extension.TrimEnd(System.String,System.String)">
+            <summary>
+            TrimEnd with string
+            </summary>
+            <param name="source"></param>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.Extension.InsertAfter(System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Try and insert Last
+            </summary>
+            <param name="str">Source string</param>
+            <param name="text"> string to insert</param>
+            <param name="identifier"></param>
+            <param name="insertLastIfNotFound">insert after a specific string, count is from last</param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.Extension.GetDbTypeByType(System.Type,EntityWorker.Core.Helper.DataBaseTypes)">
+            <summary>
+            Convert System Type to SqlType
+            </summary>
+            <param name="type"></param>
+            <param name="dbType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.Extension.Between(System.DateTime,System.DateTime,System.DateTime)">
+            <summary>
+            if date is between two dates
+            </summary>
+            <param name="input"></param>
+            <param name="date1"></param>
+            <param name="date2"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.Extension.GetPropertyName(FastDeepCloner.IFastDeepClonerProperty)">
+            <summary>
+            Get PropertyName from the cashed Properties
+            </summary>
+            <param name="prop"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.Extension.GetPrimaryKey(System.Type)">
+            <summary>
+            Get the Primary key from type
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.Extension.GetPrimaryKey(System.Object)">
+            <summary>
+            Get the Primary key from type
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.Extension.GetPrimaryKeyValue(System.Object)">
+            <summary>
+            Get the Primary key Value
+            </summary>
+            <param name="item"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.Extension.ObjectIsNew(System.Object)">
+            <summary>
+            Validate string and guid and long 
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.Extension.SetPrimaryKeyValue(System.Object,System.Object)">
+            <summary>
+            Set the Primary key Value
+            </summary>
+            <param name="item"></param>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.Extension.CreateInstance(System.Type,System.Boolean)">
+            <summary>
+            Create Instance
+            </summary>
+            <param name="type"></param>
+            <param name="uninitializedObject"> true for FormatterServices.GetUninitializedObject and false for Activator.CreateInstance </param>
+            <returns></returns>
+        </member>
+        <member name="F:EntityWorker.Core.Helper.Extension.CachedActualType">
+            <summary>
+            Get IList Actual Type
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.Extension.GetActualType(System.Type)">
+            <summary>
+            Get Internal type of IList
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.Extension.IsBase64String(System.String)">
+            <summary>
+            Check if string is base64
+            </summary>
+            <param name="str"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.Extension.ToType``1(System.Object)">
+            <summary>
+            Convert From type to another type,
+            make sure to have the same propertyNames in both or you could also map them by PropertyName Attributes
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="o"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.Extension.Clone``1(System.Collections.Generic.List{``0},FastDeepCloner.FieldType)">
+            <summary>
+            Clone Object, se FastDeepCloner fo more information
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="items"></param>
+            <param name="fieldType"></param>
+            <returns></returns>
+        </member>
+        <member name="T:EntityWorker.Core.Helper.MethodHelper">
+            <summary>
+            UseFull Methods 
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.MethodHelper.ConvertValue``1(System.Object)">
+            <summary>
+            Convert Value from Type to Type
+            when fail a default value will be loaded.
+            can handle all known types like datetime, time span, string, long etc
+            ex
+             "1115rd" to int? will return null
+             "152" to int? 152
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="value"></param>
+            <returns></returns>
+            
+        </member>
+        <member name="M:EntityWorker.Core.Helper.MethodHelper.ConvertValue(System.Object,System.Type)">
+            <summary>
+            Convert Value from Type to Type
+            when fail a default value will be loaded.
+            can handle all known types like datetime, time span, string, long etc
+            ex
+             "1115rd" to int? will return null
+             "152" to int? 152
+            </summary>
+            <param name="value"></param>
+            <param name="toType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.MethodHelper.EncodeStringToBase64(System.String)">
+            <summary>
+            Convert String ToBase64String
+            </summary>
+            <param name="stringToEncode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.MethodHelper.DecodeStringFromBase64(System.String)">
+            <summary>
+            Convert Base64String To String 
+            </summary>
+            <param name="stringToDecode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.IDbRuleTrigger`1.BeforeSave(EntityWorker.Core.InterFace.IRepository,`0)">
+            <summary>
+            Event triggered before save an item
+            </summary>
+            <param name="repository"></param>
+            <param name="itemDbEntity"></param>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.IDbRuleTrigger`1.AfterSave(EntityWorker.Core.InterFace.IRepository,`0,System.Object)">
+            <summary>
+            triggered after saveing an item
+            </summary>
+            <param name="repository"></param>
+            <param name="itemDbEntity"></param>
+            <param name="objectId"></param>
+        </member>
+        <member name="P:EntityWorker.Core.Interface.ILightDataTable.TablePrimaryKey">
+            <summary>
+            Table Primary Key Name 
+            to use FindByPrimaryKey
+            </summary>
+        </member>
+        <member name="P:EntityWorker.Core.Interface.ILightDataTable.TotalPages">
+            <summary>
+            Total Pages
+            </summary>
+        </member>
+        <member name="P:EntityWorker.Core.Interface.ILightDataTable.Columns">
+            <summary>
+            Columns string
+            </summary>
+        </member>
+        <member name="P:EntityWorker.Core.Interface.ILightDataTable.ColumnsWithIndexKey">
+            <summary>
+            Column with int
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ILightDataTable.AddColumn(System.String,System.String,System.Type,System.Object)">
+            <summary>
+            Add column to lightDataTable
+            </summary>
+            <param name="columnName"></param>
+            <param name="displayName"></param>
+            <param name="dataType"></param>
+            <param name="defaultValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ILightDataTable.AddColumn(System.String,System.Type,System.Object)">
+            <summary>
+            Add column to lightDataTable
+            </summary>
+            <param name="columnName"></param>
+            <param name="dataType"></param>
+            <param name="defaultValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ILightDataTable.FindByPrimaryKey``1(System.Object)">
+            <summary>
+            Generic find by primary Key Value.
+            T can be bool or LightDataTableRow
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="primaryKeyValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ILightDataTable.AddRow(System.Object[])">
+            <summary>
+            Add row
+            </summary>
+            <param name="values"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ILightDataTable.AddRow(EntityWorker.Core.LightDataTableRow)">
+            <summary>
+            Add Row
+            </summary>
+            <param name="row"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ILightDataTable.RemoveColumn``2(System.Linq.Expressions.Expression{System.Func{``0,``1}})">
+            <summary>
+            Remove column by expression
+            </summary>
+            <typeparam name="T"></typeparam>
+            <typeparam name="P"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ILightDataTable.MergeByPrimaryKey(EntityWorker.Core.LightDataTableRow)">
+            <summary>
+            merge two rows, will merge both column and values
+            </summary>
+            <param name="rowToBeMerged"></param>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ILightDataTable.NewRow(System.Globalization.CultureInfo)">
+            <summary>
+            return new Row
+            </summary>
+            <param name="cultureInfo"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ILightDataTable.RemoveColumn(System.String)">
+            <summary>
+            Remove column by string
+            </summary>
+            <param name="columnName"></param>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ILightDataTable.RemoveColumn(System.Int32)">
+            <summary>
+            remove column by its index
+            </summary>
+            <param name="columnIndex"></param>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ILightDataTable.AssignValueToColumn(System.String,System.Object)">
+            <summary>
+            change value of the column
+            </summary>
+            <param name="columnName"></param>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ILightDataTable.MergeColumns(EntityWorker.Core.LightDataTable)">
+            <summary>
+            merge Column, will add if not exist
+            </summary>
+            <param name="data2"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ILightDataTable.Merge(EntityWorker.Core.LightDataTable,System.Boolean)">
+            <summary>
+            Merge LightDataTable 
+            </summary>
+            <param name="data2"></param>
+            <param name="mergeColumnAndRow"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ILightDataTable.OrderBy``2(System.Linq.Expressions.Expression{System.Func{``0,``1}},System.Boolean)">
+            <summary>
+            Reorder rows by expression
+            </summary>
+            <typeparam name="T"></typeparam>
+            <typeparam name="P"></typeparam>
+            <param name="action"></param>
+            <param name="position"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ILightDataTable.OrderBy(System.String,System.Boolean)">
+            <summary>
+            Reorder by string
+            </summary>
+            <param name="columnName"></param>
+            <param name="position">desc or asc</param>
+            <returns></returns>
+        </member>
+        <member name="P:EntityWorker.Core.Interface.ILightDataTable.Rows">
+            <summary>
+            Rows
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ILightDataTable.SelectMany``1(System.Predicate{EntityWorker.Core.LightDataTableRow})">
+            <summary>
+            T could be bool For Any
+            T could be LightDataTableRow for the first found Item
+            T could be List of LightDataTableRow found items
+            T could be LightDataTable a Table result 
+            T could also be LightDataRowCollection of found items
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="func"></param>
+            <returns></returns>
+        </member>
+        <member name="T:EntityWorker.Core.Interface.IMigration">
+            <summary>
+            Inhert from this class and create a migration File
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.IMigration.ExecuteMigration(EntityWorker.Core.InterFace.IRepository)">
+            <summary>
+            Do your db Changes here
+            </summary>
+            <param name="repository"></param>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.IMigrationConfig.GetMigrations(EntityWorker.Core.InterFace.IRepository)">
+            <summary>
+            All available Migrations to be executed
+            </summary>
+        </member>
+        <member name="T:EntityWorker.Core.Interface.ISqlQueryable`1">
+            <summary>
+            quaryProvider for EntityWorker.Core
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="P:EntityWorker.Core.Interface.ISqlQueryable`1.ParsedLinqToSql">
+            <summary>
+            Result of LightDataTable LinqToSql
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.AddRange(System.Collections.Generic.List{`0})">
+            <summary>
+            Add Items
+            </summary>
+            <param name="items"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.Add(`0)">
+            <summary>
+            Add Item
+            </summary>
+            <param name="item"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.IgnoreChildren(System.Linq.Expressions.Expression{System.Func{`0,System.Object}}[])">
+            <summary>
+            Ignore loading some children eg ignore Person
+            IgnoreChildren(x=> x.User.Person)
+            </summary>
+            <param name="ignoreActions"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.LoadChildren(System.Boolean)">
+            <summary>
+            LoadChildren, will load all children herarkie if onlyFirstLevel is not true
+            </summary>
+            <param name="onlyFirstLevel"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.LoadChildren(System.Linq.Expressions.Expression{System.Func{`0,System.Object}}[])">
+            <summary>
+            LoadChildren, will load all selected children herarkie eg
+            LoadChildren(x=> x.User, x=> x.Adress.Select(a=> a.Country)
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.Where(System.Linq.Expressions.Expression{System.Predicate{`0}})">
+            <summary>
+            Search 
+            </summary>
+            <param name="match"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.Take(System.Int32)">
+            <summary>
+            Take only the selected rows 
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.Skip(System.Int32)">
+            <summary>
+            Skip rows
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.OrderBy(System.Linq.Expressions.Expression{System.Func{`0,System.Object}})">
+            <summary>
+            Order By Column
+            </summary>
+            <param name="exp"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.OrderByDescending(System.Linq.Expressions.Expression{System.Func{`0,System.Object}})">
+            <summary>
+            OrderByDescending Column
+            </summary>
+            <param name="exp"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.Execute">
+            <summary>
+            Execute the search Command
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.ExecuteAsync">
+            <summary>
+            Execute the search Command
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.ExecuteFirstOrDefault">
+            <summary>
+            Select the top 1
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.ExecuteCount">
+            <summary>
+            Return the count of the executed quary
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.ExecuteAny">
+            <summary>
+            Return the Any of the executed quary
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.Save">
+            <summary>
+            Save All Changes. 
+            You have to trigger SaveChanges() to commit
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.SaveAll(System.Func{`0,System.Boolean})">
+            <summary>
+            Save All Changes. 
+            You have to trigger SaveChanges() to commit
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.Remove">
+            <summary>
+            Remove All objects herarkie. 
+            You have to trigger SaveChanges() to commit
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.RemoveAll(System.Func{`0,System.Boolean})">
+            <summary>
+            Remove All objects herarkie. 
+            You have to trigger SaveChanges() to commit
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.SaveChanges">
+            <summary>
+            Commit Changes
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.ToTable">
+            <summary>
+            Convert to LightDataTable
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.ExecuteAndConvertToType``1">
+            <summary>
+            Convert Object of type a to b 
+            all properties of B have to be mapped using attribute PropertyName or the propertName of A = B eg a."UserId" = b."UserId" 
+            </summary>
+            <typeparam name="TSource"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="T:EntityWorker.Core.InterFace.IRepository">
+            <summary>
+            EntityWorker.Core Repository
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.Clone``1(``0,FastDeepCloner.CloneLevel,FastDeepCloner.FieldType)">
+            <summary>
+            Clone Object
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="o"></param>
+            <param name="level"></param>
+            <param name="fieldType"></param>
+            <returns></returns>
+        </member>
+        <member name="P:EntityWorker.Core.InterFace.IRepository.DataBaseTypes">
+            <summary>
+            Database type
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.GetLightDataTable(EntityWorker.Core.Object.Library.DbCommandExtended,System.String)">
+            <summary>
+            Get LightDataTable by SqlCommand
+            </summary>
+            <param name="cmd"></param>
+            <param name="primaryKey"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.GetSqlCommand(System.String,System.Type)">
+            <summary>
+            Get SqlCommand by sql string
+            </summary>
+            <param name="sql"></param>
+            <param name="type"> Set for faster loading </param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.AddInnerParameter(EntityWorker.Core.Object.Library.DbCommandExtended,System.String,System.Object,System.Data.SqlDbType)">
+            <summary>
+            Add Parameter to sqlCommand
+            </summary>
+            <param name="cmd"></param>
+            <param name="attrName"></param>
+            <param name="value"></param>
+            <param name="dbType"></param>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.GetSqlType(System.Type)">
+            <summary>
+            Get SqlDbType By system Type
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.ExecuteScalar(EntityWorker.Core.Object.Library.DbCommandExtended)">
+            <summary>
+            ExecuteScale with return value
+            </summary>
+            <param name="cmd"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.ExecuteNonQuery(EntityWorker.Core.Object.Library.DbCommandExtended)">
+            <summary>
+            Execute Quary
+            </summary>
+            <param name="cmd"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.CreateTransaction">
+            <summary>
+            Create Transaction
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.Rollback">
+            <summary>
+            RoleBack trnsaction
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.SaveChanges">
+            <summary>
+            Commit Changes
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.Delete(System.Object)">
+            <summary>
+            Delete entity.
+            SaveChanges is needet after
+            </summary>
+            <param name="entity"></param>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.DeleteAsync(System.Object)">
+            <summary>
+            Delete entity.
+            SaveChanges is needet after
+            </summary>
+            <param name="entity"></param>
+            
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.Save(System.Object)">
+            <summary>
+            Save entity.
+            SaveChanges is needet after
+            </summary>
+            <param name="entity"></param>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.SaveAsync(System.Object)">
+            <summary>
+            Save entity.
+            SaveChanges is needet after
+            </summary>
+            <param name="entity"></param>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.Attach(System.Object,System.Boolean)">
+            <summary>
+            Attach an object to entityWorker.
+            </summary>
+            <param name="objcDbEntity"></param>
+            <param name="overwrite"> override if exist</param>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.Get``1">
+            <summary>
+            Get Entity 
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.GetAll``1">
+            <summary>
+            Get all 
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.GetAllAsync``1">
+            <summary>
+            Get all 
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.LoadChildren``1(``0,System.Boolean,System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String})">
+            <summary>
+            load children 
+            </summary>
+            <typeparam name="T"></typeparam>
+            <typeparam name="TP"></typeparam>
+            <param name="repository"></param>
+            <param name="item"></param>
+            <param name="onlyFirstLevel"></param>
+            <param name="ignoreList"></param>
+            <param name="actions"></param>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.LoadChildrenAsync``1(``0,System.Boolean,System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String})">
+            <summary>
+            load children 
+            </summary>
+            <typeparam name="T"></typeparam>
+            <typeparam name="TP"></typeparam>
+            <param name="repository"></param>
+            <param name="item"></param>
+            <param name="onlyFirstLevel"></param>
+            <param name="classes"></param>
+            <param name="ignoreList"></param>
+            <param name="actions"></param>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.LoadChildrenAsync``2(``0,System.Boolean,System.Collections.Generic.List{System.String},System.Linq.Expressions.Expression{System.Func{``0,``1}}[])">
+            <summary>
+            load children 
+            </summary>
+            <typeparam name="T"></typeparam>
+            <typeparam name="TP"></typeparam>
+            <param name="repository"></param>
+            <param name="item"></param>
+            <param name="onlyFirstLevel"></param>
+            <param name="ignoreList"></param>
+            <param name="actions"></param>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.LoadChildren``2(``0,System.Boolean,System.Collections.Generic.List{System.String},System.Linq.Expressions.Expression{System.Func{``0,``1}}[])">
+            <summary>
+            load children 
+            </summary>
+            <typeparam name="T"></typeparam>
+            <typeparam name="TP"></typeparam>
+            <param name="repository"></param>
+            <param name="item"></param>
+            <param name="onlyFirstLevel"></param>
+            <param name="ignoreList"></param>
+            <param name="actions"></param>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.Select``1(System.String)">
+            <summary>
+            Get IList by sql
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="sqlString"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.SelectAsync``1(System.String)">
+            <summary>
+            Get IList by sql
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="sqlString"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.GetObjectChanges(System.Object)">
+            <summary>
+            Get EntityChanges. entity has to be attachet 
+            </summary>
+            <param name="entity"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.GetObjectChanges(System.Object,System.Object)">
+            <summary>
+            Get object changes
+            </summary>
+            <param name="entityA"></param>
+            <param name="entityB"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.IsAttached(System.Object)">
+            <summary>
+            If enetiy is attached
+            </summary>
+            <param name="entity"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.CreateTable``1(System.Boolean)">
+            <summary>
+            Create Table by System.Type
+            all under tables will be created
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="force">force recreation if table eg if exist delete then create agen</param>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.CreateTable(System.Type,System.Boolean)">
+            <summary>
+            Create Table by System.Type
+            all under tables will be created
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="type"></param>
+            <param name="force">force recreation if table eg if exist delete then create agen</param>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.RemoveTable``1">
+            <summary>
+            Remove Table
+            all under tables will also be removed
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.RemoveTable(System.Type)">
+            <summary>
+            Remove Table
+            all under tables will also be removed
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.DataReaderConverter``1(EntityWorker.Core.Object.Library.DbCommandExtended)">
+            <summary>
+            Convert DbCommandExtended to List of Type T
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="command"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.DataReaderConverter(EntityWorker.Core.Object.Library.DbCommandExtended,System.Type)">
+            <summary>
+            Convert DbCommandExtended to list of System.Type
+            </summary>
+            <param name="repository"></param>
+            <param name="command"></param>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.LightDataTable.OrderBy(System.String,System.Boolean)">
+            <summary>
+            ReOrders the _columns
+            </summary>
+            <param name="columnName"></param>
+            <param name="position"></param>
+        </member>
+        <member name="M:EntityWorker.Core.LightDataTable.OrderBy``2(System.Linq.Expressions.Expression{System.Func{``0,``1}},System.Boolean)">
+            <summary>
+            Orderby expressions
+            </summary>
+            <typeparam name="T"></typeparam>
+            <typeparam name="P"></typeparam>
+            <param name="action"></param>
+            <param name="position"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.LightDataTable.ValidatePagerByPageNumber(System.Int32)">
+            <summary>
+            return true if pageNumber exist
+            </summary>
+            <param name="pageNumber"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.LightDataTable.Merge(EntityWorker.Core.LightDataTable,System.Boolean)">
+            <summary>
+            Merge two dataTable togather. The Two tables dose not have to have the same number of columns!
+            </summary>
+            <param name="data2"></param>
+            <param name="mergeColumnAndRow"></param>
+        </member>
+        <member name="M:EntityWorker.Core.LightDataTable.MergeColumns(EntityWorker.Core.LightDataTable)">
+            <summary>
+            Merge two dataTables _columns togather. The Two tables dose not have to have the same number of columns!
+            </summary>
+            <param name="data2"></param>
+        </member>
+        <member name="M:EntityWorker.Core.LightDataTable.AssignValueToColumn(System.String,System.Object)">
+            <summary>
+            Assign Value to column. 
+            </summary>
+            <param name="columnName"></param>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.LightDataTable.RemoveColumn``2(System.Linq.Expressions.Expression{System.Func{``0,``1}})">
+            <summary>
+            Remove Column By Expression eg this.RemoveColumn((Employee x)=> x.EmployeeID);
+            </summary>
+            <typeparam name="T"></typeparam>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.LightDataTable.MergeByPrimaryKey(EntityWorker.Core.LightDataTableRow)">
+            <summary>
+             Merge two existing rows by its primaryKey
+            </summary>
+            <param name="rowToBeMerged"></param>
+        </member>
+        <member name="M:EntityWorker.Core.LightDataTable.FindByPrimaryKey``1(System.Object)">
+            <summary>
+            T can only be Bool or LightDataRow.
+            bool for is found or lightDatarow for data
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="primaryKeyValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.LightDataTable.AddColumn(System.String,System.Type,System.Object)">
+            <summary>
+            Add Column to LightDataTable, its alot faster to add column before adding any rows.
+            </summary>
+            <param name="columnName"></param>
+            <param name="dataType"></param>
+            <param name="defaultValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.LightDataTable.AddColumn(System.String,System.String,System.Type,System.Object)">
+            <summary>
+            Add Column to LightDataTable, its alot faster to add column before adding any rows.
+            </summary>
+            <param name="columnName"></param>
+            <param name="displayName"></param>
+            <param name="dataType"></param>
+            <param name="defaultValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.LightDataTable.AddRow(System.Object[])">
+            <summary>
+            Add new row to lightDataTable
+            </summary>
+            <param name="values"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.LightDataTable.AddRow(EntityWorker.Core.LightDataTableRow)">
+            <summary>
+            Add new Row to LightDataTable
+            </summary>
+            <param name="row"></param>
+            <returns></returns>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:EntityWorker.Core.LightDataTable.SelectMany``1(System.Predicate{EntityWorker.Core.LightDataTableRow})" -->
+        <member name="M:EntityWorker.Core.LightDataTable.#ctor(System.Object,System.Boolean,System.Type,System.Boolean,System.Boolean)">
+            <summary>
+            Convert ObjectList To LightDataTable
+            </summary>
+            <param name="obj"></param>
+            <param name="execludeClasses"></param>
+            <param name="overdedDataType"></param>
+            <param name="ignoreTypeValidation"></param>
+        </member>
+        <member name="M:EntityWorker.Core.LightDataTableRow.ContainKey``2(System.Linq.Expressions.Expression{System.Func{``0,``1}})">
+            <summary>
+            Column ContainKey By Expression
+            </summary>
+            <typeparam name="T"></typeparam>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.LightDataTableRow.SetTValue``2(System.Linq.Expressions.Expression{System.Func{``0,``1}},``1)">
+            <summary>
+            Set Value By Expressions
+            </summary>
+            <typeparam name="T"></typeparam>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.LightDataTableRow.Value``1(System.Int32)">
+            <summary>
+            return already converted value by T eg row<string/>(0) its a lot faster when reading values, but the returned values is wont be a sheared one
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.LightDataTableRow.Value``1(System.String)">
+            <summary>
+            return already converted value by T eg row<string/>(0) its a lot faster when reading values, but the returned values is wont be a sheared one
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.LightDataTableRow.Value``2(System.Linq.Expressions.Expression{System.Func{``0,``1}})">
+            <summary>
+            Get Property By expression;
+            </summary>
+            <typeparam name="T"></typeparam>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.LightDataTableRow.Value``1(EntityWorker.Core.LightDataTableColumn)">
+            <summary>
+            return already converted value by T eg row<string/>(0) its a lot faster when reading values, but the returned values is wont be a sheared one
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.LightDataTableRow.ValueAndConvert``1(System.String,System.Boolean)">
+            <summary>
+            This will try to load the selected value and convert it to the selected type when it fails
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="key"></param>
+            <param name="loadDefault"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.LightDataTableRow.ValueAndConvert(System.Type,System.String,System.Boolean)">
+            <summary>
+            This will try to load the selected value and convert it to the selected type when it fails
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="type"></param>
+            <param name="key"></param>
+            <param name="loadDefault"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.LightDataTableRow.ToDataRow(System.Data.DataTable)">
+            <summary>
+            Convert LightDataRow to DataRow
+            </summary>
+            <param name="parentTable"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.LightDataTableRow.Merge(EntityWorker.Core.LightDataTableRow)">
+            <summary>
+            Merge two rows together.
+            </summary>
+            <param name="row"></param>
+        </member>
+        <member name="M:EntityWorker.Core.LightDataTableRow.MergeUnKnownObject(System.Object)">
+            <summary>
+            Merge a class to the selected LightDataRow
+            </summary>
+            <param name="objectToBeMerged"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.LightDataTableRow.MergeToAnObject(System.Object)">
+            <summary>
+            Merge LightDataRow to an object
+            </summary>
+            <param name="selectedObject"></param>
+        </member>
+        <member name="M:EntityWorker.Core.LightDataTableRow.ToObject``1">
+            <summary>
+            Convert the current created row to an object
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.LightDataTableRow.ToObject(System.Object)">
+            <summary>
+            Convert the current created row to an object
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.LightDataTableRow.AddValue(EntityWorker.Core.LightDataTableColumn,System.Object,EntityWorker.Core.ColumnsCollections{System.String},EntityWorker.Core.ColumnsCollections{System.Int32})">
+            <summary>
+            This Method should only be called from the lightdatatable object
+            </summary>
+            <param name="col"></param>
+            <param name="value"></param>
+            <param name="cols"></param>
+            <param name="colsIndex"></param>
+        </member>
+        <member name="M:EntityWorker.Core.LightDataTableRow.Remove(System.Int32,EntityWorker.Core.ColumnsCollections{System.String},EntityWorker.Core.ColumnsCollections{System.Int32})">
+            <summary>
+            This Method should only be called from the lightdatatable object
+            </summary>
+            <param name="columnIndex"></param>
+            <param name="cols"></param>
+            <param name="colsIndex"></param>
+        </member>
+        <member name="P:EntityWorker.Core.Object.Library.DbCommandExtended.DataStructure">
+            <summary>
+            This is initialized after TableType
+            </summary>
+        </member>
+        <member name="P:EntityWorker.Core.Object.Library.DbCommandExtended.TableType">
+            <summary>
+            Set This for faster reading of sql
+            </summary>
+        </member>
+        <member name="T:EntityWorker.Core.Object.Library.Migration">
+            <inheritdoc />
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.Migration.#ctor">
+            <summary>
+            Default cto
+            </summary>
+        </member>
+        <member name="P:EntityWorker.Core.Object.Library.Migration.MigrationIdentifier">
+            <summary>
+             Make sure that the key dose not exist in the database
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.Migration.ExecuteMigration(EntityWorker.Core.InterFace.IRepository)">
+            <inheritdoc />
+            <summary>
+            Do your db Changes here
+            </summary>
+            <param name="repository"></param>
+        </member>
+        <member name="T:EntityWorker.Core.Object.Library.SqlQueryable`1">
+            <summary>
+            quaryProvider for EntityWorker.Core
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="P:EntityWorker.Core.Object.Library.SqlQueryable`1.ParsedLinqToSql">
+            <summary>
+            Result of LightDataTable LinqToSql
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.Add(`0)">
+            <summary>
+            Add Item
+            </summary>
+            <param name="item"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.AddRange(System.Collections.Generic.List{`0})">
+            <summary>
+            Add Items
+            </summary>
+            <param name="items"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.IgnoreChildren(System.Linq.Expressions.Expression{System.Func{`0,System.Object}}[])">
+            <summary>
+            Ignore loading some children eg ignore Person
+            IgnoreChildren(x=> x.User.Person)
+            </summary>
+            <param name="ignoreActions"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.LoadChildren(System.Boolean)">
+            <summary>
+            LoadChildren, will load all children herarkie if onlyFirstLevel is not true
+            </summary>
+            <param name="onlyFirstLevel"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.LoadChildren(System.Linq.Expressions.Expression{System.Func{`0,System.Object}}[])">
+            <summary>
+            LoadChildren, will load all selected children herarkie eg
+            LoadChildren(x=> x.User, x=> x.Adress.Select(a=> a.Country)
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.Where(System.Linq.Expressions.Expression{System.Predicate{`0}})">
+            <summary>
+            Search 
+            </summary>
+            <param name="match"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.Take(System.Int32)">
+            <summary>
+            Take only the selected rows 
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.Skip(System.Int32)">
+            <summary>
+            Skip rows
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.OrderBy(System.Linq.Expressions.Expression{System.Func{`0,System.Object}})">
+            <summary>
+            Order By Column
+            </summary>
+            <param name="exp"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.OrderByDescending(System.Linq.Expressions.Expression{System.Func{`0,System.Object}})">
+            <summary>
+            OrderByDescending Column
+            </summary>
+            <param name="exp"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.ExecuteAsync">
+            <summary>
+            Execute the search Command
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.Execute">
+            <summary>
+            Execute the search Command
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.ExecuteFirstOrDefault">
+            <summary>
+            Get Only the top 1
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.ExecuteCount">
+            <summary>
+            Return the count of the executed quary
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.ExecuteAny">
+            <summary>
+            Return the Any of the executed quary
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.Save">
+            <summary>
+            Save All Changes. 
+            You have to trigger SaveChanges() to commit
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.SaveAll(System.Func{`0,System.Boolean})">
+            <summary>
+            Save All Changes. 
+            You have to trigger SaveChanges() to commit
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.Remove">
+            <summary>
+            Remove All objects herarkie. 
+            You have to trigger SaveChanges() to commit
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.RemoveAll(System.Func{`0,System.Boolean})">
+            <summary>
+            Remove All objects herarkie. 
+            You have to trigger SaveChanges() to commit
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.SaveChanges">
+            <summary>
+            Commit Changes
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.ToTable">
+            <summary>
+            Convert to LightDataTable
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.ExecuteAndConvertToType``1">
+            <summary>
+            Convert Object of type a to b 
+            all properties of B have to be mapped using attribute PropertyName or the propertName of A = B eg a."UserId" = b."UserId" 
+            </summary>
+            <typeparam name="TSource"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.Dispose">
+            <summary>
+            Dispose the repository
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.PrimaryKeyIndex.ClearAndRenderValues(System.Collections.Generic.List{EntityWorker.Core.LightDataTableRow},System.String)">
+            <summary>
+            For faster search we index all values for primaryKey.
+            </summary>
+            <param name="rows"></param>
+            <param name="key"></param>
+        </member>
+        <member name="T:EntityWorker.Core.SqlQuerys.Evaluator">
+            <summary>
+            Rewrites an expression tree so that locally isolatable sub-expressions are evaluated and converted into ConstantExpression nodes.
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.SqlQuerys.Evaluator.Eval(System.Linq.Expressions.Expression)">
+            <summary>
+            Performs evaluation and replacement of independent sub-trees
+            </summary>
+            <param name="expression">The root of the expression tree.</param>
+            <returns>A new tree with sub-trees evaluated and replaced.</returns>
+        </member>
+        <member name="M:EntityWorker.Core.SqlQuerys.Evaluator.Eval(System.Linq.Expressions.Expression,System.Func{System.Linq.Expressions.Expression,System.Boolean})">
+            <summary>
+            Performs evaluation and replacement of independent sub-trees
+            </summary>
+            <param name="expression">The root of the expression tree.</param>
+            <param name="fnCanBeEvaluated">A function that decides whether a given expression node can be part of the local function.</param>
+            <returns>A new tree with sub-trees evaluated and replaced.</returns>
+        </member>
+        <member name="T:EntityWorker.Core.SqlQuerys.Evaluator.SubtreeEvaluator">
+            <summary>
+            Evaluates and replaces sub-trees when first candidate is reached (top-down)
+            </summary>
+        </member>
+        <member name="T:EntityWorker.Core.SqlQuerys.Evaluator.Nominator">
+            <summary>
+            Performs bottom-up analysis to determine which nodes can possibly
+            be part of an evaluated sub-tree.
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.SqlQuerys.LightDataLinqToNoSql.VisitBinary(System.Linq.Expressions.BinaryExpression)">
+            <summary>
+            
+            </summary>
+            <param name="b"></param>
+            <returns></returns>
+        </member>
+        <member name="T:EntityWorker.Core.SqlQuerys.TypeHelper">
+            <summary>
+            Type related helper methods
+            </summary>
+        </member>
+        <member name="T:EntityWorker.Core.Transaction.Transaction">
+            <summary>
+            EntityWorker.Core Repository
+            </summary>
+        </member>
+        <member name="F:EntityWorker.Core.Transaction.Transaction.ConnectionString">
+            <summary>
+            DataBase FullConnectionString
+            </summary>
+        </member>
+        <member name="P:EntityWorker.Core.Transaction.Transaction.DataBaseTypes">
+            <summary>
+            DataBase Type
+            </summary>
+        </member>
+        <member name="P:EntityWorker.Core.Transaction.Transaction.SqlConnection">
+            <summary>
+            DataBase Connection
+            </summary>
+        </member>
+        <member name="P:EntityWorker.Core.Transaction.Transaction.EnableMigration">
+            <summary>
+            Enable migrations
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.#ctor(System.String,System.Boolean,EntityWorker.Core.Helper.DataBaseTypes)">
+            <summary>
+            
+            </summary>
+            <param name="connectionString">Full connection string</param>
+            <param name="enableMigration"></param>
+            <param name="dataBaseTypes">The type of the database Ms-sql or Sql-light</param>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.DataBaseExist">
+            <summary>
+            Validate if database exist 
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.CreateDataBase">
+            <summary>
+            Create DataBase if not exist
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.Clone``1(``0,FastDeepCloner.CloneLevel,FastDeepCloner.FieldType)">
+            <summary>
+            Clone Items
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="o"></param>
+            <param name="fieldType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.MigrationConfig``1(``0)">
+            <summary>
+            Specifies the migrationConfig which contain a list Migration to migrate
+            the migration is executed automatic but as long as you have class that inherit from IMigrationConfig
+            or you could manually execute a migration
+            </summary>
+            <typeparam name="T"></typeparam>
+            <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.ValidateConnection">
+            <summary>
+            Validate Connection is Open or broken
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.CreateTransaction">
+            <summary>
+            Create Transaction
+            Only one Transaction will be created until it get disposed
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.DataReaderConverter``1(EntityWorker.Core.Object.Library.DbCommandExtended)">
+            <summary>
+            Convert to known object
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="command"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.DataReaderConverter(EntityWorker.Core.Object.Library.DbCommandExtended,System.Type)">
+            <summary>
+            Convert to unknown type
+            </summary>
+            <param name="command"></param>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.ExecuteScalar(EntityWorker.Core.Object.Library.DbCommandExtended)">
+            <summary>
+            
+            </summary>
+            <param name="cmd"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.ExecuteNonQuery(EntityWorker.Core.Object.Library.DbCommandExtended)">
+            <inheritdoc />
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.Rollback">
+            <summary>
+            Rollback transaction
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.SaveChanges">
+            <summary>
+            commit the transaction
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.Dispose">
+            <summary>
+            Dispose the connection
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.GetSqlType(System.Type)">
+            <summary>
+            SqlDbType by system.Type
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.AddInnerParameter(EntityWorker.Core.Object.Library.DbCommandExtended,System.String,System.Object,System.Data.SqlDbType)">
+            <summary>
+            Add parameters to SqlCommand
+            </summary>
+            <param name="cmd"></param>
+            <param name="attrName"></param>
+            <param name="value"></param>
+            <param name="dbType"></param>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.GetSqlCommand(System.String,System.Type)">
+            <summary>
+            Return SqlCommand that already contain SQLConnection
+            </summary>
+            <param name="sql"></param>
+            <param name="type">set for faster loading of sql</param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.GetLightDataTableList(EntityWorker.Core.Object.Library.DbCommandExtended,System.String)">
+            <summary>
+            return a list of LightDataTable e.g. DataSet
+            </summary>
+            <param name="cmd">sqlCommand that are create from GetSqlCommand</param>
+            <param name="primaryKeyId"> Table primaryKeyId, so LightDataTable.FindByPrimaryKey could be used </param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.Attach(System.Object,System.Boolean)">
+            <summary>
+            Attach object to WorkEntity to track changes
+            </summary>
+            <param name="objcDbEntity"></param>
+            <param name="overwrite"></param>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.AttachNew(System.Object,System.Boolean)">
+            <summary>
+            Attach object to WorkEntity to track changes
+            </summary>
+            <param name="objcDbEntity"></param>
+            <param name="overwrite"></param>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.GetObjectChanges(System.Object)">
+            <summary>
+            Get object changes from already attached objects
+            </summary>
+            <param name="entity"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.GetObjectChanges(System.Object,System.Object)">
+            <summary>
+            Get object changes
+            </summary>
+            <param name="entityA"></param>
+            <param name="entityB"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.IsAttached(System.Object)">
+            <summary>
+            check if object is already attached
+            </summary>
+            <param name="entity"></param>
+            <returns> primaryId >0 is mandatory </returns>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.GetLightDataTable(EntityWorker.Core.Object.Library.DbCommandExtended,System.String)">
+            <summary>
+            return LightDataTable e.g. DataTable
+            </summary>
+            <param name="cmd">sqlCommand that are create from GetSqlCommand</param>
+            <param name="primaryKey">Table primaryKeyId, so LightDataTable.FindByPrimaryKey could be used </param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.DeleteAsync(System.Object)">
+            <summary>
+            Remove Row
+            </summary>
+            <param name="entity"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.Delete(System.Object)">
+            <summary>
+            Remove Row
+            </summary>
+            <param name="entity"></param>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.SelectAsync``1(System.String)">
+            <summary>
+            select by quarry
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="sqlString"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.Select``1(System.String)">
+            <summary>
+            select by quarry
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="sqlString"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.CreateTable``1(System.Boolean)">
+            <summary>
+            This will recreate the table and if it has a ForeignKey to other tables it will also recreate those table to
+            use it wisely
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="force"> remove and recreate all</param>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.CreateTable(System.Type,System.Boolean)">
+            <summary>
+            This will recreate the table and if it has a ForeignKey to other tables it will also recreate those table to
+            use it wisely
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="force"> remove and recreate all</param>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.RemoveTable``1">
+            <summary>
+            This will remove the table and if it has a ForeignKey to other tables it will also remove those table to
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.RemoveTable(System.Type)">
+            <summary>
+            This will remove the table and if it has a ForeignKey to other tables it will also remove those table to
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="type"></param>
+        </member>
+    </members>
+</doc>

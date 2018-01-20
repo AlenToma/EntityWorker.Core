@@ -8,10 +8,9 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using EntityWorker.Core.InterFace;
-using EntityWorker.SQLite;
+using EntityWorker.Core.SQLite;
 using EntityWorker.Core.Object.Library;
-using Npgsql;
-using EntityWorker.Core.Interface;
+using EntityWorker.Core.Postgres;
 
 namespace EntityWorker.Core.Helper
 {

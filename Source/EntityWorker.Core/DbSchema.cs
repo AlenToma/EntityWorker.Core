@@ -11,8 +11,8 @@ using EntityWorker.Core.Interface;
 using EntityWorker.Core.InterFace;
 using EntityWorker.Core.Object.Library;
 using EntityWorker.Core.SqlQuerys;
-using FastDeepCloner;
-using Npgsql;
+using EntityWorker.Core.FastDeepCloner;
+using EntityWorker.Core.Postgres;
 using Rule = EntityWorker.Core.Attributes.Rule;
 
 namespace EntityWorker.Core
@@ -27,11 +27,11 @@ namespace EntityWorker.Core
 
         public static object ObjectLocker = new object();
 
-        private readonly IRepository _repository;
+        private readonly Transaction.Transaction _repository;
 
         private static ILightDataTable NotValidkeywords;
 
-        public DbSchema(IRepository repository)
+        public DbSchema(Transaction.Transaction repository)
         {
             _repository = repository;
         }
@@ -58,8 +58,7 @@ namespace EntityWorker.Core
             }
             catch (NpgsqlException ex)
             {
-                _repository.SaveChanges();
-                _repository.CreateTransaction();
+                _repository.Renew();
                 return ObjectColumns(type);
             }
             return CachedObjectColumn[key];
@@ -447,7 +446,9 @@ namespace EntityWorker.Core
                 else
                 {
                     sql += string.Join(",", cols.Select(x => "[" + x.GetPropertyName() + "]" + " = @" + x.GetPropertyName()));
-                    sql += Querys.Where(_repository.DataBaseTypes).Column(o.GetType().GetActualType().GetPrimaryKey().GetPropertyName()).Equal(string.Format("Guid[{0}]", primaryKeyId), true).Execute();
+                    if (!primaryKey.PropertyType.IsNumeric())
+                        sql += Querys.Where(_repository.DataBaseTypes).Column(o.GetType().GetActualType().GetPrimaryKey().GetPropertyName()).Equal(string.Format("Guid[{0}]", primaryKeyId), true).Execute();
+                    else Querys.Where(_repository.DataBaseTypes).Column(o.GetType().GetActualType().GetPrimaryKey().GetPropertyName()).Equal(primaryKeyId).Execute();
                 }
 
                 var cmd = _repository.GetSqlCommand(sql);
@@ -684,11 +685,7 @@ namespace EntityWorker.Core
                                     sSql = sSql.TrimEnd(",)") + ")";
                                 var cmd = _repository.GetSqlCommand(sSql);
                                 _repository.ExecuteNonQuery(cmd);
-                                if (_repository.DataBaseTypes == DataBaseTypes.PostgreSql)
-                                {
-                                    _repository.SaveChanges();
-                                    _repository.CreateTransaction();
-                                }
+                     
                             }
                             c--;
                         }
@@ -697,9 +694,7 @@ namespace EntityWorker.Core
                             if (ex.ToString().Contains("already exists"))
                                 c--;
 
-                            _repository.Rollback();
-                            _repository.CreateTransaction();
-
+                            _repository.Renew();
                             exp = ex;
                         }
                         catch (Exception ex)
@@ -792,11 +787,6 @@ namespace EntityWorker.Core
                             var cmd = _repository.GetSqlCommand("DROP TABLE [" + tableName + "];");
                             _repository.ExecuteNonQuery(cmd);
                             CachedObjectColumn.Remove(tType.FullName + _repository.DataBaseTypes.ToString());
-                            if (_repository.DataBaseTypes == DataBaseTypes.PostgreSql)
-                            {
-                                _repository.SaveChanges();
-                                _repository.CreateTransaction();
-                            }
                         }
 
 
@@ -804,8 +794,7 @@ namespace EntityWorker.Core
                     }
                     catch (NpgsqlException ex)
                     {
-                        _repository.Rollback();
-                        _repository.CreateTransaction();
+                        _repository.Renew();
                     }
                     catch
                     {

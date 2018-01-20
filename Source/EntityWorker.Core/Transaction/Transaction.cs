@@ -12,11 +12,11 @@ using EntityWorker.Core.Helper;
 using EntityWorker.Core.Interface;
 using EntityWorker.Core.InterFace;
 using EntityWorker.Core.Object.Library;
-using FastDeepCloner;
-using EntityWorker.SQLite;
+using EntityWorker.Core.FastDeepCloner;
+using EntityWorker.Core.SQLite;
 using System.Collections;
 using EntityWorker.Core.SqlQuerys;
-using Npgsql;
+using EntityWorker.Core.Postgres;
 
 namespace EntityWorker.Core.Transaction
 {
@@ -276,6 +276,21 @@ namespace EntityWorker.Core.Transaction
 
             if (SqlConnection.State == ConnectionState.Broken || SqlConnection.State == ConnectionState.Closed)
                 SqlConnection.Open();
+        }
+
+
+        internal void Renew()
+        {
+            if (Trans?.Connection == null)
+            {
+                SqlConnection.Close();
+                SqlConnection.Open();
+            }else
+            {
+                Trans.Commit();
+                CreateTransaction();
+            }
+
         }
 
         /// <summary>

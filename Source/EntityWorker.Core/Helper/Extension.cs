@@ -10,7 +10,7 @@ using System.Text;
 using EntityWorker.Core.Attributes;
 using EntityWorker.Core.Interface;
 using EntityWorker.Core.Object.Library;
-using FastDeepCloner;
+using EntityWorker.Core.FastDeepCloner;
 
 namespace EntityWorker.Core.Helper
 {

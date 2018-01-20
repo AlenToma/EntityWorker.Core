@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2010
+VisualStudioVersion = 15.0.27130.2024
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EntityWorker.Core", "..\Source\EntityWorker.Core\EntityWorker.Core.csproj", "{8B949BC6-F09C-460E-91F9-590611036B4E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EntityWorker.SQLite", "..\Source\EntityWorker.SQLite\EntityWorker.SQLite.csproj", "{CED07B9D-9E21-4A47-A3E0-4FEC99FE05A4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest", "..\Source\EntityWorkerTest\UnitTest\UnitTest.csproj", "{7DF57AE3-91C1-4C62-B802-9D18DF4886C2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FastDeepCloner", "..\..\FastDeepCloner\source\FastDeepCloner.csproj", "{B7054EB3-F09D-4E9B-B83A-8ED4441745A7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess.EntityWorker", "..\Source\EntityWorkerTest\DataAccess.EntityWorker\DataAccess.EntityWorker.csproj", "{527CFA5E-F314-4841-9926-062F7F89EF24}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,22 +25,22 @@ Global
 		{8B949BC6-F09C-460E-91F9-590611036B4E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8B949BC6-F09C-460E-91F9-590611036B4E}.Release|x64.ActiveCfg = Release|Any CPU
 		{8B949BC6-F09C-460E-91F9-590611036B4E}.Release|x64.Build.0 = Release|Any CPU
-		{CED07B9D-9E21-4A47-A3E0-4FEC99FE05A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CED07B9D-9E21-4A47-A3E0-4FEC99FE05A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CED07B9D-9E21-4A47-A3E0-4FEC99FE05A4}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{CED07B9D-9E21-4A47-A3E0-4FEC99FE05A4}.Debug|x64.Build.0 = Debug|Any CPU
-		{CED07B9D-9E21-4A47-A3E0-4FEC99FE05A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CED07B9D-9E21-4A47-A3E0-4FEC99FE05A4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CED07B9D-9E21-4A47-A3E0-4FEC99FE05A4}.Release|x64.ActiveCfg = Release|Any CPU
-		{CED07B9D-9E21-4A47-A3E0-4FEC99FE05A4}.Release|x64.Build.0 = Release|Any CPU
-		{B7054EB3-F09D-4E9B-B83A-8ED4441745A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B7054EB3-F09D-4E9B-B83A-8ED4441745A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B7054EB3-F09D-4E9B-B83A-8ED4441745A7}.Debug|x64.ActiveCfg = Debug|x64
-		{B7054EB3-F09D-4E9B-B83A-8ED4441745A7}.Debug|x64.Build.0 = Debug|x64
-		{B7054EB3-F09D-4E9B-B83A-8ED4441745A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B7054EB3-F09D-4E9B-B83A-8ED4441745A7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B7054EB3-F09D-4E9B-B83A-8ED4441745A7}.Release|x64.ActiveCfg = Release|x64
-		{B7054EB3-F09D-4E9B-B83A-8ED4441745A7}.Release|x64.Build.0 = Release|x64
+		{7DF57AE3-91C1-4C62-B802-9D18DF4886C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DF57AE3-91C1-4C62-B802-9D18DF4886C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DF57AE3-91C1-4C62-B802-9D18DF4886C2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7DF57AE3-91C1-4C62-B802-9D18DF4886C2}.Debug|x64.Build.0 = Debug|Any CPU
+		{7DF57AE3-91C1-4C62-B802-9D18DF4886C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DF57AE3-91C1-4C62-B802-9D18DF4886C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DF57AE3-91C1-4C62-B802-9D18DF4886C2}.Release|x64.ActiveCfg = Release|Any CPU
+		{7DF57AE3-91C1-4C62-B802-9D18DF4886C2}.Release|x64.Build.0 = Release|Any CPU
+		{527CFA5E-F314-4841-9926-062F7F89EF24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{527CFA5E-F314-4841-9926-062F7F89EF24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{527CFA5E-F314-4841-9926-062F7F89EF24}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{527CFA5E-F314-4841-9926-062F7F89EF24}.Debug|x64.Build.0 = Debug|Any CPU
+		{527CFA5E-F314-4841-9926-062F7F89EF24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{527CFA5E-F314-4841-9926-062F7F89EF24}.Release|Any CPU.Build.0 = Release|Any CPU
+		{527CFA5E-F314-4841-9926-062F7F89EF24}.Release|x64.ActiveCfg = Release|Any CPU
+		{527CFA5E-F314-4841-9926-062F7F89EF24}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
