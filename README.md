@@ -76,13 +76,14 @@ let's start by creating the dbContext, lets call it Repository
         }
 
         // get the full connection string
+        // for postgresql make sure to have the database name lower case
         public static string GetConnectionString(DataBaseTypes dbType)
         {
           if (dbType == DataBaseTypes.Mssql)
             return  @"Server=.\SQLEXPRESS; Database=CMS; User Id=root; Password=root;";
           else if (dbType == DataBaseTypes.Sqlite)
             return  @"Data Source=D:\Projects\CMS\source\App_Data\CMS.db";
-          else return "Host=localhost;Username=postgres;Password=root;Database=CMS";
+          else return "Host=localhost;Username=postgres;Password=root;Database=cms"; 
         }
     }
 ```
