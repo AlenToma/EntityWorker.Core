@@ -390,7 +390,7 @@ There are many attributes you could use to improve the code
 
 /// <summary>
 /// Property is a primary key
-/// PrimaryId could be System.Guid or number eg long and int
+/// PrimaryId could be System.String,  System.Guid or number eg long and int
 /// </summary>
 [PrimaryKey]
 
