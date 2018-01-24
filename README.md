@@ -73,6 +73,14 @@ let's start by creating the dbContext, lets call it Repository
             {
                 base.CreateDataBase();
             }
+            
+            /// Limited support for sqlite
+            // Get the latest change between the code and the database. 
+            // Property Rename is not supported. renaming property x will end up removing the x and adding y so there will be dataloss
+            // Adding a primary key is not supported either, you have to recreate the the whole table with CreateTable(true);
+            var latestChanges = GetCodeLatestChanges();
+            if (latestChanges.Any())
+                latestChanges.Execute(true);
         }
 
         // get the full connection string
