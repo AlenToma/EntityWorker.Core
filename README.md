@@ -73,16 +73,25 @@ let's start by creating the dbContext, lets call it Repository
             {
                 base.CreateDataBase();
             }
+            
+            /// Limited support for sqlite
+            // Get the latest change between the code and the database. 
+            // Property Rename is not supported. renaming property x will end up removing the x and adding y so there will be dataloss
+            // Adding a primary key is not supported either, you have to recreate the the whole table with CreateTable(true);
+            var latestChanges = GetCodeLatestChanges();
+            if (latestChanges.Any())
+                latestChanges.Execute(true);
         }
 
         // get the full connection string
+        // for postgresql make sure to have the database name lower case
         public static string GetConnectionString(DataBaseTypes dbType)
         {
           if (dbType == DataBaseTypes.Mssql)
             return  @"Server=.\SQLEXPRESS; Database=CMS; User Id=root; Password=root;";
           else if (dbType == DataBaseTypes.Sqlite)
             return  @"Data Source=D:\Projects\CMS\source\App_Data\CMS.db";
-          else return "Host=localhost;Username=postgres;Password=root;Database=CMS";
+          else return "Host=localhost;Username=postgres;Password=root;Database=cms"; 
         }
     }
 ```
@@ -243,14 +252,14 @@ lets see how EntityWorker gets the changed objects
                 //var m = rep.Get<User>().
                 var user = rep.Get<User>().LoadChildren().ExecuteFirstOrDefault();
                 user.UserName = "hahahadfsfddfsdfhaha";
-                var changes = rep.GetObjectChanges(person); 
+                var changes = rep.GetObjectChanges(user); 
                 var oldValue = changes.First().OldValue;
                 var newValue = changes.First().NewValue;
                 var propertyName = changes.First().PropertyName;
                 rep.Save(user);
-                var changes2 = rep.GetObjectChanges(person);
+                var changes2 = rep.GetObjectChanges(user);
                 rep.SaveChanges();
-                var changes3 = rep.GetObjectChanges(person);
+                var changes3 = rep.GetObjectChanges(user);
             }
 
 ```
@@ -390,7 +399,7 @@ There are many attributes you could use to improve the code
 
 /// <summary>
 /// Property is a primary key
-/// PrimaryId could be System.Guid or number eg long and int
+/// PrimaryId could be System.String,  System.Guid or number eg long and int
 /// </summary>
 [PrimaryKey]
 
