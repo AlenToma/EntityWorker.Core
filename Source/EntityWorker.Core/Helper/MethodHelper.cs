@@ -25,10 +25,7 @@ namespace EntityWorker.Core.Helper
         ///// </summary>
         ///// <param name="assembly"></param>
         ///// <returns></returns>
-        public static List<Type> GetDbEntitys(Assembly assembly)
-        {
-            return assembly.DefinedTypes.Where(type => type.GetPrimaryKey() != null).Cast<Type>().ToList();
-        }
+        public static List<Type> GetDbEntitys(Assembly assembly) => assembly.DefinedTypes.Where(type => type.GetPrimaryKey() != null).Cast<Type>().ToList();
 
         /// <summary>
         /// Convert Value from Type to Type
@@ -42,10 +39,7 @@ namespace EntityWorker.Core.Helper
         /// <param name="value"></param>
         /// <returns></returns>
         /// 
-        public static T ConvertValue<T>(this object value)
-        {
-            return (T)ConvertValue(value, typeof(T));
-        }
+        public static T ConvertValue<T>(this object value) => (T)ConvertValue(value, typeof(T));
 
         /// <summary>
         /// Convert Value from Type to Type
@@ -93,8 +87,8 @@ namespace EntityWorker.Core.Helper
             var stringExp = new Regex(@"String\[.*?\]|String\[.?\]");
             var dateExp = new Regex(@"Date\[.*?\]|Date\[.?\]");
             var guidExp = new Regex(@"Guid\[.*?\]|Guid\[.?\]");
-            var i = 0;
-            var dicCols = new Dictionary<string, Tuple<object, SqlDbType>>();
+            var i = 1;
+            var dicCols = new Custom_ValueType<string, Tuple<object, SqlDbType>>();
             MatchCollection matches = null;
             while ((matches = stringExp.Matches(sql)).Count > 0)
             {
@@ -103,7 +97,7 @@ namespace EntityWorker.Core.Helper
                 object str = exp.Value.TrimEnd(']').Substring(@"String\[".Length - 1);
                 sql = sql.Remove(exp.Index, exp.Value.Length);
                 sql = sql.Insert(exp.Index, col);
-                dicCols.Add(col, new Tuple<object, SqlDbType>(str.ConvertValue<string>(), SqlDbType.NVarChar));
+                dicCols.TryAdd(col, new Tuple<object, SqlDbType>(str.ConvertValue<string>(), SqlDbType.NVarChar));
                 i++;
             }
 
@@ -114,7 +108,7 @@ namespace EntityWorker.Core.Helper
                 object str = exp.Value.TrimEnd(']').Substring(@"Date\[".Length - 1);
                 sql = sql.Remove(exp.Index, exp.Value.Length);
                 sql = sql.Insert(exp.Index, col);
-                dicCols.Add(col, new Tuple<object, SqlDbType>(str.ConvertValue<DateTime>(), SqlDbType.DateTime));
+                dicCols.TryAdd(col, new Tuple<object, SqlDbType>(str.ConvertValue<DateTime>(), SqlDbType.DateTime));
                 i++;
             }
 
@@ -125,11 +119,11 @@ namespace EntityWorker.Core.Helper
                 object str = exp.Value.TrimEnd(']').Substring(@"Guid\[".Length - 1);
                 sql = sql.Remove(exp.Index, exp.Value.Length);
                 sql = sql.Insert(exp.Index, col);
-                dicCols.Add(col, new Tuple<object, SqlDbType>(str.ConvertValue<Guid?>(), SqlDbType.UniqueIdentifier));
+                dicCols.TryAdd(col, new Tuple<object, SqlDbType>(str.ConvertValue<Guid?>(), SqlDbType.UniqueIdentifier));
                 i++;
             }
 
-    
+
 
             sql = sql.CleanValidSqlName(repository.DataBaseTypes);
             DbCommand cmd = null;

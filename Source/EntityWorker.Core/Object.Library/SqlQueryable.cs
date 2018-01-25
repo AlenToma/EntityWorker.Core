@@ -210,7 +210,9 @@ namespace EntityWorker.Core.Object.Library
         }
 
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public new IEnumerator<T> GetEnumerator()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             return Execute().GetEnumerator();
         }

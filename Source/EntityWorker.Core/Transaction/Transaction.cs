@@ -69,6 +69,7 @@ namespace EntityWorker.Core.Transaction
         /// <param name="dataBaseTypes">The type of the database Ms-sql or Sql-light</param>
         public Transaction(string connectionString, bool enableMigration, DataBaseTypes dataBaseTypes)
         {
+
             EnableMigration = enableMigration;
             _attachedObjects = new Custom_ValueType<string, object>();
             if (string.IsNullOrEmpty(connectionString))
@@ -102,6 +103,21 @@ namespace EntityWorker.Core.Transaction
             }
         }
 
+
+        /// <summary>
+        /// Return the new added column, tables or modified prooerty
+        /// Property Rename is not supported. renaming a property x will end up removing the column x and adding column y so there will be dataloss
+        /// Adding a primary key is not supported either
+        /// </summary>
+        /// <assembly> Null for the current executed Assembly </assembly>
+        /// <returns></returns>
+        protected CodeToDataBaseMergeCollection GetCodeLatestChanges(Assembly assembly = null)
+        {
+            var codeToDataBaseMergeCollection = new CodeToDataBaseMergeCollection(this);
+            MethodHelper.GetDbEntitys(assembly ?? this.GetType().Assembly).ForEach(x => _dbSchema.GetDatabase_Diff(x, codeToDataBaseMergeCollection));
+            return codeToDataBaseMergeCollection;
+        }
+
         /// <summary>
         /// Validate if database exist 
         /// </summary>
@@ -130,6 +146,8 @@ namespace EntityWorker.Core.Transaction
                 {
                     var tr = new Transaction(sqlBuild.ToString(), false, DataBaseTypes);
                     tr.ValidateConnection();
+                    this.CreateTable<DBMigration>(false);/// make sure this exist
+                    this.SaveChanges();
                     return true;
 
                 }
@@ -143,7 +161,7 @@ namespace EntityWorker.Core.Transaction
                 dbName = npSqlBuilder.Database;
                 npSqlBuilder.Database = "";
                 var tr = new Transaction(npSqlBuilder.ToString(), false, DataBaseTypes);
-                var cmd = tr.GetSqlCommand("SELECT CAST(CASE WHEN datname is not null THEN 1 ELSE 0 END AS BIT) from pg_database WHERE datname = String[" + dbName + "]");
+                var cmd = tr.GetSqlCommand("SELECT CAST(CASE WHEN datname is not null THEN 1 ELSE 0 END AS BIT) from pg_database WHERE lower(datname) = lower(String[" + dbName + "])");
                 return tr.ExecuteScalar(cmd).ConvertValue<bool>();
 
             }
@@ -156,6 +174,9 @@ namespace EntityWorker.Core.Transaction
         {
             if (DataBaseExist())
                 return;
+
+
+
             var sqlBuild = DataBaseTypes != DataBaseTypes.PostgreSql ? new SqlConnectionStringBuilder(ConnectionString) : null;
             var npSqlBuilder = DataBaseTypes == DataBaseTypes.PostgreSql ? new NpgsqlConnectionStringBuilder(ConnectionString) : null;
             var dbName = DataBaseTypes == DataBaseTypes.Mssql ? sqlBuild?.InitialCatalog : sqlBuild?.DataSource;
@@ -175,6 +196,7 @@ namespace EntityWorker.Core.Transaction
             }
             else if (DataBaseTypes == DataBaseTypes.Sqllight)
             {
+
                 SQLiteConnection.CreateFile(dbName.Trim());
                 IniMigration();
             }
@@ -187,6 +209,8 @@ namespace EntityWorker.Core.Transaction
                 tr.ExecuteNonQuery(cmd);
                 IniMigration();
             }
+
+
         }
 
 
@@ -304,10 +328,6 @@ namespace EntityWorker.Core.Transaction
             ValidateConnection();
             if (Trans?.Connection == null)
                 Trans = SqlConnection.BeginTransaction();
-            else
-            {
-                var test = Trans.GetLifetimeService();
-            }
 
             return Trans;
         }

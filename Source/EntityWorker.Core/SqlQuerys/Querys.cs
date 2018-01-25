@@ -9,14 +9,23 @@ namespace EntityWorker.Core.SqlQuerys
 {
     public static class Querys
     {
-        internal static string GetValueByType(object value)
+        internal static string GetValueByType(object value, DataBaseTypes dbType)
         {
             if (value == null)
-                return string.Format("'{0}'", "null");
+                return string.Format("String[{0}]", "null");
             var type = value.GetType();
+            if (Nullable.GetUnderlyingType(type) != null)
+                type = Nullable.GetUnderlyingType(type);
+
             if (type == typeof(decimal) || type == typeof(double) || type == typeof(float) || type == typeof(int) || type == typeof(long) || type == typeof(bool))
-                return value.ToString();
-            else return string.Format("'{0}'", value);
+            {
+                if (type == typeof(bool) && (dbType == DataBaseTypes.Mssql || dbType == DataBaseTypes.Sqllight))
+                    return Convert.ToInt16(value).ToString();
+                return value.ToString().ToLower();
+            }
+            if (type == typeof(Guid))
+                return string.Format("Guid[{0}]", value);
+            return string.Format("String[{0}]", value);
 
         }
 
@@ -93,11 +102,16 @@ namespace EntityWorker.Core.SqlQuerys
             if (col.ToLower().Contains(" as "))
                 col = col.Remove(col.ToLower().IndexOf(" as ", StringComparison.Ordinal));
             var type = typeof(T);
+            if (Nullable.GetUnderlyingType(type) != null)
+                type = Nullable.GetUnderlyingType(type);
             if (type == typeof(decimal) || type == typeof(double) || type == typeof(float))
                 _sql += DataBaseTypes == DataBaseTypes.Mssql ? " " + "CONVERT(decimal(18,5),[" + col + "]) " : " Cast(" + DataBaseTypes.GetValidSqlName(col) + " AS decimal(18,5)) ";
             else if (type == typeof(int) || type == typeof(long))
                 _sql += DataBaseTypes == DataBaseTypes.Mssql ? " " + "CONVERT(decimal(18,5),[" + col + "]) " : " Cast(" + DataBaseTypes.GetValidSqlName(col) + " AS bigint) ";
-            else _sql += DataBaseTypes == DataBaseTypes.Mssql ? " " + "CONVERT(nvarchar(max),[" + col + "]) " : (DataBaseTypes == DataBaseTypes.Sqllight ? " Cast(" + DataBaseTypes.GetValidSqlName(col) + " AS nvarchar(4000)) " : " Cast(" + DataBaseTypes.GetValidSqlName(col) + " AS varchar(4000)) ");
+            else if (type == typeof(Guid))
+                _sql += DataBaseTypes.GetValidSqlName(col);
+            else
+                _sql += DataBaseTypes == DataBaseTypes.Mssql ? " " + "CONVERT(nvarchar(max),[" + col + "]) " : (DataBaseTypes == DataBaseTypes.Sqllight ? " Cast(" + DataBaseTypes.GetValidSqlName(col) + " AS nvarchar(4000)) " : " Cast(" + DataBaseTypes.GetValidSqlName(col) + " AS varchar(4000)) ");
 
             return new QueryConditions(_sql, DataBaseTypes);
         }
@@ -108,6 +122,8 @@ namespace EntityWorker.Core.SqlQuerys
             if (member == null) return new QueryConditions(_sql, DataBaseTypes);
             var key = member.Member.Name;
             var type = typeof(P);
+            if (Nullable.GetUnderlyingType(type) != null)
+                type = Nullable.GetUnderlyingType(type);
             var col = key;
             if (col.ToLower().Contains(" as "))
                 col = col.Remove(col.ToLower().IndexOf(" as ", StringComparison.Ordinal));
@@ -115,7 +131,11 @@ namespace EntityWorker.Core.SqlQuerys
                 _sql += DataBaseTypes == DataBaseTypes.Mssql ? " " + "CONVERT(decimal(18,5),[" + col + "]) " : " Cast(" + DataBaseTypes.GetValidSqlName(col) + " AS decimal(18,5)) ";
             else if (type == typeof(int) || type == typeof(long))
                 _sql += DataBaseTypes == DataBaseTypes.Mssql ? " " + "CONVERT(decimal(18,5),[" + col + "]) " : " Cast(" + DataBaseTypes.GetValidSqlName(col) + " AS bigint) ";
-            else _sql += DataBaseTypes == DataBaseTypes.Mssql ? " " + "CONVERT(nvarchar(max),[" + col + "]) " : (DataBaseTypes == DataBaseTypes.Sqllight ? " Cast(" + DataBaseTypes.GetValidSqlName(col) + " AS nvarchar(4000)) " : " Cast(" + DataBaseTypes.GetValidSqlName(col) + " AS varchar(4000)) ");
+            else if (type == typeof(Guid))
+                _sql += DataBaseTypes.GetValidSqlName(col);
+            else
+                _sql += DataBaseTypes == DataBaseTypes.Mssql ? " " + "CONVERT(nvarchar(max),[" + col + "]) " : (DataBaseTypes == DataBaseTypes.Sqllight ? " Cast(" + DataBaseTypes.GetValidSqlName(col) + " AS nvarchar(4000)) " : " Cast(" + DataBaseTypes.GetValidSqlName(col) + " AS varchar(4000)) ");
+
             return new QueryConditions(_sql, DataBaseTypes);
         }
 
@@ -168,7 +188,7 @@ namespace EntityWorker.Core.SqlQuerys
         public QueryConditions Like(string value, bool isColumn = false)
         {
             if (!isColumn)
-                _sql += string.Format(" like '%{0}%'", value);
+                _sql += string.Format(" like String[%{0}%]", value);
             else _sql += string.Format(" like '%'+{0}+'%'", value);
             return new QueryConditions(_sql, DataBaseTypes);
         }
@@ -176,7 +196,7 @@ namespace EntityWorker.Core.SqlQuerys
         public QueryConditions BeginWith(string value, bool isColumn = false)
         {
             if (!isColumn)
-                _sql += string.Format(" like '{0}%'", value);
+                _sql += string.Format(" like String[{0}%]", value);
             else _sql += string.Format(" like {0}+'%'", value);
             return new QueryConditions(_sql, DataBaseTypes);
         }
@@ -185,7 +205,7 @@ namespace EntityWorker.Core.SqlQuerys
         public QueryConditions EndWith(string value, bool isColumn = false)
         {
             if (!isColumn)
-                _sql += string.Format(" like '%{0}'", value);
+                _sql += string.Format(" like String[%{0}]", value);
             else _sql += string.Format(" like '%'+{0}", value);
             return new QueryConditions(_sql, DataBaseTypes);
         }
@@ -193,7 +213,7 @@ namespace EntityWorker.Core.SqlQuerys
         public QueryConditions Equal(object value, bool isColumn = false)
         {
             if (!isColumn)
-                _sql += string.Format(" = {0}", Querys.GetValueByType(value));
+                _sql += string.Format(" = {0}", Querys.GetValueByType(value, DataBaseTypes));
             else
                 _sql += string.Format(" = {0}", value);
             return new QueryConditions(_sql, DataBaseTypes);
@@ -202,7 +222,7 @@ namespace EntityWorker.Core.SqlQuerys
         public QueryConditions NotEqual(object value, bool isColumn = false)
         {
             if (!isColumn)
-                _sql += string.Format(" != {0}", Querys.GetValueByType(value));
+                _sql += string.Format(" != {0}", Querys.GetValueByType(value, DataBaseTypes));
             else _sql += string.Format(" != {0}", value);
             return new QueryConditions(_sql, DataBaseTypes);
         }
@@ -210,7 +230,7 @@ namespace EntityWorker.Core.SqlQuerys
         public QueryConditions GreaterThan(object value, bool isColumn = false)
         {
             if (!isColumn)
-                _sql += string.Format(" > {0}", Querys.GetValueByType(value));
+                _sql += string.Format(" > {0}", Querys.GetValueByType(value, DataBaseTypes));
             else _sql += string.Format(" > {0}", value);
             return new QueryConditions(_sql, DataBaseTypes);
         }
@@ -218,7 +238,7 @@ namespace EntityWorker.Core.SqlQuerys
         public QueryConditions SmallerThan(object value, bool isColumn = false)
         {
             if (!isColumn)
-                _sql += string.Format(" < {0}", Querys.GetValueByType(value));
+                _sql += string.Format(" < {0}", Querys.GetValueByType(value, DataBaseTypes));
             else _sql += string.Format(" < {0}", value);
             return new QueryConditions(_sql, DataBaseTypes);
         }

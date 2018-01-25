@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.SqlTypes;
 using System.Globalization;
+using System.Linq;
 
 namespace EntityWorker.Core
 {
@@ -55,6 +56,11 @@ namespace EntityWorker.Core
             if (propertyType == typeof(long?))
                 return new long?();
             if (propertyType == typeof(long))
+                return 0;
+
+            if (propertyType == typeof(float?))
+                return new long?();
+            if (propertyType == typeof(float))
                 return 0;
 
             if (propertyType == typeof(decimal?))
@@ -148,6 +154,17 @@ namespace EntityWorker.Core
                     return;
                 }
 
+                if (dataType == typeof(float?) || dataType == typeof(float))
+                {
+                    if (float.TryParse(CleanValue(dataType, value).ToString(), NumberStyles.Float, Culture, out var douTal))
+                        value = RoundingSettings.Round(douTal);
+                    else
+                    if (loadDefaultOnError)
+                        value = ValueByType(dataType, defaultValue);
+
+                    return;
+                }
+
                 if (dataType == typeof(decimal?) || dataType == typeof(decimal))
                 {
                     if (decimal.TryParse(CleanValue(dataType, value).ToString(), NumberStyles.Float, Culture, out var decTal))
@@ -173,7 +190,12 @@ namespace EntityWorker.Core
                 if (dataType == typeof(DateTime?) || dataType == typeof(DateTime))
                 {
                     if (DateTime.TryParse(value.ToString(), Culture, DateTimeStyles.None, out var dateValue))
+                    {
+                        if (dateValue < SqlDateTime.MinValue)
+                            dateValue = SqlDateTime.MinValue.Value;
                         value = dateValue;
+
+                    }
                     else
                     if (loadDefaultOnError)
                         value = ValueByType(dataType, defaultValue);
@@ -203,24 +225,30 @@ namespace EntityWorker.Core
 
                 }
 
-                if (dataType.IsEnum)
+                if (dataType.IsEnum || (dataType.GenericTypeArguments?.FirstOrDefault()?.IsEnum ?? false))
                 {
+
+                    var type = dataType;
+                    if ((dataType.GenericTypeArguments?.FirstOrDefault()?.IsEnum ?? false))
+                        type = (dataType.GenericTypeArguments?.FirstOrDefault());
                     if (value is int || value is long)
                     {
-                        if (Enum.IsDefined(dataType, Convert.ToInt32(value)))
-                            value = Enum.ToObject(dataType, Convert.ToInt32(value));
+                        if (Enum.IsDefined(type, Convert.ToInt32(value)))
+                            value = Enum.ToObject(type, Convert.ToInt32(value));
                     }
-                    else if (Enum.IsDefined(dataType, value))
-                        value = Enum.Parse(dataType, value.ToString(), true);
+                    else if (Enum.IsDefined(type, value))
+                        value = Enum.Parse(type, value.ToString(), true);
+                    else if (loadDefaultOnError)
+                        value = Activator.CreateInstance(dataType);
                 }
                 else if (dataType == typeof(Guid) || dataType == typeof(Guid?))
                 {
                     if (Guid.TryParse(value.ToString(), out Guid v))
-                    {
                         value = v;
-                    }
-
-                }else if (dataType == typeof(string))
+                    else if (loadDefaultOnError)
+                        value = ValueByType(dataType, defaultValue);
+                }
+                else if (dataType == typeof(string))
                 {
                     value = value.ToString();
 
@@ -238,7 +266,7 @@ namespace EntityWorker.Core
 
         private object CleanValue(Type valueType, object value)
         {
-            if ((valueType != typeof(decimal) && valueType != typeof(double)) && (valueType != typeof(decimal?) && valueType != typeof(double?))) return value;
+            if ((valueType != typeof(decimal) && valueType != typeof(double)) && (valueType != typeof(decimal?) && valueType != typeof(float?)) || (valueType != typeof(float?) && valueType != typeof(float?))) return value;
             value = Culture.NumberFormat.NumberDecimalSeparator == "." ? value.ToString().Replace(",", ".") : value.ToString().Replace(".", ",");
             value = System.Text.RegularExpressions.Regex.Replace(value.ToString(), @"\s", "");
             return value;

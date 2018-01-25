@@ -16,6 +16,8 @@ namespace EntityWorker.Core.Object.Library
                 var value = _record[index];
                 if (value != null)
                 {
+                    if (value as byte[] != null && dbType.Contains("Guid"))
+                        value = new Guid(value as byte[]);                        
                     if (toBase64 == 1)
                     {
                         if (value.ToString().IsBase64String())

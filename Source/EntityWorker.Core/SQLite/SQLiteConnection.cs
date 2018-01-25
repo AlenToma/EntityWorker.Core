@@ -2440,7 +2440,7 @@ namespace EntityWorker.Core.SQLite
             dataTable.Columns.Add("MinimumScale", typeof(short));
             dataTable.Columns.Add("IsConcurrencyType", typeof(bool));
             dataTable.BeginLoadData();
-            StringReader stringReader = new StringReader(Properties.SR.DataTypes);
+            StringReader stringReader = new StringReader(Properties.Resources.DataTypes);
             dataTable.ReadXml(stringReader);
             stringReader.Close();
             dataTable.AcceptChanges();
@@ -2920,7 +2920,7 @@ namespace EntityWorker.Core.SQLite
             dataTable.Columns.Add("NumberOfRestrictions", typeof(int));
             dataTable.Columns.Add("NumberOfIdentifierParts", typeof(int));
             dataTable.BeginLoadData();
-            StringReader stringReader = new StringReader(Properties.SR.MetaDataCollections);
+            StringReader stringReader = new StringReader(Properties.Resources.MetaDataCollections);
             dataTable.ReadXml(stringReader);
             stringReader.Close();
             dataTable.AcceptChanges();
@@ -2938,7 +2938,7 @@ namespace EntityWorker.Core.SQLite
             dataTable.Columns.Add("MaximumVersion", typeof(string));
             dataTable.Columns.Add("MinimumVersion", typeof(string));
             dataTable.BeginLoadData();
-            string[] strArrays = Properties.SR.Keywords.Split(new char[] { ',' });
+            string[] strArrays = Properties.Resources.Keywords.Split(new char[] { ',' });
             for (int i = 0; i < (int)strArrays.Length; i++)
             {
                 string str = strArrays[i];

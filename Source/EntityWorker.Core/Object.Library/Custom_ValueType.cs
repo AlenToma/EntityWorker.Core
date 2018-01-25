@@ -1,9 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 namespace EntityWorker.Core.Object.Library
 {
     public class Custom_ValueType<T, P> : Dictionary<T, P>
     {
-
+        public Custom_ValueType(Dictionary<T, P> dic = null)
+        {
+            if (dic != null)
+                foreach (var item in dic)
+                    TryAdd(item.Key, item.Value);
+        }
         public bool TryAdd(T key, P item, bool overwrite = false)
         {
             if (base.ContainsKey(key) && !overwrite)
@@ -18,6 +24,7 @@ namespace EntityWorker.Core.Object.Library
             }
             return true;
         }
+
         public P GetOrAdd(T key, P item, bool overwrite = false)
         {
             if (base.ContainsKey(key) && !overwrite)

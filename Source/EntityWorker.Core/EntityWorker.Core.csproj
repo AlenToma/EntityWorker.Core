@@ -3,16 +3,17 @@
     <TargetFrameworks>netcoreapp2.0;netstandard2.0;net451;</TargetFrameworks>
     <PackageId>EntityWorker.Core</PackageId>
     <AssemblyName>EntityWorker.Core</AssemblyName>
-    <AssemblyVersion>1.0.3.5</AssemblyVersion>
-    <FileVersion>1.0.3.5</FileVersion>
-    <Version>1.3.5</Version>
+    <AssemblyVersion>1.0.3.8</AssemblyVersion>
+    <FileVersion>1.0.3.8</FileVersion>
+    <Version>1.3.8</Version>
     <Authors>Alen Toma</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageProjectUrl>https://github.com/AlenToma/EntityWorker.Core</PackageProjectUrl>
-    <PackageTags>Entity EntityWorker.Core sql object-relation mappar LinqToSql alternative-to-entityframework C# System.Reflection generic Microsoft EntityFramework EF Database Data O/RM ADO.NET</PackageTags>
+    <PackageTags>Entity EntityWorker.Core sql object-relation mappar LinqToSql alternative-to-entityframework C# System.Reflection generic Microsoft EntityFramework EF Database Data O/RM ADO.NET sqlite postgres postgressql</PackageTags>
     <PackageLicenseUrl>https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/LICENSE</PackageLicenseUrl>
     <Copyright>Copyright (c) 2017 Alen Toma</Copyright>
-    <Description>EntityWorker is an object-relation mapper that enable .NET developers to work with relations data using objects. EntityWorker is an alternative to entityframwork. is more flexible and much faster than entity framework.</Description>
+    <Description>EntityWorker is an object-relation mapper that enable .NET developers to work with relations data using objects. EntityWorker is an alternative to entityframwork. is more flexible and much faster than entity framework.
+And it have support to multiple providers like mssql, sqlite and postgressql</Description>
     <NeutralLanguage />
     <PackageIconUrl>https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/icon.gif</PackageIconUrl>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
@@ -49,7 +50,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="Microsoft.CSharp" Version="4.4.1" />
+    <!--<PackageReference Include="Microsoft.CSharp" Version="4.4.1" />-->
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net451'">
@@ -59,13 +60,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Properties\SR.resx">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </EmbeddedResource>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="FastDeepCloner\" />
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
   <!--<ItemGroup Condition="'$(Configuration)'=='Debug'">

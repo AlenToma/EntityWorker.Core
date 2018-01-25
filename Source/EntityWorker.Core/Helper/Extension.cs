@@ -11,7 +11,6 @@ using EntityWorker.Core.Attributes;
 using EntityWorker.Core.Interface;
 using EntityWorker.Core.Object.Library;
 using EntityWorker.Core.FastDeepCloner;
-
 namespace EntityWorker.Core.Helper
 {
     /// <summary>
@@ -22,50 +21,54 @@ namespace EntityWorker.Core.Helper
         private static readonly Custom_ValueType<IFastDeepClonerProperty, string> CachedPropertyNames = new Custom_ValueType<IFastDeepClonerProperty, string>();
         private static readonly Custom_ValueType<Type, IFastDeepClonerProperty> CachedPrimaryKeys = new Custom_ValueType<Type, IFastDeepClonerProperty>();
 
-        private static readonly Dictionary<Type, string> DbMsSqlMapper = new Dictionary<Type, string>()
+        private static readonly Custom_ValueType<Type, List<string>> DbMsSqlMapper = new Custom_ValueType<Type, List<string>>()
         {
-            {typeof(int), "BIGINT"},
-            {typeof(long), "BIGINT"},
-            {typeof(string), "NVARCHAR(4000)"},
-            {typeof(bool), "BIT"},
-            {typeof(DateTime), "DATETIME"},
-            {typeof(TimeSpan), "DATETIME"},
-            {typeof(float), "FLOAT"},
-            {typeof(decimal), "DECIMAL(18,5)"},
-            {typeof(Guid), "UNIQUEIDENTIFIER"},
-            {typeof(byte[]), "varbinary(MAX)"},
-            {typeof(char), "NVARCHAR(10)"},
+            {typeof(int), new List<string>(){ "BIGINT" , "int", "single", "smallint", "tinyint" } },
+            {typeof(long), new List<string>(){ "BIGINT" } },
+            {typeof(string), new List<string>(){ "NVARCHAR(4000)" , "text", "varchar", "xml" } },
+            {typeof(bool), new List<string>(){ "BIT"} },
+            {typeof(DateTime), new List<string>(){ "DATETIME" , "date", "datetime2", "datetimeoffset", "smalldatetime" } },
+            {typeof(TimeSpan), new List<string>(){ "DATETIME" , "time" } },
+            {typeof(float), new List<string>(){ "FLOAT"} },
+            {typeof(decimal), new List<string>(){ "DECIMAL(18,5)", "money" , "numeric", "smallmoney" } },
+            {typeof(Guid), new List<string>(){ "UNIQUEIDENTIFIER"} },
+            {typeof(byte[]), new List<string>(){ "varbinary(MAX)" , "image" , "rowversion", "timestamp" } },
+            {typeof(char), new List<string>(){ "NVARCHAR(10)", "char" , "nchar" , "ntext" } },
         };
 
-        private static readonly Dictionary<Type, string> DbSQLiteMapper = new Dictionary<Type, string>()
+        private static readonly Custom_ValueType<Type, List<string>> DbSQLiteMapper = new Custom_ValueType<Type, List<string>>()
         {
-            {typeof(int), "BIGINT"},
-            {typeof(long), "BIGINT"},
-            {typeof(string), "NVARCHAR(4000)"},
-            {typeof(bool), "BIT"},
-            {typeof(DateTime), "DATETIME"},
-            {typeof(TimeSpan), "DATETIME"},
-            {typeof(float), "FLOAT"},
-            {typeof(decimal), "DECIMAL(18,5)"},
-            {typeof(Guid), "UNIQUEIDENTIFIER"},
-            {typeof(byte[]), "BLOB"},
-            {typeof(char), "NVARCHAR(10)"},
+            {typeof(int), new List<string>(){ "BIGINT" , "SMALLINT", "TINYINT", "MEDIUMINT", "UNSIGNED BIG INT", "INT2", "INT8" } },
+            {typeof(long), new List<string>(){ "BIGINT", "INT", "INTEGER"}},
+            {typeof(string),  new List<string>(){"NVARCHAR(4000)", "CHARACTER","VARYING CHARACTER", "NCHAR", "NATIVE CHARACTER" , "CLOB" }},
+            {typeof(bool), new List<string>(){ "BIT"}},
+            {typeof(DateTime), new List<string>(){ "DATETIME", "date"}},
+            {typeof(TimeSpan), new List<string>(){ "DATETIME"}},
+            {typeof(float),  new List<string>(){"FLOAT"}},
+            {typeof(decimal), new List<string>(){ "DECIMAL(18,5)", "real" , "NUMERIC", "DOUBLE PRECISION"}},
+            {typeof(Guid), new List<string>(){ "UNIQUEIDENTIFIER"}},
+            {typeof(byte[]), new List<string>(){ "BLOB"}},
+            {typeof(char), new List<string>(){ "NVARCHAR(10)"}},
+            {typeof(double), new List<string>(){ "DECIMAL(18,5)", "real" , "NUMERIC", "DOUBLE PRECISION"}},
         };
 
-        private static readonly Dictionary<Type, string> DbPostGresqlMapper = new Dictionary<Type, string>()
+        private static readonly Custom_ValueType<Type, List<string>> DbPostGresqlMapper = new Custom_ValueType<Type, List<string>>()
         {
-            {typeof(int), "BIGINT"},
-            {typeof(long), "BIGINT"},
-            {typeof(string), "VARCHAR(4000)"},
-            {typeof(bool), "BOOLEAN"},
-            {typeof(DateTime), "TIMESTAMP"},
-            {typeof(TimeSpan), "TIME"},
-            {typeof(float), "FLOAT"},
-            {typeof(decimal), "DECIMAL(18,5)"},
-            {typeof(Guid), "uuid"},
-            {typeof(byte[]), "bytea"},
-            {typeof(char), "VARCHAR(10)"},
+            {typeof(int), new List<string>(){ "BIGINT", "smallint", "integer", "smallserial", "serial"}},
+            {typeof(long), new List<string>(){ "BIGINT", "bigserial" } },
+            {typeof(string), new List<string>(){ "TEXT", "varchar" , "character varying", "character", "json", "enum" } },
+            {typeof(bool), new List<string> { "BOOLEAN" } },
+            {typeof(DateTime), new List<string>(){ "TIMESTAMP" , "timestamp", "date", "interval" } },
+            {typeof(TimeSpan), new List<string>(){ "TIME" } },
+            {typeof(float),new List<string>(){ "FLOAT"} },
+            {typeof(decimal), new List<string>(){ "DECIMAL(18,5)", "numeric" , "real" , "money"  } },
+            {typeof(Guid), new List<string>(){ "uuid"} },
+            {typeof(byte[]), new List<string>(){ "bytea"} },
+            {typeof(char), new List<string>(){ "VARCHAR(10)", "char"} },
+            {typeof(double), new List<string>(){ "DECIMAL(18,5)", "numeric" , "real" , "money"  } },
         };
+
+
 
         internal static string GetValidSqlName(this DataBaseTypes dbtype, string col)
         {
@@ -108,7 +111,7 @@ namespace EntityWorker.Core.Helper
         }
 
         /// <summary>
-        /// Clear all ids
+        /// Clear all PrimaryId and ForeignKey
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="item"></param>
@@ -212,6 +215,12 @@ namespace EntityWorker.Core.Helper
             return str;
         }
 
+
+        /// <summary>
+        /// Generate an entityKey Primary Id cant be null or empty
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         public static string EntityKey(this object entity) => entity.GetType().FullName + entity.GetPrimaryKeyValue()?.ToString();
 
 
@@ -235,11 +244,33 @@ namespace EntityWorker.Core.Helper
             if (Nullable.GetUnderlyingType(type) != null)
                 type = Nullable.GetUnderlyingType(type);
             if (dbType == DataBaseTypes.Mssql)
+                return DbMsSqlMapper.ContainsKey(type) ? DbMsSqlMapper[type].First() : null;
+            else if (dbType == DataBaseTypes.Sqllight)
+                return DbSQLiteMapper.ContainsKey(type) ? DbSQLiteMapper[type].First() : null;
+            else return DbPostGresqlMapper.ContainsKey(type) ? DbPostGresqlMapper[type].First() : null;
+        }
+
+        /// <summary>
+        /// Convert System Type to SqlType
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="dbType"></param>
+        /// <returns></returns>
+        public static List<string> GetDbTypeListByType(this Type type, DataBaseTypes dbType)
+        {
+            if (type.GetTypeInfo().IsEnum)
+                type = typeof(long);
+
+            if (Nullable.GetUnderlyingType(type) != null)
+                type = Nullable.GetUnderlyingType(type);
+            if (dbType == DataBaseTypes.Mssql)
                 return DbMsSqlMapper.ContainsKey(type) ? DbMsSqlMapper[type] : null;
             else if (dbType == DataBaseTypes.Sqllight)
                 return DbSQLiteMapper.ContainsKey(type) ? DbSQLiteMapper[type] : null;
             else return DbPostGresqlMapper.ContainsKey(type) ? DbPostGresqlMapper[type] : null;
         }
+
+
 
         /// <summary>
         /// if date is between two dates
@@ -323,7 +354,7 @@ namespace EntityWorker.Core.Helper
         {
             if (value == null || (value.GetType().IsNumeric() && value.ConvertValue<long>() <= 0))
                 return true;
-            else if (string.IsNullOrEmpty(value.ToString()) || value.ToString() == "00000000-0000-0000-0000-000000000000")
+            else if (string.IsNullOrEmpty(value.ToString()) || value.ConvertValue<string>() == Guid.Empty.ToString())
                 return true;
             return false;
         }
@@ -336,7 +367,7 @@ namespace EntityWorker.Core.Helper
         /// <returns></returns>
         public static void SetPrimaryKeyValue(this object item, object value = null)
         {
-            var prop = DeepCloner.GetFastDeepClonerProperties(item.GetType()).FirstOrDefault(x => x.ContainAttribute<PrimaryKey>());
+            var prop = item.GetPrimaryKey();
             prop.SetValue(item, MethodHelper.ConvertValue(value, prop.PropertyType));
         }
 
@@ -346,7 +377,6 @@ namespace EntityWorker.Core.Helper
         /// <param name="type"></param>
         /// <param name="uninitializedObject"> true for FormatterServices.GetUninitializedObject and false for Activator.CreateInstance </param>
         /// <returns></returns>
-
         public static object CreateInstance(this Type type, bool uninitializedObject = false)
         {
             return uninitializedObject ? FormatterServices.GetUninitializedObject(type) : DeepCloner.CreateInstance(type);
@@ -395,11 +425,9 @@ namespace EntityWorker.Core.Helper
             {
                 return false;
             }
-
             // Check that the string matches the base64 layout
             var regex = new System.Text.RegularExpressions.Regex(@"^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)$");
             return regex.Match(str).Success;
-
         }
 
         /// <summary>
@@ -474,6 +502,12 @@ namespace EntityWorker.Core.Helper
             if (propertyType == typeof(int))
                 return allowDbNull ? typeof(int?) : typeof(int);
 
+            if (propertyType == typeof(float))
+                return allowDbNull ? typeof(int?) : typeof(int);
+
+            if (propertyType == typeof(byte))
+                return allowDbNull ? typeof(byte?) : typeof(byte);
+
             if (propertyType == typeof(decimal))
                 return allowDbNull ? typeof(decimal?) : typeof(decimal);
 
@@ -542,6 +576,9 @@ namespace EntityWorker.Core.Helper
 
                         if (value != null && prop != null && prop.CanRead)
                         {
+                            if (value as byte[] != null && prop.PropertyType.FullName.Contains("Guid"))
+                                value = new Guid(value as byte[]);
+
                             var dataEncode = prop.GetCustomAttribute<DataEncode>();
                             var toBase64String = prop.GetCustomAttribute<ToBase64String>();
 

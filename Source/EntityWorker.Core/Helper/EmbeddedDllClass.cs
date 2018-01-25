@@ -21,7 +21,7 @@ namespace EntityWorker.Core.Helper
                 path = Path.Combine(path, "SQLite.Interop.dll");
 
                 if (!File.Exists(path))
-                    File.WriteAllBytes(path, Properties.x64.SQLite_Interop);
+                    File.WriteAllBytes(path, Properties.Resources.SQLite_Interop_64);
             }
             else if (IntPtr.Size == 4)
             {
@@ -33,7 +33,7 @@ namespace EntityWorker.Core.Helper
                 path = Path.Combine(path, "SQLite.Interop.dll");
 
                 if (!File.Exists(path))
-                    File.WriteAllBytes(path, Properties.x86.SQLite_Interop);
+                    File.WriteAllBytes(path, Properties.Resources.SQLite_Interop_86);
 
             }
         }
