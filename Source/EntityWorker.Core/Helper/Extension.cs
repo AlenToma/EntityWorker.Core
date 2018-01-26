@@ -34,6 +34,8 @@ namespace EntityWorker.Core.Helper
             {typeof(Guid), new List<string>(){ "UNIQUEIDENTIFIER"} },
             {typeof(byte[]), new List<string>(){ "varbinary(MAX)" , "image" , "rowversion", "timestamp" } },
             {typeof(char), new List<string>(){ "NVARCHAR(10)", "char" , "nchar" , "ntext" } },
+            {typeof(double), new List<string>(){ "DECIMAL(18,5)", "money" , "numeric", "smallmoney" } },
+
         };
 
         private static readonly Custom_ValueType<Type, List<string>> DbSQLiteMapper = new Custom_ValueType<Type, List<string>>()
