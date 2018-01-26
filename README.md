@@ -46,6 +46,9 @@ EndWith, Contains and so on
 See Code Example for more info.
 ## Code Example
 
+```js 
+alert("test")
+```
 * [GlobalConfiguration](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/GlobalConfiguration.md)
 * [Repository](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Repository.md)
 * [Allowed System type](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/System.Type.md)
