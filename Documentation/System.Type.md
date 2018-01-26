@@ -1,6 +1,6 @@
 
 ## Allowed System type
-Any of this types could be nullable
+Any of those types could be nullable
 ```csharp
 * System.Int32
 * System.Int64
