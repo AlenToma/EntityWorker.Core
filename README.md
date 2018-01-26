@@ -48,14 +48,15 @@ See Code Example for more info.
 
 * 1- [GlobalConfiguration](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/GlobalConfiguration.md)
 * 2- [Repository](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Repository.md)
-* 3- [Modules](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/modules.md)
-* 4- [Migrations](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Migration.md)
-* 5- [Querys](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Query.md)
-* 6- [Save](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Save.md)
-* 7- [LinqToSql](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/LinqToSql.md)
-* 8- [Entity Mappings](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/EntityMappings.md)
-* 9- [ObjectChanges](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/ObjectChanges.md)
-* 10- [Attributes](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md)
+* 3- [Allowed System type](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/System.Type.md)
+* 4- [Modules](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/modules.md)
+* 5- [Migrations](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Migration.md)
+* 6- [Querys](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Query.md)
+* 7- [Save](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Save.md)
+* 8- [LinqToSql](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/LinqToSql.md)
+* 9- [Entity Mappings](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/EntityMappings.md)
+* 10- [ObjectChanges](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/ObjectChanges.md)
+* 11- [Attributes](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md)
 
 ## Issues
 Please report any bugs or improvement you might find.
