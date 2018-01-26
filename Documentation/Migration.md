@@ -3,12 +3,6 @@ EntityWorker.Core has its own Migration methods, so lets see how it works.
 ```csharp
    //Create Class and call it IniMigration and inhert from Migration
    public class IniMigration : Migration
-        public IniMigration()
-        {
-           // in the database a migration will be created that contains this Identifier.
-           // it's very important that its unique.
-            MigrationIdentifier = "SystemFirstStart"; 
-        }
         public override void ExecuteMigration(ICustomRepository repository)
         {
             // create the tables User, Role, Address 
