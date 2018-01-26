@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net461;netcoreapp2.0</TargetFrameworks>
+    <AssemblyName>LightData.CMS.Modules</AssemblyName>
+    <RootNamespace>LightData.CMS.Modules</RootNamespace>
+    <PackageId>LightData.CMS.Modules</PackageId>
+    <Authors>LightData.CMS.Modules</Authors>
+    <Company>LightData.CMS.Modules</Company>
+    <Product>LightData.CMS.Modules</Product>
+    <Platforms>AnyCPU;x86;x64</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Configuration">
+      <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.1\System.Configuration.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\EntityWorker.Core\Source\EntityWorker.Core\EntityWorker.Core.csproj" />
+  </ItemGroup>
+</Project>

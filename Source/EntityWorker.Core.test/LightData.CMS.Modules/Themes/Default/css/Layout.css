@@ -1,0 +1,75 @@
+﻿.contextMenu {
+    display: inline-block;
+    border: 1px solid #CCC;
+    background: white;
+    z-index: 11;
+    position: fixed !important;
+    overflow: hidden;
+    z-index: 999;
+}
+
+    .contextMenu > .contextItem, .contextMenu .contextsubItem {
+        width: 100%;
+        height: 10px;
+        display: inline-block;
+        padding: 8px;
+        color: #4e4d4d;
+        font-size: 12px;
+        cursor: pointer;
+        padding-left: 23px;
+    }
+
+
+        .contextMenu > .contextItem:hover {
+            background: #337ab7;
+            color: white;
+        }
+
+    .contextMenu .contextsubItem {
+        position: fixed;
+        border: 1px solid #CCC;
+        padding-left: 5px;
+        width: 86%;
+        display: none;
+        padding: 12px;
+        margin-top: -1px;
+        z-index: 9999;
+    }
+
+
+table.block {
+    width: 300px;
+    height: 100%;
+}
+
+.block tbody tr td {
+    border: 1px solid #CCC;
+    padding: 8px;
+}
+
+.block tfoot tr td span {
+    display: inline-block;
+    float: left;
+    margin-left: 5px;
+    margin-right: 5px;
+    margin-top: 5px;
+}
+
+.block tfoot tr td input {
+    border: 1px #ccc solid;
+    width: 30px;
+    /* padding: 3px; */
+    height: 13px;
+    float: left;
+    text-align: center;
+    margin-top: 5px;
+    display: inline-block;
+}
+
+.block tbody tr td.selected {
+    background: #DEF;
+}
+
+.block tbody tr td.disabled {
+    background: #818284 !important;
+}

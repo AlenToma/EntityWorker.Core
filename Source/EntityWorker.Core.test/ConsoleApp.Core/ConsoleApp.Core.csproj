@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <RunCommand Condition="'$(PlatformTarget)' == 'x86'">$(MSBuildProgramFiles32)\dotnet\dotnet</RunCommand>
+    <!-- Can I provide hard coded path for dotnet.exe here?  -->
+    <RunCommand Condition="'$(PlatformTarget)' == 'x64'">$(ProgramW6432)\dotnet\dotnet</RunCommand>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\EntityWorker.Core\Source\EntityWorker.Core\EntityWorker.Core.csproj" />
+    <ProjectReference Include="..\LightData.CMS.Modules\LightData.CMS.Modules.csproj" />
+  </ItemGroup>
+
+</Project>

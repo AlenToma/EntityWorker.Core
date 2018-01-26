@@ -1,0 +1,245 @@
+﻿/*------------- start none ----------------*/
+table.default {
+    border: 0px solid #1C6EA4;
+    background-color: #EEEEEE;
+    width: 100%;
+    text-align: left;
+    border-collapse: collapse;
+}
+
+    table.default td, table.default th {
+        padding: 3px 5px;
+    }
+
+    table.default tbody td {
+        font-size: 12px;
+    }
+
+    table.default tr:nth-child(even) {
+        background: #D0E4F5;
+    }
+
+    table.default thead {
+        background: #6E81A4;
+        background: -moz-linear-gradient(top, #92a0bb 0%, #7c8dad 66%, #6E81A4 100%);
+        background: -webkit-linear-gradient(top, #92a0bb 0%, #7c8dad 66%, #6E81A4 100%);
+        background: linear-gradient(to bottom, #92a0bb 0%, #7c8dad 66%, #6E81A4 100%);
+    }
+
+        table.default thead th {
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+
+/*-------------- legend none ---------------*/
+/*---- start greenLight ---------*/
+.greenLight {
+    margin: 1em 0;
+    width: 100%;
+    overflow: hidden;
+    background: #FFF;
+    color: #024457;
+    border-radius: 10px;
+    border: 1px solid #167F92;
+}
+
+    .greenLight tr {
+        border: 1px solid #D9E4E6;
+    }
+
+        .greenLight tr:nth-child(odd) {
+            background-color: #EAF3F3;
+        }
+
+    .greenLight th {
+        display: none;
+        border: 1px solid #FFF;
+        background-color: #167F92;
+        color: #FFF;
+        padding: 1em;
+    }
+
+        .greenLight th:first-child {
+            display: table-cell;
+            text-align: center;
+        }
+
+        .greenLight th:nth-child(2) {
+            display: table-cell;
+        }
+
+            .greenLight th:nth-child(2) span {
+                display: none;
+            }
+
+            .greenLight th:nth-child(2):after {
+                content: attr(data-th);
+            }
+
+@media (min-width: 480px) {
+    .greenLight th:nth-child(2) span {
+        display: block;
+    }
+
+    .greenLight th:nth-child(2):after {
+        display: none;
+    }
+}
+
+.greenLight td {
+    display: block;
+    word-wrap: break-word;
+    max-width: 7em;
+}
+
+    .greenLight td:first-child {
+        display: table-cell;
+        text-align: center;
+        border-right: 1px solid #D9E4E6;
+    }
+
+@media (min-width: 480px) {
+    .greenLight td {
+        border: 1px solid #D9E4E6;
+    }
+}
+
+.greenLight th, .greenLight td {
+    text-align: left;
+    margin: .5em 1em;
+}
+
+@media (min-width: 480px) {
+    .greenLight th, .greenLight td {
+        display: table-cell;
+        padding: 1em;
+    }
+}
+/*---- End greenLight ---------*/
+
+/*-----Start rwd-table----*/
+.rwd-table {
+    background: #34495E;
+    color: #fff;
+    border-radius: .4em;
+    overflow: hidden;
+}
+
+    .rwd-table tr {
+        border-color: #46637f;
+    }
+
+    .rwd-table th, .rwd-table td {
+        margin: .5em 1em;
+    }
+
+@media (min-width: 480px) {
+    .rwd-table th, .rwd-table td {
+        padding: 1em !important;
+    }
+}
+
+.rwd-table th, .rwd-table td:before {
+    color: #dd5;
+}
+
+/*-----End rwd-table----*/
+
+/*------ start Blured-Table-----*/
+
+.blured-table {
+    background: #f5f5f5;
+    border-collapse: separate;
+    box-shadow: inset 0 1px 0 #fff;
+    font-size: 12px;
+    line-height: 24px;
+    margin: 30px auto;
+    text-align: left;
+    width: 800px;
+}
+
+    .blured-table th {
+        background: url(https://jackrugile.com/images/misc/noise-diagonal.png), linear-gradient(#777, #444);
+        border-left: 1px solid #555;
+        border-right: 1px solid #777;
+        border-top: 1px solid #555;
+        border-bottom: 1px solid #333;
+        box-shadow: inset 0 1px 0 #999;
+        color: #fff;
+        font-weight: bold;
+        padding: 10px 15px;
+        position: relative;
+        text-shadow: 0 1px 0 #000;
+    }
+
+        .blured-table th:after {
+            background: linear-gradient(rgba(255,255,255,0), rgba(255,255,255,.08));
+            content: '';
+            display: block;
+            height: 25%;
+            left: 0;
+            margin: 1px 0 0 0;
+            position: absolute;
+            top: 25%;
+            width: 100%;
+        }
+
+        .blured-table th:first-child {
+            border-left: 1px solid #777;
+            box-shadow: inset 1px 1px 0 #999;
+        }
+
+        .blured-table th:last-child {
+            box-shadow: inset -1px 1px 0 #999;
+        }
+
+    .blured-table td {
+        border-right: 1px solid #fff;
+        border-left: 1px solid #e8e8e8;
+        border-top: 1px solid #fff;
+        border-bottom: 1px solid #e8e8e8;
+        padding: 10px 15px;
+        position: relative;
+        transition: all 300ms;
+    }
+
+        .blured-table td:first-child {
+            box-shadow: inset 1px 0 0 #fff;
+        }
+
+        .blured-table td:last-child {
+            border-right: 1px solid #e8e8e8;
+            box-shadow: inset -1px 0 0 #fff;
+        }
+
+    .blured-table tr {
+        background: url(https://jackrugile.com/images/misc/noise-diagonal.png);
+    }
+
+        .blured-table tr:nth-child(odd) td {
+            background: #f1f1f1 url(https://jackrugile.com/images/misc/noise-diagonal.png);
+        }
+
+        .blured-table tr:last-of-type td {
+            box-shadow: inset 0 -1px 0 #fff;
+        }
+
+            .blured-table tr:last-of-type td:first-child {
+                box-shadow: inset 1px -1px 0 #fff;
+            }
+
+            .blured-table tr:last-of-type td:last-child {
+                box-shadow: inset -1px -1px 0 #fff;
+            }
+
+    .blured-table tbody:hover td {
+        color: transparent;
+        text-shadow: 0 0 3px #aaa;
+    }
+
+    .blured-table tbody:hover tr:hover td {
+        color: #444;
+        text-shadow: 0 1px 0 #fff;
+    }
+/*---------- legend blured-table ------------*/

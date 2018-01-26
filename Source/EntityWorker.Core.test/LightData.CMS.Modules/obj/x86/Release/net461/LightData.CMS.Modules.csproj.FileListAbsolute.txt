@@ -1,0 +1,13 @@
+D:\Projects\EntityWorker.Core.test\LightData.CMS.Modules\bin\x86\Release\net461\LightData.CMS.Modules.dll
+D:\Projects\EntityWorker.Core.test\LightData.CMS.Modules\bin\x86\Release\net461\LightData.CMS.Modules.pdb
+D:\Projects\EntityWorker.Core.test\LightData.CMS.Modules\bin\x86\Release\net461\Newtonsoft.Json.dll
+D:\Projects\EntityWorker.Core.test\LightData.CMS.Modules\bin\x86\Release\net461\System.Data.SqlClient.dll
+D:\Projects\EntityWorker.Core.test\LightData.CMS.Modules\bin\x86\Release\net461\EntityWorker.Core.dll
+D:\Projects\EntityWorker.Core.test\LightData.CMS.Modules\bin\x86\Release\net461\EntityWorker.Core.pdb
+D:\Projects\EntityWorker.Core.test\LightData.CMS.Modules\bin\x86\Release\net461\EntityWorker.Core.xml
+D:\Projects\EntityWorker.Core.test\LightData.CMS.Modules\obj\x86\Release\net461\LightData.CMS.Modules.csprojResolveAssemblyReference.cache
+D:\Projects\EntityWorker.Core.test\LightData.CMS.Modules\obj\x86\Release\net461\LightData.CMS.Modules.csproj.CoreCompileInputs.cache
+D:\Projects\EntityWorker.Core.test\LightData.CMS.Modules\obj\x86\Release\net461\LightData.CMS.Modules.AssemblyInfoInputs.cache
+D:\Projects\EntityWorker.Core.test\LightData.CMS.Modules\obj\x86\Release\net461\LightData.CMS.Modules.AssemblyInfo.cs
+D:\Projects\EntityWorker.Core.test\LightData.CMS.Modules\obj\x86\Release\net461\LightData.CMS.Modules.dll
+D:\Projects\EntityWorker.Core.test\LightData.CMS.Modules\obj\x86\Release\net461\LightData.CMS.Modules.pdb

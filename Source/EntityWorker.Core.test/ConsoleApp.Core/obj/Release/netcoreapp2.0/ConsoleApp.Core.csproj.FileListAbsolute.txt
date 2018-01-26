@@ -1,0 +1,16 @@
+D:\Projects\EntityWorker.Core.test\ConsoleApp.Core\bin\Release\netcoreapp2.0\ConsoleApp.Core.deps.json
+D:\Projects\EntityWorker.Core.test\ConsoleApp.Core\bin\Release\netcoreapp2.0\ConsoleApp.Core.runtimeconfig.json
+D:\Projects\EntityWorker.Core.test\ConsoleApp.Core\bin\Release\netcoreapp2.0\ConsoleApp.Core.runtimeconfig.dev.json
+D:\Projects\EntityWorker.Core.test\ConsoleApp.Core\bin\Release\netcoreapp2.0\ConsoleApp.Core.dll
+D:\Projects\EntityWorker.Core.test\ConsoleApp.Core\bin\Release\netcoreapp2.0\ConsoleApp.Core.pdb
+D:\Projects\EntityWorker.Core.test\ConsoleApp.Core\bin\Release\netcoreapp2.0\EntityWorker.Core.dll
+D:\Projects\EntityWorker.Core.test\ConsoleApp.Core\bin\Release\netcoreapp2.0\LightData.CMS.Modules.dll
+D:\Projects\EntityWorker.Core.test\ConsoleApp.Core\bin\Release\netcoreapp2.0\EntityWorker.Core.pdb
+D:\Projects\EntityWorker.Core.test\ConsoleApp.Core\bin\Release\netcoreapp2.0\EntityWorker.Core.xml
+D:\Projects\EntityWorker.Core.test\ConsoleApp.Core\bin\Release\netcoreapp2.0\LightData.CMS.Modules.pdb
+D:\Projects\EntityWorker.Core.test\ConsoleApp.Core\obj\Release\netcoreapp2.0\ConsoleApp.Core.csprojResolveAssemblyReference.cache
+D:\Projects\EntityWorker.Core.test\ConsoleApp.Core\obj\Release\netcoreapp2.0\ConsoleApp.Core.csproj.CoreCompileInputs.cache
+D:\Projects\EntityWorker.Core.test\ConsoleApp.Core\obj\Release\netcoreapp2.0\ConsoleApp.Core.AssemblyInfoInputs.cache
+D:\Projects\EntityWorker.Core.test\ConsoleApp.Core\obj\Release\netcoreapp2.0\ConsoleApp.Core.AssemblyInfo.cs
+D:\Projects\EntityWorker.Core.test\ConsoleApp.Core\obj\Release\netcoreapp2.0\ConsoleApp.Core.dll
+D:\Projects\EntityWorker.Core.test\ConsoleApp.Core\obj\Release\netcoreapp2.0\ConsoleApp.Core.pdb

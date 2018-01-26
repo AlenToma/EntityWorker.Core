@@ -1,0 +1,11 @@
+D:\Projects\EntityWorker.Core.test\ConsoleApp\obj\Debug\ConsoleApp.net46.csprojResolveAssemblyReference.cache
+D:\Projects\EntityWorker.Core.test\ConsoleApp\obj\Debug\ConsoleApp.net46.csproj.CoreCompileInputs.cache
+D:\Projects\EntityWorker.Core.test\ConsoleApp\bin\Debug\ConsoleApp1.exe.config
+D:\Projects\EntityWorker.Core.test\ConsoleApp\bin\Debug\ConsoleApp1.exe
+D:\Projects\EntityWorker.Core.test\ConsoleApp\bin\Debug\ConsoleApp1.pdb
+D:\Projects\EntityWorker.Core.test\ConsoleApp\bin\Debug\EntityWorker.Core.dll
+D:\Projects\EntityWorker.Core.test\ConsoleApp\bin\Debug\LightData.CMS.Modules.dll
+D:\Projects\EntityWorker.Core.test\ConsoleApp\bin\Debug\EntityWorker.Core.pdb
+D:\Projects\EntityWorker.Core.test\ConsoleApp\bin\Debug\LightData.CMS.Modules.pdb
+D:\Projects\EntityWorker.Core.test\ConsoleApp\obj\Debug\ConsoleApp1.exe
+D:\Projects\EntityWorker.Core.test\ConsoleApp\obj\Debug\ConsoleApp1.pdb
