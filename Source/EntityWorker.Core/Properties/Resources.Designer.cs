@@ -110,7 +110,7 @@ namespace EntityWorker.Core.Properties {
         ///  &lt;MetaDataCollections&gt;
         ///    &lt;CollectionName&gt;MetaDataCollections&lt;/CollectionName&gt;
         ///    &lt;NumberOfRestrictions&gt;0&lt;/NumberOfRestrictions&gt;
-        ///    &lt;NumberOfIdentifierP [rest of string was truncated]&quot;;.
+        ///    &lt;Numb [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string MetaDataCollections {
             get {

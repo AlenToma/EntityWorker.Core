@@ -1113,8 +1113,8 @@
     },
     "EntityWorker.Core/1.3.9": {
       "type": "project",
-      "path": "../../EntityWorker.Core/Source/EntityWorker.Core/EntityWorker.Core.csproj",
-      "msbuildProject": "../../EntityWorker.Core/Source/EntityWorker.Core/EntityWorker.Core.csproj"
+      "path": "../../EntityWorker.Core/EntityWorker.Core.csproj",
+      "msbuildProject": "../../EntityWorker.Core/EntityWorker.Core.csproj"
     },
     "LightData.CMS.Modules/1.0.0": {
       "type": "project",
@@ -1139,11 +1139,11 @@
       "hideWarningsAndErrors": true
     },
     "restore": {
-      "projectUniqueName": "D:\\Projects\\EntityWorker.Core.test\\ConsoleApp.Core\\ConsoleApp.Core.csproj",
+      "projectUniqueName": "D:\\Projects\\EntityWorker.Core\\Source\\EntityWorker.Core.test\\ConsoleApp.Core\\ConsoleApp.Core.csproj",
       "projectName": "ConsoleApp.Core",
-      "projectPath": "D:\\Projects\\EntityWorker.Core.test\\ConsoleApp.Core\\ConsoleApp.Core.csproj",
+      "projectPath": "D:\\Projects\\EntityWorker.Core\\Source\\EntityWorker.Core.test\\ConsoleApp.Core\\ConsoleApp.Core.csproj",
       "packagesPath": "C:\\Users\\Alen.Toma\\.nuget\\packages\\",
-      "outputPath": "D:\\Projects\\EntityWorker.Core.test\\ConsoleApp.Core\\obj\\",
+      "outputPath": "D:\\Projects\\EntityWorker.Core\\Source\\EntityWorker.Core.test\\ConsoleApp.Core\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -1166,8 +1166,8 @@
             "D:\\Projects\\EntityWorker.Core\\Source\\EntityWorker.Core\\EntityWorker.Core.csproj": {
               "projectPath": "D:\\Projects\\EntityWorker.Core\\Source\\EntityWorker.Core\\EntityWorker.Core.csproj"
             },
-            "D:\\Projects\\EntityWorker.Core.test\\LightData.CMS.Modules\\LightData.CMS.Modules.csproj": {
-              "projectPath": "D:\\Projects\\EntityWorker.Core.test\\LightData.CMS.Modules\\LightData.CMS.Modules.csproj"
+            "D:\\Projects\\EntityWorker.Core\\Source\\EntityWorker.Core.test\\LightData.CMS.Modules\\LightData.CMS.Modules.csproj": {
+              "projectPath": "D:\\Projects\\EntityWorker.Core\\Source\\EntityWorker.Core.test\\LightData.CMS.Modules\\LightData.CMS.Modules.csproj"
             }
           }
         }

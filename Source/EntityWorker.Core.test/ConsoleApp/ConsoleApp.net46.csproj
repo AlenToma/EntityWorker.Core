@@ -94,8 +94,8 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\EntityWorker.Core\Source\EntityWorker.Core\EntityWorker.Core.csproj">
-      <Project>{6d4f3daa-1d74-4ce2-9a67-75a9be59273e}</Project>
+    <ProjectReference Include="..\..\EntityWorker.Core\EntityWorker.Core.csproj">
+      <Project>{9ec3779e-507c-4158-be2c-c284ccd0b650}</Project>
       <Name>EntityWorker.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\LightData.CMS.Modules\LightData.CMS.Modules.csproj">

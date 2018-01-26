@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\EntityWorker.Core\Source\EntityWorker.Core\EntityWorker.Core.csproj" />
+    <ProjectReference Include="..\..\EntityWorker.Core\EntityWorker.Core.csproj" />
     <ProjectReference Include="..\LightData.CMS.Modules\LightData.CMS.Modules.csproj" />
   </ItemGroup>
 
