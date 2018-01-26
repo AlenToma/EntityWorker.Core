@@ -17,7 +17,7 @@ using EntityWorker.Core.Helper;
 
     [PropertyName("Role")]
     public RoleModule UserGroup { get; set; }
-}
+    }
 
     var user =new List<User>(){ new User { UserName="test", Password="test", Role= new Role() }};
 
