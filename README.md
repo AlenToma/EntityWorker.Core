@@ -45,16 +45,21 @@ EntityWorker.Core has its own provider called ISqlQueryable, which can handle al
 EndWith, Contains and so on
 See Code Example for more info.
 ## Code Example
-1- [GlobalConfiguration](https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/Documentation/GlobalConfiguration.md)
-2- [Repository](https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/Documentation/Repository.md)
-3- [Modules](https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/Documentation/modules.md)
-4- [Migrations](https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/Documentation/Migration.md)
-5- [Querys](https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/Documentation/Query.md)
-6- [Save](https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/Documentation/Save.md)
-7- [LinqToSql](https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/Documentation/LinqToSql.md)
-8- [Entity Mappings](https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/Documentation/EntityMappings.md)
-9- [ObjectChanges](https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/Documentation/ObjectChanges.md)
-10- [Attributes](https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/Documentation/Attributes.md)
+
+```html
+<ul>
+<li>1- [GlobalConfiguration](https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/Documentation/GlobalConfiguration.md)</li>
+<li>2- [Repository](https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/Documentation/Repository.md)</li>
+<li>3- [Modules](https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/Documentation/modules.md)</li>
+<li>4- [Migrations](https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/Documentation/Migration.md)</li>
+<li>5- [Querys](https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/Documentation/Query.md)</li>
+<li>6- [Save](https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/Documentation/Save.md)</li>
+<li>7- [LinqToSql](https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/Documentation/LinqToSql.md)</li>
+<li>8- [Entity Mappings](https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/Documentation/EntityMappings.md)</li>
+<li>9- [ObjectChanges](https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/Documentation/ObjectChanges.md)</li>
+<li>10- [Attributes](https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/Documentation/Attributes.md)</li>
+</ul>
+```
 
 ## Issues
 Please report any bugs or improvement you might find.
