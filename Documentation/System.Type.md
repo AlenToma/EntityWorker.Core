@@ -2,7 +2,7 @@
 ## Allowed System type
 Any of those types could be nullable
 ```csharp
-* System.Int32
+System.Int32
 * System.Int64
 * System.Boolean
 * System.DateTime
