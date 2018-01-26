@@ -15,6 +15,7 @@ We will execute a complicated query and see how it gets parsed.
                 var sql = users.ParsedLinqToSql;
             }
 ```
+### Generated sql result
 ```sql
             // And here is the generated Sql Query
              SELECT distinct Users.* FROM Users 
