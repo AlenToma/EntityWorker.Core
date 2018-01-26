@@ -1,4 +1,4 @@
-let's start by creating the dbContext, lets call it Repository
+## Transaction
 ```csharp
     // Here we inherit from Transaction which contains the database logic for handling the transaction.
     // Thats all we need right now.
