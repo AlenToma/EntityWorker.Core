@@ -14,6 +14,8 @@ We will execute a complicated query and see how it gets parsed.
                 List<User> userList = users.Execute();
                 var sql = users.ParsedLinqToSql;
             }
+```
+```sql
             // And here is the generated Sql Query
              SELECT distinct Users.* FROM Users 
              left join [Roles] CEjB on CEjB.[Id] = Users.[Role_Id]
