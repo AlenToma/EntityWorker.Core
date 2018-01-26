@@ -46,16 +46,16 @@ EndWith, Contains and so on
 See Code Example for more info.
 ## Code Example
 
-* 1- [GlobalConfiguration](https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/Documentation/GlobalConfiguration.md)
-* 2- [Repository](https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/Documentation/Repository.md)
-* 3- [Modules](https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/Documentation/modules.md)
-* 4- [Migrations](https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/Documentation/Migration.md)
-* 5- [Querys](https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/Documentation/Query.md)
-* 6- [Save](https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/Documentation/Save.md)
-* 7- [LinqToSql](https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/Documentation/LinqToSql.md)
-* 8- [Entity Mappings](https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/Documentation/EntityMappings.md)
-* 9- [ObjectChanges](https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/Documentation/ObjectChanges.md)
-* 10- [Attributes](https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/Documentation/Attributes.md)
+* 1- [GlobalConfiguration](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/GlobalConfiguration.md)
+* 2- [Repository](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Repository.md)
+* 3- [Modules](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/modules.md)
+* 4- [Migrations](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Migration.md)
+* 5- [Querys](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Query.md)
+* 6- [Save](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Save.md)
+* 7- [LinqToSql](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/LinqToSql.md)
+* 8- [Entity Mappings](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/EntityMappings.md)
+* 9- [ObjectChanges](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/ObjectChanges.md)
+* 10- [Attributes](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md)
 
 ## Issues
 Please report any bugs or improvement you might find.
