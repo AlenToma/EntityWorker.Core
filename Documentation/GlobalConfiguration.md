@@ -1,4 +1,4 @@
-Configurate GlobalConfiguration. 
+## Configurate GlobalConfiguration. 
 ```csharp
 // In Application_Start
 // Those two setting are for DataEnode Attribute
