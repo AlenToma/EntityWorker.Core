@@ -1,5 +1,5 @@
 
-## Allowed System type
+## Allowed System type for properties
 Any of those types could be nullable
 
 * System.Int32
