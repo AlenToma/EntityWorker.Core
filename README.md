@@ -25,15 +25,9 @@ SqlQueryable now inherits from IOrderedQueryable so we could cast it IQueryable<
 
 
 ## .NET FRAMEWORK SUPPORT 
-1- .NETCoreApp 2.0
-
-2- .NETFramework 4.5.1
-
-3- .NETFramework 4.6
-
-4- .NETFramework 4.6.1
-
-5- .NETStandard 2.0
+* .NETCoreApp 2.0
+* .NETFramework 4.5.1
+* .NETStandard 2.0
 ## What is EntityWorker.Core?
 EntityWorker.Core is an object-relation mappar that enables .NET developers to work with relational data using objects.
 EntityWorker.Core is an alternative to the Entity Framework. It is more flexible and much faster than the Entity Framework.
