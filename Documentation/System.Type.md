@@ -8,6 +8,7 @@ System.Int64
 System.Boolean
 System.DateTime
 System.TimeSpan
+System.String
 System.Single
 System.Decimal
 System.Guid
