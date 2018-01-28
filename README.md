@@ -9,13 +9,6 @@
 ## EntityWorker.Core in Action
 [LightData.CMS](https://github.com/AlenToma/LightData.CMS)
 
-## <h1 id="update">Update in >= 1.2.5</h1>
-DbEntity is Removed now, you dont have to inherit from it anymore. This way you can use the objects in other project without refering to EntityWorker.Core.
-
-Also, make sure to read about GlobalConfiguration
-
-SqlQueryable now inherits from IOrderedQueryable so we could cast it IQueryable<T> later on.
-
 ## Support for Providers
 * Mssql
 * Sqlite
