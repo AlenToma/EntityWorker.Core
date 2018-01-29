@@ -12,7 +12,6 @@ lets see how EntityWorker gets the changed objects
                 rep.Save(user);
                 var changes2 = rep.GetObjectChanges(user);
                 rep.SaveChanges();
-                var changes3 = rep.GetObjectChanges(user);
             }
 
 ```
