@@ -13,8 +13,6 @@ EntityWorker.Core has its own Migration methods, so lets see how it works.
                 Password = "test"
             };
             repository.Save(user);
-
-            base.ExecuteMigration(repository);
         }
     }
   }
