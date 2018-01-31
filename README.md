@@ -9,31 +9,14 @@
 ## EntityWorker.Core in Action
 [LightData.CMS](https://github.com/AlenToma/LightData.CMS)
 
-## <h1 id="update">Update in >= 1.2.5</h1>
-DbEntity is Removed now, you dont have to inherit from it anymore. This way you can use the objects in other project without refering to EntityWorker.Core.
-
-Also, make sure to read about GlobalConfiguration
-
-SqlQueryable now inherits from IOrderedQueryable so we could cast it IQueryable<T> later on.
-
 ## Support for Providers
-1- Mssql
-
-2- Sqlite
-
-3- Postgresql
-
-
+* Mssql
+* Sqlite
+* Postgresql
 ## .NET FRAMEWORK SUPPORT 
-1- .NETCoreApp 2.0
-
-2- .NETFramework 4.5.1
-
-3- .NETFramework 4.6
-
-4- .NETFramework 4.6.1
-
-5- .NETStandard 2.0
+* .NETCoreApp 2.0
+* .NETFramework 4.5.1
+* .NETStandard 2.0
 ## What is EntityWorker.Core?
 EntityWorker.Core is an object-relation mappar that enables .NET developers to work with relational data using objects.
 EntityWorker.Core is an alternative to the Entity Framework. It is more flexible and much faster than the Entity Framework.

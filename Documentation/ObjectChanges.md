@@ -3,7 +3,6 @@ lets see how EntityWorker gets the changed objects
 ```csharp
         using (var rep = new Repository())
             {
-                //var m = rep.Get<User>().
                 var user = rep.Get<User>().LoadChildren().ExecuteFirstOrDefault();
                 user.UserName = "hahahadfsfddfsdfhaha";
                 var changes = rep.GetObjectChanges(user); 
@@ -13,7 +12,6 @@ lets see how EntityWorker gets the changed objects
                 rep.Save(user);
                 var changes2 = rep.GetObjectChanges(user);
                 rep.SaveChanges();
-                var changes3 = rep.GetObjectChanges(user);
             }
 
 ```

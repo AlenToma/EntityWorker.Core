@@ -28,5 +28,5 @@ We will execute a complicated query and see how it gets parsed.
              ORDER BY Id
              OFFSET 20
              ROWS FETCH NEXT 100 ROWS ONLY;
-             // All String[] and Date[] will be translated to Parameters later on.   
+             // All String[], Date[] and Guid[] will be translated to Parameters later on.   
 ```

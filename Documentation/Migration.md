@@ -5,10 +5,6 @@ EntityWorker.Core has its own Migration methods, so lets see how it works.
    public class IniMigration : Migration
         public override void ExecuteMigration(ICustomRepository repository)
         {
-            // create the tables User, Role, Address 
-            // because we have a foreign keys in user class that refer to address and roles, those will also be
-            // created
-            repository.CreateTable<User>(true);
             var user = new User()
             {
                 Role = new Role() { Name = "Admin" },
@@ -17,8 +13,6 @@ EntityWorker.Core has its own Migration methods, so lets see how it works.
                 Password = "test"
             };
             repository.Save(user);
-
-            base.ExecuteMigration(repository);
         }
     }
   }
