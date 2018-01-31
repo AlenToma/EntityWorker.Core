@@ -11,8 +11,8 @@
         { 
         }
         
-    protected override void OnModuleStart()
-    {
+        protected override void OnModuleStart()
+        {
             if (!base.DataBaseExist())
                 base.CreateDataBase();
 
@@ -23,7 +23,7 @@
             var latestChanges = GetCodeLatestChanges();
             if (latestChanges.Any())
                 latestChanges.Execute(true);
-     }
+        }
 
         // get the full connection string
         // for postgresql make sure to have the database name lower case
