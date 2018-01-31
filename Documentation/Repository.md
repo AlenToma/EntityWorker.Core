@@ -9,19 +9,21 @@
         public Repository(DataBaseTypes dbType = DataBaseTypes.Mssql) : 
         base(GetConnectionString(dbType), true, dbType) 
         { 
+        }
+        
+    protected override void OnModuleStart()
+    {
             if (!base.DataBaseExist())
-            {
                 base.CreateDataBase();
-            }
-            
+
             /// Limited support for sqlite
             // Get the latest change between the code and the database. 
             // Property Rename is not supported. renaming property x will end up removing the x and adding y so there will be dataloss
-            // Adding a primary key is not supported either, you have to recreate the the whole table with CreateTable(true);
+            // Adding a primary key is not supported either
             var latestChanges = GetCodeLatestChanges();
             if (latestChanges.Any())
                 latestChanges.Execute(true);
-        }
+     }
 
         // get the full connection string
         // for postgresql make sure to have the database name lower case
