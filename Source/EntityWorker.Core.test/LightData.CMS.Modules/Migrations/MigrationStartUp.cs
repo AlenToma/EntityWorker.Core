@@ -110,7 +110,6 @@ namespace LightData.CMS.Modules.Migrations
 
                 folders.ForEach(x => repository.Save(x));
             }
-            base.ExecuteMigration(repository);
         }
     }
 }

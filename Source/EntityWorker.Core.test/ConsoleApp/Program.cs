@@ -60,6 +60,7 @@ namespace ConsoleApp1
             using (var rep = new Repository(DataBaseTypes.PostgreSql))
             {
 
+
                 var role = rep.Get<Role>().ExecuteFirstOrDefault();
 
                 var user = new User() { UserName = "test", Password = "test", Role = role, Person = new Person() { FirstName = "asd" } };
@@ -195,6 +196,8 @@ namespace ConsoleApp1
                 execute(rep.Get<User>().LoadChildren(), "Get All");
                 execute(rep.Get<Person>().Where(x => x.FirstName.Contains("Admin") || !string.IsNullOrEmpty(x.FirstName) || string.IsNullOrEmpty(x.FirstName) == false && x.Id != id), "IsNullOrEmpty");
 
+                execute(rep.DataReaderConverter<User>(rep.GetSqlCommand("select * from Users")).LoadChildren(), "CustomSelect");
+
                 execute(rep.Get<Person>().Where(x => x.Addresses.Any(a => a.Country.Name.Contains("US") && !string.IsNullOrEmpty(a.PostalCode))), "Any");
 
                 execute(rep.Get<Person>().Where(x => x.FirstName.EndsWith("a")), "EndsWith");
@@ -215,6 +218,10 @@ namespace ConsoleApp1
                 execute(rep.Get<User>().LoadChildren(), "Get All");
                 execute(rep.Get<Person>().Where(x => x.FirstName.Contains("Admin") || !string.IsNullOrEmpty(x.FirstName) || string.IsNullOrEmpty(x.FirstName) == false && x.Id != id), "IsNullOrEmpty");
 
+
+                execute(rep.DataReaderConverter<User>(rep.GetSqlCommand("select * from Users")).LoadChildren(), "CustomSelect");
+
+
                 execute(rep.Get<Person>().Where(x => x.Addresses.Any(a => a.Country.Name.Contains("US") && !string.IsNullOrEmpty(a.PostalCode))), "Any");
 
                 execute(rep.Get<Person>().Where(x => x.FirstName.EndsWith("a")), "EndsWith");
@@ -234,6 +241,8 @@ namespace ConsoleApp1
                 execute(rep.Get<User>().LoadChildren(), "Get All");
 
                 execute(rep.Get<Person>().Where(x => x.FirstName.Contains("Admin") || !string.IsNullOrEmpty(x.FirstName) || string.IsNullOrEmpty(x.FirstName) == false), "IsNullOrEmpty");
+
+                execute(rep.DataReaderConverter<User>(rep.GetSqlCommand("select * from Users")).LoadChildren(), "CustomSelect");
 
                 execute(rep.Get<Person>().Where(x => x.Addresses.Any(a => a.Country.Name.Contains("US") && !string.IsNullOrEmpty(a.PostalCode))), "Any");
 

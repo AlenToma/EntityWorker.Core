@@ -293,7 +293,7 @@ namespace EntityWorker.Core.InterFace
         /// <typeparam name="T"></typeparam>
         /// <param name="command"></param>
         /// <returns></returns>
-        List<T> DataReaderConverter<T>(DbCommandExtended command);
+        ISqlQueryable<T> DataReaderConverter<T>(DbCommandExtended command);
 
         /// <summary>
         /// Convert DbCommandExtended to list of System.Type

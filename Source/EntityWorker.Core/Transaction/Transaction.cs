@@ -17,6 +17,7 @@ using EntityWorker.Core.SQLite;
 using System.Collections;
 using EntityWorker.Core.SqlQuerys;
 using EntityWorker.Core.Postgres;
+using static EntityWorker.Core.Events;
 
 namespace EntityWorker.Core.Transaction
 {
@@ -27,6 +28,8 @@ namespace EntityWorker.Core.Transaction
     {
         internal Custom_ValueType<IDataReader, bool> OpenedDataReaders = new Custom_ValueType<IDataReader, bool>();
 
+
+
         private static object MigrationLocker = new object();
 
         private readonly DbSchema _dbSchema;
@@ -36,6 +39,8 @@ namespace EntityWorker.Core.Transaction
         /// DataBase FullConnectionString
         /// </summary>
         public readonly string ConnectionString;
+
+        private static bool _moduleIni { get; set; }
 
         /// <summary>
         /// DataBase Type
@@ -80,18 +85,34 @@ namespace EntityWorker.Core.Transaction
             DataBaseTypes = dataBaseTypes;
             _dbSchema = new DbSchema(this);
 
-            if (!_tableMigrationCheck[DataBaseTypes] && EnableMigration && DataBaseExist())
+            if (!_moduleIni)
             {
-                IniMigration();
-                _tableMigrationCheck[DataBaseTypes] = true;
+                lock (this)
+                {
+                    if (!_moduleIni)
+                    {
+                        OnModuleStart();
+                        _moduleIni = true;
+                    }
+                }
             }
+            else _moduleIni = true;
 
+            if (!_tableMigrationCheck[DataBaseTypes] && EnableMigration && DataBaseExist())
+                IniMigration();
+        }
+
+        // This will be triggererd the first time Transaction is called
+        protected virtual void OnModuleStart()
+        {
         }
 
         private void IniMigration()
         {
             lock (MigrationLocker)
             {
+                if (_tableMigrationCheck[DataBaseTypes])
+                    return;
                 this.CreateTable<DBMigration>(false);
                 this.SaveChanges();
                 var ass = this.GetType().Assembly;
@@ -100,6 +121,7 @@ namespace EntityWorker.Core.Transaction
                     config = Activator.CreateInstance(ass.DefinedTypes.First(a => typeof(IMigrationConfig).IsAssignableFrom(a))) as IMigrationConfig;
                 else throw new Exception("EnableMigration is enabled but EntityWorker.Core could not find IMigrationConfig in the current Assembly " + ass.GetName());
                 MigrationConfig(config);
+                _tableMigrationCheck[DataBaseTypes] = true;
             }
         }
 
@@ -108,13 +130,18 @@ namespace EntityWorker.Core.Transaction
         /// Return the new added column, tables or modified prooerty
         /// Property Rename is not supported. renaming a property x will end up removing the column x and adding column y so there will be dataloss
         /// Adding a primary key is not supported either
+        /// Abstract classes are ignored by default, Create abstract classes by CreateTable instead
         /// </summary>
         /// <assembly> Null for the current executed Assembly </assembly>
         /// <returns></returns>
         protected CodeToDataBaseMergeCollection GetCodeLatestChanges(Assembly assembly = null)
         {
             var codeToDataBaseMergeCollection = new CodeToDataBaseMergeCollection(this);
-            MethodHelper.GetDbEntitys(assembly ?? this.GetType().Assembly).ForEach(x => _dbSchema.GetDatabase_Diff(x, codeToDataBaseMergeCollection));
+            MethodHelper.GetDbEntitys(assembly ?? this.GetType().Assembly).ForEach(x =>
+            {
+                if (!x.IsAbstract) // Ignore abstract classes by default
+                    _dbSchema.GetDatabase_Diff(x, codeToDataBaseMergeCollection);
+            });
             return codeToDataBaseMergeCollection;
         }
 
@@ -172,44 +199,46 @@ namespace EntityWorker.Core.Transaction
         /// </summary>
         protected void CreateDataBase()
         {
-            if (DataBaseExist())
-                return;
-
-
-
-            var sqlBuild = DataBaseTypes != DataBaseTypes.PostgreSql ? new SqlConnectionStringBuilder(ConnectionString) : null;
-            var npSqlBuilder = DataBaseTypes == DataBaseTypes.PostgreSql ? new NpgsqlConnectionStringBuilder(ConnectionString) : null;
-            var dbName = DataBaseTypes == DataBaseTypes.Mssql ? sqlBuild?.InitialCatalog : sqlBuild?.DataSource;
-            if (string.IsNullOrEmpty(dbName) && DataBaseTypes != DataBaseTypes.PostgreSql)
-                throw new Exception("InitialCatalog cant be null or empty");
-
-            if (DataBaseTypes == DataBaseTypes.PostgreSql && string.IsNullOrEmpty(npSqlBuilder.Database))
-                throw new Exception("Database cant be null or empty");
-
-            if (DataBaseTypes == DataBaseTypes.Mssql)
+            lock (this)
             {
-                sqlBuild.InitialCatalog = "master";
-                var tr = new Transaction(sqlBuild.ToString(), false, DataBaseTypes);
-                var cmd = tr.GetSqlCommand("Create DataBase [" + dbName.Trim() + "]");
-                tr.ExecuteNonQuery(cmd);
+                if (DataBaseExist())
+                    return;
+
+
+
+                var sqlBuild = DataBaseTypes != DataBaseTypes.PostgreSql ? new SqlConnectionStringBuilder(ConnectionString) : null;
+                var npSqlBuilder = DataBaseTypes == DataBaseTypes.PostgreSql ? new NpgsqlConnectionStringBuilder(ConnectionString) : null;
+                var dbName = DataBaseTypes == DataBaseTypes.Mssql ? sqlBuild?.InitialCatalog : sqlBuild?.DataSource;
+                if (string.IsNullOrEmpty(dbName) && DataBaseTypes != DataBaseTypes.PostgreSql)
+                    throw new Exception("InitialCatalog cant be null or empty");
+
+                if (DataBaseTypes == DataBaseTypes.PostgreSql && string.IsNullOrEmpty(npSqlBuilder.Database))
+                    throw new Exception("Database cant be null or empty");
+
+                if (DataBaseTypes == DataBaseTypes.Mssql)
+                {
+                    sqlBuild.InitialCatalog = "master";
+                    var tr = new Transaction(sqlBuild.ToString(), false, DataBaseTypes);
+                    var cmd = tr.GetSqlCommand("Create DataBase [" + dbName.Trim() + "]");
+                    tr.ExecuteNonQuery(cmd);
+
+                }
+                else if (DataBaseTypes == DataBaseTypes.Sqllight)
+                    SQLiteConnection.CreateFile(dbName.Trim());
+                else
+                {
+                    dbName = npSqlBuilder.Database;
+                    npSqlBuilder.Database = "";
+                    var tr = new Transaction(npSqlBuilder.ToString(), false, DataBaseTypes);
+                    var cmd = tr.GetSqlCommand("Create DataBase " + dbName.Trim());
+                    tr.ExecuteNonQuery(cmd);
+                }
+
+                var latestChanges = GetCodeLatestChanges();
+                if (latestChanges.Any())
+                    latestChanges.Execute(true);
                 IniMigration();
             }
-            else if (DataBaseTypes == DataBaseTypes.Sqllight)
-            {
-
-                SQLiteConnection.CreateFile(dbName.Trim());
-                IniMigration();
-            }
-            else
-            {
-                dbName = npSqlBuilder.Database;
-                npSqlBuilder.Database = "";
-                var tr = new Transaction(npSqlBuilder.ToString(), false, DataBaseTypes);
-                var cmd = tr.GetSqlCommand("Create DataBase " + dbName.Trim());
-                tr.ExecuteNonQuery(cmd);
-                IniMigration();
-            }
-
 
         }
 
@@ -290,11 +319,13 @@ namespace EntityWorker.Core.Transaction
                 }
                 else if (DataBaseTypes == DataBaseTypes.Mssql)
                 {
-                    SqlConnection = new SqlConnection(ConnectionString);
+                    if (SqlConnection == null)
+                        SqlConnection = new SqlConnection(ConnectionString);
                 }
                 else
                 {
-                    SqlConnection = new NpgsqlConnection(ConnectionString);
+                    if (SqlConnection == null)
+                        SqlConnection = new NpgsqlConnection(ConnectionString);
                 }
             }
 
@@ -338,9 +369,9 @@ namespace EntityWorker.Core.Transaction
         /// <typeparam name="T"></typeparam>
         /// <param name="command"></param>
         /// <returns></returns>
-        public List<T> DataReaderConverter<T>(DbCommandExtended command)
+        public ISqlQueryable<T> DataReaderConverter<T>(DbCommandExtended command)
         {
-            return ((List<T>)DataReaderConverter(command, typeof(T)));
+            return new SqlQueryable<T>(this, ((List<T>)DataReaderConverter(command, typeof(T))));
         }
 
         /// <summary>

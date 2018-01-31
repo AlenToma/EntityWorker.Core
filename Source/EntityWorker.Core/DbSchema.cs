@@ -98,7 +98,7 @@ namespace EntityWorker.Core
                     query = Querys.Select(type, _repository.DataBaseTypes).Execute();
                 CachedSql.GetOrAdd(query, query);
             }
-            return _repository.DataReaderConverter<T>(_repository.GetSqlCommand(CachedSql[query]));
+            return _repository.DataReaderConverter<T>(_repository.GetSqlCommand(CachedSql[query])).Execute();
         }
 
 

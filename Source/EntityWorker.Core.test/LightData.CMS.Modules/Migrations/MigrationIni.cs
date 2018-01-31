@@ -29,7 +29,6 @@ namespace LightData.CMS.Modules.Migrations
             MethodHelper.GetDbEntitys(this.GetType().Assembly).ForEach(repository.RemoveTable);
             MethodHelper.GetDbEntitys(this.GetType().Assembly).ForEach(x => repository.CreateTable(x));
             folders.ForEach(x => repository.Save(x.ClearAllIdsHierarchy(true)));
-            base.ExecuteMigration(repository);
         }
     }
 }

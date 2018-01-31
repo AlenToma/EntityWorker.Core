@@ -9833,6 +9833,7 @@
             Return the new added column, tables or modified prooerty
             Property Rename is not supported. renaming a property x will end up removing the column x and adding column y so there will be dataloss
             Adding a primary key is not supported either
+            Abstract classes are ignored by default, Create abstract classes by CreateTable instead
             </summary>
             <assembly> Null for the current executed Assembly </assembly>
             <returns></returns>

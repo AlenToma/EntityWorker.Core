@@ -8,5 +8,6 @@ namespace EntityWorker.Core
         public delegate void IdChanged(long id);
 
         internal delegate void PropetySetter(IDataReader reader, int col, IFastDeepClonerProperty prop, object item);
+
     }
 }

@@ -5,7 +5,7 @@ using EntityWorker.Core.InterFace;
 namespace EntityWorker.Core.Object.Library
 {
     /// <inheritdoc />
-    public class Migration : IMigration
+    public abstract class Migration : IMigration
     {
         /// <summary>
         /// Default cto
@@ -22,9 +22,6 @@ namespace EntityWorker.Core.Object.Library
         /// Do your db Changes here
         /// </summary>
         /// <param name="repository"></param>
-        public virtual void ExecuteMigration(IRepository repository)
-        {
-            return;
-        }
+        public abstract void ExecuteMigration(IRepository repository);
     }
 }
