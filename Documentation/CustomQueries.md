@@ -38,7 +38,7 @@ namespace Test.Modules.Repository
                   "Host=localhost;Username=postgres;Password=root;Database=mydatabase");
         }
 
-
+        /// Create a custom ISqlQueryable, you could have store proc or a row sql query
         public List<User> GetUserByUserNameName(string userName)
         {
             var cmd = GetSqlCommand("SELECT * FROM User WHERE UserName = @userName");
