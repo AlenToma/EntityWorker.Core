@@ -23,7 +23,7 @@ Let's start building our models, lets build a simple User model
         [IndependentData]
         public Role Role { get; set; }
         
-        // Adress will be removed when we remove the user
+        // Address will be removed when we remove the user
         public List<Address> Address { get; set; }
         
         //[ExcludeFromAbstract] means that it should not be included in the DataBase Update or insert.
