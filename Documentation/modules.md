@@ -41,7 +41,8 @@ Let's start building our models, lets build a simple User model
         public Guid? Id { get; set; }
         
         public string Name { get; set; }
-        // All users will be deleted when we delete Role
+        
+        // All users who have this role, will be deleted when we delete Role
         public List<User> Users { get; set; }
     }
     
