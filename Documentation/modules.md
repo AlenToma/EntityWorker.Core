@@ -7,9 +7,13 @@ Let's start building our models, lets build a simple User model
     {
         [PrimaryId]
         public Guid? Id { get; set; }
-    
+       
         public string UserName { get; set; }
         
+        // Encode the data in the database.
+        // read global configration to specify enoding settings
+        [DataEncode]
+        public string Email{ get; set; }
        
         public string Password { get; set; }
         
