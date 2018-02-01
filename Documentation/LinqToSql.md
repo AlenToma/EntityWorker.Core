@@ -17,7 +17,7 @@ We will execute a complicated query and see how it gets parsed.
 ```
 ### Generated sql result
 ```sql
-            // And here is the generated Sql Query
+          -- And here is the generated Sql Query
              SELECT distinct Users.* FROM Users 
              left join [Roles] CEjB on CEjB.[Id] = Users.[Role_Id]
              WHERE (([CEjB].[Name] like String[%SuperAdmin] AND [Users].[UserName] like String[%alen%]) 
@@ -28,5 +28,5 @@ We will execute a complicated query and see how it gets parsed.
              ORDER BY Id
              OFFSET 20
              ROWS FETCH NEXT 100 ROWS ONLY;
-             // All String[], Date[] and Guid[] will be translated to Parameters later on.   
+          -- All String[], Date[] and Guid[] will be translated to Parameters later on.   
 ```
