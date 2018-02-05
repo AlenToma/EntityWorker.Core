@@ -8,6 +8,11 @@ namespace LightData.CMS.Modules.Repository
     {
         public Repository(DataBaseTypes dbType = DataBaseTypes.Mssql) : base(GetConnectionString(dbType), true, dbType)
         {
+          
+        }
+
+        protected override void OnModuleStart()
+        {
             if (!base.DataBaseExist())
                 base.CreateDataBase();
 
@@ -18,6 +23,7 @@ namespace LightData.CMS.Modules.Repository
             var latestChanges = GetCodeLatestChanges();
             if (latestChanges.Any())
                 latestChanges.Execute(true);
+            base.OnModuleStart();
         }
 
         // Get the full connection string from the web-config

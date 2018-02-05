@@ -9,7 +9,7 @@ using System.Text;
 
 namespace EntityWorker.Core.Object.Library
 {
-    public class CodeToDataBaseMergeCollection : List<CodeToDataBaseMerge>
+    public sealed class CodeToDataBaseMergeCollection : List<CodeToDataBaseMerge>
     {
         private readonly Transaction.Transaction _provider;
 

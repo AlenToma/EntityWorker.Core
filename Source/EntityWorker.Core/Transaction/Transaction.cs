@@ -40,7 +40,13 @@ namespace EntityWorker.Core.Transaction
         /// </summary>
         public readonly string ConnectionString;
 
-        private static bool _moduleIni { get; set; }
+
+        private static Dictionary<DataBaseTypes, bool> _moduleIni = new Dictionary<DataBaseTypes, bool>()
+        {
+            { DataBaseTypes.Mssql, false },
+            { DataBaseTypes.Sqllight, false },
+            { DataBaseTypes.PostgreSql, false }
+        };
 
         /// <summary>
         /// DataBase Type
@@ -85,24 +91,26 @@ namespace EntityWorker.Core.Transaction
             DataBaseTypes = dataBaseTypes;
             _dbSchema = new DbSchema(this);
 
-            if (!_moduleIni)
+            if (!_moduleIni[dataBaseTypes])
             {
                 lock (this)
                 {
-                    if (!_moduleIni)
+                    if (!_moduleIni[dataBaseTypes])
                     {
                         OnModuleStart();
-                        _moduleIni = true;
+                        _moduleIni[dataBaseTypes] = true;
                     }
                 }
             }
-            else _moduleIni = true;
+            else _moduleIni[dataBaseTypes] = true;
 
             if (!_tableMigrationCheck[DataBaseTypes] && EnableMigration && DataBaseExist())
                 IniMigration();
         }
 
-        // This will be triggererd the first time Transaction is called
+        /// <summary>
+        /// This will be triggererd the first time Transaction is called
+        /// </summary>
         protected virtual void OnModuleStart()
         {
         }
@@ -504,15 +512,13 @@ namespace EntityWorker.Core.Transaction
         /// <param name="attrName"></param>
         /// <param name="value"></param>
         /// <param name="dbType"></param>
-        public void AddInnerParameter(DbCommandExtended cmd, string attrName, object value, SqlDbType dbType = SqlDbType.NVarChar)
+        public IRepository AddInnerParameter(DbCommandExtended cmd, string attrName, object value, SqlDbType dbType = SqlDbType.NVarChar)
         {
             if (attrName != null && attrName[0] != '@')
                 attrName = "@" + attrName;
 
             if (value?.GetType().GetTypeInfo().IsEnum ?? false)
                 value = value.ConvertValue<long>();
-
-
 
             var sqlDbTypeValue = value ?? DBNull.Value;
 
@@ -534,6 +540,8 @@ namespace EntityWorker.Core.Transaction
             {
                 (cmd.Command as NpgsqlCommand).Parameters.AddWithValue(attrName, value ?? DBNull.Value);
             }
+
+            return this;
         }
 
         /// <summary>
@@ -823,6 +831,7 @@ namespace EntityWorker.Core.Transaction
         /// use it wisely
         /// </summary>
         /// <typeparam name="T"></typeparam>
+        /// <param name="type"></param>
         /// <param name="force"> remove and recreate all</param>
 
         public void CreateTable(Type type, bool force = false)

@@ -29,6 +29,26 @@ namespace EntityWorker.Core.SqlQuerys
 
         }
 
+        internal static string GetValueByTypeSTRING(object value, DataBaseTypes dbType)
+        {
+            if (value == null)
+                return string.Format("'{0}'", "null");
+            var type = value.GetType();
+            if (Nullable.GetUnderlyingType(type) != null)
+                type = Nullable.GetUnderlyingType(type);
+
+            if (type == typeof(decimal) || type == typeof(double) || type == typeof(float) || type == typeof(int) || type == typeof(long) || type == typeof(bool))
+            {
+                if (type == typeof(bool) && (dbType == DataBaseTypes.Mssql || dbType == DataBaseTypes.Sqllight))
+                    return Convert.ToInt16(value).ToString();
+                return value.ToString().ToLower();
+            }
+            if (type == typeof(Guid))
+                return string.Format("'{0}'", value);
+            return string.Format("'{0}'", value);
+
+        }
+
         public static QueryWhere Select<T>(DataBaseTypes dataBaseTypes)
         {
             var type = typeof(T).GetActualType();

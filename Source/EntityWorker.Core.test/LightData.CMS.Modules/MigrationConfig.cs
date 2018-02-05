@@ -12,7 +12,6 @@ namespace LightData.CMS.Modules
         {
             return new List<Migration>()
             {
-                new MigrationIni(),
                 new MigrationStartUp()
             };
         }

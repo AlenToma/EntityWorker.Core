@@ -592,15 +592,13 @@ namespace EntityWorker.Core
 
                     isPrimaryKey = prop.ContainAttribute<PrimaryKey>() ? prop.GetPropertyName() : isPrimaryKey;
                     var foreignKey = prop.GetCustomAttribute<ForeignKey>();
-                    var dbType = prop.PropertyType.GetDbTypeByType(_repository.DataBaseTypes);
+                    var dbType = prop.GetDbTypeByType(_repository.DataBaseTypes);
                     var propName = string.Format("[{0}]", prop.GetPropertyName());
                     codeToDataBaseMerge.Sql.Append(propName + " ");
                     if (!IsValidName(prop.GetPropertyName()))
                         throw new Exception(tableName + " is not a valid Name for the current provider " + _repository.DataBaseTypes);
 
 
-                    if (prop.ContainAttribute<StringFy>() || prop.ContainAttribute<DataEncode>() || prop.ContainAttribute<ToBase64String>())
-                        dbType = typeof(string).GetDbTypeByType(_repository.DataBaseTypes);
 
                     if (!prop.ContainAttribute<PrimaryKey>() || _repository.DataBaseTypes == DataBaseTypes.Mssql)
                         codeToDataBaseMerge.Sql.Append(dbType + " ");
@@ -674,16 +672,24 @@ namespace EntityWorker.Core
                     if (modify != null)
                     {
 
-                        if (!(propType.GetDbTypeListByType(_repository.DataBaseTypes).Any(x => x.ToLower().Contains(modify.Value<string>("data_type").ToLower()))))
-                            codeToDataBaseMerge.Sql.Append(string.Format("\nALTER TABLE [{0}] MODIFY " + (_repository.DataBaseTypes == DataBaseTypes.PostgreSql ? "COLUMN" : "") + " [{1}] {2} {3} DEFAULT {4};", tableName, prop.GetPropertyName(), propType.GetDbTypeByType(_repository.DataBaseTypes),
-                                (Nullable.GetUnderlyingType(propType) != null || propType == typeof(string)) && !prop.ContainAttribute<NotNullable>() ? " NULL" : " NOT NULL", Querys.GetValueByType(MethodHelper.ConvertValue(null, propType), _repository.DataBaseTypes)));
+                        if (_repository.DataBaseTypes != DataBaseTypes.Sqllight && !(prop.GetDbTypeListByType(_repository.DataBaseTypes).Any(x => x.ToLower().Contains(modify.Value<string>("data_type").ToLower()))) && _repository.DataBaseTypes != DataBaseTypes.PostgreSql)
+                        {
+                            codeToDataBaseMerge.Sql.Append($"\nALTER TABLE [{tableName}] ALTER COLUMN [{prop.GetPropertyName()}] {prop.GetDbTypeByType(_repository.DataBaseTypes)} {((Nullable.GetUnderlyingType(propType) != null || propType == typeof(string)) && !prop.ContainAttribute<NotNullable>() ? " NULL" : " NOT NULL")}");
+                        }
+                        else
+                        {
+                            if (!(prop.GetDbTypeListByType(_repository.DataBaseTypes).Any(x => x.ToLower().Contains(modify.Value<string>("data_type").ToLower()))) && _repository.DataBaseTypes == DataBaseTypes.PostgreSql)
+                                codeToDataBaseMerge.Sql.Append($"\nALTER TABLE [{tableName}] ALTER COLUMN [{prop.GetPropertyName()}] TYPE {prop.GetDbTypeByType(_repository.DataBaseTypes)}, ALTER COLUMN [{prop.GetPropertyName()}] SET DEFAULT {Querys.GetValueByTypeSTRING(MethodHelper.ConvertValue(null, propType), _repository.DataBaseTypes)};");
+
+
+                        }
                     }
                     else if (!prop.IsInternalType)
                         GetDatabase_Diff(prop.PropertyType, str, createdTables);
                     else
                     {
-                        codeToDataBaseMerge.Sql.Append(string.Format("\nALTER TABLE [{0}] ADD " + (_repository.DataBaseTypes == DataBaseTypes.PostgreSql ? "COLUMN" : "") + " [{1}] {2} {3} DEFAULT {4};", tableName, prop.GetPropertyName(), propType.GetDbTypeByType(_repository.DataBaseTypes),
-                              (Nullable.GetUnderlyingType(propType) != null || propType == typeof(string)) && !prop.ContainAttribute<NotNullable>() ? " NULL" : " NOT NULL", Querys.GetValueByType(MethodHelper.ConvertValue(null, propType), _repository.DataBaseTypes)));
+                        codeToDataBaseMerge.Sql.Append(string.Format("\nALTER TABLE [{0}] ADD " + (_repository.DataBaseTypes == DataBaseTypes.PostgreSql ? "COLUMN" : "") + " [{1}] {2} {3} DEFAULT {4};", tableName, prop.GetPropertyName(), prop.GetDbTypeByType(_repository.DataBaseTypes),
+                              (Nullable.GetUnderlyingType(propType) != null || propType == typeof(string)) && !prop.ContainAttribute<NotNullable>() ? " NULL" : " NOT NULL", Querys.GetValueByTypeSTRING(MethodHelper.ConvertValue(null, propType), _repository.DataBaseTypes)));
                     }
                 }
             }
@@ -692,7 +698,7 @@ namespace EntityWorker.Core
             // Now lets clean the table and remove unused columns
             foreach (LightDataTableRow col in table.SelectMany<LightDataRowCollection>(x =>
              !props.Any(a => string.Equals(x.Value<string>("column_name"), a.GetPropertyName(), StringComparison.CurrentCultureIgnoreCase) &&
-             (a.PropertyType.GetDbTypeByType(_repository.DataBaseTypes) != null || !a.IsInternalType) &&
+             (a.GetDbTypeByType(_repository.DataBaseTypes) != null || !a.IsInternalType) &&
              !a.ContainAttribute<ExcludeFromAbstract>())))
             {
                 if (_repository.DataBaseTypes != DataBaseTypes.Sqllight)
@@ -706,7 +712,7 @@ namespace EntityWorker.Core
                 {
                     colRemove.Sql.Append(string.Format("DROP TABLE IF exists [{0}_temp];\nCREATE TABLE [{0}_temp] AS SELECT {1} FROM [{0}];", tableName, string.Join(",", table.SelectMany<LightDataRowCollection>(x =>
                     props.Any(a => string.Equals(x.Value<string>("column_name"), a.GetPropertyName(), StringComparison.CurrentCultureIgnoreCase) &&
-                    (a.PropertyType.GetDbTypeByType(_repository.DataBaseTypes) != null || !a.IsInternalType) &&
+                    (a.GetDbTypeByType(_repository.DataBaseTypes) != null || !a.IsInternalType) &&
                     !a.ContainAttribute<ExcludeFromAbstract>())).Select(x => x.Value<string>("column_name")))));
                     colRemove.Sql.Append(string.Format("DROP TABLE [{0}];\n", tableName));
                     colRemove.Sql.Append(string.Format("ALTER TABLE [{0}_temp] RENAME TO [{0}]; ", tableName));

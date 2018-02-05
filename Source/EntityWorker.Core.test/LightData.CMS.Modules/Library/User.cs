@@ -1,4 +1,5 @@
 ﻿using EntityWorker.Core.Attributes;
+using EntityWorker.Core.Helper;
 
 namespace LightData.CMS.Modules.Library
 {
@@ -8,6 +9,7 @@ namespace LightData.CMS.Modules.Library
         [PrimaryKey(autoGenerate: false)]
         public string Id { get; set; }
 
+        
         [NotNullable]
         [DataEncode]
         public string UserName { get; set; }
@@ -26,5 +28,6 @@ namespace LightData.CMS.Modules.Library
         public System.Guid PersonId { get; set; }
 
         public Person Person { get; set; }
+
     }
 }

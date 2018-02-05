@@ -57,7 +57,7 @@ namespace EntityWorker.Core.InterFace
         /// <param name="value"></param>
         /// <param name="dbType"></param>
 
-        void AddInnerParameter(DbCommandExtended cmd, string attrName, object value, SqlDbType dbType = SqlDbType.NVarChar);
+        IRepository AddInnerParameter(DbCommandExtended cmd, string attrName, object value, SqlDbType dbType = SqlDbType.NVarChar);
 
         /// <summary>
         /// Get SqlDbType By system Type

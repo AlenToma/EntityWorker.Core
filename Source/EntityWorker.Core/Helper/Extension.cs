@@ -255,6 +255,55 @@ namespace EntityWorker.Core.Helper
         /// <summary>
         /// Convert System Type to SqlType
         /// </summary>
+        /// <param name="prop"></param>
+        /// <param name="dbType"></param>
+        /// <returns></returns>
+        public static string GetDbTypeByType(this IFastDeepClonerProperty prop, DataBaseTypes dbType)
+        {
+            var type = prop.PropertyType;
+
+            if (prop.ContainAttribute<StringFy>() || prop.ContainAttribute<DataEncode>() || prop.ContainAttribute<ToBase64String>())
+                return typeof(string).GetDbTypeByType(dbType);
+  
+
+            if (type.GetTypeInfo().IsEnum)
+                type = typeof(long);
+
+            if (Nullable.GetUnderlyingType(type) != null)
+                type = Nullable.GetUnderlyingType(type);
+            if (dbType == DataBaseTypes.Mssql)
+                return DbMsSqlMapper.ContainsKey(type) ? DbMsSqlMapper[type].First() : null;
+            else if (dbType == DataBaseTypes.Sqllight)
+                return DbSQLiteMapper.ContainsKey(type) ? DbSQLiteMapper[type].First() : null;
+            else return DbPostGresqlMapper.ContainsKey(type) ? DbPostGresqlMapper[type].First() : null;
+        }
+
+
+        /// <summary>
+        /// Convert System Type to SqlType
+        /// </summary>
+        /// <param name="prop"></param>
+        /// <param name="dbType"></param>
+        /// <returns></returns>
+        public static List<string> GetDbTypeListByType(this IFastDeepClonerProperty prop, DataBaseTypes dbType)
+        {
+            var type = prop.PropertyType;
+
+            if (type.GetTypeInfo().IsEnum)
+                type = typeof(long);
+
+            if (Nullable.GetUnderlyingType(type) != null)
+                type = Nullable.GetUnderlyingType(type);
+            if (dbType == DataBaseTypes.Mssql)
+                return DbMsSqlMapper.ContainsKey(type) ? DbMsSqlMapper[type] : null;
+            else if (dbType == DataBaseTypes.Sqllight)
+                return DbSQLiteMapper.ContainsKey(type) ? DbSQLiteMapper[type] : null;
+            else return DbPostGresqlMapper.ContainsKey(type) ? DbPostGresqlMapper[type] : null;
+        }
+
+        /// <summary>
+        /// Convert System Type to SqlType
+        /// </summary>
         /// <param name="type"></param>
         /// <param name="dbType"></param>
         /// <returns></returns>
