@@ -7,9 +7,13 @@ Let's start building our models, lets build a simple User model
     {
         [PrimaryId]
         public Guid? Id { get; set; }
-    
+       
         public string UserName { get; set; }
         
+        // Encode the data in the database.
+        // read global configration to specify enoding settings
+        [DataEncode]
+        public string Email{ get; set; }
        
         public string Password { get; set; }
         
@@ -22,7 +26,8 @@ Let's start building our models, lets build a simple User model
         // when we delete a User
         [IndependentData]
         public Role Role { get; set; }
-
+        
+        // Address will be removed when we remove the user
         public List<Address> Address { get; set; }
         
         //[ExcludeFromAbstract] means that it should not be included in the DataBase Update or insert.
@@ -40,7 +45,8 @@ Let's start building our models, lets build a simple User model
         public Guid? Id { get; set; }
         
         public string Name { get; set; }
-
+        
+        // All users who have this role, will be deleted when we delete Role
         public List<User> Users { get; set; }
     }
     
