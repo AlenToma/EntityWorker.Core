@@ -11,3 +11,5 @@
 /Source/System.Data.Sqlite.Core/bin
 /Source/System.Data.Sqlite.Core/obj
 *.nupkg
+/Solution/packages/System.Data.SqlClient.4.4.2/lib
+/Solution/packages/System.Data.SqlClient.4.4.2/ref
