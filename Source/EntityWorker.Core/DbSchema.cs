@@ -45,7 +45,7 @@ namespace EntityWorker.Core
 
                 if (CachedObjectColumn.ContainsKey(key))
                     return CachedObjectColumn[key];
-                var table = type.GetCustomAttribute<Table>()?.Name ?? type.Name;
+                var table = type.TableName();
                 var cmd = _repository.GetSqlCommand(_repository.DataBaseTypes == DataBaseTypes.Mssql || _repository.DataBaseTypes == DataBaseTypes.PostgreSql
                     ? "SELECT COLUMN_NAME as column_name, data_type FROM INFORMATION_SCHEMA.COLUMNS WHERE LOWER(TABLE_NAME) = LOWER(String[" + table + "])"
                     : "SELECT name as column_name, type as data_type  FROM pragma_table_info(String[" + table + "]);");
@@ -287,7 +287,7 @@ namespace EntityWorker.Core
         {
             var type = o.GetType().GetActualType();
             var props = DeepCloner.GetFastDeepClonerProperties(type);
-            var table = "[" + (type.GetCustomAttribute<Table>()?.Name ?? type.Name) + "]";
+            var table = "[" + (type.TableName()) + "]";
             var primaryKey = o.GetType().GetPrimaryKey();
             var primaryKeyValue = o.GetPrimaryKeyValue();
             if (primaryKeyValue.ObjectIsNew())
@@ -392,7 +392,7 @@ namespace EntityWorker.Core
                 var primaryKeyId = !Extension.ObjectIsNew(o.GetPrimaryKeyValue()) ? o.GetPrimaryKeyValue() : null;
                 var availableColumns = ObjectColumns(o.GetType());
                 var objectRules = o.GetType().GetCustomAttribute<Rule>();
-                var tableName = o.GetType().GetCustomAttribute<Table>()?.Name ?? o.GetType().Name;
+                var tableName = o.GetType().TableName();
                 var primaryKeySubstitut = !primaryKey.GetCustomAttribute<PrimaryKey>().AutoGenerate ? primaryKeyId : null;
 
                 object dbTrigger = null;
@@ -426,7 +426,7 @@ namespace EntityWorker.Core
                 if (!updateOnly)
                     dbTrigger?.GetType().GetMethod("BeforeSave").Invoke(dbTrigger, new List<object>() { _repository, o }.ToArray()); // Check the Rule before save
                 object tempPrimaryKey = null;
-                var sql = "UPDATE [" + (o.GetType().GetCustomAttribute<Table>()?.Name ?? o.GetType().Name) + "] SET ";
+                var sql = "UPDATE [" + (o.GetType().TableName()) + "] SET ";
                 var cols = props.FindAll(x => (availableColumns.FindByPrimaryKey<bool>(x.GetPropertyName()) || availableColumns.FindByPrimaryKey<bool>(x.GetPropertyName().ToLower())) && x.IsInternalType && !x.ContainAttribute<ExcludeFromAbstract>() && x.GetCustomAttribute<PrimaryKey>() == null);
                 if (primaryKeyId == null)
                 {
@@ -569,7 +569,7 @@ namespace EntityWorker.Core
 
             createdTables.Add(tableType);
             var table = ObjectColumns(tableType);
-            var tableName = tableType.GetCustomAttribute<Table>()?.Name ?? tableType.Name;
+            var tableName = tableType.TableName();
             var props = DeepCloner.GetFastDeepClonerProperties(tableType).Where(x => !x.ContainAttribute<ExcludeFromAbstract>());
             var codeToDataBaseMerge = new CodeToDataBaseMerge() { Object_Type = tableType };
             var isPrimaryKey = "";
@@ -633,7 +633,7 @@ namespace EntityWorker.Core
                         var key = str.Keys.FirstOrDefault(x => x.Value.Item1 == tableName);
                         var type = key.Value.Item2.Type.GetActualType();
                         var keyPrimary = type.GetPrimaryKey().GetPropertyName();
-                        var tb = type.GetCustomAttribute<Table>()?.Name ?? type.Name;
+                        var tb = type.TableName();
                         codeToDataBaseMerge.Sql.Append("FOREIGN KEY(" + key.Key.Split('-')[0] + ") REFERENCES " + tb + "(" + keyPrimary + "),");
                         str.Keys.Remove(key.Key);
                     }
@@ -789,7 +789,7 @@ namespace EntityWorker.Core
                             CachedObjectColumn.Remove(tType.FullName + _repository.DataBaseTypes.ToString());
                             if (Extension.CachedDataRecord.ContainsKey(tType))
                                 Extension.CachedDataRecord.Remove(tType);
-                            var tableName = tType.GetCustomAttribute<Table>()?.Name ?? tType.Name;
+                            var tableName = tType.TableName();
                             _repository.ExecuteNonQuery(_repository.GetSqlCommand("DELETE FROM [" + tableName + "];"));
                             var cmd = _repository.GetSqlCommand("DROP TABLE [" + tableName + "];");
                             _repository.ExecuteNonQuery(cmd);

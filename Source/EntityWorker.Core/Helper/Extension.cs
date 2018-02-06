@@ -11,6 +11,8 @@ using EntityWorker.Core.Attributes;
 using EntityWorker.Core.Interface;
 using EntityWorker.Core.Object.Library;
 using EntityWorker.Core.FastDeepCloner;
+using System.Text.RegularExpressions;
+
 namespace EntityWorker.Core.Helper
 {
     /// <summary>
@@ -20,6 +22,7 @@ namespace EntityWorker.Core.Helper
     {
         private static readonly Custom_ValueType<IFastDeepClonerProperty, string> CachedPropertyNames = new Custom_ValueType<IFastDeepClonerProperty, string>();
         private static readonly Custom_ValueType<Type, IFastDeepClonerProperty> CachedPrimaryKeys = new Custom_ValueType<Type, IFastDeepClonerProperty>();
+        private static readonly Custom_ValueType<Type, string> CachedTableNames = new Custom_ValueType<Type, string>();
 
         private static readonly Custom_ValueType<Type, List<string>> DbMsSqlMapper = new Custom_ValueType<Type, List<string>>()
         {
@@ -264,7 +267,7 @@ namespace EntityWorker.Core.Helper
 
             if (prop.ContainAttribute<StringFy>() || prop.ContainAttribute<DataEncode>() || prop.ContainAttribute<ToBase64String>())
                 return typeof(string).GetDbTypeByType(dbType);
-  
+
 
             if (type.GetTypeInfo().IsEnum)
                 type = typeof(long);
@@ -344,7 +347,8 @@ namespace EntityWorker.Core.Helper
         {
             if (CachedPropertyNames.ContainsKey(prop))
                 return CachedPropertyNames[prop];
-            return CachedPropertyNames.GetOrAdd(prop, prop.GetCustomAttribute<PropertyName>()?.Name ?? prop.Name);
+
+            return CachedPropertyNames.GetOrAdd(prop, (new Regex("[^a-zA-Z0-9,_]").Replace(prop.GetCustomAttribute<PropertyName>()?.Name ?? prop.Name, "_")));
         }
 
 
@@ -367,12 +371,20 @@ namespace EntityWorker.Core.Helper
             if (CachedPrimaryKeys.ContainsKey(type))
                 return CachedPrimaryKeys[type];
             return CachedPrimaryKeys.GetOrAdd(type, DeepCloner.GetFastDeepClonerProperties(type).FirstOrDefault(x => x.ContainAttribute<PrimaryKey>()));
-
         }
+
+
 
         public static String TableName<T>()
         {
-            return typeof(T).GetCustomAttribute<Table>()?.Name ?? typeof(T).Name;
+            return typeof(T).TableName();
+        }
+
+        public static String TableName(this Type type)
+        {
+            if (CachedTableNames.ContainsKey(type))
+                return CachedTableNames[type];
+            return CachedTableNames.GetOrAdd(type, (new Regex("[^a-zA-Z0-9,_]").Replace(type.GetCustomAttribute<Table>()?.Name ?? type.Name, "_")));
         }
 
         /// <summary>

@@ -4,7 +4,6 @@ using EntityWorker.Core.Postgres;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 
 namespace EntityWorker.Core.Object.Library
@@ -62,18 +61,26 @@ namespace EntityWorker.Core.Object.Library
                             }
                             catch (NpgsqlException ex)
                             {
+                                data[i].Counter += 1;
                                 if (ex.ToString().Contains("already exists"))
                                     items[i].Executed = true;
                                 items[i].Exception = ex;
                                 _provider.Renew();
                                 exp = ex;
+
+                                if (data[i].Counter >= 50)
+                                    throw ex;
                             }
                             catch (Exception ex)
                             {
+                                data[i].Counter += 1;
                                 data[i].Exception = ex;
                                 if (ex.ToString().Contains("already exists"))
                                     items[i].Executed = true;
                                 exp = ex;
+
+                                if (data[i].Counter >= 50)
+                                    throw ex;
                             }
                         }
                     }
@@ -84,7 +91,7 @@ namespace EntityWorker.Core.Object.Library
                         {
                             var type = key.Value.Item2.Type.GetActualType();
                             var keyPrimary = type.GetPrimaryKey().GetPropertyName();
-                            var tb = type.GetCustomAttribute<Table>()?.Name ?? type.Name;
+                            var tb = type.TableName();
                             if (_provider.DataBaseTypes == DataBaseTypes.Mssql)
                                 sql.Append("ALTER TABLE [" + key.Value.Item1 + "] ADD FOREIGN KEY (" + key.Key.Split('-')[0] + ") REFERENCES [" + tb + "](" + keyPrimary + ");");
                             else sql.Append("ALTER TABLE " + key.Value.Item1 + " ADD CONSTRAINT fk_" + (tb + "_" + key.Key.Split('-')[0]) + " FOREIGN KEY (" + key.Key.Split('-')[0] + ") REFERENCES " + tb + "(" + keyPrimary + ");");

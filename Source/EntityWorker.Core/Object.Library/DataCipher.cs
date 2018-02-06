@@ -76,19 +76,8 @@ namespace EntityWorker.Core.Object.Library
             if (v != salt256 && v != salt128)
                 return cipherText;
 
-            // Get the complete stream of bytes that represent:
-            // [32 bytes of Salt] + [32 bytes of IV] + [n bytes of CipherText]
-           
-            // Get the saltbytes by extracting the first 32 bytes from the supplied cipherText bytes.
-            //var saltStringString = Encoding.UTF8.GetString(cipherTextBytesWithSaltAndIv.Take(_Keysize / 8).ToArray());
-            //// Get the IV bytes by extracting the next 32 bytes from the supplied cipherText bytes.
-            //var ivStringBytes = cipherTextBytesWithSaltAndIv.Skip(_Keysize / 8).Take(_Keysize / 8).ToArray();
-            // Get the actual cipher text bytes by removing the first 64 bytes from the cipherText string.
             var cipherTextBytes = cipherTextBytesWithSaltAndIv.Skip((_Keysize / 8) * 2).Take(cipherTextBytesWithSaltAndIv.Length - ((_Keysize / 8) * 2)).ToArray();
            
-
-         
-
             using (var password = new Rfc2898DeriveBytes(_passPhrase, saltStringBytes, DerivationIterations))
             {
                 var keyBytes = password.GetBytes(_Keysize / 8);

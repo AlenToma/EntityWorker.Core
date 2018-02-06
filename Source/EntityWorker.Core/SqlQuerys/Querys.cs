@@ -52,13 +52,13 @@ namespace EntityWorker.Core.SqlQuerys
         public static QueryWhere Select<T>(DataBaseTypes dataBaseTypes)
         {
             var type = typeof(T).GetActualType();
-            return new QueryWhere("Select * from " + (type.GetCustomAttribute<Table>()?.Name ?? typeof(T).Name) + " ", dataBaseTypes);
+            return new QueryWhere("Select * from " + (type.TableName()) + " ", dataBaseTypes);
         }
 
         public static QueryWhere Select(Type type, DataBaseTypes dataBaseTypes)
         {
             type = type.GetActualType();
-            return new QueryWhere("Select * from " + (type.GetCustomAttribute<Table>()?.Name ?? type.Name) + " ", dataBaseTypes);
+            return new QueryWhere("Select * from " + (type.TableName()) + " ", dataBaseTypes);
         }
 
         public static QueryWhere Select(string tableName, DataBaseTypes dataBaseTypes)

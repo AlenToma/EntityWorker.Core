@@ -47,7 +47,7 @@ namespace EntityWorker.Core.SqlQuerys
             _obType = type.GetActualType();
             _columns = new List<string>
             {
-                DataBaseTypes.GetValidSqlName((_obType.GetCustomAttribute<Table>()?.Name ?? _obType.Name)) + ".*"
+                DataBaseTypes.GetValidSqlName((_obType.TableName())) + ".*"
             };
             _primaryId = OrderBy = _obType.GetPrimaryKey()?.GetPropertyName();
 
@@ -58,7 +58,7 @@ namespace EntityWorker.Core.SqlQuerys
             DataBaseTypes = dataBaseTypes;
             _columns = new List<string>
             {
-                (_obType.GetCustomAttribute<Table>()?.Name ?? _obType.Name) + ".*"
+                (_obType.TableName()) + ".*"
             };
             OrderBy = _obType.GetPrimaryKey().GetPropertyName();
         }
@@ -68,7 +68,7 @@ namespace EntityWorker.Core.SqlQuerys
             get
             {
                 WhereClause.RemoveAll(x => string.IsNullOrEmpty(x));
-                var tableName = _obType.GetCustomAttribute<Table>()?.Name ?? _obType.Name;
+                var tableName = _obType.TableName();
                 var query = "SELECT distinct " + string.Join(",", _columns) + " FROM " + DataBaseTypes.GetValidSqlName(tableName) + " " + System.Environment.NewLine +
                        string.Join(System.Environment.NewLine, JoinClauses.Values.Select(x => x.Item2)) +
                        System.Environment.NewLine + (WhereClause.Any() ? "WHERE " : string.Empty) + string.Join(" AND ", WhereClause.ToArray());
@@ -108,7 +108,7 @@ namespace EntityWorker.Core.SqlQuerys
             get
             {
                 WhereClause.RemoveAll(x => string.IsNullOrEmpty(x));
-                var tableName = _obType.GetCustomAttribute<Table>()?.Name ?? _obType.Name;
+                var tableName = _obType.TableName();
                 var query = "SELECT count(distinct " + DataBaseTypes.GetValidSqlName(tableName) + "." + _primaryId + ") as items FROM " + DataBaseTypes.GetValidSqlName(tableName) + " " + System.Environment.NewLine +
                        string.Join(System.Environment.NewLine, JoinClauses.Values.Select(x => x.Item2)) +
                        System.Environment.NewLine + (WhereClause.Any() ? "WHERE " : string.Empty) + string.Join(" AND ", WhereClause.ToArray());
@@ -121,7 +121,7 @@ namespace EntityWorker.Core.SqlQuerys
         {
             get
             {
-                var tableName = _obType.GetCustomAttribute<Table>()?.Name ?? _obType.Name;
+                var tableName = _obType.TableName();
                 return " EXISTS (SELECT 1 FROM " + DataBaseTypes.GetValidSqlName(tableName) + " " + System.Environment.NewLine +
                        string.Join(System.Environment.NewLine, JoinClauses.Values.Select(x => x.Item2)) +
                        System.Environment.NewLine + "WHERE " + string.Join(" AND ", WhereClause.ToArray()) + ")";
@@ -768,7 +768,7 @@ namespace EntityWorker.Core.SqlQuerys
                     var cl = hasValueAttr ? (m.Expression as MemberExpression).Expression.Type : m.Expression.Type;
                     var prop = DeepCloner.GetFastDeepClonerProperties(cl).First(x => x.Name == (hasValueAttr ? (m.Expression as MemberExpression).Member.Name : m.Member.Name));
                     var name = prop.GetPropertyName();
-                    var table = cl.GetCustomAttribute<Table>()?.Name ?? cl.Name;
+                    var table = cl.TableName();
                     var columnName = string.Format("[{0}].[{1}]", table, name).CleanValidSqlName(DataBaseTypes);
                     var dataEncode = prop.GetCustomAttribute<DataEncode>();
                     if (columnOnly)
@@ -806,7 +806,7 @@ namespace EntityWorker.Core.SqlQuerys
                     var cl = m.Expression.Type;
                     var prop = DeepCloner.GetFastDeepClonerProperties(cl).First(x => x.Name == m.Member.Name);
                     var name = prop.GetPropertyName();
-                    var table = cl.GetCustomAttribute<Table>()?.Name ?? cl.Name;
+                    var table = cl.TableName();
                     var randomTableName = JoinClauses.ContainsKey(key) ? JoinClauses[key].Item1 : RandomKey();
                     var primaryId = DeepCloner.GetFastDeepClonerProperties(cl).First(x => x.ContainAttribute<PrimaryKey>()).GetPropertyName();
                     var columnName = string.Format("[{0}].[{1}]", randomTableName, name).CleanValidSqlName(DataBaseTypes);
@@ -817,7 +817,7 @@ namespace EntityWorker.Core.SqlQuerys
                         return m;
                     // Ok lets build inner join 
                     var parentType = (m.Expression as MemberExpression).Expression.Type;
-                    var parentTable = parentType.GetCustomAttribute<Table>()?.Name ?? parentType.Name;
+                    var parentTable = parentType.TableName();
                     prop = DeepCloner.GetFastDeepClonerProperties(parentType).FirstOrDefault(x => x.ContainAttribute<ForeignKey>() && x.GetCustomAttribute<ForeignKey>().Type == cl);
                     var v = "";
                     if (prop != null)
@@ -850,14 +850,14 @@ namespace EntityWorker.Core.SqlQuerys
                     var key = string.Join("", m.ToString().Split('.').Take(m.ToString().Split('.').Length - 1));
                     var cl = m.Expression.Type;
                     var prop = DeepCloner.GetFastDeepClonerProperties(cl).First(x => x.Name == m.Member.Name);
-                    var table = cl.GetCustomAttribute<Table>()?.Name ?? cl.Name;
+                    var table = cl.TableName();
                     var randomTableName = JoinClauses.ContainsKey(key) ? JoinClauses[key].Item1 : RandomKey();
                     var primaryId = DeepCloner.GetFastDeepClonerProperties(cl).First(x => x.ContainAttribute<PrimaryKey>()).GetPropertyName();
                     if (JoinClauses.ContainsKey(key))
                         return m;
                     // Ok lets build inner join 
                     var parentType = (m as MemberExpression).Type.GetActualType();
-                    var parentTable = parentType.GetCustomAttribute<Table>()?.Name ?? parentType.Name;
+                    var parentTable = parentType.TableName();
                     prop = DeepCloner.GetFastDeepClonerProperties(parentType).FirstOrDefault(x => x.ContainAttribute<ForeignKey>() && x.GetCustomAttribute<ForeignKey>().Type == cl);
                     var v = "";
                     if (prop != null)

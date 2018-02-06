@@ -1,7 +1,6 @@
 ﻿using EntityWorker.Core.Attributes;
 using EntityWorker.Core.Helper;
 using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace EntityWorker.Core.Object.Library
@@ -15,6 +14,8 @@ namespace EntityWorker.Core.Object.Library
         public bool Executed { get; internal set; }
 
         public Exception Exception { get; internal set; }
+
+        internal int Counter { get; set; }
 
         /// <summary>
         /// If sql statement containe drop operations, which will loose data
