@@ -10039,6 +10039,33 @@
             </summary>
             <param name="entity"></param>
         </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.SaveAsync(System.Object)">
+            <summary>
+            Save object
+            </summary>
+            <param name="entity"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.Save(System.Object)">
+            <summary>
+            Save object
+            </summary>
+            <param name="entity"></param>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.GetAllAsync``1">
+            <summary>
+            Get All Rows
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.GetAll``1">
+            <summary>
+            Get All Rows
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
         <member name="M:EntityWorker.Core.Transaction.Transaction.SelectAsync``1(System.String)">
             <summary>
             select by quarry
@@ -10054,6 +10081,50 @@
             <typeparam name="T"></typeparam>
             <param name="sqlString"></param>
             <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.LoadChildrenAsync``1(``0,System.Boolean,System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String})">
+            <summary>
+            Load Object Children
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="item"></param>
+            <param name="onlyFirstLevel"></param>
+            <param name="classes"></param>
+            <param name="ignoreList"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.LoadChildren``1(``0,System.Boolean,System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String})">
+            <summary>
+            Load Object Children
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="item"></param>
+            <param name="onlyFirstLevel"></param>
+            <param name="classes"></param>
+            <param name="ignoreList"></param>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.LoadChildrenAsync``2(``0,System.Boolean,System.Collections.Generic.List{System.String},System.Linq.Expressions.Expression{System.Func{``0,``1}}[])">
+            <summary>
+            Load Object Children
+            </summary>
+            <typeparam name="T"></typeparam>
+            <typeparam name="TP"></typeparam>
+            <param name="item"></param>
+            <param name="onlyFirstLevel"></param>
+            <param name="ignoreList"></param>
+            <param name="actions"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.LoadChildren``2(``0,System.Boolean,System.Collections.Generic.List{System.String},System.Linq.Expressions.Expression{System.Func{``0,``1}}[])">
+            <summary>
+            Load Object Children
+            </summary>
+            <typeparam name="T"></typeparam>
+            <typeparam name="TP"></typeparam>
+            <param name="item"></param>
+            <param name="onlyFirstLevel"></param>
+            <param name="ignoreList"></param>
+            <param name="actions"></param>
         </member>
         <member name="M:EntityWorker.Core.Transaction.Transaction.CreateTable``1(System.Boolean)">
             <summary>
@@ -10084,6 +10155,44 @@
             </summary>
             <typeparam name="T"></typeparam>
             <param name="type"></param>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.Get``1">
+            <summary>
+            Generic Get Quary
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.CreateQuery``1(System.Linq.Expressions.Expression)">
+            <summary>
+            Create IQueryable from Expression
+            </summary>
+            <typeparam name="TElement"></typeparam>
+            <param name="expression"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.CreateQuery(System.Linq.Expressions.Expression)">
+            <summary>
+            Create IQueryable from Expression
+            NotImplementedException
+            </summary>
+            <param name="expression"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.Execute(System.Linq.Expressions.Expression)">
+            <summary>
+            Execute Quary
+            </summary>
+            <param name="expression"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.Execute``1(System.Linq.Expressions.Expression)">
+            <summary>
+            Execute generic quary
+            </summary>
+            <typeparam name="TResult"></typeparam>
+            <param name="expression"></param>
+            <returns></returns>
         </member>
         <member name="T:JetBrains.Annotations.CanBeNullAttribute">
             <summary>

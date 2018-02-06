@@ -17,7 +17,6 @@ using EntityWorker.Core.SQLite;
 using System.Collections;
 using EntityWorker.Core.SqlQuerys;
 using EntityWorker.Core.Postgres;
-using static EntityWorker.Core.Events;
 
 namespace EntityWorker.Core.Transaction
 {
@@ -27,8 +26,6 @@ namespace EntityWorker.Core.Transaction
     public class Transaction : IRepository
     {
         internal Custom_ValueType<IDataReader, bool> OpenedDataReaders = new Custom_ValueType<IDataReader, bool>();
-
-
 
         private static object MigrationLocker = new object();
 
@@ -218,10 +215,10 @@ namespace EntityWorker.Core.Transaction
                 var npSqlBuilder = DataBaseTypes == DataBaseTypes.PostgreSql ? new NpgsqlConnectionStringBuilder(ConnectionString) : null;
                 var dbName = DataBaseTypes == DataBaseTypes.Mssql ? sqlBuild?.InitialCatalog : sqlBuild?.DataSource;
                 if (string.IsNullOrEmpty(dbName) && DataBaseTypes != DataBaseTypes.PostgreSql)
-                    throw new Exception("InitialCatalog cant be null or empty");
+                    throw new Exception("InitialCatalog can not be null or empty");
 
                 if (DataBaseTypes == DataBaseTypes.PostgreSql && string.IsNullOrEmpty(npSqlBuilder.Database))
-                    throw new Exception("Database cant be null or empty");
+                    throw new Exception("Database can not be null or empty");
 
                 if (DataBaseTypes == DataBaseTypes.Mssql)
                 {
@@ -731,6 +728,11 @@ namespace EntityWorker.Core.Transaction
             _dbSchema.DeleteAbstract(entity);
         }
 
+        /// <summary>
+        /// Save object
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         public async Task SaveAsync(object entity)
         {
             await Task.Run(() =>
@@ -739,16 +741,30 @@ namespace EntityWorker.Core.Transaction
             });
         }
 
+        /// <summary>
+        /// Save object
+        /// </summary>
+        /// <param name="entity"></param>
         public void Save(object entity)
         {
             _dbSchema.Save(entity);
         }
 
+        /// <summary>
+        /// Get All Rows
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public async Task<IList<T>> GetAllAsync<T>()
         {
             return await Task.FromResult<IList<T>>(_dbSchema.GetSqlAll(typeof(T)).Cast<T>().ToList());
         }
 
+        /// <summary>
+        /// Get All Rows
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public IList<T> GetAll<T>()
         {
             return _dbSchema.GetSqlAll(typeof(T)).Cast<T>().ToList();
@@ -777,6 +793,15 @@ namespace EntityWorker.Core.Transaction
             return _dbSchema.Select<T>(sqlString);
         }
 
+        /// <summary>
+        /// Load Object Children
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="item"></param>
+        /// <param name="onlyFirstLevel"></param>
+        /// <param name="classes"></param>
+        /// <param name="ignoreList"></param>
+        /// <returns></returns>
         public async Task LoadChildrenAsync<T>(T item, bool onlyFirstLevel, List<string> classes, List<string> ignoreList)
         {
             await Task.Run(() =>
@@ -786,12 +811,29 @@ namespace EntityWorker.Core.Transaction
 
         }
 
+        /// <summary>
+        /// Load Object Children
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="item"></param>
+        /// <param name="onlyFirstLevel"></param>
+        /// <param name="classes"></param>
+        /// <param name="ignoreList"></param>
         public void LoadChildren<T>(T item, bool onlyFirstLevel, List<string> classes, List<string> ignoreList)
         {
             _dbSchema.LoadChildren(item, onlyFirstLevel, classes, ignoreList);
         }
 
-
+        /// <summary>
+        /// Load Object Children
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TP"></typeparam>
+        /// <param name="item"></param>
+        /// <param name="onlyFirstLevel"></param>
+        /// <param name="ignoreList"></param>
+        /// <param name="actions"></param>
+        /// <returns></returns>
         public async Task LoadChildrenAsync<T, TP>(T item, bool onlyFirstLevel = false, List<string> ignoreList = null, params Expression<Func<T, TP>>[] actions)
         {
             await Task.Run(() =>
@@ -804,7 +846,15 @@ namespace EntityWorker.Core.Transaction
             });
         }
 
-
+        /// <summary>
+        /// Load Object Children
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TP"></typeparam>
+        /// <param name="item"></param>
+        /// <param name="onlyFirstLevel"></param>
+        /// <param name="ignoreList"></param>
+        /// <param name="actions"></param>
         public void LoadChildren<T, TP>(T item, bool onlyFirstLevel = false, List<string> ignoreList = null, params Expression<Func<T, TP>>[] actions)
         {
             var parames = new List<string>();
@@ -823,7 +873,7 @@ namespace EntityWorker.Core.Transaction
 
         public void CreateTable<T>(bool force = false)
         {
-            _dbSchema.CreateTable(typeof(T), null, true, force);
+            _dbSchema.CreateTable(typeof(T), null, force);
         }
 
         /// <summary>
@@ -836,7 +886,7 @@ namespace EntityWorker.Core.Transaction
 
         public void CreateTable(Type type, bool force = false)
         {
-            _dbSchema.CreateTable(type, null, true, force);
+            _dbSchema.CreateTable(type, null, force);
         }
 
         /// <summary>
@@ -858,6 +908,11 @@ namespace EntityWorker.Core.Transaction
             _dbSchema.RemoveTable(type);
         }
 
+        /// <summary>
+        /// Generic Get Quary
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public ISqlQueryable<T> Get<T>()
         {
             if (typeof(T).GetPrimaryKey() == null)
@@ -865,16 +920,33 @@ namespace EntityWorker.Core.Transaction
             return new SqlQueryable<T>(null, this);
         }
 
+        /// <summary>
+        /// Create IQueryable from Expression
+        /// </summary>
+        /// <typeparam name="TElement"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
         public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
         {
             return new SqlQueryable<TElement>(expression, this) as IQueryable<TElement>;
         }
 
+        /// <summary>
+        /// Create IQueryable from Expression
+        /// NotImplementedException
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
         public IQueryable CreateQuery(Expression expression)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Execute Quary
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
         public object Execute(Expression expression)
         {
             var _expression = new LightDataLinqToNoSql(expression.Type);
@@ -883,6 +955,12 @@ namespace EntityWorker.Core.Transaction
 
         }
 
+        /// <summary>
+        /// Execute generic quary
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
         public TResult Execute<TResult>(Expression expression)
         {
             var isEnumerable = (typeof(TResult).Name == "IEnumerable`1");
