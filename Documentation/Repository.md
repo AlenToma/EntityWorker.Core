@@ -5,7 +5,6 @@
     public class Repository : Transaction
     {
         // there are three databases types mssql, Sqlite and PostgreSql
-        // then true or false for migration
         public Repository(DataBaseTypes dbType = DataBaseTypes.Mssql) : 
         base(GetConnectionString(dbType), true, dbType) 
         { 
