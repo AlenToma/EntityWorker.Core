@@ -25,6 +25,7 @@
                 
              // Start the migration
             InitiolizeMigration();
+            base.OnModuleStart();
         }
 
         // get the full connection string
