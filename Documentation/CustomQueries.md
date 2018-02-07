@@ -1,7 +1,7 @@
 ## Create Custom ISqlQueryable
 ```csharp
 
-using (var rep = new Repository())
+   using (var rep = new Repository())
    {
           //Create a custom ISqlQueryable, you could have store proc or a row sql query
             var cmd = rep.GetSqlCommand("SELECT * FROM Users WHERE UserName = @userName");
