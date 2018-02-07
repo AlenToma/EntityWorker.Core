@@ -23,6 +23,9 @@
             var latestChanges = GetCodeLatestChanges();
             if (latestChanges.Any())
                 latestChanges.Execute(true);
+                
+             // Start the migration
+            InitiolizeMigration();
         }
 
         // get the full connection string
