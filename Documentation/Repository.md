@@ -6,7 +6,7 @@
     {
         // there are three databases types mssql, Sqlite and PostgreSql
         public Repository(DataBaseTypes dbType = DataBaseTypes.Mssql) : 
-        base(GetConnectionString(dbType), true, dbType) 
+        base(GetConnectionString(dbType), dbType) 
         { 
         }
         
