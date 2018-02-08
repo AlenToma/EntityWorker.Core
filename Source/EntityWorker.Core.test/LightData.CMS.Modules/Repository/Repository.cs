@@ -4,6 +4,7 @@ using System.Linq;
 using EntityWorker.Core.Interface;
 using LightData.CMS.Modules.Library;
 using System;
+using LightData.CMS.Modules.Rules;
 
 namespace LightData.CMS.Modules.Repository
 {
@@ -41,7 +42,8 @@ namespace LightData.CMS.Modules.Repository
                 .HasDataEncode(x => x.UserName)
                 .HasForeignKey<Role, Guid>(x => x.RoleId)
                 .HasIndependentData(x => x.Role)
-                .HasForeignKey<Person, Guid>(x => x.PersonId);
+                .HasForeignKey<Person, Guid>(x => x.PersonId)
+                .HasRule<UserRule>();
             base.OnModuleConfiguration(moduleBuilder);
         }
 

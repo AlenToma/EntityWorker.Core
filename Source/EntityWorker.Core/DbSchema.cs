@@ -399,7 +399,7 @@ namespace EntityWorker.Core
                     dbTrigger = objectRules.RuleType.CreateInstance(true);
                     CachedIDbRuleTrigger.Add(o.GetType(), dbTrigger);
                 }
-                else if (objectRules != null)
+                else if (objectRules != null || CachedIDbRuleTrigger.ContainsKey(o.GetType()))
                     dbTrigger = CachedIDbRuleTrigger[o.GetType()];
 
                 if (primaryKeyId != null && !updateOnly) // lets attach the object
@@ -540,7 +540,7 @@ namespace EntityWorker.Core
                 if (oState != null && _repository.GetObjectChanges(o, oState).Count > 0) // a change has been made outside the function Save then resave          
                 {
                     o.SetPrimaryKeyValue(primaryKeyId);
-                    Save(o, false);
+                    Save(o, false, true);
                 }
                 o.SetPrimaryKeyValue(primaryKeyId);
                 _repository.Attach(o, true);

@@ -18,7 +18,7 @@ namespace EntityWorker.Core.Interface
         /// </summary>
         /// <typeparam name="Source">Must implement interface IDbRuleTrigger</typeparam>
         /// <returns></returns>
-        IObjectMapps<T> HasRule<Source>() where Source : IDbRuleTrigger<object>;
+        IObjectMapps<T> HasRule<Source>();
 
         /// <summary>
         /// Add Primary Key to Property

@@ -2,6 +2,7 @@
 using EntityWorker.Core.Helper;
 using EntityWorker.Core.Interface;
 using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 
@@ -34,8 +35,10 @@ namespace EntityWorker.Core.Object.Library.Modules
         /// </summary>
         /// <typeparam name="Source">Must implement interface IDbRuleTrigger</typeparam>
         /// <returns></returns>
-        public IObjectMapps<T> HasRule<Source>() where Source : IDbRuleTrigger<object>
+        public IObjectMapps<T> HasRule<Source>()
         {
+            if (typeof(Source).GetInterfaces().Length <= 0 || !typeof(Source).GetInterfaces().Any(x => x.ToString().Contains("IDbRuleTrigger")))
+                throw new Exception("Source dose not implement interface IDbRuleTrigger");
             var rule = typeof(Source).CreateInstance();
             DbSchema.CachedIDbRuleTrigger.GetOrAdd(typeof(T), rule);
             return this;
