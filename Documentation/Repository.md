@@ -32,7 +32,7 @@
         }
         
         // We could configrate our modules here instead of adding attributes in the class, offcource you could choose.
-         protected override void OnModuleConfiguration(IModuleBuilder moduleBuilder)
+        protected override void OnModuleConfiguration(IModuleBuilder moduleBuilder)
         {
             moduleBuilder.Entity<User>()
                 .TableName("Users")
