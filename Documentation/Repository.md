@@ -16,8 +16,8 @@
                 base.CreateDataBase();
                 
                 
-            // You could choose to use this to apply you changes to the database or create your own migration that will
-            // update the database, like alter drop or create.
+            // You could choose to use this to apply you changes to the database or create your own migration
+            // that will update the database, like alter drop or create.
             // Limited support for sqlite
             // Get the latest change between the code and the database. 
             // Property Rename is not supported. renaming property x will end up removing the x and adding y so there will be dataloss
