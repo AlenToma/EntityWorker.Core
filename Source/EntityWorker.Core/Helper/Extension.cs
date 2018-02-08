@@ -22,7 +22,7 @@ namespace EntityWorker.Core.Helper
     {
         private static readonly Custom_ValueType<IFastDeepClonerProperty, string> CachedPropertyNames = new Custom_ValueType<IFastDeepClonerProperty, string>();
         private static readonly Custom_ValueType<Type, IFastDeepClonerProperty> CachedPrimaryKeys = new Custom_ValueType<Type, IFastDeepClonerProperty>();
-        private static readonly Custom_ValueType<Type, string> CachedTableNames = new Custom_ValueType<Type, string>();
+        internal static readonly Custom_ValueType<Type, string> CachedTableNames = new Custom_ValueType<Type, string>();
 
         private static readonly Custom_ValueType<Type, List<string>> DbMsSqlMapper = new Custom_ValueType<Type, List<string>>()
         {

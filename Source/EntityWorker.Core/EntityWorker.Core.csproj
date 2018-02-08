@@ -3,23 +3,24 @@
     <TargetFrameworks>netcoreapp2.0;netstandard2.0;net451;</TargetFrameworks>
     <PackageId>EntityWorker.Core</PackageId>
     <AssemblyName>EntityWorker.Core</AssemblyName>
-    <AssemblyVersion>1.0.4.5</AssemblyVersion>
-    <FileVersion>1.0.4.5</FileVersion>
-    <Version>1.4.5</Version>
+    <AssemblyVersion>1.0.4.7</AssemblyVersion>
+    <FileVersion>1.0.4.7</FileVersion>
+    <Version>1.4.7</Version>
     <Authors>Alen Toma</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageProjectUrl>https://github.com/AlenToma/EntityWorker.Core</PackageProjectUrl>
     <PackageTags>Entity EntityWorker.Core sql object-relation mappar LinqToSql alternative-to-entityframework C# System.Reflection generic Microsoft EntityFramework EF Database Data O/RM ADO.NET sqlite postgres postgressql</PackageTags>
     <PackageLicenseUrl>https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/LICENSE</PackageLicenseUrl>
     <Copyright>Copyright (c) 2017 Alen Toma</Copyright>
-    <Description>EntityWorker is an object-relation mapper that enable .NET developers to work with relations data using objects. EntityWorker is an alternative to entityframwork. is more flexible and much faster than entity framework.
+    <Description>EntityWorker is an object-relation mapper(ORM) that enable .NET developers to work with relations data using objects. EntityWorker is an alternative to entityframwork. is more flexible and much faster than entity framework.
 And it have support to multiple providers like mssql, sqlite and postgressql</Description>
     <NeutralLanguage />
     <PackageIconUrl>https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/icon.gif</PackageIconUrl>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <!--<TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeP2POutput;</TargetsForTfmSpecificBuildOutput>-->
     <!--<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);CustomContentTarget</TargetsForTfmSpecificContentInPackage>-->
-    <PackageReleaseNotes>Rename Attribute StringFy =&gt; Stringify
+    <PackageReleaseNotes>Implementing OnModuleConfiguration where we could configrate our modules
+Rename Attribute StringFy =&gt; Stringify
 Remove EnabledMigration and adding InitiolizeMigration() method instead, for more info read https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Repository.md</PackageReleaseNotes>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>7.2</LangVersion>

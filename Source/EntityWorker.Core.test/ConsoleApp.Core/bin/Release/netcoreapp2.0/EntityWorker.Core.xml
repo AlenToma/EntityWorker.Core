@@ -713,6 +713,125 @@
             All available Migrations to be executed
             </summary>
         </member>
+        <member name="T:EntityWorker.Core.Interface.IModuleBuilder">
+            <summary>
+            Configrate you class here, add forgenKeys or Primary Keys so on.
+            </summary>
+        </member>
+        <member name="P:EntityWorker.Core.Interface.IModuleBuilder.DataBaseType">
+            <summary>
+            Provider type
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.IModuleBuilder.Entity``1">
+            <summary>
+            
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.TableName(System.String)">
+            <summary>
+            Assign diffrent name for the object in the database
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.HasRule``1">
+            <summary>
+            Assign a rule to object
+            </summary>
+            <typeparam name="Source">Must implement interface IDbRuleTrigger</typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.HasPrimaryKey``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
+            <summary>
+            Add Primary Key to Property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <param name="autoGenerate"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.HasForeignKey``2(System.Linq.Expressions.Expression{System.Func{`0,``1}},System.String)">
+            <summary>
+            Add Foreign Key to Property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <param name="Source"></param>
+            <param name="propertyName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.HasDataEncode``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.String,EntityWorker.Core.Helper.DataCipherKeySize)">
+            <summary>
+            Add DataEncode for property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <param name="key"></param>
+            <param name="keySize"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.HasIndependentData``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+            Add IndependentData for property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.NotNullable``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+            Add NotNullable for property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.HasPropertyName``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.String,System.String)">
+            <summary>
+            Add PropertyName for property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <param name="name"></param>
+            <param name="displayName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.HasStringify``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+            Add Stringify for property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.ExcludeFromAbstract``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+            Add ExcludeFromAbstract for property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.HasDefaultOnEmpty``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Object)">
+            <summary>
+            Add DefaultOnEmpty for property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <param name="value"> Fefault value when property is null</param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.HasToBase64String``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+            Add ToBase64String for property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
         <member name="T:EntityWorker.Core.Interface.ISqlQueryable`1">
             <summary>
             quaryProvider for EntityWorker.Core
@@ -1433,6 +1552,131 @@
             Do your db Changes here
             </summary>
             <param name="repository"></param>
+        </member>
+        <member name="T:EntityWorker.Core.Object.Library.Modules.ModuleBuilder">
+            <summary>
+            Configrate you class here, add forgenKeys or Primary Keys so on.
+            </summary>
+        </member>
+        <member name="P:EntityWorker.Core.Object.Library.Modules.ModuleBuilder.DataBaseType">
+            <summary>
+            Providers type
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.Modules.ModuleBuilder.Entity``1">
+            <summary>
+            
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="T:EntityWorker.Core.Object.Library.Modules.ObjectMapps`1">
+            <summary>
+            Object Configration
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.Modules.ObjectMapps`1.TableName(System.String)">
+            <summary>
+            Assign diffrent name for the object in the database
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.Modules.ObjectMapps`1.HasRule``1">
+            <summary>
+            Assign a rule to object
+            </summary>
+            <typeparam name="Source">Must implement interface IDbRuleTrigger</typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.Modules.ObjectMapps`1.HasPrimaryKey``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
+            <summary>
+            Add Primary Key to Property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <param name="autoGenerate"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.Modules.ObjectMapps`1.HasForeignKey``2(System.Linq.Expressions.Expression{System.Func{`0,``1}},System.String)">
+            <summary>
+            Add Foreign Key to Property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <param name="type"></param>
+            <param name="propertyName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.Modules.ObjectMapps`1.HasDataEncode``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.String,EntityWorker.Core.Helper.DataCipherKeySize)">
+            <summary>
+            Add DataEncode for property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <param name="key"></param>
+            <param name="keySize"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.Modules.ObjectMapps`1.HasIndependentData``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+            Add IndependentData for property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.Modules.ObjectMapps`1.NotNullable``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+            Add NotNullable for property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.Modules.ObjectMapps`1.HasPropertyName``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.String,System.String)">
+            <summary>
+            Add PropertyName for property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <param name="name"></param>
+            <param name="displayName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.Modules.ObjectMapps`1.HasStringify``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+            Add Stringify for property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.Modules.ObjectMapps`1.ExcludeFromAbstract``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+            Add ExcludeFromAbstract for property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.Modules.ObjectMapps`1.HasDefaultOnEmpty``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Object)">
+            <summary>
+            Add DefaultOnEmpty for property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <param name="value"> Fefault value when property is null</param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.Modules.ObjectMapps`1.HasToBase64String``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+            Add ToBase64String for property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
         </member>
         <member name="T:EntityWorker.Core.Object.Library.SqlQueryable`1">
             <summary>
@@ -9851,6 +10095,12 @@
             <summary>
             Start once the Transaction first initialized and its threadsafe
             </summary>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.OnModuleConfiguration(EntityWorker.Core.Interface.IModuleBuilder)">
+            <summary>
+            Configrate your modules here, add Primary keys , ForeignKey and so on here.
+            </summary>
+            <param name="moduleBuilder"></param>
         </member>
         <member name="M:EntityWorker.Core.Transaction.Transaction.InitiolizeMigration(System.Reflection.Assembly)">
             <summary>

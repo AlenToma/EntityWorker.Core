@@ -1,12 +1,13 @@
-﻿using System;
+﻿using EntityWorker.Core.Object.Library;
+using System;
 using System.Collections.Generic;
 
 namespace EntityWorker.Core.FastDeepCloner
 {
     public class AttributesCollections : List<Attribute>
     {
-        internal Dictionary<Attribute, Attribute> ContainedAttributes = new Dictionary<Attribute, Attribute>();
-        internal Dictionary<Type, Attribute> ContainedAttributestypes = new Dictionary<Type, Attribute>();
+        internal Custom_ValueType<Attribute, Attribute> ContainedAttributes = new Custom_ValueType<Attribute, Attribute>();
+        internal Custom_ValueType<Type, Attribute> ContainedAttributestypes = new Custom_ValueType<Type, Attribute>();
 
         public AttributesCollections(List<Attribute> attrs)
         {
@@ -14,8 +15,8 @@ namespace EntityWorker.Core.FastDeepCloner
                 return;
             foreach(Attribute attr in attrs)
             {
-                ContainedAttributes.Add(attr, attr);
-                ContainedAttributestypes.Add(attr.GetType(), attr);
+                ContainedAttributes.GetOrAdd(attr, attr);
+                ContainedAttributestypes.GetOrAdd(attr.GetType(), attr);
                 base.Add(attr);
             }
           
@@ -23,8 +24,8 @@ namespace EntityWorker.Core.FastDeepCloner
 
         public new void Add(Attribute attr)
         {
-            ContainedAttributes.Add(attr, attr);
-            ContainedAttributestypes.Add(attr.GetType(), attr);
+            ContainedAttributes.GetOrAdd(attr, attr, true);
+            ContainedAttributestypes.GetOrAdd(attr.GetType(), attr, true);
             base.Add(attr);
         }
 

@@ -1,6 +1,9 @@
 ﻿using EntityWorker.Core.Transaction;
 using EntityWorker.Core.Helper;
 using System.Linq;
+using EntityWorker.Core.Interface;
+using LightData.CMS.Modules.Library;
+using System;
 
 namespace LightData.CMS.Modules.Repository
 {
@@ -8,7 +11,7 @@ namespace LightData.CMS.Modules.Repository
     {
         public Repository(DataBaseTypes dbType = DataBaseTypes.Mssql) : base(GetConnectionString(dbType), dbType)
         {
-          
+
         }
 
         protected override void OnModuleStart()
@@ -27,6 +30,19 @@ namespace LightData.CMS.Modules.Repository
             // Start the migration
             InitiolizeMigration();
             base.OnModuleStart();
+        }
+
+        protected override void OnModuleConfiguration(IModuleBuilder moduleBuilder)
+        {
+            moduleBuilder.Entity<User>()
+                .TableName("Users")
+                .HasPrimaryKey(x => x.Id, false)
+                .NotNullable(x => x.UserName)
+                .HasDataEncode(x => x.UserName)
+                .HasForeignKey<Role, Guid>(x => x.RoleId)
+                .HasIndependentData(x => x.Role)
+                .HasForeignKey<Person, Guid>(x => x.PersonId);
+            base.OnModuleConfiguration(moduleBuilder);
         }
 
         // Get the full connection string from the web-config

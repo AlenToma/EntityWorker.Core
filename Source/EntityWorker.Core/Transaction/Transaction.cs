@@ -17,6 +17,7 @@ using EntityWorker.Core.SQLite;
 using System.Collections;
 using EntityWorker.Core.SqlQuerys;
 using EntityWorker.Core.Postgres;
+using EntityWorker.Core.Object.Library.Modules;
 
 namespace EntityWorker.Core.Transaction
 {
@@ -89,6 +90,7 @@ namespace EntityWorker.Core.Transaction
                 {
                     if (!_moduleIni[dataBaseTypes])
                     {
+                        OnModuleConfiguration(new ModuleBuilder(dataBaseTypes));
                         OnModuleStart();
                         _moduleIni[dataBaseTypes] = true;
                     }
@@ -105,6 +107,14 @@ namespace EntityWorker.Core.Transaction
 
         }
 
+        /// <summary>
+        /// Configrate your modules here, add Primary keys , ForeignKey and so on here.
+        /// </summary>
+        /// <param name="moduleBuilder"></param>
+        protected virtual void OnModuleConfiguration(IModuleBuilder moduleBuilder)
+        {
+
+        }
 
         /// <summary>
         /// Initiolize the migration

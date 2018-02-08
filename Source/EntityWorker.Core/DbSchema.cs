@@ -536,10 +536,13 @@ namespace EntityWorker.Core
                     }
                 }
 
-                o.SetPrimaryKeyValue(primaryKeyId);
-                if (oState != null && _repository.GetObjectChanges(o, oState).Count > 0) // a change has been made outside the function Save then resave 
-                    Save(o, false);
 
+                if (oState != null && _repository.GetObjectChanges(o, oState).Count > 0) // a change has been made outside the function Save then resave          
+                {
+                    o.SetPrimaryKeyValue(primaryKeyId);
+                    Save(o, false);
+                }
+                o.SetPrimaryKeyValue(primaryKeyId);
                 _repository.Attach(o, true);
                 return primaryKeyId;
             }
