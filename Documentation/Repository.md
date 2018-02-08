@@ -30,6 +30,22 @@
             InitiolizeMigration();
             base.OnModuleStart();
         }
+        
+        // We could configrate our modules here instead of adding attributes in the class, offcource you could choose.
+         protected override void OnModuleConfiguration(IModuleBuilder moduleBuilder)
+        {
+            moduleBuilder.Entity<User>()
+                .TableName("Users")
+                .HasPrimaryKey(x => x.Id, false)
+                .NotNullable(x => x.UserName)
+                .HasDataEncode(x => x.UserName)
+                .HasForeignKey<Role, Guid>(x => x.RoleId)
+                .HasIndependentData(x => x.Role)
+                .HasForeignKey<Person, Guid>(x => x.PersonId);
+                
+            base.OnModuleConfiguration(moduleBuilder);
+         }
+
 
         // get the full connection string
         // for postgresql make sure to have the database name lower case
