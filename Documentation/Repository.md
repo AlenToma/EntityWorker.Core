@@ -14,8 +14,11 @@
         {
             if (!base.DataBaseExist())
                 base.CreateDataBase();
-
-            /// Limited support for sqlite
+                
+                
+            // You could choose to use this to apply you changes to the database or create your own migration
+            // that will update the database, like alter drop or create.
+            // Limited support for sqlite
             // Get the latest change between the code and the database. 
             // Property Rename is not supported. renaming property x will end up removing the x and adding y so there will be dataloss
             // Adding a primary key is not supported either
@@ -27,6 +30,22 @@
             InitiolizeMigration();
             base.OnModuleStart();
         }
+        
+        // We could configrate our modules here instead of adding attributes in the class, offcource you could choose.
+        protected override void OnModuleConfiguration(IModuleBuilder moduleBuilder)
+        {
+            moduleBuilder.Entity<User>()
+                .TableName("Users")
+                .HasPrimaryKey(x => x.Id, false)
+                .NotNullable(x => x.UserName)
+                .HasDataEncode(x => x.UserName)
+                .HasForeignKey<Role, Guid>(x => x.RoleId)
+                .HasIndependentData(x => x.Role)
+                .HasForeignKey<Person, Guid>(x => x.PersonId);
+                
+            base.OnModuleConfiguration(moduleBuilder);
+         }
+
 
         // get the full connection string
         // for postgresql make sure to have the database name lower case
