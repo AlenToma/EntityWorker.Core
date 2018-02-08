@@ -5,9 +5,8 @@
     public class Repository : Transaction
     {
         // there are three databases types mssql, Sqlite and PostgreSql
-        // then true or false for migration
         public Repository(DataBaseTypes dbType = DataBaseTypes.Mssql) : 
-        base(GetConnectionString(dbType), true, dbType) 
+        base(GetConnectionString(dbType), dbType) 
         { 
         }
         
@@ -23,6 +22,10 @@
             var latestChanges = GetCodeLatestChanges();
             if (latestChanges.Any())
                 latestChanges.Execute(true);
+                
+             // Start the migration
+            InitiolizeMigration();
+            base.OnModuleStart();
         }
 
         // get the full connection string
