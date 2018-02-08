@@ -42,12 +42,20 @@ namespace EntityWorker.Core.InterFace
         ILightDataTable GetLightDataTable(DbCommandExtended cmd, string primaryKey = null);
 
         /// <summary>
-        /// Get SqlCommand by sql string
+        /// Return SqlCommand that already contain SQLConnection
         /// </summary>
         /// <param name="sql"></param>
-        /// <param name="type"> Set for faster loading </param>
+        /// <param name="type">Set for faster Converting of dbreader to object</param>
         /// <returns></returns>
         DbCommandExtended GetSqlCommand(string sql, Type type = null);
+
+        /// <summary>
+        /// Return SqlCommand that already contain SQLConnection
+        /// </summary>
+        /// <param name="storedProcedure"></param>
+        /// <param name="type">Set for faster Converting of dbreader to object</param>
+        /// <returns></returns>
+        DbCommandExtended GetStoredProcedure(string storedProcedure, Type type = null);
 
         /// <summary>
         /// Add Parameter to sqlCommand

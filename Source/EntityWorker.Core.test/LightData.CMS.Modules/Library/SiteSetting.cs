@@ -14,7 +14,7 @@ namespace LightData.CMS.Modules.Library
 
         public string Value { get; set; }
 
-        [StringFy]
+        [Stringify]
         public Helper.EnumHelper.Keys Key { get; set; }
 
         [ForeignKey(typeof(SiteSettingCollection))]

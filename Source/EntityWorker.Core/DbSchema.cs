@@ -35,8 +35,6 @@ namespace EntityWorker.Core
             _repository = repository;
         }
 
-
-
         public ILightDataTable ObjectColumns(Type type)
         {
             var key = type.FullName + _repository.DataBaseTypes.ToString();
@@ -488,7 +486,7 @@ namespace EntityWorker.Core
                         }
                     }
 
-                    if (col.ContainAttribute<StringFy>() || col.ContainAttribute<DataEncode>())
+                    if (col.ContainAttribute<Stringify>() || col.ContainAttribute<DataEncode>())
                         v = v?.ConvertValue<string>();
 
                     if (col.ContainAttribute<DataEncode>())
@@ -506,7 +504,7 @@ namespace EntityWorker.Core
                     if (v == null && defaultOnEmpty != null)
                         v = defaultOnEmpty.Value.ConvertValue(col.PropertyType);
 
-                    _repository.AddInnerParameter(cmd, col.GetPropertyName(), v, (col.ContainAttribute<StringFy>() || col.ContainAttribute<DataEncode>() || col.ContainAttribute<ToBase64String>() ? _repository.GetSqlType(typeof(string)) : _repository.GetSqlType(col.PropertyType)));
+                    _repository.AddInnerParameter(cmd, col.GetPropertyName(), v, (col.ContainAttribute<Stringify>() || col.ContainAttribute<DataEncode>() || col.ContainAttribute<ToBase64String>() ? _repository.GetSqlType(typeof(string)) : _repository.GetSqlType(col.PropertyType)));
                 }
 
                 if (primaryKeyId == null)
@@ -665,7 +663,7 @@ namespace EntityWorker.Core
                     if (prop.ContainAttribute<ForeignKey>())
                         GetDatabase_Diff(prop.GetCustomAttribute<ForeignKey>().Type, str, createdTables);
                     var propType = prop.PropertyType;
-                    if (prop.ContainAttribute<StringFy>() || prop.ContainAttribute<DataEncode>() || prop.ContainAttribute<ToBase64String>())
+                    if (prop.ContainAttribute<Stringify>() || prop.ContainAttribute<DataEncode>() || prop.ContainAttribute<ToBase64String>())
                         propType = typeof(string);
 
                     var modify = prop.IsInternalType ? (_repository.DataBaseTypes == DataBaseTypes.PostgreSql ? table.FindByPrimaryKey<LightDataTableRow>(prop.GetPropertyName().ToLower()) : table.FindByPrimaryKey<LightDataTableRow>(prop.GetPropertyName())) : null;

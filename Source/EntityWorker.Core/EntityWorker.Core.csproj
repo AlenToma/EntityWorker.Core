@@ -3,9 +3,9 @@
     <TargetFrameworks>netcoreapp2.0;netstandard2.0;net451;</TargetFrameworks>
     <PackageId>EntityWorker.Core</PackageId>
     <AssemblyName>EntityWorker.Core</AssemblyName>
-    <AssemblyVersion>1.0.4.4</AssemblyVersion>
-    <FileVersion>1.0.4.4</FileVersion>
-    <Version>1.4.4</Version>
+    <AssemblyVersion>1.0.4.5</AssemblyVersion>
+    <FileVersion>1.0.4.5</FileVersion>
+    <Version>1.4.5</Version>
     <Authors>Alen Toma</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageProjectUrl>https://github.com/AlenToma/EntityWorker.Core</PackageProjectUrl>
@@ -19,7 +19,8 @@ And it have support to multiple providers like mssql, sqlite and postgressql</De
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <!--<TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeP2POutput;</TargetsForTfmSpecificBuildOutput>-->
     <!--<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);CustomContentTarget</TargetsForTfmSpecificContentInPackage>-->
-    <PackageReleaseNotes>Safeguard for invalid property Names and Table Names</PackageReleaseNotes>
+    <PackageReleaseNotes>Rename Attribute StringFy =&gt; Stringify
+Remove EnabledMigration and adding InitiolizeMigration() method instead, for more info read https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Repository.md</PackageReleaseNotes>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>7.2</LangVersion>
   </PropertyGroup>

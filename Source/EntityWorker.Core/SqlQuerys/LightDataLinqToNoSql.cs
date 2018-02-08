@@ -18,8 +18,8 @@ namespace EntityWorker.Core.SqlQuerys
         private StringBuilder sb;
         private ExpressionType? _overridedNodeType;
         private readonly List<string> _columns;
-        private const string stringyFy = "<StringFy>[#]</StringFy>";
-        private Regex StringyFyExp = new Regex(@"<StringFy>\[.*?\]</StringFy>");
+        private const string stringyFy = "<Stringify>[#]</Stringify>";
+        private Regex StringyFyExp = new Regex(@"<Stringify>\[.*?\]</Stringify>");
         private const string boolString = "<bool>[#]</bool>";
         private Regex BoolExp = new Regex(@"<bool>\[.*?\]</bool>");
 
@@ -252,18 +252,18 @@ namespace EntityWorker.Core.SqlQuerys
                     InsertBeforeDecoder(" in (");
                     try
                     {
-                        var stringFy = (m.Arguments[0] as MemberExpression).Member as PropertyInfo != null ? ((m.Arguments[0] as MemberExpression).Member as PropertyInfo).GetCustomAttributes<StringFy>() != null : false;
+                        var Stringify = (m.Arguments[0] as MemberExpression).Member as PropertyInfo != null ? ((m.Arguments[0] as MemberExpression).Member as PropertyInfo).GetCustomAttributes<Stringify>() != null : false;
                         var value = (((MemberExpression)m.Object).Member as FieldInfo) != null ? (((MemberExpression)m.Object).Member as FieldInfo)?.GetValue(ex.Value) : (((MemberExpression)m.Object).Member as PropertyInfo)?.GetValue(ex.Value);
                         if (value == null)
                             this.Visit(ex);
                         else
                         {
-                            var v = ValuetoSql(value, stringFy);
+                            var v = ValuetoSql(value, Stringify);
                             if (string.IsNullOrEmpty(v))
                             {
-                                if (stringFy)
-                                    v = ValuetoSql(string.Format("DefaultValueForEmptyArray({0})", Guid.NewGuid().ToString()), stringFy);
-                                else v = ValuetoSql(-1, stringFy);
+                                if (Stringify)
+                                    v = ValuetoSql(string.Format("DefaultValueForEmptyArray({0})", Guid.NewGuid().ToString()), Stringify);
+                                else v = ValuetoSql(-1, Stringify);
                             }
 
                             CleanDecoder(v);
@@ -404,7 +404,7 @@ namespace EntityWorker.Core.SqlQuerys
             {
                 var exp = matches[0];
 
-                result = exp.Value.Replace("</StringFy>", "").TrimEnd(']').Substring(@"<StringFy>\[".Length - 1);
+                result = exp.Value.Replace("</Stringify>", "").TrimEnd(']').Substring(@"<Stringify>\[".Length - 1);
                 sb = sb.Remove(exp.Index, exp.Value.Length);
                 if (replaceWith != null)
                     sb = sb.Insert(exp.Index, replaceWith);
@@ -484,8 +484,8 @@ namespace EntityWorker.Core.SqlQuerys
             if (b != null && exp != null)
             {
 
-                var stringFyText = StringyFyExp.Matches(sb.ToString()).Cast<Match>().FirstOrDefault();
-                var isEnum = stringFyText != null;
+                var StringifyText = StringyFyExp.Matches(sb.ToString()).Cast<Match>().FirstOrDefault();
+                var isEnum = StringifyText != null;
                 if ((exp.NodeType == ExpressionType.MemberAccess || exp.NodeType == ExpressionType.Not)
                     && b.NodeType != ExpressionType.Equal
                     && b.NodeType != ExpressionType.NotEqual && (exp.Type == typeof(bool) || exp.Type == typeof(bool?)))
@@ -523,8 +523,8 @@ namespace EntityWorker.Core.SqlQuerys
         {
             sb.Append("(");
             this.Visit(b.Left);
-            var stringFyText = StringyFyExp.Matches(sb.ToString()).Cast<Match>().FirstOrDefault();
-            var isEnum = stringFyText != null;
+            var StringifyText = StringyFyExp.Matches(sb.ToString()).Cast<Match>().FirstOrDefault();
+            var isEnum = StringifyText != null;
             validateBinaryExpression(b, b.Left);
             switch (b.NodeType)
             {
@@ -548,7 +548,7 @@ namespace EntityWorker.Core.SqlQuerys
                         {
                             CleanText();
                             InsertBeforeDecoder(" IS ");
-                            InsertBeforeDecoder(stringFyText.ToString());
+                            InsertBeforeDecoder(StringifyText.ToString());
                         }
                         else
                             CleanDecoder(" IS ");
@@ -559,7 +559,7 @@ namespace EntityWorker.Core.SqlQuerys
                         {
                             CleanText();
                             InsertBeforeDecoder(" = ");
-                            InsertBeforeDecoder(stringFyText.ToString());
+                            InsertBeforeDecoder(StringifyText.ToString());
                         }
                         else
                             InsertBeforeDecoder(" = ");
@@ -573,7 +573,7 @@ namespace EntityWorker.Core.SqlQuerys
                         {
                             CleanText();
                             InsertBeforeDecoder(" IS NOT ");
-                            InsertBeforeDecoder(stringFyText.ToString());
+                            InsertBeforeDecoder(StringifyText.ToString());
                         }
                         else
                             InsertBeforeDecoder(" IS NOT ");
@@ -585,7 +585,7 @@ namespace EntityWorker.Core.SqlQuerys
                         {
                             CleanText();
                             InsertBeforeDecoder(" <> ");
-                            InsertBeforeDecoder(stringFyText.ToString());
+                            InsertBeforeDecoder(StringifyText.ToString());
                         }
                         else
                             InsertBeforeDecoder(" <> ");
@@ -675,8 +675,8 @@ namespace EntityWorker.Core.SqlQuerys
         protected Expression VisitConstantFixed(ConstantExpression c, string memName = "")
         {
             IQueryable q = c.Value as IQueryable;
-            var stringFyText = StringyFyExp.Matches(sb.ToString()).Cast<Match>().FirstOrDefault();
-            var isEnum = stringFyText != null;
+            var StringifyText = StringyFyExp.Matches(sb.ToString()).Cast<Match>().FirstOrDefault();
+            var isEnum = StringifyText != null;
             string type = null;
             if (isEnum)
                 type = CleanText();
@@ -775,7 +775,7 @@ namespace EntityWorker.Core.SqlQuerys
                         return columnName;
 
                     bool isNot = sb.ToString().EndsWith("NOT ");
-                    if (prop.PropertyType.IsEnum && prop.ContainAttribute<StringFy>())
+                    if (prop.PropertyType.IsEnum && prop.ContainAttribute<Stringify>())
                     {
                         if (!SavedTypes.ContainsKey(prop.FullName))
                             SavedTypes.Add(prop.FullName, prop.PropertyType);

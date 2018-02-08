@@ -101,7 +101,7 @@
             </summary>
             <param name="ruleType"></param>
         </member>
-        <member name="T:EntityWorker.Core.Attributes.StringFy">
+        <member name="T:EntityWorker.Core.Attributes.Stringify">
             <summary>
             Save the property as string in the database
             mostly used when we don't want an enum to be saved as integer in the database
@@ -902,10 +902,18 @@
         </member>
         <member name="M:EntityWorker.Core.InterFace.IRepository.GetSqlCommand(System.String,System.Type)">
             <summary>
-            Get SqlCommand by sql string
+            Return SqlCommand that already contain SQLConnection
             </summary>
             <param name="sql"></param>
-            <param name="type"> Set for faster loading </param>
+            <param name="type">Set for faster Converting of dbreader to object</param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.GetStoredProcedure(System.String,System.Type)">
+            <summary>
+            Return SqlCommand that already contain SQLConnection
+            </summary>
+            <param name="storedProcedure"></param>
+            <param name="type">Set for faster Converting of dbreader to object</param>
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.InterFace.IRepository.AddInnerParameter(EntityWorker.Core.Object.Library.DbCommandExtended,System.String,System.Object,System.Data.SqlDbType)">
@@ -9831,12 +9839,7 @@
             DataBase Connection
             </summary>
         </member>
-        <member name="P:EntityWorker.Core.Transaction.Transaction.EnableMigration">
-            <summary>
-            Enable migrations
-            </summary>
-        </member>
-        <member name="M:EntityWorker.Core.Transaction.Transaction.#ctor(System.String,System.Boolean,EntityWorker.Core.Helper.DataBaseTypes)">
+        <member name="M:EntityWorker.Core.Transaction.Transaction.#ctor(System.String,EntityWorker.Core.Helper.DataBaseTypes)">
             <summary>
             
             </summary>
@@ -9846,7 +9849,12 @@
         </member>
         <member name="M:EntityWorker.Core.Transaction.Transaction.OnModuleStart">
             <summary>
-            This will be triggererd the first time Transaction is called
+            Start once the Transaction first initialized and its threadsafe
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.InitiolizeMigration(System.Reflection.Assembly)">
+            <summary>
+            Initiolize the migration
             </summary>
         </member>
         <member name="M:EntityWorker.Core.Transaction.Transaction.GetCodeLatestChanges(System.Reflection.Assembly)">
@@ -9963,7 +9971,15 @@
             Return SqlCommand that already contain SQLConnection
             </summary>
             <param name="sql"></param>
-            <param name="type">set for faster loading of sql</param>
+            <param name="type">Set for faster Converting of dbreader to object</param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.GetStoredProcedure(System.String,System.Type)">
+            <summary>
+            Return SqlCommand that already contain SQLConnection
+            </summary>
+            <param name="storedProcedure"></param>
+            <param name="type">Set for faster Converting of dbreader to object</param>
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Transaction.Transaction.GetLightDataTableList(EntityWorker.Core.Object.Library.DbCommandExtended,System.String)">

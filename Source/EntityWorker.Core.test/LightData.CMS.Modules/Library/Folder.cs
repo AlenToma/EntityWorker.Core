@@ -19,7 +19,7 @@ namespace LightData.CMS.Modules.Library
 
         public bool IsSystem { get; set; }
 
-        [StringFy]
+        [Stringify]
         public FolderTypes FolderType { get; set; }
 
         public List<FileItem> Files { get; set; }

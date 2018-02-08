@@ -265,7 +265,7 @@ namespace EntityWorker.Core.Helper
         {
             var type = prop.PropertyType;
 
-            if (prop.ContainAttribute<StringFy>() || prop.ContainAttribute<DataEncode>() || prop.ContainAttribute<ToBase64String>())
+            if (prop.ContainAttribute<Stringify>() || prop.ContainAttribute<DataEncode>() || prop.ContainAttribute<ToBase64String>())
                 return typeof(string).GetDbTypeByType(dbType);
 
 
@@ -291,6 +291,9 @@ namespace EntityWorker.Core.Helper
         public static List<string> GetDbTypeListByType(this IFastDeepClonerProperty prop, DataBaseTypes dbType)
         {
             var type = prop.PropertyType;
+
+            if (prop.ContainAttribute<Stringify>() || prop.ContainAttribute<DataEncode>() || prop.ContainAttribute<ToBase64String>())
+                return new List<string>() { typeof(string).GetDbTypeByType(dbType) };
 
             if (type.GetTypeInfo().IsEnum)
                 type = typeof(long);

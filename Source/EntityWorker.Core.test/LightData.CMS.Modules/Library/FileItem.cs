@@ -29,7 +29,7 @@ namespace LightData.CMS.Modules.Library
         /// <summary>
         /// PDF, PNG, JPG....
         /// </summary>
-        [StringFy]
+        [Stringify]
         public EnumHelper.AllowedFiles FileType { get; set; }
 
 

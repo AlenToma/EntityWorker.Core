@@ -64,10 +64,6 @@ namespace EntityWorker.Core.Transaction
             { DataBaseTypes.PostgreSql, false }
         };
 
-        /// <summary>
-        /// Enable migrations
-        /// </summary>
-        protected bool EnableMigration { get; private set; }
 
         /// <summary>
         /// 
@@ -75,10 +71,9 @@ namespace EntityWorker.Core.Transaction
         /// <param name="connectionString">Full connection string</param>
         /// <param name="enableMigration"></param>
         /// <param name="dataBaseTypes">The type of the database Ms-sql or Sql-light</param>
-        public Transaction(string connectionString, bool enableMigration, DataBaseTypes dataBaseTypes)
+        public Transaction(string connectionString, DataBaseTypes dataBaseTypes)
         {
 
-            EnableMigration = enableMigration;
             _attachedObjects = new Custom_ValueType<string, object>();
             if (string.IsNullOrEmpty(connectionString))
                 if (string.IsNullOrEmpty(connectionString))
@@ -100,33 +95,32 @@ namespace EntityWorker.Core.Transaction
                 }
             }
             else _moduleIni[dataBaseTypes] = true;
-
-            if (!_tableMigrationCheck[DataBaseTypes] && EnableMigration && DataBaseExist())
-                IniMigration();
         }
 
         /// <summary>
-        /// This will be triggererd the first time Transaction is called
+        /// Start once the Transaction first initialized and its threadsafe
         /// </summary>
         protected virtual void OnModuleStart()
         {
+
         }
 
-        private void IniMigration()
+
+        /// <summary>
+        /// Initiolize the migration
+        /// </summary>
+        protected void InitiolizeMigration(Assembly assembly = null)
         {
             lock (MigrationLocker)
             {
                 if (_tableMigrationCheck[DataBaseTypes])
                     return;
-                this.CreateTable<DBMigration>(false);
-                this.SaveChanges();
-                var ass = this.GetType().Assembly;
+                assembly = assembly ?? this.GetType().Assembly;
                 IMigrationConfig config;
-                if (ass.DefinedTypes.Any(a => typeof(IMigrationConfig).IsAssignableFrom(a)))
-                    config = Activator.CreateInstance(ass.DefinedTypes.First(a => typeof(IMigrationConfig).IsAssignableFrom(a))) as IMigrationConfig;
-                else throw new Exception("EnableMigration is enabled but EntityWorker.Core could not find IMigrationConfig in the current Assembly " + ass.GetName());
+                if (assembly.DefinedTypes.Any(a => typeof(IMigrationConfig).IsAssignableFrom(a)))
+                    config = Activator.CreateInstance(assembly.DefinedTypes.First(a => typeof(IMigrationConfig).IsAssignableFrom(a))) as IMigrationConfig;
+                else throw new Exception("EntityWorker.Core could not find IMigrationConfig in the current Assembly " + assembly.GetName());
                 MigrationConfig(config);
-                _tableMigrationCheck[DataBaseTypes] = true;
             }
         }
 
@@ -168,7 +162,7 @@ namespace EntityWorker.Core.Transaction
             if (DataBaseTypes == DataBaseTypes.Mssql)
             {
                 sqlBuild.InitialCatalog = "master";
-                var tr = new Transaction(sqlBuild.ToString(), false, DataBaseTypes);
+                var tr = new Transaction(sqlBuild.ToString(), DataBaseTypes);
                 var cmd = tr.GetSqlCommand("SELECT  CAST(CASE WHEN db_id(String[" + dbName + "]) is not null THEN 1 ELSE 0 END AS BIT)");
                 return tr.ExecuteScalar(cmd).ConvertValue<bool>();
             }
@@ -176,10 +170,8 @@ namespace EntityWorker.Core.Transaction
             {
                 try
                 {
-                    var tr = new Transaction(sqlBuild.ToString(), false, DataBaseTypes);
+                    var tr = new Transaction(sqlBuild.ToString(), DataBaseTypes);
                     tr.ValidateConnection();
-                    this.CreateTable<DBMigration>(false);/// make sure this exist
-                    this.SaveChanges();
                     return true;
 
                 }
@@ -192,7 +184,7 @@ namespace EntityWorker.Core.Transaction
             {
                 dbName = npSqlBuilder.Database;
                 npSqlBuilder.Database = "";
-                var tr = new Transaction(npSqlBuilder.ToString(), false, DataBaseTypes);
+                var tr = new Transaction(npSqlBuilder.ToString(), DataBaseTypes);
                 var cmd = tr.GetSqlCommand("SELECT CAST(CASE WHEN datname is not null THEN 1 ELSE 0 END AS BIT) from pg_database WHERE lower(datname) = lower(String[" + dbName + "])");
                 return tr.ExecuteScalar(cmd).ConvertValue<bool>();
 
@@ -223,7 +215,7 @@ namespace EntityWorker.Core.Transaction
                 if (DataBaseTypes == DataBaseTypes.Mssql)
                 {
                     sqlBuild.InitialCatalog = "master";
-                    var tr = new Transaction(sqlBuild.ToString(), false, DataBaseTypes);
+                    var tr = new Transaction(sqlBuild.ToString(), DataBaseTypes);
                     var cmd = tr.GetSqlCommand("Create DataBase [" + dbName.Trim() + "]");
                     tr.ExecuteNonQuery(cmd);
 
@@ -234,7 +226,7 @@ namespace EntityWorker.Core.Transaction
                 {
                     dbName = npSqlBuilder.Database;
                     npSqlBuilder.Database = "";
-                    var tr = new Transaction(npSqlBuilder.ToString(), false, DataBaseTypes);
+                    var tr = new Transaction(npSqlBuilder.ToString(), DataBaseTypes);
                     var cmd = tr.GetSqlCommand("Create DataBase " + dbName.Trim());
                     tr.ExecuteNonQuery(cmd);
                 }
@@ -242,7 +234,6 @@ namespace EntityWorker.Core.Transaction
                 var latestChanges = GetCodeLatestChanges();
                 if (latestChanges.Any())
                     latestChanges.Execute(true);
-                IniMigration();
             }
 
         }
@@ -276,6 +267,7 @@ namespace EntityWorker.Core.Transaction
         {
             try
             {
+                this.CreateTable<DBMigration>(false);
                 var migrations = config.GetMigrations(this) ?? new List<Migration>();
                 this.CreateTransaction();
                 foreach (var migration in migrations)
@@ -300,6 +292,8 @@ namespace EntityWorker.Core.Transaction
                 Rollback();
                 throw;
             }
+
+            _tableMigrationCheck[DataBaseTypes] = true;
         }
 
         private void CloseifPassible()
@@ -545,12 +539,25 @@ namespace EntityWorker.Core.Transaction
         /// Return SqlCommand that already contain SQLConnection
         /// </summary>
         /// <param name="sql"></param>
-        /// <param name="type">set for faster loading of sql</param>
+        /// <param name="type">Set for faster Converting of dbreader to object</param>
         /// <returns></returns>
         public DbCommandExtended GetSqlCommand(string sql, Type type = null)
         {
             ValidateConnection();
-            var cmd = this.ProcessSql(SqlConnection, Trans, sql, type);
+            return this.ProcessSql(SqlConnection, Trans, sql, type);
+        }
+
+        /// <summary>
+        /// Return SqlCommand that already contain SQLConnection
+        /// </summary>
+        /// <param name="storedProcedure"></param>
+        /// <param name="type">Set for faster Converting of dbreader to object</param>
+        /// <returns></returns>
+        public DbCommandExtended GetStoredProcedure(string storedProcedure, Type type = null)
+        {
+            ValidateConnection();
+            var cmd = this.ProcessSql(SqlConnection, Trans, storedProcedure, type);
+            cmd.Command.CommandType = CommandType.StoredProcedure;
             return cmd;
         }
 

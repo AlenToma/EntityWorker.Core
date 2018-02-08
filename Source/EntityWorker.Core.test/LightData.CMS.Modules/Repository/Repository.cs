@@ -6,7 +6,7 @@ namespace LightData.CMS.Modules.Repository
 {
     public class Repository : Transaction
     {
-        public Repository(DataBaseTypes dbType = DataBaseTypes.Mssql) : base(GetConnectionString(dbType), true, dbType)
+        public Repository(DataBaseTypes dbType = DataBaseTypes.Mssql) : base(GetConnectionString(dbType), dbType)
         {
           
         }
@@ -23,6 +23,9 @@ namespace LightData.CMS.Modules.Repository
             var latestChanges = GetCodeLatestChanges();
             if (latestChanges.Any())
                 latestChanges.Execute(true);
+
+            // Start the migration
+            InitiolizeMigration();
             base.OnModuleStart();
         }
 

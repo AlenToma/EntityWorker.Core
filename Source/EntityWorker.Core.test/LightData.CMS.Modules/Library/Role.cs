@@ -13,7 +13,7 @@ namespace LightData.CMS.Modules.Library
         [NotNullable]
         public string Name { get; set; }
 
-        [StringFy]
+        [Stringify]
         public EnumHelper.RoleDefinition RoleDefinition { get; set; }
     }
 }
