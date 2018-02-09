@@ -22,8 +22,7 @@ EntityWorker.Core has its own Migration methods, so lets see how it works.
     {
         /// <summary>
         /// All available Migrations to be executed.
-        // when Migration Is enabled in Transaction.
-        // this class will be triggered at system start.
+        /// trigget this class by InitializeMigration() in OnModuleStart
         /// </summary>
         public IList<Migration> GetMigrations(ICustomRepository repository)
         {
