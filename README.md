@@ -1,5 +1,6 @@
 # Introduction to [EntityWorker.Core](https://www.nuget.org/packages/EntityWorker.Core/)
-
+EntityWorker is an object-relation mapper(ORM) that enable .NET developers to work with relations data using objects.
+EntityWorker is an alternative to entityframwork. is more flexible and much faster than entity framework.
 ## EntityFrameWork vs EntityWorker.Core Performance test
 ![screenshot](https://github.com/AlenToma/EntityWorker.Core/blob/master/EF_VS_EW.PNG?raw=true)
 
@@ -17,9 +18,6 @@
 * .NETCoreApp 2.0
 * .NETFramework 4.5.1
 * .NETStandard 2.0
-## What is EntityWorker.Core?
-EntityWorker.Core is an object-relation mappar that enables .NET developers to work with relational data using objects.
-EntityWorker.Core is an alternative to the Entity Framework. It is more flexible and much faster than the Entity Framework.
 ## Can I use it to an existing database?
 Yes, you can easily implement your existing modules and use attributes to map all your Primary Keys and Foreign Key without even
 touching the database.
