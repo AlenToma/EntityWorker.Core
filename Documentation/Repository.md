@@ -27,7 +27,7 @@
                 latestChanges.Execute(true);
                 
              // Start the migration
-            InitiolizeMigration();
+            InitializeMigration();
             base.OnModuleStart();
         }
         
