@@ -1,7 +1,7 @@
 ## Migration
 EntityWorker.Core has its own Migration methods, so lets see how it works.
 ```csharp
-   //Create Class and call it IniMigration and inhert from Migration
+   //Create Class and call it IniMigration and inherit from Migration
    public class IniMigration : Migration
         public override void ExecuteMigration(ICustomRepository repository)
         {
