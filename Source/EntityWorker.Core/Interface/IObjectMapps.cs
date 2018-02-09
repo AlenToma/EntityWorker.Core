@@ -4,6 +4,11 @@ using System.Linq.Expressions;
 
 namespace EntityWorker.Core.Interface
 {
+    /// <summary>
+    /// Entity Configration
+    /// Here we could configrate and set all primary keys and Foreign keys for properties
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public interface IObjectMapps<T>  where T : class
     {
         /// <summary>

@@ -22,6 +22,7 @@ using EntityWorker.Core.Object.Library.Modules;
 namespace EntityWorker.Core.Transaction
 {
     /// <summary>
+    /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Repository.md
     /// EntityWorker.Core Repository
     /// </summary>
     public class Transaction : IRepository

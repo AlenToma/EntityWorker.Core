@@ -3,6 +3,7 @@
 namespace EntityWorker.Core.Attributes
 {
     /// <summary>
+    /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
     /// Assign Default Value when Property is null
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]

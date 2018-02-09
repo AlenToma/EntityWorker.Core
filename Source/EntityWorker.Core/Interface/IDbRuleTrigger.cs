@@ -2,6 +2,11 @@
 
 namespace EntityWorker.Core.Interface
 {
+    /// <summary>
+    /// Interface for Entity Rules
+    /// read https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/modules.md for more information
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public interface IDbRuleTrigger<T> where T: class
     {
         /// <summary>

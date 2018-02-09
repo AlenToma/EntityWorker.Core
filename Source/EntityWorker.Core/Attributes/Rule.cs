@@ -3,6 +3,9 @@ using System.Linq;
 
 namespace EntityWorker.Core.Attributes
 {
+    /// <summary>
+    /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
+    /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public sealed class Rule : Attribute
     {

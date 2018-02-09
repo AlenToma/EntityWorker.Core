@@ -9,7 +9,9 @@ using System.Text.RegularExpressions;
 namespace EntityWorker.Core.Object.Library.Modules
 {
     /// <summary>
-    /// Object Configration
+    /// Entity Configration
+    /// Here we could configrate and set all primary keys and Foreign keys for properties
+    /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Repository.md
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public sealed class ObjectMapps<T> : IObjectMapps<T> where T : class
@@ -44,7 +46,6 @@ namespace EntityWorker.Core.Object.Library.Modules
             return this;
         }
 
-
         /// <summary>
         /// Add Primary Key to Property
         /// </summary>
@@ -60,7 +61,6 @@ namespace EntityWorker.Core.Object.Library.Modules
             prop.Attributes.Add(new PrimaryKey(autoGenerate));
             return this;
         }
-
 
         /// <summary>
         /// Add Foreign Key to Property
@@ -80,7 +80,6 @@ namespace EntityWorker.Core.Object.Library.Modules
             return this;
         }
 
-
         /// <summary>
         /// Add DataEncode for property
         /// </summary>
@@ -98,7 +97,6 @@ namespace EntityWorker.Core.Object.Library.Modules
             prop.Attributes.Add(new DataEncode(key, keySize));
             return this;
         }
-
 
         /// <summary>
         /// Add IndependentData for property
@@ -165,7 +163,6 @@ namespace EntityWorker.Core.Object.Library.Modules
             prop.Attributes.Add(new Stringify());
             return this;
         }
-
 
         /// <summary>
         /// Add ExcludeFromAbstract for property

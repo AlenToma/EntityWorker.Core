@@ -3,6 +3,7 @@
 namespace EntityWorker.Core.Attributes
 {
     /// <summary>
+    /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
     /// Have diffrent Name for the property in the database
     /// </summary>
     [AttributeUsage(AttributeTargets.Property, Inherited = false)]

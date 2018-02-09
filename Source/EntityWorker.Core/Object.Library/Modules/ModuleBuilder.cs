@@ -5,6 +5,7 @@ namespace EntityWorker.Core.Object.Library.Modules
 {
     /// <summary>
     /// Configrate you class here, add forgenKeys or Primary Keys so on.
+    /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Repository.md
     /// </summary>
     public sealed class ModuleBuilder : IModuleBuilder
     {

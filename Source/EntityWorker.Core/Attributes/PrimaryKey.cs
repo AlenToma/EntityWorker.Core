@@ -4,6 +4,7 @@ namespace EntityWorker.Core.Attributes
 {
     /// <inheritdoc />
     /// <summary>
+    /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
     /// </summary>
     [AttributeUsage(AttributeTargets.Property, Inherited = true)]
     public sealed class PrimaryKey : Attribute

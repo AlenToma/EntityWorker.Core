@@ -4,6 +4,7 @@ namespace EntityWorker.Core.Attributes
 {
     /// <inheritdoc />
     /// <summary>
+    /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
     /// Property is a ForeignKey in the database.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]

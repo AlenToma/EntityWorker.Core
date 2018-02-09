@@ -87,6 +87,13 @@ namespace EntityWorker.Core.Helper
             return col;
         }
 
+        /// <summary>
+        /// Get PropertyName of the expression
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TP"></typeparam>
+        /// <param name="action"></param>
+        /// <returns></returns>
         public static string GetMemberName<T, TP>(this Expression<Func<T, TP>> action)
         {
             var member = action.Body is UnaryExpression ? ((MemberExpression)((UnaryExpression)action.Body).Operand) : (action.Body is MethodCallExpression ? ((MemberExpression)((MethodCallExpression)action.Body).Object) : (MemberExpression)action.Body);
@@ -198,6 +205,14 @@ namespace EntityWorker.Core.Helper
             return str;
         }
 
+        /// <summary>
+        /// Try to insert 
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="text"></param>
+        /// <param name="identifier"></param>
+        /// <param name="insertLastIfNotFound"></param>
+        /// <returns></returns>
         public static string InsertBefore(this string str, string text, string identifier, bool insertLastIfNotFound = true)
         {
             var txt = "";
@@ -245,6 +260,7 @@ namespace EntityWorker.Core.Helper
         {
             if (type.GetTypeInfo().IsEnum)
                 type = typeof(long);
+
 
             if (Nullable.GetUnderlyingType(type) != null)
                 type = Nullable.GetUnderlyingType(type);
@@ -308,28 +324,6 @@ namespace EntityWorker.Core.Helper
         }
 
         /// <summary>
-        /// Convert System Type to SqlType
-        /// </summary>
-        /// <param name="type"></param>
-        /// <param name="dbType"></param>
-        /// <returns></returns>
-        public static List<string> GetDbTypeListByType(this Type type, DataBaseTypes dbType)
-        {
-            if (type.GetTypeInfo().IsEnum)
-                type = typeof(long);
-
-            if (Nullable.GetUnderlyingType(type) != null)
-                type = Nullable.GetUnderlyingType(type);
-            if (dbType == DataBaseTypes.Mssql)
-                return DbMsSqlMapper.ContainsKey(type) ? DbMsSqlMapper[type] : null;
-            else if (dbType == DataBaseTypes.Sqllight)
-                return DbSQLiteMapper.ContainsKey(type) ? DbSQLiteMapper[type] : null;
-            else return DbPostGresqlMapper.ContainsKey(type) ? DbPostGresqlMapper[type] : null;
-        }
-
-
-
-        /// <summary>
         /// if date is between two dates
         /// </summary>
         /// <param name="input"></param>
@@ -354,9 +348,11 @@ namespace EntityWorker.Core.Helper
             return CachedPropertyNames.GetOrAdd(prop, (new Regex("[^a-zA-Z0-9,_]").Replace(prop.GetCustomAttribute<PropertyName>()?.Name ?? prop.Name, "_")));
         }
 
-
-
-
+        /// <summary>
+        /// Type is numeric eg long, decimal or float
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static bool IsNumeric(this Type type)
         {
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
@@ -376,13 +372,21 @@ namespace EntityWorker.Core.Helper
             return CachedPrimaryKeys.GetOrAdd(type, DeepCloner.GetFastDeepClonerProperties(type).FirstOrDefault(x => x.ContainAttribute<PrimaryKey>()));
         }
 
-
-
+        /// <summary>
+        /// The value of attribute Table
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public static String TableName<T>()
         {
             return typeof(T).TableName();
         }
 
+        /// <summary>
+        /// The value of attribute Table
+        /// </summary>
+        /// <typeparam name="type"></typeparam>
+        /// <returns></returns>
         public static String TableName(this Type type)
         {
             if (CachedTableNames.ContainsKey(type))
@@ -547,7 +551,6 @@ namespace EntityWorker.Core.Helper
                         propTree = string.Join(".", propTree.Split('.').Skip(2));
                     tempList.Add(propTree.TrimStart('.'));
                 }
-
 
                 if (!onlyLast)
                     result.AddRange(tempList);

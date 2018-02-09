@@ -5,6 +5,9 @@ using EntityWorker.Core.Object.Library;
 
 namespace EntityWorker.Core.Interface
 {
+    /// <summary>
+    /// Interface for Migrationconfig
+    /// </summary>
     public interface IMigrationConfig
     {
         /// <summary>

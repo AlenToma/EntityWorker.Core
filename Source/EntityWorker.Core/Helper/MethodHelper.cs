@@ -123,8 +123,6 @@ namespace EntityWorker.Core.Helper
                 i++;
             }
 
-
-
             sql = sql.CleanValidSqlName(repository.DataBaseTypes);
             DbCommand cmd = null;
             if (repository.DataBaseTypes == DataBaseTypes.Mssql)

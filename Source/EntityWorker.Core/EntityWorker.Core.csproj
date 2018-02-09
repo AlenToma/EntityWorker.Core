@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.0;netstandard2.0;net451;</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.0;netstandard2.0;net451</TargetFrameworks>
     <PackageId>EntityWorker.Core</PackageId>
     <AssemblyName>EntityWorker.Core</AssemblyName>
     <AssemblyVersion>1.0.4.9</AssemblyVersion>

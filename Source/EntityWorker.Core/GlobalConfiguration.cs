@@ -4,6 +4,7 @@ using System.Globalization;
 namespace EntityWorker.Core
 {
     /// <summary>
+    /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/GlobalConfiguration.md
     /// Set this in Application_Start
     /// </summary>
     public static class GlobalConfiguration

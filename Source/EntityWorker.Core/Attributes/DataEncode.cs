@@ -4,6 +4,7 @@ using System;
 namespace EntityWorker.Core.Attributes
 {
     /// <summary>
+    /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
     /// Choose to Encode the data in the database so none could read or decript it without knowing the key
     /// LinqToSql will also Encode the value when you select a Search
     /// <Example>

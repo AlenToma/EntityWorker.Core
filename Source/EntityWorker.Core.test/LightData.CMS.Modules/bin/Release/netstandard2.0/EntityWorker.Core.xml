@@ -6,6 +6,7 @@
     <members>
         <member name="T:EntityWorker.Core.Attributes.DataEncode">
             <summary>
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
             Choose to Encode the data in the database so none could read or decript it without knowing the key
             LinqToSql will also Encode the value when you select a Search
             <Example>
@@ -25,6 +26,7 @@
         </member>
         <member name="T:EntityWorker.Core.Attributes.DefaultOnEmpty">
             <summary>
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
             Assign Default Value when Property is null
             </summary>
         </member>
@@ -36,12 +38,14 @@
         </member>
         <member name="T:EntityWorker.Core.Attributes.ExcludeFromAbstract">
             <summary>
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
             This indicates that the prop will not be saved to the database.
             </summary>
         </member>
         <member name="T:EntityWorker.Core.Attributes.ForeignKey">
             <inheritdoc />
             <summary>
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
             Property is a ForeignKey in the database.
             </summary>
         </member>
@@ -65,11 +69,13 @@
         <member name="T:EntityWorker.Core.Attributes.IndependentData">
             <inheritdoc />
             <summary>
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
             This attr will tell LightDataTable abstract to not auto Delete this object when deleting parent, it will however try to create new or update  
             </summary>
         </member>
         <member name="T:EntityWorker.Core.Attributes.NotNullable">
             <summary>
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
             This attribute is most used on properties with type string
             in-case we don't want them to be null able
             </summary>
@@ -77,6 +83,7 @@
         <member name="T:EntityWorker.Core.Attributes.PrimaryKey">
             <inheritdoc />
             <summary>
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
             </summary>
         </member>
         <member name="M:EntityWorker.Core.Attributes.PrimaryKey.#ctor(System.Boolean)">
@@ -89,7 +96,13 @@
         </member>
         <member name="T:EntityWorker.Core.Attributes.PropertyName">
             <summary>
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
             Have diffrent Name for the property in the database
+            </summary>
+        </member>
+        <member name="T:EntityWorker.Core.Attributes.Rule">
+            <summary>
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
             </summary>
         </member>
         <member name="M:EntityWorker.Core.Attributes.Rule.#ctor(System.Type)">
@@ -103,18 +116,21 @@
         </member>
         <member name="T:EntityWorker.Core.Attributes.Stringify">
             <summary>
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
             Save the property as string in the database
             mostly used when we don't want an enum to be saved as integer in the database
             </summary>
         </member>
         <member name="T:EntityWorker.Core.Attributes.Table">
             <summary>
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
             Define diffrent name for the table
             </summary>
         </member>
         <member name="T:EntityWorker.Core.Attributes.ToBase64String">
             <inheritdoc />
             <summary>
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
             Will be saved to the database as base64string 
             and converted back to its original string when its read
             </summary>
@@ -271,6 +287,7 @@
         </member>
         <member name="T:EntityWorker.Core.GlobalConfiguration">
             <summary>
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/GlobalConfiguration.md
             Set this in Application_Start
             </summary>
         </member>
@@ -299,6 +316,15 @@
             <summary>
             UseFull Extension, that work with EntityWorker.Core
             </summary>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.Extension.GetMemberName``2(System.Linq.Expressions.Expression{System.Func{``0,``1}})">
+            <summary>
+            Get PropertyName of the expression
+            </summary>
+            <typeparam name="T"></typeparam>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Helper.Extension.ClearAllIdsHierarchy``1(``0,System.Boolean)">
             <summary>
@@ -342,6 +368,16 @@
             <param name="insertLastIfNotFound">insert after a specific string, count is from last</param>
             <returns></returns>
         </member>
+        <member name="M:EntityWorker.Core.Helper.Extension.InsertBefore(System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Try to insert 
+            </summary>
+            <param name="str"></param>
+            <param name="text"></param>
+            <param name="identifier"></param>
+            <param name="insertLastIfNotFound"></param>
+            <returns></returns>
+        </member>
         <member name="M:EntityWorker.Core.Helper.Extension.EntityKey(System.Object)">
             <summary>
             Generate an entityKey Primary Id cant be null or empty
@@ -373,14 +409,6 @@
             <param name="dbType"></param>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.Helper.Extension.GetDbTypeListByType(System.Type,EntityWorker.Core.Helper.DataBaseTypes)">
-            <summary>
-            Convert System Type to SqlType
-            </summary>
-            <param name="type"></param>
-            <param name="dbType"></param>
-            <returns></returns>
-        </member>
         <member name="M:EntityWorker.Core.Helper.Extension.Between(System.DateTime,System.DateTime,System.DateTime)">
             <summary>
             if date is between two dates
@@ -397,11 +425,32 @@
             <param name="prop"></param>
             <returns></returns>
         </member>
+        <member name="M:EntityWorker.Core.Helper.Extension.IsNumeric(System.Type)">
+            <summary>
+            Type is numeric eg long, decimal or float
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
         <member name="M:EntityWorker.Core.Helper.Extension.GetPrimaryKey(System.Type)">
             <summary>
             Get the Primary key from type
             </summary>
             <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.Extension.TableName``1">
+            <summary>
+            The value of attribute Table
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.Extension.TableName(System.Type)">
+            <summary>
+            The value of attribute Table
+            </summary>
+            <typeparam name="type"></typeparam>
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Helper.Extension.GetPrimaryKey(System.Object)">
@@ -525,6 +574,13 @@
             </summary>
             <param name="stringToDecode"></param>
             <returns></returns>
+        </member>
+        <member name="T:EntityWorker.Core.Interface.IDbRuleTrigger`1">
+            <summary>
+            Interface for Entity Rules
+            read https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/modules.md for more information
+            </summary>
+            <typeparam name="T"></typeparam>
         </member>
         <member name="M:EntityWorker.Core.Interface.IDbRuleTrigger`1.BeforeSave(EntityWorker.Core.InterFace.IRepository,`0)">
             <summary>
@@ -708,6 +764,11 @@
             </summary>
             <param name="repository"></param>
         </member>
+        <member name="T:EntityWorker.Core.Interface.IMigrationConfig">
+            <summary>
+            Interface for Migrationconfig
+            </summary>
+        </member>
         <member name="M:EntityWorker.Core.Interface.IMigrationConfig.GetMigrations(EntityWorker.Core.InterFace.IRepository)">
             <summary>
             All available Migrations to be executed
@@ -729,6 +790,13 @@
             </summary>
             <typeparam name="T"></typeparam>
             <returns></returns>
+        </member>
+        <member name="T:EntityWorker.Core.Interface.IObjectMapps`1">
+            <summary>
+            Entity Configration
+            Here we could configrate and set all primary keys and Foreign keys for properties
+            </summary>
+            <typeparam name="T"></typeparam>
         </member>
         <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.TableName(System.String)">
             <summary>
@@ -1556,6 +1624,7 @@
         <member name="T:EntityWorker.Core.Object.Library.Modules.ModuleBuilder">
             <summary>
             Configrate you class here, add forgenKeys or Primary Keys so on.
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Repository.md
             </summary>
         </member>
         <member name="P:EntityWorker.Core.Object.Library.Modules.ModuleBuilder.DataBaseType">
@@ -1572,7 +1641,9 @@
         </member>
         <member name="T:EntityWorker.Core.Object.Library.Modules.ObjectMapps`1">
             <summary>
-            Object Configration
+            Entity Configration
+            Here we could configrate and set all primary keys and Foreign keys for properties
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Repository.md
             </summary>
             <typeparam name="T"></typeparam>
         </member>
@@ -10065,6 +10136,7 @@
         </member>
         <member name="T:EntityWorker.Core.Transaction.Transaction">
             <summary>
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Repository.md
             EntityWorker.Core Repository
             </summary>
         </member>
