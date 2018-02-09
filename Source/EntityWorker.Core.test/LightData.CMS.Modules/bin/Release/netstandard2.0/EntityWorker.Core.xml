@@ -10102,9 +10102,9 @@
             </summary>
             <param name="moduleBuilder"></param>
         </member>
-        <member name="M:EntityWorker.Core.Transaction.Transaction.InitiolizeMigration(System.Reflection.Assembly)">
+        <member name="M:EntityWorker.Core.Transaction.Transaction.InitializeMigration(System.Reflection.Assembly)">
             <summary>
-            Initiolize the migration
+            Initialize the migration
             </summary>
         </member>
         <member name="M:EntityWorker.Core.Transaction.Transaction.GetCodeLatestChanges(System.Reflection.Assembly)">

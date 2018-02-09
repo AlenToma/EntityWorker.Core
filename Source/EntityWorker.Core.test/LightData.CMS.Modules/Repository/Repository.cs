@@ -29,7 +29,7 @@ namespace LightData.CMS.Modules.Repository
                 latestChanges.Execute(true);
 
             // Start the migration
-            InitiolizeMigration();
+            InitializeMigration();
             base.OnModuleStart();
         }
 
@@ -44,6 +44,7 @@ namespace LightData.CMS.Modules.Repository
                 .HasIndependentData(x => x.Role)
                 .HasForeignKey<Person, Guid>(x => x.PersonId)
                 .HasRule<UserRule>();
+
             base.OnModuleConfiguration(moduleBuilder);
         }
 

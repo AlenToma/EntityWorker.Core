@@ -117,9 +117,9 @@ namespace EntityWorker.Core.Transaction
         }
 
         /// <summary>
-        /// Initiolize the migration
+        /// Initialize the migration
         /// </summary>
-        protected void InitiolizeMigration(Assembly assembly = null)
+        protected void InitializeMigration(Assembly assembly = null)
         {
             lock (MigrationLocker)
             {

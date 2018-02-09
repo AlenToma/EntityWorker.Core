@@ -8,7 +8,7 @@ namespace LightData.CMS.Modules.Rules
     {
         public void AfterSave(IRepository repository, User itemDbEntity, object objectId)
         {
-            itemDbEntity.UserName = "jdjdjdj";
+
         }
 
         public void BeforeSave(IRepository repository, User itemDbEntity)

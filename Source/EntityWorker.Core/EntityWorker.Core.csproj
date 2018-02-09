@@ -3,9 +3,9 @@
     <TargetFrameworks>netcoreapp2.0;netstandard2.0;net451;</TargetFrameworks>
     <PackageId>EntityWorker.Core</PackageId>
     <AssemblyName>EntityWorker.Core</AssemblyName>
-    <AssemblyVersion>1.0.4.7</AssemblyVersion>
-    <FileVersion>1.0.4.7</FileVersion>
-    <Version>1.4.7</Version>
+    <AssemblyVersion>1.0.4.9</AssemblyVersion>
+    <FileVersion>1.0.4.9</FileVersion>
+    <Version>1.4.9</Version>
     <Authors>Alen Toma</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageProjectUrl>https://github.com/AlenToma/EntityWorker.Core</PackageProjectUrl>
@@ -19,9 +19,10 @@ And it have support to multiple providers like mssql, sqlite and postgressql</De
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <!--<TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeP2POutput;</TargetsForTfmSpecificBuildOutput>-->
     <!--<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);CustomContentTarget</TargetsForTfmSpecificContentInPackage>-->
-    <PackageReleaseNotes>Implementing OnModuleConfiguration where we could configrate our modules
+    <PackageReleaseNotes>Rename InitiolizeMigration to InitializeMigration
+Implementing OnModuleConfiguration where we could configrate our modules
 Rename Attribute StringFy =&gt; Stringify
-Remove EnabledMigration and adding InitiolizeMigration() method instead, for more info read https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Repository.md</PackageReleaseNotes>
+https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Repository.md</PackageReleaseNotes>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>7.2</LangVersion>
   </PropertyGroup>
