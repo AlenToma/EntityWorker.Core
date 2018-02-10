@@ -16,7 +16,6 @@ EntityWorker.Core has its own Migration methods, so lets see how it works.
             repository.Save(user);
         }
     }
-  }
 
     // now lets create the MigrationConfig Class
     public class MigrationConfig : IMigrationConfig
@@ -31,6 +30,6 @@ EntityWorker.Core has its own Migration methods, so lets see how it works.
             // all already executed migrations that do exist in the database will be ignored
             return new List<Migration>(){new IniMigration()};
         }
-    }
+     }
 
 ```
