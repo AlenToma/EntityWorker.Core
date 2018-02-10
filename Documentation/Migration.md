@@ -22,7 +22,7 @@ EntityWorker.Core has its own Migration methods, so lets see how it works.
     {
         /// <summary>
         /// All available Migrations to be executed.
-        /// trigget this class by InitializeMigration() in OnModuleStart
+        /// trigger this class by InitializeMigration() in OnModuleStart
         /// </summary>
         public IList<Migration> GetMigrations(ICustomRepository repository)
         {
