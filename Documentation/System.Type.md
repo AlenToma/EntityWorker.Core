@@ -15,4 +15,5 @@ Any of those types could be nullable
 * System.Char
 * System.Double
 * System.byte[]
+* Enum
 
