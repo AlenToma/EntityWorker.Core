@@ -40,6 +40,7 @@
                 .HasPrimaryKey(x => x.Id, false)
                 .NotNullable(x => x.UserName)
                 .HasDataEncode(x => x.UserName)
+                .HasDataEncode(x => x.Password)
                 .HasForeignKey<Role, Guid>(x => x.RoleId)
                 .HasIndependentData(x => x.Role)
                 .HasForeignKey<Person, Guid>(x => x.PersonId)
