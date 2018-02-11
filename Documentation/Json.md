@@ -1,6 +1,7 @@
   ## Json Serializing and deserializing.
   Entityworker.Core has its own json handler. lets se how it work
-   
+  
+  ```csharp
    using (var rep = new Repository())
    {
     var usersJsonString = rep.Get<User>().LoadChildren().Json();
@@ -13,3 +14,4 @@
     users.Save();
     user.SaveChanges()
    }
+   ```
