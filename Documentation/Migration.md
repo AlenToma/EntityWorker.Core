@@ -1,9 +1,10 @@
 ## Migration
 EntityWorker.Core has its own Migration methods, so lets see how it works.
 ```csharp
-   //Create Class and call it IniMigration and inhert from Migration
+   //Create Class and call it IniMigration and inherit from Migration
    public class IniMigration : Migration
-        public override void ExecuteMigration(ICustomRepository repository)
+   {
+        public override void ExecuteMigration(IRepository repository)
         {
             var user = new User()
             {
@@ -15,22 +16,20 @@ EntityWorker.Core has its own Migration methods, so lets see how it works.
             repository.Save(user);
         }
     }
-  }
 
     // now lets create the MigrationConfig Class
     public class MigrationConfig : IMigrationConfig
     {
         /// <summary>
         /// All available Migrations to be executed.
-        // when Migration Is enabled in Transaction.
-        // this class will be triggered at system start.
+        /// trigger this class by InitializeMigration() in OnModuleStart
         /// </summary>
-        public IList<Migration> GetMigrations(ICustomRepository repository)
+        public IList<Migration> GetMigrations(IRepository repository)
         {
             // return all migrations that are to be executetd
             // all already executed migrations that do exist in the database will be ignored
             return new List<Migration>(){new IniMigration()};
         }
-    }
+     }
 
 ```
