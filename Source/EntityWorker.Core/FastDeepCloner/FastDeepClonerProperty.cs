@@ -6,9 +6,9 @@ namespace EntityWorker.Core.FastDeepCloner
 {
     internal class FastDeepClonerProperty : IFastDeepClonerProperty
     {
-        private readonly Func<object, object> _propertyGet;
+        internal readonly Func<object, object> _propertyGet;
 
-        private readonly Action<object, object> _propertySet;
+        internal readonly Action<object, object> _propertySet;
 
         public bool CanRead { get; private set; }
 
@@ -33,7 +33,7 @@ namespace EntityWorker.Core.FastDeepCloner
         internal FastDeepClonerProperty(FieldInfo field)
         {
 
-            CanRead = !(field.IsInitOnly || field.FieldType == typeof(IntPtr));
+            CanRead = !(field.IsInitOnly || field.FieldType == typeof(IntPtr) || field.IsLiteral);
             FastDeepClonerIgnore = field.GetCustomAttribute<FastDeepClonerIgnore>() != null;
             Attributes = new AttributesCollections(field.GetCustomAttributes().ToList());
             _propertyGet = field.GetValue;
@@ -46,7 +46,7 @@ namespace EntityWorker.Core.FastDeepCloner
 
         internal FastDeepClonerProperty(PropertyInfo property)
         {
-            CanRead = !(!property.CanWrite || !property.CanRead || property.PropertyType == typeof(IntPtr));
+            CanRead = !(!property.CanWrite || !property.CanRead || property.PropertyType == typeof(IntPtr) || property.GetIndexParameters().Length > 0);
             FastDeepClonerIgnore = property.GetCustomAttribute<FastDeepClonerIgnore>() != null;
             _propertyGet = property.GetValue;
             _propertySet = property.SetValue;

@@ -26,6 +26,15 @@ namespace EntityWorker.Core.Interface
         IObjectMapps<T> HasRule<Source>();
 
         /// <summary>
+        /// EntityWorker will ignore serializing or derializing all properties that contain this attribute
+        /// </summary>
+        /// <typeparam name="TP"></typeparam>
+        /// <param name="action"></param>
+        /// <param name="autoGenerate"></param>
+        /// <returns></returns>
+        IObjectMapps<T> HasJsonIgnore<TP>(Expression<Func<T, TP>> action);
+
+        /// <summary>
         /// Add Primary Key to Property
         /// </summary>
         /// <typeparam name="TP"></typeparam>

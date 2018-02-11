@@ -11,6 +11,17 @@ namespace EntityWorker.Core.Interface
     /// <typeparam name="T"></typeparam>
     public interface ISqlQueryable<T>
     {
+
+        /// <summary>
+        /// The Expression has already been executed, calling execute will only  return the current list and no db call will be done.
+        /// </summary>
+        bool Executed { get; }
+
+        /// <summary>
+        /// The Expression has already been executed, but you could still load children.
+        /// </summary>
+        bool PartExecuted { get; }
+
         /// <summary>
         /// Result of LightDataTable LinqToSql
         /// </summary>
@@ -164,5 +175,17 @@ namespace EntityWorker.Core.Interface
         /// <typeparam name="TSource"></typeparam>
         /// <returns></returns>
         List<TSource> ExecuteAndConvertToType<TSource>() where TSource : class;
+
+        /// <summary>
+        /// Convert To JSON
+        /// </summary>
+        /// <returns></returns>
+        string Json();
+
+        /// <summary>
+        /// Convert To JSON
+        /// </summary>
+        /// <returns></returns>
+        Task<string> JsonAsync();
     }
 }

@@ -12,6 +12,10 @@ using EntityWorker.Core.Interface;
 using EntityWorker.Core.Object.Library;
 using EntityWorker.Core.FastDeepCloner;
 using System.Text.RegularExpressions;
+using EntityWorker.Core.Object.Library.JSON;
+using System.Threading.Tasks;
+using EntityWorker.Core.InterFace;
+using EntityWorker.Core.SqlQuerys;
 
 namespace EntityWorker.Core.Helper
 {
@@ -85,6 +89,109 @@ namespace EntityWorker.Core.Helper
             if (dbtype == DataBaseTypes.PostgreSql)
                 return col.Replace("[", "").Replace("]", "");
             return col;
+        }
+
+        internal static string CleanName(this string name)
+        {
+            return new Regex("[^a-zA-Z0-9,_]").Replace(name, "_");
+        }
+
+        /// <summary>
+        /// Convert To Json
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns></returns>
+        public static string ToJson(this object o)
+        {
+            return JSON.ToNiceJSON(o);
+        }
+
+        /// <summary>
+        /// generic Json to object
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        public static T FromJson<T>(this string json)
+        {
+            return JSON.ToObject<T>(json);
+        }
+
+        /// <summary>
+        /// generic Json to object
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        internal static T FromJson<T>(this string json, IRepository repository)
+        {
+            var o = JSON.ToObject<T>(json);
+
+
+            void LoadJsonIgnoreProperties(object item)
+            {
+                if (item is IList)
+                {
+                    foreach (var t in (IList)item)
+                        LoadJsonIgnoreProperties(t);
+                    return;
+                }
+
+                var type = item?.GetType().GetActualType();
+                if (type == null)
+                    return;
+                if (!(item?.GetPrimaryKeyValue().ObjectIsNew() ?? true))
+                {
+                    var primaryId = item.GetPrimaryKeyValue();
+                    foreach (var prop in DeepCloner.GetFastDeepClonerProperties(item.GetType()).Where(x => (x.ContainAttribute<JsonIgnore>() || !x.IsInternalType) && !x.ContainAttribute<ExcludeFromAbstract>() && x.CanRead))
+                    {
+                        var value = prop.GetValue(item);
+                        if (prop.PropertyType == typeof(string) && string.IsNullOrEmpty(value?.ToString()))
+                            value = string.Empty;
+                        if (prop.IsInternalType && value == LightDataTableShared.ValueByType(prop.PropertyType)) // Value is default
+                        {
+                            var cmd = repository.GetSqlCommand($"SELECT [{prop.GetPropertyName()}] FROM [{type.TableName()}] WHERE [{item.GetPrimaryKey().GetPropertyName()}] = {Querys.GetValueByType(item.GetPrimaryKeyValue(), repository.DataBaseTypes)}");
+                            var data = repository.ExecuteScalar(cmd);
+                            if (data == null)
+                                continue;
+                            if (prop.ContainAttribute<DataEncode>())
+                                data = new DataCipher(prop.GetCustomAttribute<DataEncode>().Key, prop.GetCustomAttribute<DataEncode>().KeySize).Decrypt(data.ToString());
+                            else if (prop.ContainAttribute<ToBase64String>() && data.ToString().IsBase64String())
+                                data = MethodHelper.DecodeStringFromBase64(data.ToString());
+
+                            prop.SetValue(item, data.ConvertValue(prop.PropertyType));
+                        }
+                        else if (value != null) LoadJsonIgnoreProperties(value);
+                    }
+
+                }
+            }
+
+            LoadJsonIgnoreProperties(o);
+            return o;
+        }
+
+        /// <summary>
+        /// Json to object
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        public static object FromJson(this string json, Type type)
+        {
+            return JSON.ToObject(json, type);
+        }
+
+        /// <summary>
+        /// Json to object
+        /// json must containe the $type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        public static object FromJson(this string json)
+        {
+            return JSON.ToObject(json);
         }
 
         /// <summary>
@@ -243,7 +350,14 @@ namespace EntityWorker.Core.Helper
         /// <returns></returns>
         public static string EntityKey(this object entity) => entity.GetType().FullName + entity.GetPrimaryKeyValue()?.ToString();
 
-
+        /// <summary>
+        /// Search and insert before identifier
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="text"></param>
+        /// <param name="identifier"></param>
+        /// <param name="insertLastIfNotFound"></param>
+        /// <returns></returns>
         public static StringBuilder InsertBefore(this StringBuilder str, string text, string identifier, bool insertLastIfNotFound = true)
         {
             str = new StringBuilder(str.ToString().InsertBefore(text, identifier, insertLastIfNotFound));
@@ -345,7 +459,7 @@ namespace EntityWorker.Core.Helper
             if (CachedPropertyNames.ContainsKey(prop))
                 return CachedPropertyNames[prop];
 
-            return CachedPropertyNames.GetOrAdd(prop, (new Regex("[^a-zA-Z0-9,_]").Replace(prop.GetCustomAttribute<PropertyName>()?.Name ?? prop.Name, "_")));
+            return CachedPropertyNames.GetOrAdd(prop, (prop.GetCustomAttribute<PropertyName>()?.Name ?? prop.Name).CleanName());
         }
 
         /// <summary>
@@ -391,7 +505,7 @@ namespace EntityWorker.Core.Helper
         {
             if (CachedTableNames.ContainsKey(type))
                 return CachedTableNames[type];
-            return CachedTableNames.GetOrAdd(type, (new Regex("[^a-zA-Z0-9,_]").Replace(type.GetCustomAttribute<Table>()?.Name ?? type.Name, "_")));
+            return CachedTableNames.GetOrAdd(type, (type.GetCustomAttribute<Table>()?.Name ?? type.Name).CleanName());
         }
 
         /// <summary>
@@ -411,7 +525,7 @@ namespace EntityWorker.Core.Helper
         /// <returns></returns>
         public static object GetPrimaryKeyValue(this object item)
         {
-            return item.GetPrimaryKey().GetValue(item);
+            return item?.GetPrimaryKey()?.GetValue(item);
         }
 
         /// <summary>
@@ -496,7 +610,7 @@ namespace EntityWorker.Core.Helper
                 return false;
             }
             // Check that the string matches the base64 layout
-            var regex = new System.Text.RegularExpressions.Regex(@"^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)$");
+            var regex = new Regex(@"^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)$");
             return regex.Match(str).Success;
         }
 
@@ -600,6 +714,9 @@ namespace EntityWorker.Core.Helper
 
             if (propertyType == typeof(Guid))
                 return allowDbNull ? typeof(Guid?) : typeof(Guid);
+
+            if (propertyType == typeof(byte))
+                return allowDbNull ? typeof(byte?) : typeof(byte);
 
             return propertyType == typeof(byte[]) ? typeof(byte[]) : typeof(string);
         }

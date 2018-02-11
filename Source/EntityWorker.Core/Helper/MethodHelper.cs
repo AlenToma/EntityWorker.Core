@@ -21,11 +21,11 @@ namespace EntityWorker.Core.Helper
     {
 
         ///// <summary>
-        /////  get All types that containe Property with PrimaryId Attribute
+        /////  Get All types that containe Property with PrimaryId Attribute
         ///// </summary>
         ///// <param name="assembly"></param>
         ///// <returns></returns>
-        public static List<Type> GetDbEntitys(Assembly assembly) => assembly.DefinedTypes.Where(type => type.GetPrimaryKey() != null).Cast<Type>().ToList();
+        public static List<Type> GetDbEntitys(Assembly assembly) => assembly?.DefinedTypes.Where(type => type.GetPrimaryKey() != null).Cast<Type>().ToList();
 
         /// <summary>
         /// Convert Value from Type to Type
@@ -80,13 +80,11 @@ namespace EntityWorker.Core.Helper
             return Encoding.UTF8.GetString(Convert.FromBase64String(stringToDecode));
         }
 
-
+        private static Regex stringExp = new Regex(@"String\[.*?\]|String\[.?\]");
+        private static Regex dateExp = new Regex(@"Date\[.*?\]|Date\[.?\]");
+        private static Regex guidExp = new Regex(@"Guid\[.*?\]|Guid\[.?\]");
         internal static DbCommandExtended ProcessSql(this IRepository repository, IDbConnection connection, IDbTransaction tran, string sql, Type type)
         {
-
-            var stringExp = new Regex(@"String\[.*?\]|String\[.?\]");
-            var dateExp = new Regex(@"Date\[.*?\]|Date\[.?\]");
-            var guidExp = new Regex(@"Guid\[.*?\]|Guid\[.?\]");
             var i = 1;
             var dicCols = new Custom_ValueType<string, Tuple<object, SqlDbType>>();
             MatchCollection matches = null;

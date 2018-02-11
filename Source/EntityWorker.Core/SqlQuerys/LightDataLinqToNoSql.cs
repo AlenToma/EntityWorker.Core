@@ -18,17 +18,17 @@ namespace EntityWorker.Core.SqlQuerys
         private StringBuilder sb;
         private ExpressionType? _overridedNodeType;
         private readonly List<string> _columns;
-        private const string stringyFy = "<Stringify>[#]</Stringify>";
-        private Regex StringyFyExp = new Regex(@"<Stringify>\[.*?\]</Stringify>");
-        private const string boolString = "<bool>[#]</bool>";
-        private Regex BoolExp = new Regex(@"<bool>\[.*?\]</bool>");
+        private static string stringyFy = "<Stringify>[#]</Stringify>";
+        private static Regex StringyFyExp = new Regex(@"<Stringify>\[.*?\]</Stringify>");
+        private static string boolString = "<bool>[#]</bool>";
+        private static Regex BoolExp = new Regex(@"<bool>\[.*?\]</bool>");
 
-        private const string dataEncodeString = "<DataEncode>[#]</DataEncode>";
-        private Regex DataEncodeExp = new Regex(@"<DataEncode>\[.*?\]</DataEncode>");
+        private static string dataEncodeString = "<DataEncode>[#]</DataEncode>";
+        private static Regex DataEncodeExp = new Regex(@"<DataEncode>\[.*?\]</DataEncode>");
         private string _primaryId;
 
-        private static Dictionary<string, Type> SavedTypes = new Dictionary<string, Type>();
-        public Dictionary<string, Tuple<string, string>> JoinClauses { get; private set; } = new Dictionary<string, Tuple<string, string>>();
+        private static Custom_ValueType<string, Type> SavedTypes = new Custom_ValueType<string, Type>();
+        public Custom_ValueType<string, Tuple<string, string>> JoinClauses { get; private set; } = new Custom_ValueType<string, Tuple<string, string>>();
 
         public int Skip { get; set; }
 
@@ -70,16 +70,16 @@ namespace EntityWorker.Core.SqlQuerys
                 WhereClause.RemoveAll(x => string.IsNullOrEmpty(x));
                 var tableName = _obType.TableName();
                 var query = "SELECT distinct " + string.Join(",", _columns) + " FROM " + DataBaseTypes.GetValidSqlName(tableName) + " " + System.Environment.NewLine +
-                       string.Join(System.Environment.NewLine, JoinClauses.Values.Select(x => x.Item2)) +
-                       System.Environment.NewLine + (WhereClause.Any() ? "WHERE " : string.Empty) + string.Join(" AND ", WhereClause.ToArray());
+                       string.Join(Environment.NewLine, JoinClauses.Values.Select(x => x.Item2)) +
+                       Environment.NewLine + (WhereClause.Any() ? "WHERE " : string.Empty) + string.Join(" AND ", WhereClause.ToArray());
                 query = query.TrimEnd(" AND ").TrimEnd(" OR ");
                 if (!string.IsNullOrEmpty(OrderBy))
-                    query += System.Environment.NewLine + "ORDER BY " + OrderBy;
-                else query += System.Environment.NewLine + "ORDER BY 1 ASC";
+                    query += Environment.NewLine + "ORDER BY " + OrderBy;
+                else query += Environment.NewLine + "ORDER BY 1 ASC";
 
                 if (DataBaseTypes == DataBaseTypes.Mssql || DataBaseTypes == DataBaseTypes.PostgreSql)
-                    query += System.Environment.NewLine + "OFFSET " + Skip + System.Environment.NewLine + "ROWS FETCH NEXT " + Take + " ROWS ONLY;";
-                else query += System.Environment.NewLine + "LIMIT  " + Skip + System.Environment.NewLine + "," + Take + ";";
+                    query += Environment.NewLine + "OFFSET " + Skip + Environment.NewLine + "ROWS FETCH NEXT " + Take + " ROWS ONLY;";
+                else query += Environment.NewLine + "LIMIT  " + Skip + Environment.NewLine + "," + Take + ";";
 
                 return query;
             }
@@ -91,13 +91,12 @@ namespace EntityWorker.Core.SqlQuerys
             {
                 if (DataBaseTypes == DataBaseTypes.Mssql)
                 {
-                    var quary = "SELECT TOP (1) * from ( " + Quary.TrimEnd(';') + ") AS [RESULT]";
-                    return quary;
+                    return $"SELECT TOP (1) * from ({Quary.TrimEnd(';') }) AS [RESULT]";
                 }
                 else
                 {
                     if (DataBaseTypes == DataBaseTypes.Sqllight)
-                    return Quary.Substring(0, Quary.LastIndexOf("LIMIT")) + "LIMIT 1";
+                        return Quary.Substring(0, Quary.LastIndexOf("LIMIT")) + "LIMIT 1";
                     else return Quary.Substring(0, Quary.LastIndexOf("OFFSET")) + "LIMIT 1";
                 }
             }
@@ -109,9 +108,9 @@ namespace EntityWorker.Core.SqlQuerys
             {
                 WhereClause.RemoveAll(x => string.IsNullOrEmpty(x));
                 var tableName = _obType.TableName();
-                var query = "SELECT count(distinct " + DataBaseTypes.GetValidSqlName(tableName) + "." + _primaryId + ") as items FROM " + DataBaseTypes.GetValidSqlName(tableName) + " " + System.Environment.NewLine +
-                       string.Join(System.Environment.NewLine, JoinClauses.Values.Select(x => x.Item2)) +
-                       System.Environment.NewLine + (WhereClause.Any() ? "WHERE " : string.Empty) + string.Join(" AND ", WhereClause.ToArray());
+                var query = "SELECT count(distinct " + DataBaseTypes.GetValidSqlName(tableName) + "." + _primaryId + ") as items FROM " + DataBaseTypes.GetValidSqlName(tableName) + " " + Environment.NewLine +
+                       string.Join(Environment.NewLine, JoinClauses.Values.Select(x => x.Item2)) +
+                       Environment.NewLine + (WhereClause.Any() ? "WHERE " : string.Empty) + string.Join(" AND ", WhereClause.ToArray());
                 query = query.TrimEnd(" AND ").TrimEnd(" OR ");
                 return query;
             }
@@ -122,9 +121,9 @@ namespace EntityWorker.Core.SqlQuerys
             get
             {
                 var tableName = _obType.TableName();
-                return " EXISTS (SELECT 1 FROM " + DataBaseTypes.GetValidSqlName(tableName) + " " + System.Environment.NewLine +
-                       string.Join(System.Environment.NewLine, JoinClauses.Values.Select(x => x.Item2)) +
-                       System.Environment.NewLine + "WHERE " + string.Join(" AND ", WhereClause.ToArray()) + ")";
+                return " EXISTS (SELECT 1 FROM " + DataBaseTypes.GetValidSqlName(tableName) + " " + Environment.NewLine +
+                       string.Join(Environment.NewLine, JoinClauses.Values.Select(x => x.Item2)) +
+                       Environment.NewLine + "WHERE " + string.Join(" AND ", WhereClause.ToArray()) + ")";
             }
         }
 
@@ -217,13 +216,13 @@ namespace EntityWorker.Core.SqlQuerys
 
                 var invert = sb.ToString().EndsWith("NOT ");
                 GetInvert();
-                sb.Append("((case when ");
+                sb.Append("((CASE WHEN ");
                 this.Visit(m.Arguments[0]);
                 CleanDecoder("");
-                sb.Append(" IS NULL then 1 else case when ");
+                sb.Append(" IS NULL THEN 1 ELSE CASE WHEN ");
                 this.Visit(m.Arguments[0]);
                 CleanDecoder("");
-                sb.Append(" = String[] then 1 else 0 end end)");
+                sb.Append(" = String[] THEN 1 ELSE 0 END END)");
                 sb.Append(")");
                 sb.Append(boolString.Replace("#", invert ? "0" : "1"));
                 return m;
@@ -236,18 +235,18 @@ namespace EntityWorker.Core.SqlQuerys
                 {
                     var invert = GetInvert();
                     var value = GetSingleValue(m.Arguments[0]);
-                    sb.Append("(case when ");
+                    sb.Append("(CASE WHEN ");
                     this.Visit(m.Object);
-                    InsertBeforeDecoder(" like ");
+                    InsertBeforeDecoder(" LIKE ");
                     var v = string.Format("String[%{0}%]", value);
                     CleanDecoder(v);
-                    sb.Append(" then 1 else 0 end) ");
+                    sb.Append(" THEN 1 ELSE 0 END) ");
                     sb.Append(boolString.Replace("#", !string.IsNullOrEmpty(invert) ? "0" : "1"));
                 }
                 else
                 {
                     var invert = GetInvert();
-                    sb.Append("(case when ");
+                    sb.Append("(CASE WHEN ");
                     this.Visit(m.Arguments[0]);
                     InsertBeforeDecoder(" in (");
                     try
@@ -273,7 +272,7 @@ namespace EntityWorker.Core.SqlQuerys
                     {
                         this.Visit(ex);
                     }
-                    sb.Append(") then 1 else 0 end) ");
+                    sb.Append(") THEN 1 ELSE 0 END) ");
                     sb.Append(boolString.Replace("#", !string.IsNullOrEmpty(invert) ? "0" : "1"));
                 }
                 return m;
@@ -285,12 +284,12 @@ namespace EntityWorker.Core.SqlQuerys
                 {
                     var invert = GetInvert();
                     var value = GetSingleValue(m.Arguments[0]);
-                    sb.Append("(case when ");
+                    sb.Append("(CASE WHEN ");
                     this.Visit(m.Object);
-                    InsertBeforeDecoder(" like ");
+                    InsertBeforeDecoder(" LIKE ");
                     var v = string.Format("String[{0}%]", value);
                     CleanDecoder(v);
-                    sb.Append(" then 1 else 0 end) ");
+                    sb.Append(" THEN 1 ELSE 0 END) ");
                     sb.Append(boolString.Replace("#", !string.IsNullOrEmpty(invert) ? "0" : "1"));
 
                 }
@@ -298,13 +297,13 @@ namespace EntityWorker.Core.SqlQuerys
                 {
 
                     var invert = GetInvert();
-                    sb.Append("(case when ");
+                    sb.Append("(CASE WHEN ");
                     this.Visit(m.Arguments[0]);
-                    InsertBeforeDecoder(" like ");
+                    InsertBeforeDecoder(" LIKE ");
                     var value = (((MemberExpression)m.Object).Member as FieldInfo) != null ? (((MemberExpression)m.Object).Member as FieldInfo)?.GetValue(ex.Value) : (((MemberExpression)m.Object).Member as PropertyInfo)?.GetValue(ex.Value);
                     var v = string.Format("String[{0}%]", value);
                     CleanDecoder(v);
-                    sb.Append(" then 1 else 0 end) ");
+                    sb.Append(" THEN 1 ELSE 0 END) ");
                     sb.Append(boolString.Replace("#", !string.IsNullOrEmpty(invert) ? "0" : "1"));
 
                 }
@@ -318,12 +317,12 @@ namespace EntityWorker.Core.SqlQuerys
                 {
                     var invert = GetInvert();
                     var value = GetSingleValue(m.Arguments[0]);
-                    sb.Append("(case when ");
+                    sb.Append("(CASE WHEN ");
                     this.Visit(m.Object);
-                    InsertBeforeDecoder(" like ");
+                    InsertBeforeDecoder(" LIKE ");
                     var v = string.Format("String[%{0}]", value);
                     CleanDecoder(v);
-                    sb.Append(" then 1 else 0 end) ");
+                    sb.Append(" THEN 1 ELSE 0 END) ");
                     sb.Append(boolString.Replace("#", !string.IsNullOrEmpty(invert) ? "0" : "1"));
 
                 }
@@ -331,13 +330,13 @@ namespace EntityWorker.Core.SqlQuerys
                 {
 
                     var invert = GetInvert();
-                    sb.Append("(case when ");
+                    sb.Append("(CASE WHEN ");
                     this.Visit(m.Arguments[0]);
-                    InsertBeforeDecoder(" like ");
+                    InsertBeforeDecoder(" LIKE ");
                     var value = (((MemberExpression)m.Object).Member as FieldInfo) != null ? (((MemberExpression)m.Object).Member as FieldInfo)?.GetValue(ex.Value) : (((MemberExpression)m.Object).Member as PropertyInfo)?.GetValue(ex.Value);
                     var v = string.Format("String[%{0}]", value);
                     CleanDecoder(v);
-                    sb.Append(" then 1 else 0 end) ");
+                    sb.Append(" THEN 1 ELSE 0 END) ");
                     sb.Append(boolString.Replace("#", !string.IsNullOrEmpty(invert) ? "0" : "1"));
 
                 }
@@ -778,18 +777,18 @@ namespace EntityWorker.Core.SqlQuerys
                     if (prop.PropertyType.IsEnum && prop.ContainAttribute<Stringify>())
                     {
                         if (!SavedTypes.ContainsKey(prop.FullName))
-                            SavedTypes.Add(prop.FullName, prop.PropertyType);
+                            SavedTypes.TryAdd(prop.FullName, prop.PropertyType);
                         columnName += stringyFy.Replace("#", prop.FullName);
                     }
                     if (isNot)
                     {
                         if (!hasValueAttr)
-                            columnName = "(case when " + columnName + " = 0 then 1 else 0 end)" + boolString.Replace("#", "0");
-                        else columnName = "(case when " + columnName + " IS NULL then 1 else 0 end)" + boolString.Replace("#", "0");
+                            columnName = $"(CASE WHEN { columnName } = 0 THEN 1 ELSE 0 END) {boolString.Replace("#", "0")}";
+                        else columnName = $"(CASE WHEN {columnName} IS NULL THEN 1 ELSE 0 END) {boolString.Replace("#", "0")}";
                     }
                     else if (hasValueAttr)
                     {
-                        columnName = "(case when " + columnName + " IS NULL then 0 else 1 end)" + boolString.Replace("#", "1");
+                        columnName = $"(CASE WHEN {columnName} IS NULL THEN 0 ELSE 1 END) {boolString.Replace("#", "1")}";
                     }
                     else if (prop.PropertyType == typeof(bool) || prop.PropertyType == typeof(bool?))
                         columnName = columnName + boolString.Replace("#", "1");
@@ -838,7 +837,7 @@ namespace EntityWorker.Core.SqlQuerys
                     }
                     else
                     {
-                        JoinClauses.Add(key, new Tuple<string, string>(randomTableName, v));
+                        JoinClauses.TryAdd(key, new Tuple<string, string>(randomTableName, v));
                     }
 
 
@@ -866,11 +865,11 @@ namespace EntityWorker.Core.SqlQuerys
                     }
                     else
                     {
-                        throw new NotSupportedException(string.Format("CLASS STRUCTURE IS NOT SUPPORTED MEMBER{0}", m.Member.Name));
+                        throw new NotSupportedException(string.Format("Expression STRUCTURE IS NOT SUPPORTED MEMBER{0} for EntityWorker", m.Member.Name));
                     }
 
                     if (!string.IsNullOrEmpty(v))
-                        JoinClauses.Add(key, new Tuple<string, string>(randomTableName, v));
+                        JoinClauses.TryAdd(key, new Tuple<string, string>(randomTableName, v));
                     return m;
                 }
 

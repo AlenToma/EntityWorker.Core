@@ -130,7 +130,7 @@ namespace EntityWorker.Core.Transaction
                 IMigrationConfig config;
                 if (assembly.DefinedTypes.Any(a => typeof(IMigrationConfig).IsAssignableFrom(a)))
                     config = Activator.CreateInstance(assembly.DefinedTypes.First(a => typeof(IMigrationConfig).IsAssignableFrom(a))) as IMigrationConfig;
-                else throw new Exception("EntityWorker.Core could not find IMigrationConfig in the current Assembly " + assembly.GetName());
+                else throw new Exception($"EntityWorker.Core could not find IMigrationConfig in the current Assembly {assembly.GetName()}");
                 MigrationConfig(config);
             }
         }
@@ -938,6 +938,33 @@ namespace EntityWorker.Core.Transaction
             return new SqlQueryable<T>(null, this);
         }
 
+
+        /// <summary>
+        /// Get ISqlQueryable from Json.
+        /// All JsonIgnore Values will be loaded from the database if a primary key exist and the value is default()  eg null or empty or even 0 for int and decimal
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public ISqlQueryable<T> FromJson<T>(string json)
+        {
+            if (typeof(T).GetPrimaryKey() == null)
+                throw new ArgumentNullException("Primary Id not found for object " + typeof(T).FullName);
+            return new SqlQueryable<T>(this, json.FromJson<List<T>>(this));
+        }
+
+        /// <summary>
+        /// Get ISqlQueryable from Json.
+        /// All JsonIgnore Values will be loaded from the database if a primary key exist
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public async Task<ISqlQueryable<T>> FromJsonAsync<T>(string json)
+        {
+            if (typeof(T).GetPrimaryKey() == null)
+                throw new ArgumentNullException("Primary Id not found for object " + typeof(T).FullName);
+            return await Task.FromResult<ISqlQueryable<T>>(new SqlQueryable<T>(this, json.FromJson<List<T>>(this)));
+        }
+
         /// <summary>
         /// Create IQueryable from Expression
         /// </summary>
@@ -988,8 +1015,6 @@ namespace EntityWorker.Core.Transaction
                 return Select<TResult>(_expression.Quary).First();
             else return (TResult)_dbSchema.Select(expression.Type, _expression.Quary);
         }
-
-
         #endregion
     }
 }

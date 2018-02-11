@@ -18,11 +18,19 @@ namespace EntityWorker.Core.Object.Library
         private readonly Transaction.Transaction _repository;
         private readonly List<string> _ignoreActions = new List<string>();
         private LightDataLinqToNoSql _expression = new LightDataLinqToNoSql(typeof(T));
-        private bool _executed = false;
-        private readonly bool _partExecuted = false;
         private readonly List<Expression<Func<T, object>>> _childrenToLoad = new List<Expression<Func<T, object>>>();
         private bool? _landholderOnlyFirstLevel;
         private readonly List<Expression> _matches = new List<Expression>();
+
+        /// <summary>
+        /// The Expression has already been executed, calling execute will only return the current list and no db call will be done.
+        /// </summary>
+        public bool Executed { get; private set; }
+
+        /// <summary>
+        /// The Expression has already been executed, but you could still load children.
+        /// </summary>
+        public bool PartExecuted { get; private set; }
 
         public IQueryProvider Provider => _repository;
 
@@ -31,11 +39,10 @@ namespace EntityWorker.Core.Object.Library
             _repository = repository;
             if (items == null)
                 return;
-            _partExecuted = true;
+            PartExecuted = true;
             items.RemoveAll(x => x == null);
             base.AddRange(items);
         }
-
 
         internal SqlQueryable(Expression exp, Transaction.Transaction repository)
         {
@@ -43,7 +50,6 @@ namespace EntityWorker.Core.Object.Library
             if (exp != null)
                 _matches.Add(exp);
         }
-
 
         /// <summary>
         /// Result of LightDataTable LinqToSql
@@ -53,7 +59,6 @@ namespace EntityWorker.Core.Object.Library
         public Type ElementType => typeof(T);
 
         public Expression Expression => throw new NotImplementedException();
-
 
         /// <summary>
         /// Add Item
@@ -93,6 +98,7 @@ namespace EntityWorker.Core.Object.Library
 
             return this;
         }
+
         /// <summary>
         /// LoadChildren, will load all children herarkie if onlyFirstLevel is not true
         /// </summary>
@@ -181,7 +187,7 @@ namespace EntityWorker.Core.Object.Library
         /// <returns></returns>
         public async Task<List<T>> ExecuteAsync()
         {
-            if (_executed)
+            if (Executed)
                 return this.ToList<T>();
             else
             {
@@ -191,7 +197,7 @@ namespace EntityWorker.Core.Object.Library
                     _expression.Translate(exp);
 
                 ParsedLinqToSql = _expression.Quary;
-                if (!_partExecuted)
+                if (!PartExecuted)
                     result.AddRange(await _repository.SelectAsync<T>(ParsedLinqToSql));
                 if (_childrenToLoad.Any() || _landholderOnlyFirstLevel.HasValue)
                 {
@@ -202,13 +208,12 @@ namespace EntityWorker.Core.Object.Library
                         else await _repository.LoadChildrenAsync(item, _landholderOnlyFirstLevel.Value, null, _ignoreActions);
                     }
                 }
-                _executed = true;
+                Executed = true;
                 this.AddRange(result);
             }
 
             return this.ToList<T>();
         }
-
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public new IEnumerator<T> GetEnumerator()
@@ -223,7 +228,7 @@ namespace EntityWorker.Core.Object.Library
         /// <returns></returns>
         public List<T> Execute()
         {
-            if (_executed)
+            if (Executed)
                 return this.ToList<T>();
             else
             {
@@ -234,7 +239,7 @@ namespace EntityWorker.Core.Object.Library
                 foreach (var exp in _matches)
                     _expression.Translate(exp);
                 ParsedLinqToSql = _expression.Quary;
-                if (!_partExecuted)
+                if (!PartExecuted)
                     result.AddRange(_repository.Select<T>(ParsedLinqToSql));
                 if (_childrenToLoad.Any() || _landholderOnlyFirstLevel.HasValue)
                 {
@@ -245,7 +250,7 @@ namespace EntityWorker.Core.Object.Library
                         else _repository.LoadChildren(item, _landholderOnlyFirstLevel.Value, null, _ignoreActions);
                     }
                 }
-                _executed = true;
+                Executed = true;
                 this.AddRange(result);
             }
 
@@ -258,7 +263,7 @@ namespace EntityWorker.Core.Object.Library
         /// <returns></returns>
         public T ExecuteFirstOrDefault()
         {
-            if (_executed)
+            if (Executed)
                 return this.ToList<T>().FirstOrDefault();
             else
             {
@@ -267,7 +272,7 @@ namespace EntityWorker.Core.Object.Library
                 foreach (var exp in _matches)
                     _expression.Translate(exp);
                 ParsedLinqToSql = _expression.QuaryFirst;
-                if (!_partExecuted)
+                if (!PartExecuted)
                     result.AddRange(_repository.Select<T>(ParsedLinqToSql));
                 if (_childrenToLoad.Any() || _landholderOnlyFirstLevel.HasValue)
                 {
@@ -278,7 +283,7 @@ namespace EntityWorker.Core.Object.Library
                         else _repository.LoadChildren(item, _landholderOnlyFirstLevel.Value, null, _ignoreActions);
                     }
                 }
-                _executed = true;
+                Executed = true;
                 this.AddRange(result);
             }
             return this.ToList<T>().FirstOrDefault();
@@ -399,6 +404,24 @@ namespace EntityWorker.Core.Object.Library
         public void Dispose()
         {
             _repository?.Dispose();
+        }
+
+        /// <summary>
+        /// Convert To JSON
+        /// </summary>
+        /// <returns></returns>
+        public string Json()
+        {
+            return Execute().ToJson();
+        }
+
+        /// <summary>
+        /// Convert To JSON
+        /// </summary>
+        /// <returns></returns>
+        public async Task<string> JsonAsync()
+        {
+            return await Task.FromResult<string>(Execute().ToJson());
         }
     }
 }

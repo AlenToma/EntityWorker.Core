@@ -16,6 +16,8 @@ namespace ConsoleApp1
             TestSave();
             ExpressionTest();
             Console.ReadLine();
+            Console.Clear();
+            Main(null);
 
         }
 
@@ -193,6 +195,10 @@ namespace ConsoleApp1
             using (var rep = new Repository(DataBaseTypes.PostgreSql))
             {
                 var id = Guid.NewGuid();
+
+                //var json = rep.Get<User>().LoadChildren().Json();
+                //var test = rep.FromJson<User>(json);
+
                 execute(rep.Get<User>().LoadChildren(), "Get All");
                 execute(rep.Get<Person>().Where(x => x.FirstName.Contains("Admin") || !string.IsNullOrEmpty(x.FirstName) || string.IsNullOrEmpty(x.FirstName) == false && x.Id != id), "IsNullOrEmpty");
 
@@ -251,12 +257,7 @@ namespace ConsoleApp1
                 execute(rep.Get<Person>().Where(x => strList.Contains(x.FirstName) || !strList.Contains(x.FirstName)), "EndsWith");
 
                 execute(rep.Get<Person>().Where(x => x.FirstName.StartsWith("a") || !x.FirstName.StartsWith("b") && x.FirstName.StartsWith("b") == false), "StartsWith");
-            }
-
-
-
-            Console.ReadLine();
-            ExpressionTest();
+            }           
         }
 
     }

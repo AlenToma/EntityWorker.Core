@@ -34,7 +34,7 @@ namespace EntityWorker.Core
         }
 
 
-        protected object ValueByType(Type propertyType, object defaultValue = null)
+        internal static object ValueByType(Type propertyType, object defaultValue = null)
         {
             if (defaultValue != null)
             {
@@ -48,6 +48,8 @@ namespace EntityWorker.Core
                 if (typeOne == typeTwo)
                     return defaultValue;
             }
+
+
             if (propertyType == typeof(int?))
                 return new int?();
             if (propertyType == typeof(int))
@@ -98,6 +100,13 @@ namespace EntityWorker.Core
 
             if (propertyType == typeof(Guid))
                 return new Guid();
+
+            if (propertyType == typeof(byte))
+                return new byte();
+
+
+            if (propertyType == typeof(byte?))
+                return new byte?();
 
             if (propertyType == typeof(byte[]))
                 return new byte[0];

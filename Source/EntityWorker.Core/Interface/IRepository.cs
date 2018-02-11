@@ -155,6 +155,22 @@ namespace EntityWorker.Core.InterFace
         ISqlQueryable<T> Get<T>();
 
         /// <summary>
+        /// Get ISqlQueryable from Json.
+        /// All JsonIgnore Values will be loaded from the database if a primary key exist and the value is default()  eg null or empty or even 0 for int and decimal
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        ISqlQueryable<T> FromJson<T>(string json);
+
+        /// <summary>
+        /// Get ISqlQueryable from Json.
+        /// All JsonIgnore Values will be loaded from the database if a primary key exist and the value is default()  eg null or empty or even 0 for int and decimal
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        Task<ISqlQueryable<T>> FromJsonAsync<T>(string json);
+
+        /// <summary>
         /// Get all 
         /// </summary>
         /// <typeparam name="T"></typeparam>
