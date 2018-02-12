@@ -35,7 +35,7 @@ namespace EntityWorker.Core.Interface
         IObjectMapps<T> HasJsonIgnore<TP>(Expression<Func<T, TP>> action);
 
         /// <summary>
-        /// Assign a diffrent database type fot the property
+        /// Assign a diffrent database type for the property
         /// Attibutes Stringify, DataEncode and ToBase64String will override this attribute.
         /// </summary>
         /// <param name="dataType">The database type ex nvarchar(4000)</param>

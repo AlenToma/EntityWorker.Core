@@ -4,6 +4,20 @@
         <name>EntityWorker.Core</name>
     </assembly>
     <members>
+        <member name="T:EntityWorker.Core.Attributes.ColumnType">
+            <summary>
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
+            Assign a diffrent database type fot ht property
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.Attributes.ColumnType.#ctor(System.String,System.Nullable{EntityWorker.Core.Helper.DataBaseTypes})">
+            <summary>
+            Assign a diffrent database type fot the property. 
+            Attibutes Stringify, DataEncode and ToBase64String will override this attribute. 
+            </summary>
+            <param name="dataType">The database type ex nvarchar(4000)</param>
+            <param name="dataBaseTypes">null for all providers</param>
+        </member>
         <member name="T:EntityWorker.Core.Attributes.DataEncode">
             <summary>
             https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
@@ -880,6 +894,15 @@
             <typeparam name="TP"></typeparam>
             <param name="action"></param>
             <param name="autoGenerate"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.HasColumnType``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.String,System.Nullable{EntityWorker.Core.Helper.DataBaseTypes})">
+            <summary>
+            Assign a diffrent database type fot the property
+            Attibutes Stringify, DataEncode and ToBase64String will override this attribute.
+            </summary>
+            <param name="dataType">The database type ex nvarchar(4000)</param>
+            <param name="dataBaseTypes">null for all providers</param>
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.HasPrimaryKey``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
@@ -2035,6 +2058,15 @@
             <param name="action"></param>
             <param name="Source"></param>
             <param name="propertyName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.Modules.ObjectMapps`1.HasColumnType``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.String,System.Nullable{EntityWorker.Core.Helper.DataBaseTypes})">
+            <summary>
+            Assign a diffrent database type fot the property
+            Attibutes Stringify, DataEncode and ToBase64String will override this attribute. 
+            </summary>
+            <param name="dataType">The database type ex nvarchar(4000)</param>
+            <param name="dataBaseTypes">null for all providers</param>
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Object.Library.Modules.ObjectMapps`1.HasDataEncode``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.String,EntityWorker.Core.Helper.DataCipherKeySize)">
