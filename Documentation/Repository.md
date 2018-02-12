@@ -47,6 +47,8 @@
                 .HasRule<UserRule>()
                 .HasJsonIgnore(x=> x.Password);
                 
+                 moduleBuilder.Entity<Person>().
+                 HasColumnType(x => x.FirstName, "varchar(100)");
             base.OnModuleConfiguration(moduleBuilder);
          }
 
