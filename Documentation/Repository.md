@@ -49,6 +49,7 @@
                 
                  moduleBuilder.Entity<Person>()
                  .HasColumnType(x => x.FirstName, "varchar(100)");
+                 
             base.OnModuleConfiguration(moduleBuilder);
          }
 
