@@ -9,7 +9,7 @@ namespace EntityWorker.Core.Interface
     /// Here we could configrate and set all primary keys and Foreign keys for properties
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface IObjectMapps<T>  where T : class
+    public interface IObjectMapps<T> where T : class
     {
         /// <summary>
         /// Assign diffrent name for the object in the database
@@ -33,6 +33,15 @@ namespace EntityWorker.Core.Interface
         /// <param name="autoGenerate"></param>
         /// <returns></returns>
         IObjectMapps<T> HasJsonIgnore<TP>(Expression<Func<T, TP>> action);
+
+        /// <summary>
+        /// Assign a diffrent database type fot the property
+        /// Attibutes Stringify, DataEncode and ToBase64String will override this attribute.
+        /// </summary>
+        /// <param name="dataType">The database type ex nvarchar(4000)</param>
+        /// <param name="dataBaseTypes">null for all providers</param>
+        /// <returns></returns>
+        IObjectMapps<T> HasColumnType<TP>(Expression<Func<T, TP>> action, string dataType, DataBaseTypes? dataBaseTypes = null);
 
         /// <summary>
         /// Add Primary Key to Property
@@ -70,7 +79,7 @@ namespace EntityWorker.Core.Interface
         /// <param name="action"></param>
         /// <returns></returns>
         IObjectMapps<T> HasIndependentData<TP>(Expression<Func<T, TP>> action) where TP : class;
- 
+
         /// <summary>
         /// Add NotNullable for property
         /// </summary>

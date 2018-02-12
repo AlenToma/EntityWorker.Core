@@ -98,6 +98,23 @@ namespace EntityWorker.Core.Object.Library.Modules
         }
 
         /// <summary>
+        /// Assign a diffrent database type fot the property
+        /// Attibutes Stringify, DataEncode and ToBase64String will override this attribute. 
+        /// </summary>
+        /// <param name="dataType">The database type ex nvarchar(4000)</param>
+        /// <param name="dataBaseTypes">null for all providers</param>
+        /// <returns></returns>
+        public IObjectMapps<T> HasColumnType<TP>(Expression<Func<T, TP>> action, string dataType, DataBaseTypes? dataBaseTypes = null)
+        {
+            var prop = FastDeepCloner.DeepCloner.GetProperty(typeof(T), Extension.GetMemberName(action));
+            if (prop == null)
+                throw new Exception($"Could not find Property {Extension.GetMemberName(action)}");
+
+            prop.Attributes.Add(new ColumnType(dataType, dataBaseTypes));
+            return this;
+        }
+
+        /// <summary>
         /// Add DataEncode for property
         /// </summary>
         /// <typeparam name="TP"></typeparam>

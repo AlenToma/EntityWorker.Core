@@ -73,6 +73,12 @@
             This attr will tell LightDataTable abstract to not auto Delete this object when deleting parent, it will however try to create new or update  
             </summary>
         </member>
+        <member name="T:EntityWorker.Core.Attributes.JsonIgnore">
+            <summary>
+            Ignore serialize to json
+            EntityWorker will ignore serializing or derializing all properties that contain this attribute
+            </summary>
+        </member>
         <member name="T:EntityWorker.Core.Attributes.NotNullable">
             <summary>
             https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
@@ -105,12 +111,17 @@
             https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
             </summary>
         </member>
+        <member name="P:EntityWorker.Core.Attributes.Rule.RuleType">
+            <summary>
+            Rule type which implement interface IDbRuleTrigger
+            </summary>
+        </member>
         <member name="M:EntityWorker.Core.Attributes.Rule.#ctor(System.Type)">
             <inheritdoc />
             <summary>
             Define class rule by adding this attribute
             ruleType must inherit from IDbRuleTrigger
-            ex UserRule : IDbRuleTrigger<User/>
+            ex UserRule : IDbRuleTrigger<User/> which mean that this rule belonging to User
             </summary>
             <param name="ruleType"></param>
         </member>
@@ -317,6 +328,46 @@
             UseFull Extension, that work with EntityWorker.Core
             </summary>
         </member>
+        <member name="M:EntityWorker.Core.Helper.Extension.ToJson(System.Object)">
+            <summary>
+            Convert To Json
+            </summary>
+            <param name="o"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.Extension.FromJson``1(System.String)">
+            <summary>
+            generic Json to object
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="json"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.Extension.FromJson``1(System.String,EntityWorker.Core.InterFace.IRepository)">
+            <summary>
+            generic Json to object
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="json"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.Extension.FromJson(System.String,System.Type)">
+            <summary>
+            Json to object
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="json"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.Extension.FromJson(System.String)">
+            <summary>
+            Json to object
+            json must containe the $type
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="json"></param>
+            <returns></returns>
+        </member>
         <member name="M:EntityWorker.Core.Helper.Extension.GetMemberName``2(System.Linq.Expressions.Expression{System.Func{``0,``1}})">
             <summary>
             Get PropertyName of the expression
@@ -383,6 +434,16 @@
             Generate an entityKey Primary Id cant be null or empty
             </summary>
             <param name="entity"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.Extension.InsertBefore(System.Text.StringBuilder,System.String,System.String,System.Boolean)">
+            <summary>
+            Search and insert before identifier
+            </summary>
+            <param name="str"></param>
+            <param name="text"></param>
+            <param name="identifier"></param>
+            <param name="insertLastIfNotFound"></param>
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Helper.Extension.GetDbTypeByType(System.Type,EntityWorker.Core.Helper.DataBaseTypes)">
@@ -812,6 +873,15 @@
             <typeparam name="Source">Must implement interface IDbRuleTrigger</typeparam>
             <returns></returns>
         </member>
+        <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.HasJsonIgnore``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+            EntityWorker will ignore serializing or derializing all properties that contain this attribute
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <param name="autoGenerate"></param>
+            <returns></returns>
+        </member>
         <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.HasPrimaryKey``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
             <summary>
             Add Primary Key to Property
@@ -905,6 +975,16 @@
             quaryProvider for EntityWorker.Core
             </summary>
             <typeparam name="T"></typeparam>
+        </member>
+        <member name="P:EntityWorker.Core.Interface.ISqlQueryable`1.Executed">
+            <summary>
+            The Expression has already been executed, calling execute will only  return the current list and no db call will be done.
+            </summary>
+        </member>
+        <member name="P:EntityWorker.Core.Interface.ISqlQueryable`1.PartExecuted">
+            <summary>
+            The Expression has already been executed, but you could still load children.
+            </summary>
         </member>
         <member name="P:EntityWorker.Core.Interface.ISqlQueryable`1.ParsedLinqToSql">
             <summary>
@@ -1059,6 +1139,18 @@
             <typeparam name="TSource"></typeparam>
             <returns></returns>
         </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.Json">
+            <summary>
+            Convert To JSON
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.JsonAsync">
+            <summary>
+            Convert To JSON
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:EntityWorker.Core.InterFace.IRepository">
             <summary>
             EntityWorker.Core Repository
@@ -1188,6 +1280,22 @@
         <member name="M:EntityWorker.Core.InterFace.IRepository.Get``1">
             <summary>
             Get Entity 
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.FromJson``1(System.String)">
+            <summary>
+            Get ISqlQueryable from Json.
+            All JsonIgnore Values will be loaded from the database if a primary key exist and the value is default()  eg null or empty or even 0 for int and decimal
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.FromJsonAsync``1(System.String)">
+            <summary>
+            Get ISqlQueryable from Json.
+            All JsonIgnore Values will be loaded from the database if a primary key exist and the value is default()  eg null or empty or even 0 for int and decimal
             </summary>
             <typeparam name="T"></typeparam>
             <returns></returns>
@@ -1601,6 +1709,246 @@
             Set This for faster reading of sql
             </summary>
         </member>
+        <member name="F:EntityWorker.Core.Object.Library.JSON.JSONParameters.UseOptimizedDatasetSchema">
+            <summary>
+            Use the optimized fast Dataset Schema format (default = True)
+            </summary>
+        </member>
+        <member name="F:EntityWorker.Core.Object.Library.JSON.JSONParameters.UseFastGuid">
+            <summary>
+            Use the fast GUID format (default = True)
+            </summary>
+        </member>
+        <member name="F:EntityWorker.Core.Object.Library.JSON.JSONParameters.SerializeNullValues">
+            <summary>
+            Serialize null values to the output (default = True)
+            </summary>
+        </member>
+        <member name="F:EntityWorker.Core.Object.Library.JSON.JSONParameters.UseUTCDateTime">
+            <summary>
+            Use the UTC date format (default = True)
+            </summary>
+        </member>
+        <member name="F:EntityWorker.Core.Object.Library.JSON.JSONParameters.ShowReadOnlyProperties">
+            <summary>
+            Show the readonly properties of types in the output (default = False)
+            </summary>
+        </member>
+        <member name="F:EntityWorker.Core.Object.Library.JSON.JSONParameters.UsingGlobalTypes">
+            <summary>
+            Use the $types extension to optimise the output json (default = True)
+            </summary>
+        </member>
+        <member name="F:EntityWorker.Core.Object.Library.JSON.JSONParameters.IgnoreCaseOnDeserialize">
+            <summary>
+            Ignore case when processing json and deserializing 
+            </summary>
+        </member>
+        <member name="F:EntityWorker.Core.Object.Library.JSON.JSONParameters.EnableAnonymousTypes">
+            <summary>
+            Anonymous types have read only properties 
+            </summary>
+        </member>
+        <member name="F:EntityWorker.Core.Object.Library.JSON.JSONParameters.UseExtensions">
+            <summary>
+            Enable fastJSON extensions $types, $type, $map (default = True)
+            </summary>
+        </member>
+        <member name="F:EntityWorker.Core.Object.Library.JSON.JSONParameters.UseEscapedUnicode">
+            <summary>
+            Use escaped unicode i.e. \uXXXX format for non ASCII characters (default = True)
+            </summary>
+        </member>
+        <member name="F:EntityWorker.Core.Object.Library.JSON.JSONParameters.KVStyleStringDictionary">
+            <summary>
+            Output string key dictionaries as "k"/"v" format (default = False) 
+            </summary>
+        </member>
+        <member name="F:EntityWorker.Core.Object.Library.JSON.JSONParameters.UseValuesOfEnums">
+            <summary>
+            Output Enum values instead of names (default = False)
+            </summary>
+        </member>
+        <member name="F:EntityWorker.Core.Object.Library.JSON.JSONParameters.ParametricConstructorOverride">
+            <summary>
+            If you have parametric and no default constructor for you classes (default = False)
+            
+            IMPORTANT NOTE : If True then all initial values within the class will be ignored and will be not set
+            </summary>
+        </member>
+        <member name="F:EntityWorker.Core.Object.Library.JSON.JSONParameters.DateTimeMilliseconds">
+            <summary>
+            Serialize DateTime milliseconds i.e. yyyy-MM-dd HH:mm:ss.nnn (default = false)
+            </summary>
+        </member>
+        <member name="F:EntityWorker.Core.Object.Library.JSON.JSONParameters.SerializerMaxDepth">
+            <summary>
+            Maximum depth for circular references in inline mode (default = 20)
+            </summary>
+        </member>
+        <member name="F:EntityWorker.Core.Object.Library.JSON.JSONParameters.InlineCircularReferences">
+            <summary>
+            Inline circular or already seen objects instead of replacement with $i (default = False) 
+            </summary>
+        </member>
+        <member name="F:EntityWorker.Core.Object.Library.JSON.JSONParameters.SerializeToLowerCaseNames">
+            <summary>
+            Save property/field names as lowercase (default = false)
+            </summary>
+        </member>
+        <member name="F:EntityWorker.Core.Object.Library.JSON.JSONParameters.FormatterIndentSpaces">
+            <summary>
+            Formatter indent spaces (default = 3)
+            </summary>
+        </member>
+        <member name="F:EntityWorker.Core.Object.Library.JSON.JSON.Parameters">
+            <summary>
+            Globally set-able parameters for controlling the serializer
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.JSON.JSON.ToNiceJSON(System.Object)">
+            <summary>
+            Create a formatted json string (beautified) from an object
+            </summary>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.JSON.JSON.ToNiceJSON(System.Object,EntityWorker.Core.Object.Library.JSON.JSONParameters)">
+            <summary>
+            Create a formatted json string (beautified) from an object
+            </summary>
+            <param name="obj"></param>
+            <param name="param"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.JSON.JSON.ToJSON(System.Object)">
+            <summary>
+            Create a json representation for an object
+            </summary>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.JSON.JSON.ToJSON(System.Object,EntityWorker.Core.Object.Library.JSON.JSONParameters)">
+            <summary>
+            Create a json representation for an object with parameter override on this call
+            </summary>
+            <param name="obj"></param>
+            <param name="param"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.JSON.JSON.Parse(System.String)">
+            <summary>
+            Parse a json string and generate a Dictionary&lt;string,object&gt; or List&lt;object&gt; structure
+            </summary>
+            <param name="json"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.JSON.JSON.ToObject``1(System.String)">
+            <summary>
+            Create a typed generic object from the json
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="json"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.JSON.JSON.ToObject``1(System.String,EntityWorker.Core.Object.Library.JSON.JSONParameters)">
+            <summary>
+            Create a typed generic object from the json with parameter override on this call
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="json"></param>
+            <param name="param"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.JSON.JSON.ToObject(System.String)">
+            <summary>
+            Create an object from the json
+            </summary>
+            <param name="json"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.JSON.JSON.ToObject(System.String,EntityWorker.Core.Object.Library.JSON.JSONParameters)">
+            <summary>
+            Create an object from the json with parameter override on this call
+            </summary>
+            <param name="json"></param>
+            <param name="param"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.JSON.JSON.ToObject(System.String,System.Type)">
+            <summary>
+            Create an object of type from the json
+            </summary>
+            <param name="json"></param>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.JSON.JSON.ToObject(System.String,System.Type,EntityWorker.Core.Object.Library.JSON.JSONParameters)">
+            <summary>
+            Create an object of type from the json with parameter override on this call
+            </summary>
+            <param name="json"></param>
+            <param name="type"></param>
+            <param name="par"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.JSON.JSON.FillObject(System.Object,System.String)">
+            <summary>
+            Fill a given object with the json represenation
+            </summary>
+            <param name="input"></param>
+            <param name="json"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.JSON.JSON.DeepCopy(System.Object)">
+            <summary>
+            Deep copy an object i.e. clone to a new object
+            </summary>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.JSON.JSON.DeepCopy``1(``0)">
+            <summary>
+            
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.JSON.JSON.Beautify(System.String)">
+            <summary>
+            Create a human readable string from the json 
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.JSON.JSON.Beautify(System.String,System.Byte)">
+            <summary>
+            Create a human readable string from the json with specified indent spaces
+            </summary>
+            <param name="input"></param>
+            <param name="spaces"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.JSON.JSON.RegisterCustomType(System.Type,EntityWorker.Core.Object.Library.JSON.Serialize,EntityWorker.Core.Object.Library.JSON.Deserialize)">
+            <summary>
+            Register custom type handlers for your own types not natively handled by fastJSON
+            </summary>
+            <param name="type"></param>
+            <param name="serializer"></param>
+            <param name="deserializer"></param>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.JSON.JSON.ClearReflectionCache">
+            <summary>
+            Clear the internal reflection cache so you can start from new (you will loose performance)
+            </summary>
+        </member>
+        <member name="T:EntityWorker.Core.Object.Library.JSON.JsonParser">
+            <summary>
+            This class encodes and decodes JSON strings.
+            Spec. details, see http://www.json.org/
+            </summary>
+        </member>
         <member name="T:EntityWorker.Core.Object.Library.Migration">
             <inheritdoc />
         </member>
@@ -1659,6 +2007,15 @@
             Assign a rule to object
             </summary>
             <typeparam name="Source">Must implement interface IDbRuleTrigger</typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.Modules.ObjectMapps`1.HasJsonIgnore``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+            EntityWorker will ignore serializing or derializing all properties that contain this attribute
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <param name="autoGenerate"></param>
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Object.Library.Modules.ObjectMapps`1.HasPrimaryKey``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
@@ -1754,6 +2111,16 @@
             quaryProvider for EntityWorker.Core
             </summary>
             <typeparam name="T"></typeparam>
+        </member>
+        <member name="P:EntityWorker.Core.Object.Library.SqlQueryable`1.Executed">
+            <summary>
+            The Expression has already been executed, calling execute will only return the current list and no db call will be done.
+            </summary>
+        </member>
+        <member name="P:EntityWorker.Core.Object.Library.SqlQueryable`1.PartExecuted">
+            <summary>
+            The Expression has already been executed, but you could still load children.
+            </summary>
         </member>
         <member name="P:EntityWorker.Core.Object.Library.SqlQueryable`1.ParsedLinqToSql">
             <summary>
@@ -1912,6 +2279,18 @@
             <summary>
             Dispose the repository
             </summary>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.Json">
+            <summary>
+            Convert To JSON
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.JsonAsync">
+            <summary>
+            Convert To JSON
+            </summary>
+            <returns></returns>
         </member>
         <member name="T:EntityWorker.Core.Postgres.BackendMessages.CopyDataMessage">
             <summary>
@@ -10489,6 +10868,22 @@
         <member name="M:EntityWorker.Core.Transaction.Transaction.Get``1">
             <summary>
             Generic Get Quary
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.FromJson``1(System.String)">
+            <summary>
+            Get ISqlQueryable from Json.
+            All JsonIgnore Values will be loaded from the database if a primary key exist and the value is default()  eg null or empty or even 0 for int and decimal
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.FromJsonAsync``1(System.String)">
+            <summary>
+            Get ISqlQueryable from Json.
+            All JsonIgnore Values will be loaded from the database if a primary key exist
             </summary>
             <typeparam name="T"></typeparam>
             <returns></returns>

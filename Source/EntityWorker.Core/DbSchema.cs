@@ -49,9 +49,7 @@ namespace EntityWorker.Core
                     : "SELECT name as column_name, type as data_type  FROM pragma_table_info(String[" + table + "]);");
                 var data = _repository.GetLightDataTable(cmd, "column_name");
                 if (data.Rows.Any())
-                {
                     return CachedObjectColumn.GetOrAdd(key, data);
-                }
                 else return data;
             }
             catch (NpgsqlException)
@@ -59,7 +57,6 @@ namespace EntityWorker.Core
                 _repository.Renew();
                 return ObjectColumns(type);
             }
-
         }
 
         public bool IsValidName(string column)
@@ -74,9 +71,6 @@ namespace EntityWorker.Core
 
             return true;
         }
-
-
-
 
         /// <summary>
         /// Get all by object
@@ -98,7 +92,6 @@ namespace EntityWorker.Core
             }
             return _repository.DataReaderConverter<T>(_repository.GetSqlCommand(CachedSql[query])).Execute();
         }
-
 
         /// <summary>
         /// Get all by object
@@ -143,7 +136,6 @@ namespace EntityWorker.Core
             return type.GetActualType() != type ? _repository.DataReaderConverter(cmd, type) : _repository.DataReaderConverter(cmd, type).Cast<object>().FirstOrDefault();
         }
 
-
         /// <summary>
         /// Get all by object
         /// PrimaryKey attr must be set
@@ -182,7 +174,6 @@ namespace EntityWorker.Core
             _repository.AddInnerParameter(cmd, "@ID", id, _repository.GetSqlType(id.GetType()));
             return type.GetActualType() != type ? _repository.DataReaderConverter(cmd, type) : _repository.DataReaderConverter(cmd, type).Cast<object>().FirstOrDefault();
         }
-
 
         public T LoadChildren<T>(T item, bool onlyFirstLevel = false, List<string> classes = null, List<string> ignoreList = null, Dictionary<string, List<string>> pathLoaded = null, string parentProb = null, string id = null)
         {
@@ -269,9 +260,7 @@ namespace EntityWorker.Core
 
             return item;
         }
-
         #region Save Methods
-
 
         public void DeleteAbstract(object o)
         {
@@ -374,7 +363,6 @@ namespace EntityWorker.Core
                 Save(o, false);
             }
         }
-
 
         private object Save(object o, bool isIndependentData, bool updateOnly = false)
         {
@@ -554,7 +542,6 @@ namespace EntityWorker.Core
 
         }
         #endregion
-
         #region DataBase Creation Logic
 
         public CodeToDataBaseMergeCollection GetDatabase_Diff(Type tableType, CodeToDataBaseMergeCollection str = null, List<Type> createdTables = null)
@@ -581,7 +568,7 @@ namespace EntityWorker.Core
             if (!table.Rows.Any())
             {
                 codeToDataBaseMerge.Sql = new StringBuilder("CREATE TABLE " + (_repository.DataBaseTypes == DataBaseTypes.Mssql ? "[dbo]." : "") + _repository.DataBaseTypes.GetValidSqlName(tableName) + "(");
-                foreach (var prop in props.Where(x => (x.PropertyType.GetDbTypeByType(_repository.DataBaseTypes) != null || !x.IsInternalType) && !x.ContainAttribute<ExcludeFromAbstract>()).GroupBy(x => x.Name).Select(x => x.First())
+                foreach (var prop in props.Where(x => (x.GetDbTypeByType(_repository.DataBaseTypes) != null || !x.IsInternalType) && !x.ContainAttribute<ExcludeFromAbstract>()).GroupBy(x => x.Name).Select(x => x.First())
                         .OrderBy(x => x.ContainAttribute<PrimaryKey>() ? null : x.Name))
                 {
                     if (!prop.IsInternalType)
@@ -660,7 +647,7 @@ namespace EntityWorker.Core
             }
             else
             {
-                foreach (var prop in props.Where(x => (x.PropertyType.GetDbTypeByType(_repository.DataBaseTypes) != null || !x.IsInternalType) && !x.ContainAttribute<ExcludeFromAbstract>()).GroupBy(x => x.Name).Select(x => x.First())
+                foreach (var prop in props.Where(x => (x.GetDbTypeByType(_repository.DataBaseTypes) != null || !x.IsInternalType) && !x.ContainAttribute<ExcludeFromAbstract>()).GroupBy(x => x.Name).Select(x => x.First())
                 .OrderBy(x => x.ContainAttribute<PrimaryKey>() ? null : x.Name))
                 {
                     if (prop.ContainAttribute<ForeignKey>())
@@ -746,8 +733,6 @@ namespace EntityWorker.Core
             data.Execute(true);
         }
 
-
-
         public void RemoveTable(Type tableType, List<Type> tableRemoved = null, bool remove = true)
         {
 
@@ -811,8 +796,6 @@ namespace EntityWorker.Core
                 }
             }
         }
-
         #endregion
-
     }
 }

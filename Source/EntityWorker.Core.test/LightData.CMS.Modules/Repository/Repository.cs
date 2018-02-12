@@ -40,12 +40,12 @@ namespace LightData.CMS.Modules.Repository
                 .HasPrimaryKey(x => x.Id, false)
                 .NotNullable(x => x.UserName)
                 .HasDataEncode(x => x.UserName)
-                .HasDataEncode(x=> x.Password)
+                .HasDataEncode(x => x.Password)
                 .HasForeignKey<Role, Guid>(x => x.RoleId)
                 .HasIndependentData(x => x.Role)
                 .HasForeignKey<Person, Guid>(x => x.PersonId)
                 .HasRule<UserRule>()
-                .HasJsonIgnore(x=> x.Password);
+                .HasJsonIgnore(x => x.Password);
 
             base.OnModuleConfiguration(moduleBuilder);
         }

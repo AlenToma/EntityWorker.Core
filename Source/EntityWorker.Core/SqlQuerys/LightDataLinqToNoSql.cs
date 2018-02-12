@@ -15,6 +15,7 @@ namespace EntityWorker.Core.SqlQuerys
 {
     internal class LightDataLinqToNoSql : ExpressionVisitor
     {
+        private Transaction.Transaction _transaction;
         private StringBuilder sb;
         private ExpressionType? _overridedNodeType;
         private readonly List<string> _columns;
@@ -22,6 +23,7 @@ namespace EntityWorker.Core.SqlQuerys
         private static Regex StringyFyExp = new Regex(@"<Stringify>\[.*?\]</Stringify>");
         private static string boolString = "<bool>[#]</bool>";
         private static Regex BoolExp = new Regex(@"<bool>\[.*?\]</bool>");
+        internal static Custom_ValueType<Type, List<string>> CachedColumns = new Custom_ValueType<Type, List<string>>();
 
         private static string dataEncodeString = "<DataEncode>[#]</DataEncode>";
         private static Regex DataEncodeExp = new Regex(@"<DataEncode>\[.*?\]</DataEncode>");
@@ -42,13 +44,14 @@ namespace EntityWorker.Core.SqlQuerys
 
         private Type _obType;
 
-        public LightDataLinqToNoSql(Type type)
+        public LightDataLinqToNoSql(Type type, Transaction.Transaction transaction)
         {
+            _transaction = transaction;
             _obType = type.GetActualType();
-            _columns = new List<string>
-            {
-                DataBaseTypes.GetValidSqlName((_obType.TableName())) + ".*"
-            };
+            if (!CachedColumns.ContainsKey(_obType))
+                _columns = CachedColumns.GetOrAdd(_obType, _transaction._dbSchema.ObjectColumns(_obType).Rows.Select(x => $"[{_obType.TableName()}].[{x.Value<string>("column_name")}]").ToList());
+            else
+                _columns = CachedColumns[_obType];
             _primaryId = OrderBy = _obType.GetPrimaryKey()?.GetPropertyName();
 
         }
@@ -56,10 +59,10 @@ namespace EntityWorker.Core.SqlQuerys
         public LightDataLinqToNoSql(DataBaseTypes dataBaseTypes)
         {
             DataBaseTypes = dataBaseTypes;
-            _columns = new List<string>
-            {
-                (_obType.TableName()) + ".*"
-            };
+            if (!CachedColumns.ContainsKey(_obType))
+                _columns = CachedColumns.GetOrAdd(_obType, _transaction._dbSchema.ObjectColumns(_obType).Rows.Select(x => $"[{_obType.TableName()}].[{x.Value<string>("column_name")}]").ToList());
+            else
+                _columns = CachedColumns[_obType];
             OrderBy = _obType.GetPrimaryKey().GetPropertyName();
         }
 
@@ -69,10 +72,13 @@ namespace EntityWorker.Core.SqlQuerys
             {
                 WhereClause.RemoveAll(x => string.IsNullOrEmpty(x));
                 var tableName = _obType.TableName();
-                var query = "SELECT distinct " + string.Join(",", _columns) + " FROM " + DataBaseTypes.GetValidSqlName(tableName) + " " + System.Environment.NewLine +
+                var query = "SELECT " + string.Join(",", _columns) + " FROM " + DataBaseTypes.GetValidSqlName(tableName) + " " + System.Environment.NewLine +
                        string.Join(Environment.NewLine, JoinClauses.Values.Select(x => x.Item2)) +
                        Environment.NewLine + (WhereClause.Any() ? "WHERE " : string.Empty) + string.Join(" AND ", WhereClause.ToArray());
                 query = query.TrimEnd(" AND ").TrimEnd(" OR ");
+
+                query += Environment.NewLine + $"GROUP BY {string.Join(",", _columns)} ";
+
                 if (!string.IsNullOrEmpty(OrderBy))
                     query += Environment.NewLine + "ORDER BY " + OrderBy;
                 else query += Environment.NewLine + "ORDER BY 1 ASC";
@@ -198,7 +204,7 @@ namespace EntityWorker.Core.SqlQuerys
             {
                 var invert = GetInvert();
                 var typecast = m.Arguments.First().Type.GenericTypeArguments.First();
-                var cl = new LightDataLinqToNoSql(typecast);
+                var cl = new LightDataLinqToNoSql(typecast, _transaction);
                 cl._generatedKeys = _generatedKeys;
                 cl.DataBaseTypes = DataBaseTypes;
                 cl.Translate(m.Arguments.Last() as Expression);

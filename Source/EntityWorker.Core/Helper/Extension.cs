@@ -32,7 +32,7 @@ namespace EntityWorker.Core.Helper
         {
             {typeof(int), new List<string>(){ "BIGINT" , "int", "single", "smallint", "tinyint" } },
             {typeof(long), new List<string>(){ "BIGINT" } },
-            {typeof(string), new List<string>(){ "NVARCHAR(4000)" , "text", "varchar", "xml" } },
+            {typeof(string), new List<string>(){ "NVARCHAR(4000)" , "varchar", "xml" } },
             {typeof(bool), new List<string>(){ "BIT"} },
             {typeof(DateTime), new List<string>(){ "DATETIME" , "date", "datetime2", "datetimeoffset", "smalldatetime" } },
             {typeof(TimeSpan), new List<string>(){ "DATETIME" , "time" } },
@@ -49,7 +49,7 @@ namespace EntityWorker.Core.Helper
         {
             {typeof(int), new List<string>(){ "BIGINT" , "SMALLINT", "TINYINT", "MEDIUMINT", "UNSIGNED BIG INT", "INT2", "INT8" } },
             {typeof(long), new List<string>(){ "BIGINT", "INT", "INTEGER"}},
-            {typeof(string),  new List<string>(){"NVARCHAR(4000)", "CHARACTER","VARYING CHARACTER", "NCHAR", "NATIVE CHARACTER" , "CLOB" }},
+            {typeof(string),  new List<string>(){"NVARCHAR(4000)", "CHARACTER","VARYING CHARACTER", "NCHAR", "NATIVE CHARACTER" , "CLOB", "TEXT" }},
             {typeof(bool), new List<string>(){ "BIT"}},
             {typeof(DateTime), new List<string>(){ "DATETIME", "date"}},
             {typeof(TimeSpan), new List<string>(){ "DATETIME"}},
@@ -398,6 +398,8 @@ namespace EntityWorker.Core.Helper
             if (prop.ContainAttribute<Stringify>() || prop.ContainAttribute<DataEncode>() || prop.ContainAttribute<ToBase64String>())
                 return typeof(string).GetDbTypeByType(dbType);
 
+            if (prop.ContainAttribute<ColumnType>() && prop.Attributes.Any(x => x is ColumnType && !string.IsNullOrEmpty((x as ColumnType).DataType) && ((x as ColumnType).DataBaseTypes == dbType) || !(x as ColumnType).DataBaseTypes.HasValue))
+                return prop.Attributes.Where(x => x is ColumnType && !string.IsNullOrEmpty((x as ColumnType).DataType) && ((x as ColumnType).DataBaseTypes == dbType) || !(x as ColumnType).DataBaseTypes.HasValue).Select(x => (x as ColumnType).DataType).First();
 
             if (type.GetTypeInfo().IsEnum)
                 type = typeof(long);
@@ -424,6 +426,9 @@ namespace EntityWorker.Core.Helper
 
             if (prop.ContainAttribute<Stringify>() || prop.ContainAttribute<DataEncode>() || prop.ContainAttribute<ToBase64String>())
                 return new List<string>() { typeof(string).GetDbTypeByType(dbType) };
+
+            if (prop.ContainAttribute<ColumnType>() && prop.Attributes.Any(x => x is ColumnType && !string.IsNullOrEmpty((x as ColumnType).DataType) && ((x as ColumnType).DataBaseTypes == dbType) || !(x as ColumnType).DataBaseTypes.HasValue))
+                return prop.Attributes.Where(x => x is ColumnType && !string.IsNullOrEmpty((x as ColumnType).DataType) && ((x as ColumnType).DataBaseTypes == dbType) || !(x as ColumnType).DataBaseTypes.HasValue).Select(x => (x as ColumnType).DataType).ToList();
 
             if (type.GetTypeInfo().IsEnum)
                 type = typeof(long);

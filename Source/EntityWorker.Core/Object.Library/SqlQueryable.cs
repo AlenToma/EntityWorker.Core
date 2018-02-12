@@ -17,7 +17,7 @@ namespace EntityWorker.Core.Object.Library
     {
         private readonly Transaction.Transaction _repository;
         private readonly List<string> _ignoreActions = new List<string>();
-        private LightDataLinqToNoSql _expression = new LightDataLinqToNoSql(typeof(T));
+        private LightDataLinqToNoSql _expression;
         private readonly List<Expression<Func<T, object>>> _childrenToLoad = new List<Expression<Func<T, object>>>();
         private bool? _landholderOnlyFirstLevel;
         private readonly List<Expression> _matches = new List<Expression>();
@@ -37,6 +37,7 @@ namespace EntityWorker.Core.Object.Library
         internal SqlQueryable(Transaction.Transaction repository, List<T> items)
         {
             _repository = repository;
+            _expression = new LightDataLinqToNoSql(typeof(T), _repository);
             if (items == null)
                 return;
             PartExecuted = true;
@@ -47,6 +48,7 @@ namespace EntityWorker.Core.Object.Library
         internal SqlQueryable(Expression exp, Transaction.Transaction repository)
         {
             _repository = repository;
+            _expression = new LightDataLinqToNoSql(typeof(T), _repository);
             if (exp != null)
                 _matches.Add(exp);
         }
@@ -299,7 +301,7 @@ namespace EntityWorker.Core.Object.Library
             foreach (var exp in _matches)
                 _expression.Translate(exp);
             ParsedLinqToSql = _expression.Count;
-            _expression = new LightDataLinqToNoSql(typeof(T));// reset
+            _expression = new LightDataLinqToNoSql(typeof(T), _repository);// reset
             var cmd = _repository.GetSqlCommand(ParsedLinqToSql);
             return _repository.ExecuteScalar(cmd).ConvertValue<int>();
         }

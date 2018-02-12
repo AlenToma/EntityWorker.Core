@@ -31,7 +31,7 @@ namespace EntityWorker.Core.Transaction
 
         private static object MigrationLocker = new object();
 
-        private readonly DbSchema _dbSchema;
+        internal readonly DbSchema _dbSchema;
 
         private readonly Custom_ValueType<string, object> _attachedObjects;
         /// <summary>
@@ -994,7 +994,7 @@ namespace EntityWorker.Core.Transaction
         /// <returns></returns>
         public object Execute(Expression expression)
         {
-            var _expression = new LightDataLinqToNoSql(expression.Type);
+            var _expression = new LightDataLinqToNoSql(expression.Type, this);
             _expression.Translate(expression);
             return _dbSchema.Select(expression.Type, _expression.Quary);
 
@@ -1009,7 +1009,7 @@ namespace EntityWorker.Core.Transaction
         public TResult Execute<TResult>(Expression expression)
         {
             var isEnumerable = (typeof(TResult).Name == "IEnumerable`1");
-            var _expression = new LightDataLinqToNoSql(typeof(TResult).GetActualType());
+            var _expression = new LightDataLinqToNoSql(typeof(TResult).GetActualType(), this);
             _expression.Translate(expression);
             if (!isEnumerable)
                 return Select<TResult>(_expression.Quary).First();

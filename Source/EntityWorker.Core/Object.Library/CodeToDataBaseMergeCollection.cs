@@ -1,6 +1,7 @@
 ﻿using EntityWorker.Core.Attributes;
 using EntityWorker.Core.Helper;
 using EntityWorker.Core.Postgres;
+using EntityWorker.Core.SqlQuerys;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -105,6 +106,7 @@ namespace EntityWorker.Core.Object.Library
 
                     }
                     DbSchema.CachedObjectColumn.Clear();
+                    LightDataLinqToNoSql.CachedColumns.Clear();
                     DbSchema.CachedSql.Clear();
                     Extension.CachedDataRecord.Clear();
                     _provider.SaveChanges();
