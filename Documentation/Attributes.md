@@ -2,6 +2,14 @@
 There are many attributes you could use to improve the code
 ```csharp
 /// <summary>
+/// Assign a diffrent database type for the property. 
+/// Attibutes Stringify, DataEncode and ToBase64String will override this attribute. 
+/// </summary>
+/// <param name="dataType">The database type ex nvarchar(4000)</param>
+/// <param name="dataBaseTypes">(Optional)null for all providers</param>
+[ColumnType]
+
+/// <summary>
 /// This indicates that the prop will not be saved to the database.
 /// </summary>
 [ExcludeFromAbstract]
