@@ -7,7 +7,7 @@
     var usersJsonString = rep.Get<User>().LoadChildren().Json();
     // Json() will execlude all properties that has JsonIgnore Attributes
     // Convert it Back
-    // All JsonIgnore attributes will be loaded back from the database if Primary key exist withing the json string
+    // AllProperties with JsonIgnore attributes will be loaded back from the database if Primary key exist withing the json string
     ISqlQueryable<User> users = rep.FromJson<User>(usersJsonString).LoadChildren();
     List<User> userList = users.Execute();
     /// Or
