@@ -12,7 +12,7 @@ We will execute a complicated query and see how it gets parsed.
                 );
                 
                 List<User> userList = users.Execute();
-                var sql = users.ParsedLinqToSql;
+                string sql = users.ParsedLinqToSql;
             }
 ```
 ### Generated sql result
