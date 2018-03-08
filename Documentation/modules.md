@@ -1,13 +1,18 @@
 Let's start building our models, lets build a simple User model
 ```csharp
+   // Migration will ignore creating abstract classes
+   public abstract class Entity
+   {
+        [PrimaryId]
+        public Guid? Id { get; set; }
+   }
+
+
     // Table attribute indicates that the object name differs from the database table name
     [Table("Users")]
     [Rule(typeof(UserRule))]
-    public class User
-    {
-        [PrimaryId]
-        public Guid? Id { get; set; }
-       
+    public class User : Entity
+    {       
         public string UserName { get; set; }
         
         // Encode the data in the database.
@@ -39,22 +44,16 @@ Let's start building our models, lets build a simple User model
     }
     
     [Table("Roles")]
-    public class Role
-    {
-        [PrimaryId]
-        public Guid? Id { get; set; }
-        
+    public class Role : Entity
+    {        
         public string Name { get; set; }
         
         // All users who have this role, will be deleted when we delete Role
         public List<User> Users { get; set; }
     }
     
-    public class Address
-    {
-        [PrimaryId]
-        public Guid? Id { get; set; }
-        
+    public class Address : Entity
+    {        
         public string AddressName { get; set; }
         // in the User class we have a list of adresses, EntityWorker.Core will do an inner join and load the address 
         // if its included in the query
