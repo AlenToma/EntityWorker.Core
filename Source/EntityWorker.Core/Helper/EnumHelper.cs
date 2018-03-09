@@ -21,14 +21,6 @@
         RoundDown
     }
 
-    public enum ControlTypes
-    {
-        TextArea,
-        Text,
-        Password,
-        CheckBox
-    }
-
     /// <summary>
     /// Default = GlobalConfiguration.DataEncode_Key_Size
     /// </summary>

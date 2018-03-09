@@ -30,3 +30,4 @@ D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\ConsoleApp.Core\obj\
 D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\ConsoleApp.Core\obj\Release\netcoreapp2.0\ConsoleApp.Core.AssemblyInfo.cs
 D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\ConsoleApp.Core\obj\Release\netcoreapp2.0\ConsoleApp.Core.dll
 D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\ConsoleApp.Core\obj\Release\netcoreapp2.0\ConsoleApp.Core.pdb
+D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\ConsoleApp.Core\obj\Release\netcoreapp2.0\ConsoleApp.Core.csproj.CopyComplete

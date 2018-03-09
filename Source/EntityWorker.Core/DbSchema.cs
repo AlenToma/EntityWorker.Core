@@ -40,7 +40,6 @@ namespace EntityWorker.Core
             var key = type.FullName + _repository.DataBaseTypes.ToString();
             try
             {
-
                 if (CachedObjectColumn.ContainsKey(key))
                     return CachedObjectColumn[key];
                 var table = type.TableName();

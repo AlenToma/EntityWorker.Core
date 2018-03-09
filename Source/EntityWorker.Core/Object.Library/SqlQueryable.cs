@@ -32,6 +32,9 @@ namespace EntityWorker.Core.Object.Library
         /// </summary>
         public bool PartExecuted { get; private set; }
 
+        /// <summary>
+        /// Current Provider
+        /// </summary>
         public IQueryProvider Provider => _repository;
 
         internal SqlQueryable(Transaction.Transaction repository, List<T> items)
@@ -58,8 +61,14 @@ namespace EntityWorker.Core.Object.Library
         /// </summary>
         public string ParsedLinqToSql { get; private set; }
 
+        /// <summary>
+        /// The generic type of ISqlQueryable
+        /// </summary>
         public Type ElementType => typeof(T);
 
+        /// <summary>
+        /// Expression, NotImplemented
+        /// </summary>
         public Expression Expression => throw new NotImplementedException();
 
         /// <summary>
@@ -217,9 +226,11 @@ namespace EntityWorker.Core.Object.Library
             return this.ToList<T>();
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+        /// <summary>
+        /// GetEnumerator
+        /// </summary>
+        /// <returns></returns>
         public new IEnumerator<T> GetEnumerator()
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             return Execute().GetEnumerator();
         }

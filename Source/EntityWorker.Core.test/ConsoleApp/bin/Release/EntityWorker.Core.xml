@@ -12,7 +12,7 @@
         </member>
         <member name="M:EntityWorker.Core.Attributes.ColumnType.#ctor(System.String,System.Nullable{EntityWorker.Core.Helper.DataBaseTypes})">
             <summary>
-            Assign a diffrent database type fot the property. 
+            Assign a diffrent database type for the property
             Attibutes Stringify, DataEncode and ToBase64String will override this attribute. 
             </summary>
             <param name="dataType">The database type ex nvarchar(4000)</param>
@@ -870,6 +870,7 @@
             <summary>
             Entity Configration
             Here we could configrate and set all primary keys and Foreign keys for properties
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Repository.md
             </summary>
             <typeparam name="T"></typeparam>
         </member>
@@ -893,12 +894,11 @@
             </summary>
             <typeparam name="TP"></typeparam>
             <param name="action"></param>
-            <param name="autoGenerate"></param>
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.HasColumnType``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.String,System.Nullable{EntityWorker.Core.Helper.DataBaseTypes})">
             <summary>
-            Assign a diffrent database type fot the property
+            Assign a diffrent database type for the property
             Attibutes Stringify, DataEncode and ToBase64String will override this attribute.
             </summary>
             <param name="dataType">The database type ex nvarchar(4000)</param>
@@ -996,6 +996,7 @@
         <member name="T:EntityWorker.Core.Interface.ISqlQueryable`1">
             <summary>
             quaryProvider for EntityWorker.Core
+            https://github.com/AlenToma/EntityWorker.Core
             </summary>
             <typeparam name="T"></typeparam>
         </member>
@@ -1106,12 +1107,14 @@
         <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.ExecuteCount">
             <summary>
             Return the count of the executed quary
+            https://github.com/AlenToma/EntityWorker.Core
             </summary>
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.ExecuteAny">
             <summary>
             Return the Any of the executed quary
+            https://github.com/AlenToma/EntityWorker.Core
             </summary>
             <returns></returns>
         </member>
@@ -1119,6 +1122,7 @@
             <summary>
             Save All Changes. 
             You have to trigger SaveChanges() to commit
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Save.md
             </summary>
             <returns></returns>
         </member>
@@ -1126,6 +1130,7 @@
             <summary>
             Save All Changes. 
             You have to trigger SaveChanges() to commit
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Save.md
             </summary>
             <returns></returns>
         </member>
@@ -1133,6 +1138,7 @@
             <summary>
             Remove All objects herarkie. 
             You have to trigger SaveChanges() to commit
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Save.md
             </summary>
             <returns></returns>
         </member>
@@ -1140,12 +1146,14 @@
             <summary>
             Remove All objects herarkie. 
             You have to trigger SaveChanges() to commit
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Save.md
             </summary>
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.SaveChanges">
             <summary>
             Commit Changes
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Save.md
             </summary>
         </member>
         <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.ToTable">
@@ -1158,6 +1166,7 @@
             <summary>
             Convert Object of type a to b 
             all properties of B have to be mapped using attribute PropertyName or the propertName of A = B eg a."UserId" = b."UserId" 
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/EntityMappings.md
             </summary>
             <typeparam name="TSource"></typeparam>
             <returns></returns>
@@ -1165,18 +1174,21 @@
         <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.Json">
             <summary>
             Convert To JSON
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Json.md
             </summary>
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.JsonAsync">
             <summary>
             Convert To JSON
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Json.md
             </summary>
             <returns></returns>
         </member>
         <member name="T:EntityWorker.Core.InterFace.IRepository">
             <summary>
             EntityWorker.Core Repository
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Repository.md
             </summary>
         </member>
         <member name="M:EntityWorker.Core.InterFace.IRepository.Clone``1(``0,EntityWorker.Core.FastDeepCloner.CloneLevel,EntityWorker.Core.FastDeepCloner.FieldType)">
@@ -1267,14 +1279,14 @@
         <member name="M:EntityWorker.Core.InterFace.IRepository.Delete(System.Object)">
             <summary>
             Delete entity.
-            SaveChanges is needet after
+            SaveChanges is needed after
             </summary>
             <param name="entity"></param>
         </member>
         <member name="M:EntityWorker.Core.InterFace.IRepository.DeleteAsync(System.Object)">
             <summary>
             Delete entity.
-            SaveChanges is needet after
+            SaveChanges is needed after
             </summary>
             <param name="entity"></param>
             
@@ -1282,20 +1294,22 @@
         <member name="M:EntityWorker.Core.InterFace.IRepository.Save(System.Object)">
             <summary>
             Save entity.
-            SaveChanges is needet after
+            SaveChanges is needed after
             </summary>
             <param name="entity"></param>
         </member>
         <member name="M:EntityWorker.Core.InterFace.IRepository.SaveAsync(System.Object)">
             <summary>
             Save entity.
-            SaveChanges is needet after
+            SaveChanges is needed after
             </summary>
             <param name="entity"></param>
         </member>
         <member name="M:EntityWorker.Core.InterFace.IRepository.Attach(System.Object,System.Boolean)">
             <summary>
             Attach an object to entityWorker.
+            this is only to validate two objects to get the changes between two objects.
+            You dont have to attach the object to save it to the database
             </summary>
             <param name="objcDbEntity"></param>
             <param name="overwrite"> override if exist</param>
@@ -1343,7 +1357,6 @@
             </summary>
             <typeparam name="T"></typeparam>
             <typeparam name="TP"></typeparam>
-            <param name="repository"></param>
             <param name="item"></param>
             <param name="onlyFirstLevel"></param>
             <param name="ignoreList"></param>
@@ -1354,13 +1367,10 @@
             load children 
             </summary>
             <typeparam name="T"></typeparam>
-            <typeparam name="TP"></typeparam>
-            <param name="repository"></param>
             <param name="item"></param>
             <param name="onlyFirstLevel"></param>
             <param name="classes"></param>
             <param name="ignoreList"></param>
-            <param name="actions"></param>
         </member>
         <member name="M:EntityWorker.Core.InterFace.IRepository.LoadChildrenAsync``2(``0,System.Boolean,System.Collections.Generic.List{System.String},System.Linq.Expressions.Expression{System.Func{``0,``1}}[])">
             <summary>
@@ -1368,7 +1378,6 @@
             </summary>
             <typeparam name="T"></typeparam>
             <typeparam name="TP"></typeparam>
-            <param name="repository"></param>
             <param name="item"></param>
             <param name="onlyFirstLevel"></param>
             <param name="ignoreList"></param>
@@ -1380,7 +1389,6 @@
             </summary>
             <typeparam name="T"></typeparam>
             <typeparam name="TP"></typeparam>
-            <param name="repository"></param>
             <param name="item"></param>
             <param name="onlyFirstLevel"></param>
             <param name="ignoreList"></param>
@@ -1467,7 +1475,6 @@
             <summary>
             Convert DbCommandExtended to list of System.Type
             </summary>
-            <param name="repository"></param>
             <param name="command"></param>
             <param name="type"></param>
             <returns></returns>
@@ -1730,6 +1737,26 @@
         <member name="P:EntityWorker.Core.Object.Library.DbCommandExtended.TableType">
             <summary>
             Set This for faster reading of sql
+            </summary>
+        </member>
+        <member name="T:EntityWorker.Core.Object.Library.EntityChanges">
+            <summary>
+            DataChanges
+            </summary>
+        </member>
+        <member name="P:EntityWorker.Core.Object.Library.EntityChanges.PropertyName">
+            <summary>
+            PropertyType
+            </summary>
+        </member>
+        <member name="P:EntityWorker.Core.Object.Library.EntityChanges.NewValue">
+            <summary>
+            The new Value
+            </summary>
+        </member>
+        <member name="P:EntityWorker.Core.Object.Library.EntityChanges.OldValue">
+            <summary>
+            Old Value
             </summary>
         </member>
         <member name="F:EntityWorker.Core.Object.Library.JSON.JSONParameters.UseOptimizedDatasetSchema">
@@ -2154,9 +2181,24 @@
             The Expression has already been executed, but you could still load children.
             </summary>
         </member>
+        <member name="P:EntityWorker.Core.Object.Library.SqlQueryable`1.Provider">
+            <summary>
+            Current Provider
+            </summary>
+        </member>
         <member name="P:EntityWorker.Core.Object.Library.SqlQueryable`1.ParsedLinqToSql">
             <summary>
             Result of LightDataTable LinqToSql
+            </summary>
+        </member>
+        <member name="P:EntityWorker.Core.Object.Library.SqlQueryable`1.ElementType">
+            <summary>
+            The generic type of ISqlQueryable
+            </summary>
+        </member>
+        <member name="P:EntityWorker.Core.Object.Library.SqlQueryable`1.Expression">
+            <summary>
+            Expression, NotImplemented
             </summary>
         </member>
         <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.Add(`0)">
@@ -2233,6 +2275,12 @@
         <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.ExecuteAsync">
             <summary>
             Execute the search Command
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.GetEnumerator">
+            <summary>
+            GetEnumerator
             </summary>
             <returns></returns>
         </member>
@@ -10576,10 +10624,9 @@
         </member>
         <member name="M:EntityWorker.Core.Transaction.Transaction.#ctor(System.String,EntityWorker.Core.Helper.DataBaseTypes)">
             <summary>
-            
+            Constructor
             </summary>
             <param name="connectionString">Full connection string</param>
-            <param name="enableMigration"></param>
             <param name="dataBaseTypes">The type of the database Ms-sql or Sql-light</param>
         </member>
         <member name="M:EntityWorker.Core.Transaction.Transaction.OnModuleStart">
@@ -10603,7 +10650,7 @@
             Return the new added column, tables or modified prooerty
             Property Rename is not supported. renaming a property x will end up removing the column x and adding column y so there will be dataloss
             Adding a primary key is not supported either
-            Abstract classes are ignored by default, Create abstract classes by CreateTable instead
+            Abstract classes are ignored by default
             </summary>
             <assembly> Null for the current executed Assembly </assembly>
             <returns></returns>
@@ -10632,7 +10679,7 @@
         <member name="M:EntityWorker.Core.Transaction.Transaction.MigrationConfig``1(``0)">
             <summary>
             Specifies the migrationConfig which contain a list Migration to migrate
-            the migration is executed automatic but as long as you have class that inherit from IMigrationConfig
+            the migration is executed automatic as long as you have class that inherit from IMigrationConfig
             or you could manually execute a migration
             </summary>
             <typeparam name="T"></typeparam>

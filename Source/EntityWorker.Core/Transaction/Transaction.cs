@@ -25,7 +25,7 @@ namespace EntityWorker.Core.Transaction
     /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Repository.md
     /// EntityWorker.Core Repository
     /// </summary>
-    public class Transaction : IRepository
+    public abstract class Transaction : IRepository
     {
         internal Custom_ValueType<IDataReader, bool> OpenedDataReaders = new Custom_ValueType<IDataReader, bool>();
 
@@ -68,10 +68,9 @@ namespace EntityWorker.Core.Transaction
 
 
         /// <summary>
-        /// 
+        /// Constructor
         /// </summary>
         /// <param name="connectionString">Full connection string</param>
-        /// <param name="enableMigration"></param>
         /// <param name="dataBaseTypes">The type of the database Ms-sql or Sql-light</param>
         public Transaction(string connectionString, DataBaseTypes dataBaseTypes)
         {
@@ -103,19 +102,13 @@ namespace EntityWorker.Core.Transaction
         /// <summary>
         /// Start once the Transaction first initialized and its threadsafe
         /// </summary>
-        protected virtual void OnModuleStart()
-        {
-
-        }
+        protected abstract void OnModuleStart();
 
         /// <summary>
         /// Configrate your modules here, add Primary keys , ForeignKey and so on here.
         /// </summary>
         /// <param name="moduleBuilder"></param>
-        protected virtual void OnModuleConfiguration(IModuleBuilder moduleBuilder)
-        {
-
-        }
+        protected abstract void OnModuleConfiguration(IModuleBuilder moduleBuilder);
 
         /// <summary>
         /// Initialize the migration
@@ -140,7 +133,7 @@ namespace EntityWorker.Core.Transaction
         /// Return the new added column, tables or modified prooerty
         /// Property Rename is not supported. renaming a property x will end up removing the column x and adding column y so there will be dataloss
         /// Adding a primary key is not supported either
-        /// Abstract classes are ignored by default, Create abstract classes by CreateTable instead
+        /// Abstract classes are ignored by default
         /// </summary>
         /// <assembly> Null for the current executed Assembly </assembly>
         /// <returns></returns>
@@ -173,7 +166,7 @@ namespace EntityWorker.Core.Transaction
             if (DataBaseTypes == DataBaseTypes.Mssql)
             {
                 sqlBuild.InitialCatalog = "master";
-                var tr = new Transaction(sqlBuild.ToString(), DataBaseTypes);
+                var tr = new DbRepository(sqlBuild.ToString(), DataBaseTypes);
                 var cmd = tr.GetSqlCommand("SELECT  CAST(CASE WHEN db_id(String[" + dbName + "]) is not null THEN 1 ELSE 0 END AS BIT)");
                 return tr.ExecuteScalar(cmd).ConvertValue<bool>();
             }
@@ -181,12 +174,12 @@ namespace EntityWorker.Core.Transaction
             {
                 try
                 {
-                    var tr = new Transaction(sqlBuild.ToString(), DataBaseTypes);
+                    var tr = new DbRepository(sqlBuild.ToString(), DataBaseTypes);
                     tr.ValidateConnection();
                     return true;
 
                 }
-                catch (Exception ex)
+                catch
                 {
                     return false;
                 }
@@ -195,7 +188,7 @@ namespace EntityWorker.Core.Transaction
             {
                 dbName = npSqlBuilder.Database;
                 npSqlBuilder.Database = "";
-                var tr = new Transaction(npSqlBuilder.ToString(), DataBaseTypes);
+                var tr = new DbRepository(npSqlBuilder.ToString(), DataBaseTypes);
                 var cmd = tr.GetSqlCommand("SELECT CAST(CASE WHEN datname is not null THEN 1 ELSE 0 END AS BIT) from pg_database WHERE lower(datname) = lower(String[" + dbName + "])");
                 return tr.ExecuteScalar(cmd).ConvertValue<bool>();
 
@@ -226,7 +219,7 @@ namespace EntityWorker.Core.Transaction
                 if (DataBaseTypes == DataBaseTypes.Mssql)
                 {
                     sqlBuild.InitialCatalog = "master";
-                    var tr = new Transaction(sqlBuild.ToString(), DataBaseTypes);
+                    var tr = new DbRepository(sqlBuild.ToString(), DataBaseTypes);
                     var cmd = tr.GetSqlCommand("Create DataBase [" + dbName.Trim() + "]");
                     tr.ExecuteNonQuery(cmd);
 
@@ -237,7 +230,7 @@ namespace EntityWorker.Core.Transaction
                 {
                     dbName = npSqlBuilder.Database;
                     npSqlBuilder.Database = "";
-                    var tr = new Transaction(npSqlBuilder.ToString(), DataBaseTypes);
+                    var tr = new DbRepository(npSqlBuilder.ToString(), DataBaseTypes);
                     var cmd = tr.GetSqlCommand("Create DataBase " + dbName.Trim());
                     tr.ExecuteNonQuery(cmd);
                 }
@@ -269,7 +262,7 @@ namespace EntityWorker.Core.Transaction
 
         /// <summary>
         /// Specifies the migrationConfig which contain a list Migration to migrate
-        /// the migration is executed automatic but as long as you have class that inherit from IMigrationConfig
+        /// the migration is executed automatic as long as you have class that inherit from IMigrationConfig
         /// or you could manually execute a migration
         /// </summary>
         /// <typeparam name="T"></typeparam>

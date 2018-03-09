@@ -344,7 +344,7 @@
           }
         }
       },
-      "EntityWorker.Core/1.5.1": {
+      "EntityWorker.Core/1.5.3": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v2.0",
         "dependencies": {
@@ -361,7 +361,7 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v2.0",
         "dependencies": {
-          "EntityWorker.Core": "1.5.1"
+          "EntityWorker.Core": "1.5.3"
         },
         "compile": {
           "bin/placeholder/LightData.CMS.Modules.dll": {}
@@ -1111,7 +1111,7 @@
         "version.txt"
       ]
     },
-    "EntityWorker.Core/1.5.1": {
+    "EntityWorker.Core/1.5.3": {
       "type": "project",
       "path": "../../EntityWorker.Core/EntityWorker.Core.csproj",
       "msbuildProject": "../../EntityWorker.Core/EntityWorker.Core.csproj"
@@ -1124,7 +1124,7 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.0": [
-      "EntityWorker.Core >= 1.5.1",
+      "EntityWorker.Core >= 1.5.3",
       "LightData.CMS.Modules >= 1.0.0",
       "Microsoft.NETCore.App >= 2.0.0"
     ]
@@ -1136,9 +1136,6 @@
   },
   "project": {
     "version": "1.0.0",
-    "restoreSettings": {
-      "hideWarningsAndErrors": true
-    },
     "restore": {
       "projectUniqueName": "D:\\Projects\\EntityWorker.Core\\Source\\EntityWorker.Core.test\\ConsoleApp.Core\\ConsoleApp.Core.csproj",
       "projectName": "ConsoleApp.Core",
@@ -1164,11 +1161,11 @@
       "frameworks": {
         "netcoreapp2.0": {
           "projectReferences": {
-            "D:\\Projects\\EntityWorker.Core\\Source\\EntityWorker.Core\\EntityWorker.Core.csproj": {
-              "projectPath": "D:\\Projects\\EntityWorker.Core\\Source\\EntityWorker.Core\\EntityWorker.Core.csproj"
-            },
             "D:\\Projects\\EntityWorker.Core\\Source\\EntityWorker.Core.test\\LightData.CMS.Modules\\LightData.CMS.Modules.csproj": {
               "projectPath": "D:\\Projects\\EntityWorker.Core\\Source\\EntityWorker.Core.test\\LightData.CMS.Modules\\LightData.CMS.Modules.csproj"
+            },
+            "D:\\Projects\\EntityWorker.Core\\Source\\EntityWorker.Core\\EntityWorker.Core.csproj": {
+              "projectPath": "D:\\Projects\\EntityWorker.Core\\Source\\EntityWorker.Core\\EntityWorker.Core.csproj"
             }
           }
         }

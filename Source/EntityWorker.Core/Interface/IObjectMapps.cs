@@ -7,6 +7,7 @@ namespace EntityWorker.Core.Interface
     /// <summary>
     /// Entity Configration
     /// Here we could configrate and set all primary keys and Foreign keys for properties
+    /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Repository.md
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public interface IObjectMapps<T> where T : class
@@ -30,7 +31,6 @@ namespace EntityWorker.Core.Interface
         /// </summary>
         /// <typeparam name="TP"></typeparam>
         /// <param name="action"></param>
-        /// <param name="autoGenerate"></param>
         /// <returns></returns>
         IObjectMapps<T> HasJsonIgnore<TP>(Expression<Func<T, TP>> action);
 

@@ -344,7 +344,7 @@
           }
         }
       },
-      "EntityWorker.Core/1.5.1": {
+      "EntityWorker.Core/1.5.3": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v2.0",
         "dependencies": {
@@ -383,7 +383,7 @@
           }
         }
       },
-      "EntityWorker.Core/1.5.1": {
+      "EntityWorker.Core/1.5.3": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5.1",
         "dependencies": {
@@ -703,7 +703,7 @@
           "ref/netstandard1.3/_._": {}
         }
       },
-      "EntityWorker.Core/1.5.1": {
+      "EntityWorker.Core/1.5.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -2439,7 +2439,7 @@
         "system.threading.tasks.nuspec"
       ]
     },
-    "EntityWorker.Core/1.5.1": {
+    "EntityWorker.Core/1.5.3": {
       "type": "project",
       "path": "../../EntityWorker.Core/EntityWorker.Core.csproj",
       "msbuildProject": "../../EntityWorker.Core/EntityWorker.Core.csproj"
@@ -2447,14 +2447,14 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.0": [
-      "EntityWorker.Core >= 1.5.1",
+      "EntityWorker.Core >= 1.5.3",
       "Microsoft.NETCore.App >= 2.0.0"
     ],
     ".NETFramework,Version=v4.6.1": [
-      "EntityWorker.Core >= 1.5.1"
+      "EntityWorker.Core >= 1.5.3"
     ],
     ".NETStandard,Version=v2.0": [
-      "EntityWorker.Core >= 1.5.1",
+      "EntityWorker.Core >= 1.5.3",
       "NETStandard.Library >= 2.0.1"
     ]
   },
@@ -2465,9 +2465,6 @@
   },
   "project": {
     "version": "1.0.0",
-    "restoreSettings": {
-      "hideWarningsAndErrors": true
-    },
     "restore": {
       "projectUniqueName": "D:\\Projects\\EntityWorker.Core\\Source\\EntityWorker.Core.test\\LightData.CMS.Modules\\LightData.CMS.Modules.csproj",
       "projectName": "LightData.CMS.Modules",

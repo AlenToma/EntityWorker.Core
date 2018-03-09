@@ -7,6 +7,7 @@ namespace EntityWorker.Core.Interface
 {
     /// <summary>
     /// quaryProvider for EntityWorker.Core
+    /// https://github.com/AlenToma/EntityWorker.Core
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public interface ISqlQueryable<T>
@@ -119,12 +120,14 @@ namespace EntityWorker.Core.Interface
 
         /// <summary>
         /// Return the count of the executed quary
+        /// https://github.com/AlenToma/EntityWorker.Core
         /// </summary>
         /// <returns></returns>
         int ExecuteCount();
 
         /// <summary>
         /// Return the Any of the executed quary
+        /// https://github.com/AlenToma/EntityWorker.Core
         /// </summary>
         /// <returns></returns>
         bool ExecuteAny();
@@ -132,6 +135,7 @@ namespace EntityWorker.Core.Interface
         /// <summary>
         /// Save All Changes. 
         /// You have to trigger SaveChanges() to commit
+        /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Save.md
         /// </summary>
         /// <returns></returns>
         ISqlQueryable<T> Save();
@@ -139,6 +143,7 @@ namespace EntityWorker.Core.Interface
         /// <summary>
         /// Save All Changes. 
         /// You have to trigger SaveChanges() to commit
+        /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Save.md
         /// </summary>
         /// <returns></returns>
         ISqlQueryable<T> SaveAll(Func<T, bool> match);
@@ -146,6 +151,7 @@ namespace EntityWorker.Core.Interface
         /// <summary>
         /// Remove All objects herarkie. 
         /// You have to trigger SaveChanges() to commit
+        /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Save.md
         /// </summary>
         /// <returns></returns>
         ISqlQueryable<T> Remove();
@@ -153,12 +159,14 @@ namespace EntityWorker.Core.Interface
         /// <summary>
         /// Remove All objects herarkie. 
         /// You have to trigger SaveChanges() to commit
+        /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Save.md
         /// </summary>
         /// <returns></returns>
         ISqlQueryable<T> RemoveAll(Func<T, bool> match);
 
         /// <summary>
         /// Commit Changes
+        /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Save.md
         /// </summary>
         void SaveChanges();
 
@@ -171,6 +179,7 @@ namespace EntityWorker.Core.Interface
         /// <summary>
         /// Convert Object of type a to b 
         /// all properties of B have to be mapped using attribute PropertyName or the propertName of A = B eg a."UserId" = b."UserId" 
+        /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/EntityMappings.md
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
         /// <returns></returns>
@@ -178,12 +187,14 @@ namespace EntityWorker.Core.Interface
 
         /// <summary>
         /// Convert To JSON
+        /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Json.md
         /// </summary>
         /// <returns></returns>
         string Json();
 
         /// <summary>
         /// Convert To JSON
+        /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Json.md
         /// </summary>
         /// <returns></returns>
         Task<string> JsonAsync();

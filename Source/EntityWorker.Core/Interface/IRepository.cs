@@ -14,6 +14,7 @@ namespace EntityWorker.Core.InterFace
 {
     /// <summary>
     /// EntityWorker.Core Repository
+    /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Repository.md
     /// </summary>
     public interface IRepository : IQueryProvider, IDisposable
     {
@@ -111,14 +112,14 @@ namespace EntityWorker.Core.InterFace
 
         /// <summary>
         /// Delete entity.
-        /// SaveChanges is needet after
+        /// SaveChanges is needed after
         /// </summary>
         /// <param name="entity"></param>
 
         void Delete(object entity);
         /// <summary>
         /// Delete entity.
-        /// SaveChanges is needet after
+        /// SaveChanges is needed after
         /// </summary>
         /// <param name="entity"></param>
         /// 
@@ -126,7 +127,7 @@ namespace EntityWorker.Core.InterFace
 
         /// <summary>
         /// Save entity.
-        /// SaveChanges is needet after
+        /// SaveChanges is needed after
         /// </summary>
         /// <param name="entity"></param>
 
@@ -134,7 +135,7 @@ namespace EntityWorker.Core.InterFace
 
         /// <summary>
         /// Save entity.
-        /// SaveChanges is needet after
+        /// SaveChanges is needed after
         /// </summary>
         /// <param name="entity"></param>
 
@@ -142,6 +143,8 @@ namespace EntityWorker.Core.InterFace
 
         /// <summary>
         /// Attach an object to entityWorker.
+        /// this is only to validate two objects to get the changes between two objects.
+        /// You dont have to attach the object to save it to the database
         /// </summary>
         /// <param name="objcDbEntity"></param>
         /// <param name="overwrite"> override if exist</param>
@@ -189,7 +192,6 @@ namespace EntityWorker.Core.InterFace
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <typeparam name="TP"></typeparam>
-        /// <param name="repository"></param>
         /// <param name="item"></param>
         /// <param name="onlyFirstLevel"></param>
         /// <param name="ignoreList"></param>
@@ -200,13 +202,10 @@ namespace EntityWorker.Core.InterFace
         /// load children 
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <typeparam name="TP"></typeparam>
-        /// <param name="repository"></param>
         /// <param name="item"></param>
         /// <param name="onlyFirstLevel"></param>
         /// <param name="classes"></param>
         /// <param name="ignoreList"></param>
-        /// <param name="actions"></param>
         Task LoadChildrenAsync<T>(T item, bool onlyFirstLevel, List<string> classes, List<string> ignoreList);
 
         /// <summary>
@@ -214,7 +213,6 @@ namespace EntityWorker.Core.InterFace
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <typeparam name="TP"></typeparam>
-        /// <param name="repository"></param>
         /// <param name="item"></param>
         /// <param name="onlyFirstLevel"></param>
         /// <param name="ignoreList"></param>
@@ -227,7 +225,6 @@ namespace EntityWorker.Core.InterFace
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <typeparam name="TP"></typeparam>
-        /// <param name="repository"></param>
         /// <param name="item"></param>
         /// <param name="onlyFirstLevel"></param>
         /// <param name="ignoreList"></param>
@@ -322,7 +319,6 @@ namespace EntityWorker.Core.InterFace
         /// <summary>
         /// Convert DbCommandExtended to list of System.Type
         /// </summary>
-        /// <param name="repository"></param>
         /// <param name="command"></param>
         /// <param name="type"></param>
         /// <returns></returns>

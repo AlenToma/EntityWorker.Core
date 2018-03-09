@@ -30,7 +30,6 @@ namespace LightData.CMS.Modules.Repository
 
             // Start the migration
             InitializeMigration();
-            base.OnModuleStart();
         }
 
         protected override void OnModuleConfiguration(IModuleBuilder moduleBuilder)
@@ -46,8 +45,6 @@ namespace LightData.CMS.Modules.Repository
                 .HasForeignKey<Person, Guid>(x => x.PersonId)
                 .HasRule<UserRule>()
                 .HasJsonIgnore(x => x.Password);
-
-            base.OnModuleConfiguration(moduleBuilder);
         }
 
         // Get the full connection string from the web-config
