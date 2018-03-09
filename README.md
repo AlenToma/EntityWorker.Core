@@ -19,8 +19,7 @@ EntityWorker is an alternative to entityframwork. is more flexible and much fast
 * .NETFramework 4.5.1
 * .NETStandard 2.0
 ## Can I use it to an existing database?
-Yes, you can easily implement your existing modules and use attributes to map all your Primary Keys and Foreign Key without even
-touching the database.
+Yes, you can easily implement your existing modules and use attributes or IModuleBuilder to map all your Primary Keys and Foreign Key without even touching the database.
 ## Expression
 EntityWorker.Core has its own provider called ISqlQueryable, which can handle almost every expression like Startwith,
 EndWith, Contains and so on

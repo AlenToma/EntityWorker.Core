@@ -8,7 +8,7 @@ Any of those types could be nullable
 * System.DateTime
 * System.TimeSpan
 * System.String
-* System.Single
+* System.Float
 * System.Decimal
 * System.Guid
 * System.Byte
