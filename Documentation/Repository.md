@@ -28,7 +28,6 @@
                 
              // Start the migration
             InitializeMigration();
-            base.OnModuleStart();
         }
         
         // We could configrate our modules here instead of adding attributes in the class,
@@ -49,8 +48,6 @@
                 
                  moduleBuilder.Entity<Person>()
                  .HasColumnType(x => x.FirstName, "varchar(100)");
-                 
-            base.OnModuleConfiguration(moduleBuilder);
          }
 
 
