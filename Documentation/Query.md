@@ -19,7 +19,7 @@ Lets build a select expression here and see how it works
                  x.Address.Any(a=> a.AddressName.StartsWith("st"))
                 ).LoadChildren(x=> x.Role.Users.Select(a=> a.Address), x=> x.Address)
                 .IgnoreChildren(x=> x.Role.Users.Select(a=> a.Role)).OrderBy(x=> x.UserName).Skip(20).Take(100).Execute();        
-        Console.WriteLine(users.ToJson());
+        Console.WriteLine(users.Json());
         Console.ReadLine();
    }
 
