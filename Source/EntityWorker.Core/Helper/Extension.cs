@@ -739,16 +739,16 @@ namespace EntityWorker.Core.Helper
             var baseListType = typeof(List<>);
             var listType = baseListType.MakeGenericType(tType);
             var iList = DeepCloner.CreateInstance(listType) as IList;
-#if (NETSTANDARD2_0 || NETSTANDARD1_3 || NETSTANDARD1_5)
+            //#if (NETSTANDARD2_0 || NETSTANDARD1_3 || NETSTANDARD1_5)
             var props = DeepCloner.GetFastDeepClonerProperties(tType);
-#endif
+            //#endif
             try
             {
                 while (reader.Read())
                 {
                     object item = null;
                     object clItem = null;
-#if (NETSTANDARD2_0 || NETSTANDARD1_3 || NETSTANDARD1_5)
+                    //#if (NETSTANDARD2_0 || NETSTANDARD1_3 || NETSTANDARD1_5)
 
                     item = DeepCloner.CreateInstance(tType);
                     clItem = DeepCloner.CreateInstance(tType);
@@ -763,7 +763,7 @@ namespace EntityWorker.Core.Helper
                         var prop = DeepCloner.GetProperty(tType, columnName);
 
                         if (prop == null)
-                              prop = props.FirstOrDefault(x => x.GetPropertyName() == columnName || x.Name.ToLower() == columnName || x.GetPropertyName().ToLower() == columnName);
+                            prop = props.FirstOrDefault(x => string.Equals(x.GetPropertyName(), columnName, StringComparison.CurrentCultureIgnoreCase) || x.GetPropertyName().ToLower() == columnName);
 
                         if (value != null && prop != null && prop.CanRead)
                         {
@@ -787,14 +787,14 @@ namespace EntityWorker.Core.Helper
                         }
                         col++;
                     }
-#else
-                    var cmReader = new DataRecordExtended(reader);
-                    if (!CachedDataRecord.ContainsKey(tType))
-                        CachedDataRecord.GetOrAdd(tType, DynamicBuilder.CreateBuilder(cmReader, tType));
-                    var x = CachedDataRecord[tType];
-                    item = x.Build(cmReader);
-                    clItem = !(repository?.IsAttached(item) ?? true) ? x.Build(cmReader) : null;
-#endif
+                    //#else
+                    //                    var cmReader = new DataRecordExtended(reader);
+                    //                    if (!CachedDataRecord.ContainsKey(tType))
+                    //                        CachedDataRecord.GetOrAdd(tType, DynamicBuilder.CreateBuilder(cmReader, tType));
+                    //                    var x = CachedDataRecord[tType];
+                    //                    item = x.Build(cmReader);
+                    //                    clItem = !(repository?.IsAttached(item) ?? true) ? x.Build(cmReader) : null;
+                    //#endif
 
                     if (clItem != null && !(repository?.IsAttached(clItem) ?? true))
                         repository?.AttachNew(clItem);

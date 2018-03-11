@@ -4,6 +4,10 @@ namespace LightData.CMS.Modules.Library
 {
     public class User
     {
+        public User(string txt)
+        {
+
+        }
         public string Id { get; set; }
 
         public string UserName { get; set; }

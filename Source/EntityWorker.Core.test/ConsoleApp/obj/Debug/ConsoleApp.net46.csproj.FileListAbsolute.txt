@@ -20,3 +20,4 @@ D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\ConsoleApp\obj\Debug
 D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\ConsoleApp\obj\Debug\ConsoleApp.net46.csproj.CoreCompileInputs.cache
 D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\ConsoleApp\obj\Debug\ConsoleApp1.exe
 D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\ConsoleApp\obj\Debug\ConsoleApp1.pdb
+D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\ConsoleApp\obj\Debug\ConsoleApp.net46.csproj.CopyComplete

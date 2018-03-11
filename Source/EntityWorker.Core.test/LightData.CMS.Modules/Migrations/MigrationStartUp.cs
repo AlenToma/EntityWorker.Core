@@ -50,7 +50,7 @@ namespace LightData.CMS.Modules.Migrations
             {
                 users.AddRange(new List<User>()
             {
-                new User()
+                new User("")
                 {
                 Id= "ADMIN",
                 UserName = "Admin",

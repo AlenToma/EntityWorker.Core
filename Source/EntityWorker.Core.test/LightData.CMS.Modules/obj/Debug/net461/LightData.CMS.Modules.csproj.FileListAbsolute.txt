@@ -33,3 +33,4 @@ D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Module
 D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\obj\Debug\net461\LightData.CMS.Modules.AssemblyInfo.cs
 D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\obj\Debug\net461\LightData.CMS.Modules.dll
 D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\obj\Debug\net461\LightData.CMS.Modules.pdb
+D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\obj\Debug\net461\LightData.CMS.Modules.csproj.CopyComplete

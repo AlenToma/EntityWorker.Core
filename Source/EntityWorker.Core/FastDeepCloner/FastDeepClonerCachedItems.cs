@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.Serialization;
 
 namespace EntityWorker.Core.FastDeepCloner
 {
@@ -15,6 +16,7 @@ namespace EntityWorker.Core.FastDeepCloner
         private static readonly Custom_ValueType<Type, Type> CachedTypes = new Custom_ValueType<Type, Type>();
         private static readonly Custom_ValueType<Type, Func<object>> CachedConstructor = new Custom_ValueType<Type, Func<object>>();
         private static readonly Custom_ValueType<Type, ObjectActivator> CachedDynamicMethod = new Custom_ValueType<Type, ObjectActivator>();
+        private static readonly Custom_ValueType<Type, ConstructorInfo> DefaultConstructor = new Custom_ValueType<Type, ConstructorInfo>();
 
 
         public static void CleanCachedItems()
@@ -24,6 +26,7 @@ namespace EntityWorker.Core.FastDeepCloner
             CachedConstructor.Clear();
             CachedPropertyInfo.Clear();
             CachedDynamicMethod.Clear();
+            DefaultConstructor.Clear();
         }
 
         internal static Type GetIListType(this Type type)
@@ -46,22 +49,31 @@ namespace EntityWorker.Core.FastDeepCloner
 
         internal static object Creator(this Type type)
         {
+            if (!DefaultConstructor.ContainsKey(type))
+                    DefaultConstructor.Add(type, type.GetConstructor(Type.EmptyTypes));
+            
+
+            if (DefaultConstructor[type] != null)
+            {
 #if NETSTANDARD2_0 || NETSTANDARD1_3 || NETSTANDARD1_5
             if (CachedConstructor.ContainsKey(type))
                 return CachedConstructor[type].Invoke();
             return CachedConstructor.GetOrAdd(type, Expression.Lambda<Func<object>>(Expression.New(type)).Compile()).Invoke();
 #else
-            if (CachedDynamicMethod.ContainsKey(type))
-                return CachedDynamicMethod[type]();
+                if (CachedDynamicMethod.ContainsKey(type))
+                    return CachedDynamicMethod[type]();
 
-            var emptyConstructor = type.GetConstructor(Type.EmptyTypes);
-            var dynamicMethod = new System.Reflection.Emit.DynamicMethod("CreateInstance", type, Type.EmptyTypes, true);
-            System.Reflection.Emit.ILGenerator ilGenerator = dynamicMethod.GetILGenerator();
-            ilGenerator.Emit(System.Reflection.Emit.OpCodes.Nop);
-            ilGenerator.Emit(System.Reflection.Emit.OpCodes.Newobj, emptyConstructor);
-            ilGenerator.Emit(System.Reflection.Emit.OpCodes.Ret);
-            return CachedDynamicMethod.GetOrAdd(type, (ObjectActivator)dynamicMethod.CreateDelegate(typeof(ObjectActivator)))();
+                var emptyConstructor = DefaultConstructor[type];
+                var dynamicMethod = new System.Reflection.Emit.DynamicMethod("CreateInstance", type, Type.EmptyTypes, true);
+                System.Reflection.Emit.ILGenerator ilGenerator = dynamicMethod.GetILGenerator();
+                ilGenerator.Emit(System.Reflection.Emit.OpCodes.Nop);
+                ilGenerator.Emit(System.Reflection.Emit.OpCodes.Newobj, emptyConstructor);
+                ilGenerator.Emit(System.Reflection.Emit.OpCodes.Ret);
+                return CachedDynamicMethod.GetOrAdd(type, (ObjectActivator)dynamicMethod.CreateDelegate(typeof(ObjectActivator)))();
 #endif
+            }
+            else
+                return FormatterServices.GetUninitializedObject(type);
         }
 
 

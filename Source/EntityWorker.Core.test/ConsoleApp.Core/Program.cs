@@ -62,14 +62,14 @@ namespace ConsoleApp.Core
 
                 var role = rep.Get<Role>().ExecuteFirstOrDefault();
 
-                var user = new User() { UserName = "test", Password = "test", Role = role, Person = new Person() { FirstName = "asd" } };
+                var user = new User("") { UserName = "test", Password = "test", Role = role, Person = new Person() { FirstName = "asd" } };
                 Console.WriteLine("----------------Roleback Test------------------");
                 rep.Save(user);
                 rep.Rollback();
                 Console.WriteLine((rep.Get<User>().Where(x => x.Id == user.Id).ExecuteCount() > 0 ? "Failed" : "Success"));
                 Console.WriteLine(" ");
 
-                user = new User() { UserName = "test", Password = "test", Role = role, Person = new Person() { FirstName = "asd" } };
+                user = new User("") { UserName = "test", Password = "test", Role = role, Person = new Person() { FirstName = "asd" } };
                 Console.WriteLine("----------------SaveChanges Test------------------");
                 rep.Save(user);
                 rep.SaveChanges();
@@ -108,14 +108,14 @@ namespace ConsoleApp.Core
 
                 var role = rep.Get<Role>().ExecuteFirstOrDefault();
 
-                var user = new User() { UserName = "test", Password = "test", Role = role, Person = new Person() { FirstName = "asd" } };
+                var user = new User("") { UserName = "test", Password = "test", Role = role, Person = new Person() { FirstName = "asd" } };
                 Console.WriteLine("----------------Roleback Test------------------");
                 rep.Save(user);
                 rep.Rollback();
                 Console.WriteLine((rep.Get<User>().Where(x => x.Id == user.Id).ExecuteCount() > 0 ? "Failed" : "Success"));
                 Console.WriteLine(" ");
 
-                user = new User() { UserName = "test", Password = "test", Role = role, Person = new Person() { FirstName = "asd" } };
+                user = new User("") { UserName = "test", Password = "test", Role = role, Person = new Person() { FirstName = "asd" } };
                 Console.WriteLine("----------------SaveChanges Test------------------");
                 rep.Save(user);
                 rep.SaveChanges();
@@ -151,14 +151,14 @@ namespace ConsoleApp.Core
             using (var rep = new Repository(EntityWorker.Core.Helper.DataBaseTypes.Sqllight))
             {
                 var role = rep.Get<Role>().ExecuteFirstOrDefault();
-                var user = new User() { UserName = "test", Password = "test", Role = role, Person = new Person() { FirstName = "asd" } };
+                var user = new User("") { UserName = "test", Password = "test", Role = role, Person = new Person() { FirstName = "asd" } };
                 Console.WriteLine("----------------Roleback Test------------------");
                 rep.Save(user);
                 rep.Rollback();
                 Console.WriteLine((rep.Get<User>().Where(x => x.Id == user.Id).ExecuteCount() > 0 ? "Failed" : "Success"));
                 Console.WriteLine(" ");
 
-                user = new User() { UserName = "test", Password = "test", Role = role, Person = new Person() { FirstName = "asd" } };
+                user = new User("") { UserName = "test", Password = "test", Role = role, Person = new Person() { FirstName = "asd" } };
                 Console.WriteLine("----------------SaveChanges Test------------------");
                 rep.Save(user);
                 rep.SaveChanges();

@@ -3,9 +3,9 @@
     <TargetFrameworks>netcoreapp2.0;netstandard2.0;net451</TargetFrameworks>
     <PackageId>EntityWorker.Core</PackageId>
     <AssemblyName>EntityWorker.Core</AssemblyName>
-    <AssemblyVersion>1.0.5.3</AssemblyVersion>
-    <FileVersion>1.0.5.3</FileVersion>
-    <Version>1.5.3</Version>
+    <AssemblyVersion>1.0.5.4</AssemblyVersion>
+    <FileVersion>1.0.5.4</FileVersion>
+    <Version>1.5.4</Version>
     <Authors>Alen Toma</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageProjectUrl>https://github.com/AlenToma/EntityWorker.Core</PackageProjectUrl>
@@ -19,7 +19,7 @@ And it have support to multiple providers like mssql, sqlite and postgressql</De
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <!--<TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeP2POutput;</TargetsForTfmSpecificBuildOutput>-->
     <!--<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);CustomContentTarget</TargetsForTfmSpecificContentInPackage>-->
-    <PackageReleaseNotes>Added Attribute ColumnType to be able to apply custom datatype for the column.</PackageReleaseNotes>
+    <PackageReleaseNotes>Handle Types with parameters constructor</PackageReleaseNotes>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>7.2</LangVersion>
   </PropertyGroup>
