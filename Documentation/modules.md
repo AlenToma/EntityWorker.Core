@@ -1,4 +1,4 @@
-Let's start building our models, lets build a simple User model
+### Let's start building our models, lets build a simple User model
 Importend rule: Every class except abstract classes like entity , those wont be created only inherted must have a 
 public Constructor
 ```csharp
