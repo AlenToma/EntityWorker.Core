@@ -1,6 +1,6 @@
 ### Let's start building our models, lets build a simple User model
 Importend rule: Every class except abstract classes like entity , those wont be created only inherted must have a 
-public default Constructor
+public default without any parameters Constructor
 ```csharp
    // Migration will ignore creating abstract classes
    public abstract class Entity
