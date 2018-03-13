@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using EntityWorker.Core.Interface;
 using EntityWorker.Core.SqlQuerys;
 using EntityWorker.Core.Helper;
+using EntityWorker.Core.Object.Library.XML;
 
 namespace EntityWorker.Core.Object.Library
 {
@@ -435,6 +436,24 @@ namespace EntityWorker.Core.Object.Library
         public async Task<string> JsonAsync()
         {
             return await Task.FromResult<string>(Execute().ToJson());
+        }
+
+        /// <summary>
+        /// Convert To XML
+        /// </summary>
+        /// <returns></returns>
+        public string Xml()
+        {
+           return Execute().ToXml();
+        }
+
+        /// <summary>
+        /// Convert To XML
+        /// </summary>
+        /// <returns></returns>
+        public async Task<string> XmlAsync()
+        {
+            return await Task.FromResult<string>(Execute().ToXml());
         }
     }
 }

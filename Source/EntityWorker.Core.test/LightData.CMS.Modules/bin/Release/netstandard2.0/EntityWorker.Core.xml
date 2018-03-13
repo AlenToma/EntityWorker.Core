@@ -160,6 +160,12 @@
             and converted back to its original string when its read
             </summary>
         </member>
+        <member name="T:EntityWorker.Core.Attributes.XmlIgnore">
+            <summary>
+            Ignore serialize to xml
+            EntityWorker will ignore serializing or derializing all properties that contain this attribute
+            </summary>
+        </member>
         <member name="M:EntityWorker.Core.DbSchema.Select``1(System.String)">
             <summary>
             Get all by object
@@ -1185,6 +1191,20 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.Xml">
+            <summary>
+            Convert To XML
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Xml.md
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.XmlAsync">
+            <summary>
+            Convert To XML
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Xml.md
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:EntityWorker.Core.InterFace.IRepository">
             <summary>
             EntityWorker.Core Repository
@@ -1333,6 +1353,22 @@
             <summary>
             Get ISqlQueryable from Json.
             All JsonIgnore Values will be loaded from the database if a primary key exist and the value is default()  eg null or empty or even 0 for int and decimal
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.FromXml``1(System.String)">
+            <summary>
+            Get ISqlQueryable from Xml.
+            All XmlIgnore Values will be loaded from the database if a primary key exist and the value is default()  eg null or empty or even 0 for int and decimal
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.FromXmlAsync``1(System.String)">
+            <summary>
+            Get ISqlQueryable from Xml.
+            All XmlIgnore Values will be loaded from the database if a primary key exist and the value is default()  eg null or empty or even 0 for int and decimal
             </summary>
             <typeparam name="T"></typeparam>
             <returns></returns>
@@ -2065,7 +2101,14 @@
             </summary>
             <typeparam name="TP"></typeparam>
             <param name="action"></param>
-            <param name="autoGenerate"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.Modules.ObjectMapps`1.HasXmlIgnore``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+            EntityWorker will ignore serializing or derializing all properties that contain this attribute
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Object.Library.Modules.ObjectMapps`1.HasPrimaryKey``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
@@ -2370,6 +2413,42 @@
             <summary>
             Convert To JSON
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.Xml">
+            <summary>
+            Convert To XML
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.XmlAsync">
+            <summary>
+            Convert To XML
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:EntityWorker.Core.Object.Library.XML.XmlUtility">
+            <summary>
+            Xml handler
+            </summary>
+            Name:Alen Toma
+            Date: 2018-02-13
+            Assignment: 4
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.XML.XmlUtility.ToXml(System.Object)">
+            <summary>
+            serialize object to xml
+            </summary>
+            <param name="o"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.XML.XmlUtility.FromXml``1(System.String,EntityWorker.Core.Transaction.Transaction)">
+            <summary>
+            DeSerilize Xml to IAnimal, this is supposed to handle all unknow object types but there has not been to many tests.
+            Only IAnimal test been done here.
+            </summary>
+            <param name="xml"></param>
+            <param name="transaction"></param>
             <returns></returns>
         </member>
         <member name="T:EntityWorker.Core.Postgres.BackendMessages.CopyDataMessage">
@@ -10963,6 +11042,22 @@
             <summary>
             Get ISqlQueryable from Json.
             All JsonIgnore Values will be loaded from the database if a primary key exist
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.FromXml``1(System.String)">
+            <summary>
+            Get ISqlQueryable from Xml.
+            All XmlIgnore Values will be loaded from the database if a primary key exist and the value is default()  eg null or empty or even 0 for int and decimal
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.FromXmlAsync``1(System.String)">
+            <summary>
+            Get ISqlQueryable from Xml.
+            All XmlIgnore Values will be loaded from the database if a primary key exist and the value is default()  eg null or empty or even 0 for int and decimal
             </summary>
             <typeparam name="T"></typeparam>
             <returns></returns>

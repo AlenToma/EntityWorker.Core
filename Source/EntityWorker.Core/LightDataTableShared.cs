@@ -141,6 +141,13 @@ namespace EntityWorker.Core
                 if (IgnoreTypeValidation)
                     return;
 
+                if (dataType == typeof(byte[]) && value.GetType() == typeof(string))
+                {
+                    if (value.ToString().Length % 4 == 0) // its a valid base64string
+                        value = Convert.FromBase64String(value.ToString());
+                    return;
+                }
+
                 if (dataType == typeof(int?) || dataType == typeof(int))
                 {
                     if (double.TryParse(CleanValue(dataType, value).ToString(), NumberStyles.Float, Culture, out var douTal))

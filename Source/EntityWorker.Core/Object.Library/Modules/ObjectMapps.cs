@@ -4,7 +4,6 @@ using EntityWorker.Core.Interface;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text.RegularExpressions;
 
 namespace EntityWorker.Core.Object.Library.Modules
 {
@@ -52,7 +51,6 @@ namespace EntityWorker.Core.Object.Library.Modules
         /// </summary>
         /// <typeparam name="TP"></typeparam>
         /// <param name="action"></param>
-        /// <param name="autoGenerate"></param>
         /// <returns></returns>
         public IObjectMapps<T> HasJsonIgnore<TP>(Expression<Func<T, TP>> action)
         {
@@ -60,6 +58,21 @@ namespace EntityWorker.Core.Object.Library.Modules
             if (prop == null)
                 throw new Exception($"Could not find Property{Extension.GetMemberName(action)}");
             prop.Attributes.Add(new JsonIgnore());
+            return this;
+        }
+
+        /// <summary>
+        /// EntityWorker will ignore serializing or derializing all properties that contain this attribute
+        /// </summary>
+        /// <typeparam name="TP"></typeparam>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public IObjectMapps<T> HasXmlIgnore<TP>(Expression<Func<T, TP>> action)
+        {
+            var prop = FastDeepCloner.DeepCloner.GetProperty(typeof(T), Extension.GetMemberName(action));
+            if (prop == null)
+                throw new Exception($"Could not find Property{Extension.GetMemberName(action)}");
+            prop.Attributes.Add(new XmlIgnore());
             return this;
         }
 

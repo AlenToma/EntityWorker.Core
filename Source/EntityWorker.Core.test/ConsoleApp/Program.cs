@@ -199,6 +199,9 @@ namespace ConsoleApp1
                 //var json = rep.Get<User>().LoadChildren().Json();
                 //var test = rep.FromJson<User>(json);
 
+                //var xml = rep.Get<User>().LoadChildren().Xml();
+                //var test = rep.FromXml<User>(xml);
+
                 execute(rep.Get<User>().LoadChildren(), "Get All");
                 execute(rep.Get<Person>().Where(x => x.FirstName.Contains("Admin") || !string.IsNullOrEmpty(x.FirstName) || string.IsNullOrEmpty(x.FirstName) == false && x.Id != id), "IsNullOrEmpty");
 

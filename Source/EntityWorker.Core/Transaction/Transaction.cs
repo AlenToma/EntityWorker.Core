@@ -18,6 +18,7 @@ using System.Collections;
 using EntityWorker.Core.SqlQuerys;
 using EntityWorker.Core.Postgres;
 using EntityWorker.Core.Object.Library.Modules;
+using EntityWorker.Core.Object.Library.XML;
 
 namespace EntityWorker.Core.Transaction
 {
@@ -959,6 +960,32 @@ namespace EntityWorker.Core.Transaction
         }
 
         /// <summary>
+        /// Get ISqlQueryable from Xml.
+        /// All XmlIgnore Values will be loaded from the database if a primary key exist and the value is default()  eg null or empty or even 0 for int and decimal
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public ISqlQueryable<T> FromXml<T>(string xmlString)
+        {
+            if (typeof(T).GetPrimaryKey() == null)
+                throw new ArgumentNullException("Primary Id not found for object " + typeof(T).FullName);
+            return new SqlQueryable<T>(this, xmlString.FromXml<List<T>>(this));
+        }
+
+        /// <summary>
+        /// Get ISqlQueryable from Xml.
+        /// All XmlIgnore Values will be loaded from the database if a primary key exist and the value is default()  eg null or empty or even 0 for int and decimal
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public async Task<ISqlQueryable<T>> FromXmlAsync<T>(string xmlString)
+        {
+            if (typeof(T).GetPrimaryKey() == null)
+                throw new ArgumentNullException("Primary Id not found for object " + typeof(T).FullName);
+            return await Task.FromResult<ISqlQueryable<T>>(new SqlQueryable<T>(this, xmlString.FromXml<List<T>>(this)));
+        }
+
+        /// <summary>
         /// Create IQueryable from Expression
         /// </summary>
         /// <typeparam name="TElement"></typeparam>
@@ -1008,6 +1035,7 @@ namespace EntityWorker.Core.Transaction
                 return Select<TResult>(_expression.Quary).First();
             else return (TResult)_dbSchema.Select(expression.Type, _expression.Quary);
         }
+
         #endregion
     }
 }

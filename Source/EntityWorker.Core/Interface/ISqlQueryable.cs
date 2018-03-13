@@ -198,5 +198,19 @@ namespace EntityWorker.Core.Interface
         /// </summary>
         /// <returns></returns>
         Task<string> JsonAsync();
+
+        /// <summary>
+        /// Convert To XML
+        /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Xml.md
+        /// </summary>
+        /// <returns></returns>
+        string Xml();
+
+        /// <summary>
+        /// Convert To XML
+        /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Xml.md
+        /// </summary>
+        /// <returns></returns>
+        Task<string> XmlAsync();
     }
 }
