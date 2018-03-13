@@ -34,6 +34,7 @@ See Code Example for more info.
 * [Migrations](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Migration.md)
 * [Querys](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Query.md)
 * [Json](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Json.md)
+* [Xml](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Xml.md)
 * [Save](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Save.md)
 * [LinqToSql](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/LinqToSql.md)
 * [Custom ISqlQueryable](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/CustomQueries.md)
