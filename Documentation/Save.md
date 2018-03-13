@@ -31,6 +31,7 @@ Depending on the primarykey it will either execute an update or insert.
             // .ClearAllIdsHierarchy(true);
             rep.Save(user);
         }
+        rep.SaveChanges();
         Console.WriteLine(users.ToJson());
         Console.ReadLine();
    }
