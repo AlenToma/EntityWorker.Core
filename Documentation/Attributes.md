@@ -11,6 +11,13 @@ There are many attributes you could use to improve the code
 
 /// <summary>
 /// Ignore serlizing and deserializing property
+/// when deserializing using entityWorker.Xml all Xml ignored property will be loaded back
+/// from the database as long as primary key exist withing the xml string.
+/// </summary>
+[XmlIgnore]
+
+/// <summary>
+/// Ignore serlizing and deserializing property
 /// when deserializing using entityWorker.Json all Json ignored property will be loaded back
 /// from the database as long as primary key exist withing the json string.
 /// </summary>
