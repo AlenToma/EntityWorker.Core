@@ -44,7 +44,8 @@
                 .HasIndependentData(x => x.Role)
                 .HasForeignKey<Person, Guid>(x => x.PersonId)
                 .HasRule<UserRule>()
-                .HasJsonIgnore(x=> x.Password);
+                .HasJsonIgnore(x=> x.Password)
+                .HasXmlIgnore(x=> x.Password);
                 
                  moduleBuilder.Entity<Person>()
                  .HasColumnType(x => x.FirstName, "varchar(100)");

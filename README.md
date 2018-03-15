@@ -40,6 +40,7 @@ See Code Example for more info.
 * [Custom ISqlQueryable](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/CustomQueries.md)
 * [Entity Mappings](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/EntityMappings.md)
 * [ObjectChanges](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/ObjectChanges.md)
+* [Package](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Package.md)
 * [Attributes](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md)
 
 ## Issues
