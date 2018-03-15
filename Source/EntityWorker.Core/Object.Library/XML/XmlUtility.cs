@@ -1,6 +1,7 @@
 ﻿using EntityWorker.Core.Attributes;
 using EntityWorker.Core.FastDeepCloner;
 using EntityWorker.Core.Helper;
+using EntityWorker.Core.InterFace;
 using EntityWorker.Core.SqlQuerys;
 using System;
 using System.Collections;
@@ -11,12 +12,6 @@ using System.Xml;
 
 namespace EntityWorker.Core.Object.Library.XML
 {
-    /// <summary>
-    /// Xml handler
-    /// </summary>
-    /// Name:Alen Toma
-    /// Date: 2018-02-13
-    /// Assignment: 4
     internal static class XmlUtility
     {
         /// <summary>
@@ -42,7 +37,7 @@ namespace EntityWorker.Core.Object.Library.XML
         /// <param name="xml"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
-        public static T FromXml<T>(this string xml, Transaction.Transaction transaction)
+        public static T FromXml<T>(this string xml, IRepository transaction) where T : class
         {
             if (string.IsNullOrEmpty(xml))
                 return (T)(new object());
@@ -87,8 +82,8 @@ namespace EntityWorker.Core.Object.Library.XML
 
                 }
             }
-
-            LoadXmlIgnoreProperties(o);
+            if (transaction != null)
+                LoadXmlIgnoreProperties(o);
             return o;
 
         }

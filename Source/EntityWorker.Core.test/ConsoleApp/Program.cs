@@ -13,6 +13,7 @@ namespace ConsoleApp1
         private static Stopwatch sw = new Stopwatch();
         static void Main(string[] args)
         {
+            PackageTest();
             TestSave();
             ExpressionTest();
             Console.ReadLine();
@@ -54,6 +55,18 @@ namespace ConsoleApp1
             }
         }
 
+
+        private static void PackageTest()
+        {
+            Console.WriteLine("----------------Package Handler Create Package------------------");
+            using (var rep = new Repository(DataBaseTypes.PostgreSql))
+            {
+                var users = rep.Get<User>().LoadChildren().Execute();
+                var package = rep.CreatePackage(new Package() { Data = users.Cast<object>().ToList() });
+                var readerPackage = rep.GetPackage<Package>(package);
+                Console.WriteLine((readerPackage.Data.Count <= 0 ? "Failed" : "Success"));
+            }
+        }
 
         public static void TestSave()
         {
@@ -196,8 +209,8 @@ namespace ConsoleApp1
             {
                 var id = Guid.NewGuid();
 
-                //var json = rep.Get<User>().LoadChildren().Json();
-                //var test = rep.FromJson<User>(json);
+                var json = rep.Get<User>().LoadChildren().Json();
+                var test = rep.FromJson<User>(json);
 
                 //var xml = rep.Get<User>().LoadChildren().Xml();
                 //var test = rep.FromXml<User>(xml);
@@ -260,7 +273,7 @@ namespace ConsoleApp1
                 execute(rep.Get<Person>().Where(x => strList.Contains(x.FirstName) || !strList.Contains(x.FirstName)), "EndsWith");
 
                 execute(rep.Get<Person>().Where(x => x.FirstName.StartsWith("a") || !x.FirstName.StartsWith("b") && x.FirstName.StartsWith("b") == false), "StartsWith");
-            }           
+            }
         }
 
     }

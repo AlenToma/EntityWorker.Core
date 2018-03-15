@@ -163,7 +163,7 @@ namespace EntityWorker.Core.InterFace
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        ISqlQueryable<T> FromJson<T>(string json);
+        ISqlQueryable<T> FromJson<T>(string json) where T : class;
 
         /// <summary>
         /// Get ISqlQueryable from Json.
@@ -171,7 +171,7 @@ namespace EntityWorker.Core.InterFace
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        Task<ISqlQueryable<T>> FromJsonAsync<T>(string json);
+        Task<ISqlQueryable<T>> FromJsonAsync<T>(string json) where T : class;
 
         /// <summary>
         /// Get ISqlQueryable from Xml.
@@ -179,7 +179,7 @@ namespace EntityWorker.Core.InterFace
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        ISqlQueryable<T> FromXml<T>(string xmlString);
+        ISqlQueryable<T> FromXml<T>(string xmlString) where T : class;
 
         /// <summary>
         /// Get ISqlQueryable from Xml.
@@ -187,7 +187,7 @@ namespace EntityWorker.Core.InterFace
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        Task<ISqlQueryable<T>> FromXmlAsync<T>(string xmlString);
+        Task<ISqlQueryable<T>> FromXmlAsync<T>(string xmlString) where T : class;
 
         /// <summary>
         /// Get all 
@@ -340,5 +340,21 @@ namespace EntityWorker.Core.InterFace
         /// <returns></returns>
         IList DataReaderConverter(DbCommandExtended command, Type type);
 
+        /// <summary>
+        /// Create Protected package that contain files or data for backup purpose or moving data from one location to another.
+        /// Note that this package can only be readed by EntityWorker.Core
+        /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Package.md
+        /// </summary>
+        /// <param name="package"></param>
+        /// <returns></returns>
+        byte[] CreatePackage<T>(T package) where T : PackageEntity;
+
+        /// <summary>
+        /// Read the package and get its content
+        /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Package.md
+        /// </summary>
+        /// <param name="package"></param>
+        /// <returns></returns>
+        T GetPackage<T>(byte[] package) where T : PackageEntity;
     }
 }

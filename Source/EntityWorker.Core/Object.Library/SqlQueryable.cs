@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using EntityWorker.Core.Interface;
 using EntityWorker.Core.SqlQuerys;
 using EntityWorker.Core.Helper;
-using EntityWorker.Core.Object.Library.XML;
 
 namespace EntityWorker.Core.Object.Library
 {

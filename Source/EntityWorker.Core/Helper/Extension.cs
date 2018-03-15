@@ -16,6 +16,7 @@ using EntityWorker.Core.Object.Library.JSON;
 using System.Threading.Tasks;
 using EntityWorker.Core.InterFace;
 using EntityWorker.Core.SqlQuerys;
+using EntityWorker.Core.Object.Library.XML;
 
 namespace EntityWorker.Core.Helper
 {
@@ -193,6 +194,28 @@ namespace EntityWorker.Core.Helper
         {
             return JSON.ToObject(json);
         }
+
+        /// <summary>
+        /// Xml to object
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="xml"></param>
+        /// <param name="repository"> Assign repository to load XmlIgnored properties</param>
+        /// <returns></returns>
+        public static T FromXml<T>(this string xml, IRepository repository = null)  where T : class
+        {
+            return XmlUtility.FromXml<T>(xml, repository);
+        }
+
+        /// <summary>
+        /// Object to xml
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns></returns>
+        public static string ToXml(this object o)
+        {
+            return XmlUtility.ToXml(o);
+        } 
 
         /// <summary>
         /// Get PropertyName of the expression

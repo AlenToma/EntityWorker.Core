@@ -18,7 +18,9 @@ using System.Collections;
 using EntityWorker.Core.SqlQuerys;
 using EntityWorker.Core.Postgres;
 using EntityWorker.Core.Object.Library.Modules;
-using EntityWorker.Core.Object.Library.XML;
+using System.IO;
+using System.IO.Compression;
+using EntityWorker.Core.Object.Library.Gzip;
 
 namespace EntityWorker.Core.Transaction
 {
@@ -79,7 +81,7 @@ namespace EntityWorker.Core.Transaction
             _attachedObjects = new Custom_ValueType<string, object>();
             if (string.IsNullOrEmpty(connectionString))
                 if (string.IsNullOrEmpty(connectionString))
-                    throw new Exception("connectionString cant be empty");
+                    throw new Exception("ConnectionString can not be empty");
 
             ConnectionString = connectionString;
             DataBaseTypes = dataBaseTypes;
@@ -112,8 +114,9 @@ namespace EntityWorker.Core.Transaction
         protected abstract void OnModuleConfiguration(IModuleBuilder moduleBuilder);
 
         /// <summary>
-        /// Initialize the migration
+        ///  Initialize the migration
         /// </summary>
+        /// <param name="assembly">null for the current Assembly</param>
         protected void InitializeMigration(Assembly assembly = null)
         {
             lock (MigrationLocker)
@@ -159,16 +162,16 @@ namespace EntityWorker.Core.Transaction
             var npSqlBuilder = DataBaseTypes == DataBaseTypes.PostgreSql ? new NpgsqlConnectionStringBuilder(ConnectionString) : null;
             var dbName = DataBaseTypes == DataBaseTypes.Mssql ? sqlBuild.InitialCatalog : sqlBuild?.DataSource;
             if (string.IsNullOrEmpty(dbName) && DataBaseTypes != DataBaseTypes.PostgreSql)
-                throw new Exception("InitialCatalog cant be null or empty");
+                throw new Exception("InitialCatalog can not be null or empty");
 
             if (DataBaseTypes == DataBaseTypes.PostgreSql && string.IsNullOrEmpty(npSqlBuilder.Database))
-                throw new Exception("Database cant be null or empty");
+                throw new Exception("Database can not be null or empty");
 
             if (DataBaseTypes == DataBaseTypes.Mssql)
             {
                 sqlBuild.InitialCatalog = "master";
                 var tr = new DbRepository(sqlBuild.ToString(), DataBaseTypes);
-                var cmd = tr.GetSqlCommand("SELECT  CAST(CASE WHEN db_id(String[" + dbName + "]) is not null THEN 1 ELSE 0 END AS BIT)");
+                var cmd = tr.GetSqlCommand($"SELECT  CAST(CASE WHEN db_id(String[{dbName}]) is not null THEN 1 ELSE 0 END AS BIT)");
                 return tr.ExecuteScalar(cmd).ConvertValue<bool>();
             }
             else if (DataBaseTypes == DataBaseTypes.Sqllight)
@@ -190,7 +193,7 @@ namespace EntityWorker.Core.Transaction
                 dbName = npSqlBuilder.Database;
                 npSqlBuilder.Database = "";
                 var tr = new DbRepository(npSqlBuilder.ToString(), DataBaseTypes);
-                var cmd = tr.GetSqlCommand("SELECT CAST(CASE WHEN datname is not null THEN 1 ELSE 0 END AS BIT) from pg_database WHERE lower(datname) = lower(String[" + dbName + "])");
+                var cmd = tr.GetSqlCommand($"SELECT CAST(CASE WHEN datname is not null THEN 1 ELSE 0 END AS BIT) from pg_database WHERE lower(datname) = lower(String[{dbName}])");
                 return tr.ExecuteScalar(cmd).ConvertValue<bool>();
 
             }
@@ -221,7 +224,7 @@ namespace EntityWorker.Core.Transaction
                 {
                     sqlBuild.InitialCatalog = "master";
                     var tr = new DbRepository(sqlBuild.ToString(), DataBaseTypes);
-                    var cmd = tr.GetSqlCommand("Create DataBase [" + dbName.Trim() + "]");
+                    var cmd = tr.GetSqlCommand($"Create DataBase [{dbName.Trim()}]");
                     tr.ExecuteNonQuery(cmd);
 
                 }
@@ -232,7 +235,7 @@ namespace EntityWorker.Core.Transaction
                     dbName = npSqlBuilder.Database;
                     npSqlBuilder.Database = "";
                     var tr = new DbRepository(npSqlBuilder.ToString(), DataBaseTypes);
-                    var cmd = tr.GetSqlCommand("Create DataBase " + dbName.Trim());
+                    var cmd = tr.GetSqlCommand($"Create DataBase {dbName}");
                     tr.ExecuteNonQuery(cmd);
                 }
 
@@ -939,7 +942,7 @@ namespace EntityWorker.Core.Transaction
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public ISqlQueryable<T> FromJson<T>(string json)
+        public ISqlQueryable<T> FromJson<T>(string json) where T : class
         {
             if (typeof(T).GetPrimaryKey() == null)
                 throw new ArgumentNullException("Primary Id not found for object " + typeof(T).FullName);
@@ -952,7 +955,7 @@ namespace EntityWorker.Core.Transaction
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public async Task<ISqlQueryable<T>> FromJsonAsync<T>(string json)
+        public async Task<ISqlQueryable<T>> FromJsonAsync<T>(string json) where T : class
         {
             if (typeof(T).GetPrimaryKey() == null)
                 throw new ArgumentNullException("Primary Id not found for object " + typeof(T).FullName);
@@ -965,7 +968,7 @@ namespace EntityWorker.Core.Transaction
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public ISqlQueryable<T> FromXml<T>(string xmlString)
+        public ISqlQueryable<T> FromXml<T>(string xmlString) where T : class
         {
             if (typeof(T).GetPrimaryKey() == null)
                 throw new ArgumentNullException("Primary Id not found for object " + typeof(T).FullName);
@@ -978,7 +981,7 @@ namespace EntityWorker.Core.Transaction
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public async Task<ISqlQueryable<T>> FromXmlAsync<T>(string xmlString)
+        public async Task<ISqlQueryable<T>> FromXmlAsync<T>(string xmlString) where T : class
         {
             if (typeof(T).GetPrimaryKey() == null)
                 throw new ArgumentNullException("Primary Id not found for object " + typeof(T).FullName);
@@ -1034,6 +1037,64 @@ namespace EntityWorker.Core.Transaction
             if (!isEnumerable)
                 return Select<TResult>(_expression.Quary).First();
             else return (TResult)_dbSchema.Select(expression.Type, _expression.Quary);
+        }
+
+        #endregion
+
+        #region Package Handler
+
+        private const string packageSecurityKey = "EntityWorker.Security.Key";
+        /// <summary>
+        /// Create Protected package that contain files or data for backup purpose or moving data from one location to another.
+        /// Note that this package can only be readed by EntityWorker.Core
+        /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Package.md
+        /// </summary>
+        /// <param name="package"></param>
+        /// <returns></returns>
+        public byte[] CreatePackage<T>(T package) where T : PackageEntity
+        {
+
+            if (package == null)
+                throw new NullReferenceException("Package cant be null");
+            using (var mem = new MemoryStream())
+            {
+                using (var db = new LiteDB.LiteDatabase(mem))
+                {
+
+                    var packageCollection = db.GetCollection<T>("Packages");
+                    packageCollection.Insert(package);
+
+                    return GzipUtility.Compress(new ByteCipher("packageSecurityKey", DataCipherKeySize.Key_128).Encrypt(mem.ToArray()));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Read the package and get its content
+        /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Package.md
+        /// </summary>
+        /// <param name="package"></param>
+        /// <returns></returns>
+        public T GetPackage<T>(byte[] package) where T : PackageEntity
+        {
+            try
+            {
+                var uncompressedFile = GzipUtility.Decompress(package);
+                using (var msi = new MemoryStream(new ByteCipher("packageSecurityKey", DataCipherKeySize.Key_128).Decrypt(uncompressedFile)))
+                {
+                    // now read the file
+                    using (var db = new LiteDB.LiteDatabase(msi))
+                    {
+                        var packageCollection = db.GetCollection<T>("Packages");
+                        return packageCollection.FindOne(x => x.Data != null || x.Files != null);
+                    }
+                }
+
+            }
+            catch (Exception exception)
+            {
+                throw new Exception($"Error the package structure is not valid.\n Orginal exception\n{exception.Message}");
+            }
         }
 
         #endregion

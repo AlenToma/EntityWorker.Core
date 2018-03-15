@@ -24,7 +24,6 @@ namespace EntityWorker.Core.SqlQuerys
             if (type == typeof(Guid))
                 return string.Format("Guid[{0}]", value);
             return string.Format("String[{0}]", value);
-
         }
 
         internal static string GetValueByTypeSTRING(object value, DataBaseTypes dbType)
