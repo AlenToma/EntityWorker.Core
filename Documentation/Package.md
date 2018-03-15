@@ -10,7 +10,7 @@ Note that this package can only be readed by EntityWorker.Core
         // List of files
         public override List<byte[]> Files { get; set; }
     }
-            using (var rep = new Repository(DataBaseTypes.PostgreSql))
+            using (var rep = new Repository())
             {
                 var users = rep.Get<User>().LoadChildren().Execute();
                 // You could save the result to a file or even database
