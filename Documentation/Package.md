@@ -1,5 +1,6 @@
 ## Package Handler
 Create Protected package that contains files and data for backup purpose or moving data from one location to another.
+
 Note that this package can only be readed by EntityWorker.Core
 ```csharp
 // Create class that inherit from PackageEntity
