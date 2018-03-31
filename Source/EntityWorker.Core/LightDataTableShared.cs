@@ -274,7 +274,7 @@ namespace EntityWorker.Core
             }
             catch (Exception ex)
             {
-                throw new Exception("Error: InvalidType. ColumnType is " + dataType.FullName + " and the given value is of type " + value.GetType().FullName + " Original Exception " + ex.Message);
+                throw new Exception($"Error: InvalidType. ColumnType is {dataType.FullName} and the given value is of type {value.GetType().FullName} Original Exception {ex.Message}");
 
             }
         }
@@ -282,7 +282,7 @@ namespace EntityWorker.Core
 
         private object CleanValue(Type valueType, object value)
         {
-            if ((valueType != typeof(decimal) && valueType != typeof(double)) && (valueType != typeof(decimal?) && valueType != typeof(float?)) || (valueType != typeof(float?) && valueType != typeof(float?))) return value;
+            if ((valueType != typeof(decimal) && valueType != typeof(double)) && (valueType != typeof(decimal?) && valueType != typeof(float?) && valueType != typeof(float)) ) return value;
             value = Culture.NumberFormat.NumberDecimalSeparator == "." ? value.ToString().Replace(",", ".") : value.ToString().Replace(".", ",");
             value = System.Text.RegularExpressions.Regex.Replace(value.ToString(), @"\s", "");
             return value;

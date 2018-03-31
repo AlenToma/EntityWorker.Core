@@ -86,7 +86,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         public IObjectMapps<T> HasPrimaryKey<TP>(Expression<Func<T, TP>> action, bool autoGenerate = true)
         {
             var prop = FastDeepCloner.DeepCloner.GetProperty(typeof(T), Extension.GetMemberName(action));
-            if (prop == null || !prop.IsInternalType || (prop.PropertyType != typeof(string) && !prop.PropertyType.IsNumeric() && prop.PropertyType != typeof(Guid)))
+            if (prop == null || !prop.IsInternalType || (prop.PropertyType != typeof(string) && !prop.PropertyType.IsNumeric() && prop.PropertyType != typeof(Guid) && prop.PropertyType != typeof(Guid?)))
                 throw new Exception($"PrimaryKey for Property { prop?.FullName } kan only be of type string or numeric or Guid");
             prop.Attributes.Add(new PrimaryKey(autoGenerate));
             return this;
@@ -103,8 +103,8 @@ namespace EntityWorker.Core.Object.Library.Modules
         public IObjectMapps<T> HasForeignKey<Source, TP>(Expression<Func<T, TP>> action, string propertyName = null) where Source : class
         {
             var prop = FastDeepCloner.DeepCloner.GetProperty(typeof(T), Extension.GetMemberName(action));
-            if (prop == null || !prop.IsInternalType || (prop.PropertyType != typeof(string) && !prop.PropertyType.IsNumeric() && prop.PropertyType != typeof(Guid)))
-                throw new Exception($"ForeignKey for Property { prop?.FullName } kan only be of type string or numeric or Guid");
+            if (prop == null || !prop.IsInternalType || (prop.PropertyType != typeof(string) && !prop.PropertyType.IsNumeric() && prop.PropertyType != typeof(Guid) && prop.PropertyType != typeof(Guid?)))
+                throw new Exception($"ForeignKey for Property { prop?.Name } kan only be of type string or numeric or Guid");
 
             prop.Attributes.Add(new ForeignKey(typeof(Source), propertyName));
             return this;

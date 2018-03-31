@@ -1,7 +1,7 @@
 {
   "runtimeTarget": {
     "name": ".NETStandard,Version=v2.0/",
-    "signature": "89cd171cbbedc215c5e2382caf598ee1af3c2542"
+    "signature": "f596dbf4d7ffdc478433f3523408ea68f3c60e52"
   },
   "compilationOptions": {},
   "targets": {
@@ -9,7 +9,7 @@
     ".NETStandard,Version=v2.0/": {
       "LightData.CMS.Modules/1.0.0": {
         "dependencies": {
-          "EntityWorker.Core": "1.5.5",
+          "EntityWorker.Core": "1.5.8",
           "NETStandard.Library": "2.0.1",
           "System.Configuration": "4.0.0.0"
         },
@@ -50,7 +50,7 @@
           "System.Runtime": "4.3.0"
         }
       },
-      "System.Data.SqlClient/4.4.2": {
+      "System.Data.SqlClient/4.4.3": {
         "dependencies": {
           "Microsoft.Win32.Registry": "4.4.0",
           "System.Diagnostics.DiagnosticSource": "4.4.1",
@@ -169,9 +169,9 @@
           "System.Runtime": "4.3.0"
         }
       },
-      "EntityWorker.Core/1.5.5": {
+      "EntityWorker.Core/1.5.8": {
         "dependencies": {
-          "System.Data.SqlClient": "4.4.2"
+          "System.Data.SqlClient": "4.4.3"
         },
         "runtime": {
           "EntityWorker.Core.dll": {}
@@ -253,12 +253,12 @@
       "path": "system.collections/4.3.0",
       "hashPath": "system.collections.4.3.0.nupkg.sha512"
     },
-    "System.Data.SqlClient/4.4.2": {
+    "System.Data.SqlClient/4.4.3": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-Bv5J2EBAdP7FSgehKYN4O6iw1AaZrw4rFFqwt9vZSjRvC70FpwP2d9UG4aTaI2wh3vfrBKK+tjewowGM2Y6c1w==",
-      "path": "system.data.sqlclient/4.4.2",
-      "hashPath": "system.data.sqlclient.4.4.2.nupkg.sha512"
+      "sha512": "sha512-D1hEOS1oPLJ6WcGCzpTWe8SauWVxnDoDTUWhv5XCNdRm/QeSUk4BQ3ZDe7BH+zNVHDBkPYjVzpVjnCl43eOSGg==",
+      "path": "system.data.sqlclient/4.4.3",
+      "hashPath": "system.data.sqlclient.4.4.3.nupkg.sha512"
     },
     "System.Diagnostics.Debug/4.3.0": {
       "type": "package",
@@ -358,7 +358,7 @@
       "path": "system.threading.tasks/4.3.0",
       "hashPath": "system.threading.tasks.4.3.0.nupkg.sha512"
     },
-    "EntityWorker.Core/1.5.5": {
+    "EntityWorker.Core/1.5.8": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

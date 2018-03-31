@@ -256,7 +256,7 @@
           }
         }
       },
-      "System.Data.SqlClient/4.4.2": {
+      "System.Data.SqlClient/4.4.3": {
         "type": "package",
         "dependencies": {
           "Microsoft.Win32.Registry": "4.4.0",
@@ -344,11 +344,11 @@
           }
         }
       },
-      "EntityWorker.Core/1.5.6": {
+      "EntityWorker.Core/1.5.8": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v2.0",
         "dependencies": {
-          "System.Data.SqlClient": "4.4.2"
+          "System.Data.SqlClient": "4.4.3"
         },
         "compile": {
           "bin/placeholder/EntityWorker.Core.dll": {}
@@ -359,7 +359,7 @@
       }
     },
     ".NETFramework,Version=v4.6.1": {
-      "System.Data.SqlClient/4.4.2": {
+      "System.Data.SqlClient/4.4.3": {
         "type": "package",
         "frameworkAssemblies": [
           "System.Data",
@@ -383,11 +383,11 @@
           }
         }
       },
-      "EntityWorker.Core/1.5.6": {
+      "EntityWorker.Core/1.5.8": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5.1",
         "dependencies": {
-          "System.Data.SqlClient": "4.4.2"
+          "System.Data.SqlClient": "4.4.3"
         },
         "compile": {
           "bin/placeholder/EntityWorker.Core.dll": {}
@@ -496,7 +496,7 @@
           "ref/netstandard1.3/_._": {}
         }
       },
-      "System.Data.SqlClient/4.4.2": {
+      "System.Data.SqlClient/4.4.3": {
         "type": "package",
         "dependencies": {
           "Microsoft.Win32.Registry": "4.4.0",
@@ -703,11 +703,11 @@
           "ref/netstandard1.3/_._": {}
         }
       },
-      "EntityWorker.Core/1.5.6": {
+      "EntityWorker.Core/1.5.8": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
-          "System.Data.SqlClient": "4.4.2"
+          "System.Data.SqlClient": "4.4.3"
         },
         "compile": {
           "bin/placeholder/EntityWorker.Core.dll": {}
@@ -1489,10 +1489,10 @@
         "system.collections.nuspec"
       ]
     },
-    "System.Data.SqlClient/4.4.2": {
-      "sha512": "Bv5J2EBAdP7FSgehKYN4O6iw1AaZrw4rFFqwt9vZSjRvC70FpwP2d9UG4aTaI2wh3vfrBKK+tjewowGM2Y6c1w==",
+    "System.Data.SqlClient/4.4.3": {
+      "sha512": "D1hEOS1oPLJ6WcGCzpTWe8SauWVxnDoDTUWhv5XCNdRm/QeSUk4BQ3ZDe7BH+zNVHDBkPYjVzpVjnCl43eOSGg==",
       "type": "package",
-      "path": "system.data.sqlclient/4.4.2",
+      "path": "system.data.sqlclient/4.4.3",
       "files": [
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
@@ -1549,7 +1549,7 @@
         "runtimes/win/lib/net461/System.Data.SqlClient.dll",
         "runtimes/win/lib/netstandard1.3/System.Data.SqlClient.dll",
         "runtimes/win/lib/netstandard2.0/System.Data.SqlClient.dll",
-        "system.data.sqlclient.4.4.2.nupkg.sha512",
+        "system.data.sqlclient.4.4.3.nupkg.sha512",
         "system.data.sqlclient.nuspec",
         "useSharedDesignerContext.txt",
         "version.txt"
@@ -2439,7 +2439,7 @@
         "system.threading.tasks.nuspec"
       ]
     },
-    "EntityWorker.Core/1.5.6": {
+    "EntityWorker.Core/1.5.8": {
       "type": "project",
       "path": "../../EntityWorker.Core/EntityWorker.Core.csproj",
       "msbuildProject": "../../EntityWorker.Core/EntityWorker.Core.csproj"
@@ -2447,14 +2447,14 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.0": [
-      "EntityWorker.Core >= 1.5.6",
+      "EntityWorker.Core >= 1.5.8",
       "Microsoft.NETCore.App >= 2.0.0"
     ],
     ".NETFramework,Version=v4.6.1": [
-      "EntityWorker.Core >= 1.5.6"
+      "EntityWorker.Core >= 1.5.8"
     ],
     ".NETStandard,Version=v2.0": [
-      "EntityWorker.Core >= 1.5.6",
+      "EntityWorker.Core >= 1.5.8",
       "NETStandard.Library >= 2.0.1"
     ]
   },

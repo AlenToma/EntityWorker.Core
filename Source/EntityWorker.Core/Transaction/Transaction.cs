@@ -1042,8 +1042,6 @@ namespace EntityWorker.Core.Transaction
         #endregion
 
         #region Package Handler
-
-        private const string packageSecurityKey = "EntityWorker.Security.Key";
         /// <summary>
         /// Create Protected package that contain files or data for backup purpose or moving data from one location to another.
         /// Note that this package can only be readed by EntityWorker.Core
