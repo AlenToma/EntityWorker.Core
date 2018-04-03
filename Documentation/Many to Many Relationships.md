@@ -44,7 +44,8 @@ We will create two class Menus and Article
         public bool Published { get; set; }
 
         // Its importend to se propertyName in Manytomany relations
-        [ForeignKey( type: typeof(Menus), propertyName: "Menus")]
+        [ForeignKey(type: typeof(Menus), propertyName: "Menus")]
+        public long MenusId { get; set; }
         
         // Referense to menus 
         [IndependentData]
