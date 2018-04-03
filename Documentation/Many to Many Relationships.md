@@ -4,7 +4,7 @@ We will create two class Menus and Article
 ```csharp
     public class Menus
     {
-        [PrimaryKey(autoGenerate: false)]
+        [PrimaryKey]
         public long? Id { get; set; }
 
         [NotNullable]
