@@ -41,6 +41,7 @@ See Code Example for more info.
 * [Entity Mappings](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/EntityMappings.md)
 * [ObjectChanges](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/ObjectChanges.md)
 * [Package](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Package.md)
+* [Many to Many Relationships](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Many%20to%20Many%20Relationships.md)
 * [Attributes](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md)
 
 ## Issues
