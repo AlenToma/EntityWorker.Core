@@ -29,6 +29,9 @@ We will create two class Menus and Article
         public bool Publish { get; set; }
 
         public string Description { get; set; }
+        
+        /// This is optional if you want to search or include articles in your quaries
+        public List<Article> Articles { get; set;}
 
     }
 
