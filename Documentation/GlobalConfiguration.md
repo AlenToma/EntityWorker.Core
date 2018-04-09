@@ -13,7 +13,7 @@ EntityWorker.Core.GlobalConfiguration.DataEncode_Key = "the key used to Encode t
 /// <summary>
 /// The Default Value for package encryption
 /// </summary>
-EntityWorker.Core.GlobalConfiguration.PackageDataEncode_Key { get; set; } = "packageSecurityKey";
+EntityWorker.Core.GlobalConfiguration.PackageDataEncode_Key = "packageSecurityKey";
 
 
 // Last set the culture for converting the data eg DateTime, decimal.
