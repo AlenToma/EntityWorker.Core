@@ -2,6 +2,11 @@
 There are many attributes you could use to improve the code
 ```csharp
 /// <summary>
+/// Use this when you have types that are unknown like interface wich it can takes more than one type
+/// </summary>
+[KnownType]
+
+/// <summary>
 /// Assign a diffrent database type for the property. 
 /// Attibutes Stringify, DataEncode and ToBase64String will override this attribute. 
 /// </summary>
