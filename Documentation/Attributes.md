@@ -3,6 +3,10 @@ There are many attributes you could use to improve the code
 ```csharp
 /// <summary>
 /// Use this when you have types that are unknown like interface wich it can takes more than one type
+/// <example>
+/// [KnownType(objectType: typeof(Person))]
+/// public List<IPerson> Person { get; set; }
+/// </example>
 /// </summary>
 [KnownType]
 
