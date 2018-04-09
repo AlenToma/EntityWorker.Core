@@ -35,6 +35,24 @@ namespace EntityWorker.Core.Interface
         IObjectMapps<T> HasJsonIgnore<TP>(Expression<Func<T, TP>> action);
 
         /// <summary>
+        /// EntityWorker will ignore serializing or derializing all properties that contain this attribute
+        /// </summary>
+        /// <typeparam name="TP"></typeparam>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        IObjectMapps<T> HasXmlIgnore<TP>(Expression<Func<T, TP>> action);
+
+
+
+        /// <summary>
+        /// Use this when you have types that are unknown like interface wich it can takes more than one type 
+        /// </summary>
+        /// <typeparam name="TP"></typeparam>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        IObjectMapps<T> HasKnownType<TP>(Expression<Func<T, TP>> action, Type objectType);
+
+        /// <summary>
         /// Assign a diffrent database type for the property
         /// Attibutes Stringify, DataEncode and ToBase64String will override this attribute.
         /// </summary>

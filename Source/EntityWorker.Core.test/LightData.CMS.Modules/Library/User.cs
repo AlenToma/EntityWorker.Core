@@ -1,4 +1,5 @@
 ﻿using EntityWorker.Core.Attributes;
+using LightData.CMS.Modules.Interface;
 
 namespace LightData.CMS.Modules.Library
 {
@@ -20,7 +21,7 @@ namespace LightData.CMS.Modules.Library
 
         public System.Guid PersonId { get; set; }
 
-        public Person Person { get; set; }
+        public IPerson Person { get; set; }
 
     }
 }

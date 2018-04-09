@@ -15,6 +15,13 @@ namespace LightData.CMS.Modules.Library
         [ForeignKey(typeof(Menus))]
         public long? ParentId { get; set; }
 
+
+        /// <summary>
+        /// Indicate 
+        /// this is a list so the where sats will be 
+        /// Select * from Menus where ParentId = Id
+        /// the parentId in this list will be set to Id automaticly and this list will be children to the current Menus
+        /// </summary>
         public List<Menus> Children { get; set; }
 
         [NotNullable]

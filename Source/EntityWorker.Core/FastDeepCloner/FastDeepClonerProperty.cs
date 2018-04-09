@@ -2,6 +2,8 @@
 using System.Reflection;
 using System.Linq;
 using System.Collections.Generic;
+using EntityWorker.Core.Attributes;
+using EntityWorker.Core.Helper;
 
 namespace EntityWorker.Core.FastDeepCloner
 {
@@ -43,6 +45,13 @@ namespace EntityWorker.Core.FastDeepCloner
             FullName = field.FieldType.FullName;
             PropertyType = field.FieldType;
             IsInternalType = field.FieldType.IsInternalType();
+
+            if (ContainAttribute<KnownType>())
+            {
+                if (PropertyType != PropertyType.GetActualType())
+                    PropertyType = typeof(List<>).MakeGenericType(GetCustomAttribute<KnownType>().ObjectType);
+                else PropertyType = GetCustomAttribute<KnownType>().ObjectType;
+            }
         }
 
         internal FastDeepClonerProperty(PropertyInfo property)
@@ -59,6 +68,13 @@ namespace EntityWorker.Core.FastDeepCloner
             IsVirtual = property.GetMethod.IsVirtual;
             PropertyGetValue = property.GetMethod;
             PropertySetValue = property.SetMethod;
+
+            if (ContainAttribute<KnownType>())
+            {
+                if (PropertyType != PropertyType.GetActualType())
+                    PropertyType = typeof(List<>).MakeGenericType(GetCustomAttribute<KnownType>().ObjectType);
+                else PropertyType = GetCustomAttribute<KnownType>().ObjectType;
+            }
         }
 
         public bool ContainAttribute<T>() where T : Attribute
@@ -89,6 +105,17 @@ namespace EntityWorker.Core.FastDeepCloner
         public object GetValue(object o)
         {
             return _propertyGet(o);
+        }
+
+        public void Add(Attribute attr)
+        {
+            Attributes.Add(attr);
+            if (ContainAttribute<KnownType>())
+            {
+                if (PropertyType != PropertyType.GetActualType())
+                    PropertyType = typeof(List<>).MakeGenericType(GetCustomAttribute<KnownType>().ObjectType);
+                else PropertyType = GetCustomAttribute<KnownType>().ObjectType;
+            }
         }
     }
 }

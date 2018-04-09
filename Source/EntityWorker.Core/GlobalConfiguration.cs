@@ -20,11 +20,19 @@ namespace EntityWorker.Core
         /// </summary>
         public static string DataEncode_Key { get; set; } = "EntityWorker.Default.Key.Pass";
 
+
+        /// <summary>
+        /// The Default Value for package encryption
+        /// </summary>
+        public static string PackageDataEncode_Key { get; set; } = "packageSecurityKey";
+
         /// <summary>
         /// EntityWorker will Use this CultureInfo to convert the data eg decimal, datetime and so on, from the database 
         /// Default is EN;
         /// </summary>
         public static CultureInfo CultureInfo { get; set; } = new CultureInfo("en");
+
+
 
     }
 }

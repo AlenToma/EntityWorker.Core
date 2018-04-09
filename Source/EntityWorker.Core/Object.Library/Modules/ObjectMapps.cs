@@ -57,7 +57,7 @@ namespace EntityWorker.Core.Object.Library.Modules
             var prop = FastDeepCloner.DeepCloner.GetProperty(typeof(T), Extension.GetMemberName(action));
             if (prop == null)
                 throw new Exception($"Could not find Property{Extension.GetMemberName(action)}");
-            prop.Attributes.Add(new JsonIgnore());
+            prop.Add(new JsonIgnore());
             return this;
         }
 
@@ -72,7 +72,22 @@ namespace EntityWorker.Core.Object.Library.Modules
             var prop = FastDeepCloner.DeepCloner.GetProperty(typeof(T), Extension.GetMemberName(action));
             if (prop == null)
                 throw new Exception($"Could not find Property{Extension.GetMemberName(action)}");
-            prop.Attributes.Add(new XmlIgnore());
+            prop.Add(new XmlIgnore());
+            return this;
+        }
+
+        /// <summary>
+        /// Use this when you have types that are unknown like interface wich it can takes more than one type 
+        /// </summary>
+        /// <typeparam name="TP"></typeparam>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public IObjectMapps<T> HasKnownType<TP>(Expression<Func<T, TP>> action, Type objectType)
+        {
+            var prop = FastDeepCloner.DeepCloner.GetProperty(typeof(T), Extension.GetMemberName(action));
+            if (prop == null)
+                throw new Exception($"Could not find Property{Extension.GetMemberName(action)}");
+            prop.Add(new KnownType(objectType));
             return this;
         }
 
@@ -88,7 +103,7 @@ namespace EntityWorker.Core.Object.Library.Modules
             var prop = FastDeepCloner.DeepCloner.GetProperty(typeof(T), Extension.GetMemberName(action));
             if (prop == null || !prop.IsInternalType || (prop.PropertyType != typeof(string) && !prop.PropertyType.IsNumeric() && prop.PropertyType != typeof(Guid) && prop.PropertyType != typeof(Guid?)))
                 throw new Exception($"PrimaryKey for Property { prop?.FullName } kan only be of type string or numeric or Guid");
-            prop.Attributes.Add(new PrimaryKey(autoGenerate));
+            prop.Add(new PrimaryKey(autoGenerate));
             return this;
         }
 
@@ -106,7 +121,7 @@ namespace EntityWorker.Core.Object.Library.Modules
             if (prop == null || !prop.IsInternalType || (prop.PropertyType != typeof(string) && !prop.PropertyType.IsNumeric() && prop.PropertyType != typeof(Guid) && prop.PropertyType != typeof(Guid?)))
                 throw new Exception($"ForeignKey for Property { prop?.Name } kan only be of type string or numeric or Guid");
 
-            prop.Attributes.Add(new ForeignKey(typeof(Source), propertyName));
+            prop.Add(new ForeignKey(typeof(Source), propertyName));
             return this;
         }
 
@@ -123,7 +138,7 @@ namespace EntityWorker.Core.Object.Library.Modules
             if (prop == null)
                 throw new Exception($"Could not find Property {Extension.GetMemberName(action)}");
 
-            prop.Attributes.Add(new ColumnType(dataType, dataBaseTypes));
+            prop.Add(new ColumnType(dataType, dataBaseTypes));
             return this;
         }
 
@@ -141,7 +156,7 @@ namespace EntityWorker.Core.Object.Library.Modules
             if (prop == null || prop.PropertyType != typeof(string))
                 throw new Exception($"DataEncode for Property {prop?.FullName} kan only be of type string");
 
-            prop.Attributes.Add(new DataEncode(key, keySize));
+            prop.Add(new DataEncode(key, keySize));
             return this;
         }
 
@@ -157,7 +172,7 @@ namespace EntityWorker.Core.Object.Library.Modules
             if (prop == null || prop.IsInternalType)
                 throw new Exception($"IndependentData for Property {prop?.FullName} kan only be of type class, eg an object");
 
-            prop.Attributes.Add(new IndependentData());
+            prop.Add(new IndependentData());
             return this;
         }
 
@@ -173,7 +188,7 @@ namespace EntityWorker.Core.Object.Library.Modules
             if (prop == null)
                 throw new Exception($"Could not find Property{Extension.GetMemberName(action)}");
 
-            prop.Attributes.Add(new NotNullable());
+            prop.Add(new NotNullable());
             return this;
         }
 
@@ -191,7 +206,7 @@ namespace EntityWorker.Core.Object.Library.Modules
             if (prop == null)
                 throw new Exception($"Could not find Property{Extension.GetMemberName(action)}");
 
-            prop.Attributes.Add(new PropertyName(name, displayName));
+            prop.Add(new PropertyName(name, displayName));
             return this;
         }
 
@@ -207,7 +222,7 @@ namespace EntityWorker.Core.Object.Library.Modules
             if (prop == null)
                 throw new Exception($"Could not find Property{Extension.GetMemberName(action)}");
 
-            prop.Attributes.Add(new Stringify());
+            prop.Add(new Stringify());
             return this;
         }
 
@@ -223,7 +238,7 @@ namespace EntityWorker.Core.Object.Library.Modules
             if (prop == null)
                 throw new Exception($"Could not find Property{Extension.GetMemberName(action)}");
 
-            prop.Attributes.Add(new ExcludeFromAbstract());
+            prop.Add(new ExcludeFromAbstract());
             return this;
         }
 
@@ -240,7 +255,7 @@ namespace EntityWorker.Core.Object.Library.Modules
             if (prop == null)
                 throw new Exception($"Could not find Property{Extension.GetMemberName(action)}");
 
-            prop.Attributes.Add(new DefaultOnEmpty(value));
+            prop.Add(new DefaultOnEmpty(value));
             return this;
         }
 
@@ -256,7 +271,7 @@ namespace EntityWorker.Core.Object.Library.Modules
             if (prop == null || prop.PropertyType != typeof(string))
                 throw new Exception($"ToBase64String for Property {prop?.FullName} kan only be of type string");
 
-            prop.Attributes.Add(new ToBase64String());
+            prop.Add(new ToBase64String());
             return this;
         }
     }

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using EntityWorker.Core.Attributes;
-using EntityWorker.Core.Object.Library;
-
 
 namespace LightData.CMS.Modules.Library
 {
@@ -19,7 +17,7 @@ namespace LightData.CMS.Modules.Library
 
         public bool Published { get; set; }
 
-        [ForeignKey(typeof(Menus))]
+        [ForeignKey( type: typeof(Menus), propertyName: "Menus")]
         public long MenusId { get; set; }
 
         [IndependentData]

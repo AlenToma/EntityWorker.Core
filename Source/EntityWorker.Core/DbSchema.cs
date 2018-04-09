@@ -221,7 +221,7 @@ namespace EntityWorker.Core
                         if (path?.Split('.').Length >= 2)
                             propertyName = string.Join(".", path.Split('.').Reverse().Take(3).Reverse()) + "." + parentProb.Split('.').Last() + "." + propertyName;
 
-                        var type = prop.PropertyType.GetActualType();
+                        var type =  prop.PropertyType.GetActualType();
 
                         var key = props.FirstOrDefault(x => x.ContainAttribute<ForeignKey>() && x.GetCustomAttribute<ForeignKey>().Type == type && (string.IsNullOrEmpty(x.GetCustomAttribute<ForeignKey>().PropertyName) || x.GetCustomAttribute<ForeignKey>().PropertyName == prop.Name));
                         if (key == null)
@@ -292,7 +292,7 @@ namespace EntityWorker.Core
                 if (value == null)
                     continue;
                 var subSql = new List<string>();
-                var propType = prop.PropertyType.GetActualType();
+                var propType =  prop.PropertyType.GetActualType();
                 var insertBefore = props.Any(x => x.GetCustomAttribute<ForeignKey>()?.Type == propType);
                 if (DeepCloner.GetFastDeepClonerProperties(propType).All(x => x.GetCustomAttribute<ForeignKey>()?.Type != type))
                     if (!insertBefore)
@@ -453,7 +453,7 @@ namespace EntityWorker.Core
                     var defaultOnEmpty = col.GetCustomAttribute<DefaultOnEmpty>();
                     if (col.ContainAttribute<ForeignKey>() && (v?.ObjectIsNew() ?? true))
                     {
-                        var ob = props.FirstOrDefault(x => x.PropertyType == col.GetCustomAttribute<ForeignKey>().Type && (string.IsNullOrEmpty(col.GetCustomAttribute<ForeignKey>().PropertyName) || col.GetCustomAttribute<ForeignKey>().PropertyName == x.Name));
+                        var ob = props.FirstOrDefault(x => x.PropertyType == col.GetCustomAttribute<ForeignKey>().Type  && (string.IsNullOrEmpty(col.GetCustomAttribute<ForeignKey>().PropertyName) || col.GetCustomAttribute<ForeignKey>().PropertyName == x.Name));
                         var obValue = ob?.GetValue(o);
                         var independentData = ob?.GetCustomAttribute<IndependentData>() != null;
                         if (obValue != null)
@@ -505,7 +505,7 @@ namespace EntityWorker.Core
                 foreach (var prop in props.Where(x => !x.IsInternalType && !x.ContainAttribute<ExcludeFromAbstract>()))
                 {
                     var independentData = prop.GetCustomAttribute<IndependentData>() != null;
-                    var type = prop.PropertyType.GetActualType();
+                    var type =   prop.PropertyType.GetActualType();
                     var oValue = prop.GetValue(o);
                     if (oValue == null)
                         continue;

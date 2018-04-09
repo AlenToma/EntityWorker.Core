@@ -44,5 +44,7 @@ namespace EntityWorker.Core.FastDeepCloner
 
         MethodInfo PropertySetValue { get; set; }
 
+        void Add(Attribute attr);
+
     }
 }

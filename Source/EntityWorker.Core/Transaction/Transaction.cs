@@ -1017,7 +1017,7 @@ namespace EntityWorker.Core.Transaction
         /// <returns></returns>
         public object Execute(Expression expression)
         {
-            var _expression = new LightDataLinqToNoSql(expression.Type, this);
+            var _expression = new LightDataLinqToNoSql(expression.Type.GetActualType(), this);
             _expression.Translate(expression);
             return _dbSchema.Select(expression.Type, _expression.Quary);
 
@@ -1062,7 +1062,7 @@ namespace EntityWorker.Core.Transaction
                     var packageCollection = db.GetCollection<T>("Packages");
                     packageCollection.Insert(package);
 
-                    return GzipUtility.Compress(new ByteCipher("packageSecurityKey", DataCipherKeySize.Key_128).Encrypt(mem.ToArray()));
+                    return GzipUtility.Compress(new ByteCipher(GlobalConfiguration.PackageDataEncode_Key, DataCipherKeySize.Key_128).Encrypt(mem.ToArray()));
                 }
             }
         }
@@ -1078,7 +1078,7 @@ namespace EntityWorker.Core.Transaction
             try
             {
                 var uncompressedFile = GzipUtility.Decompress(package);
-                using (var msi = new MemoryStream(new ByteCipher("packageSecurityKey", DataCipherKeySize.Key_128).Decrypt(uncompressedFile)))
+                using (var msi = new MemoryStream(new ByteCipher(GlobalConfiguration.PackageDataEncode_Key, DataCipherKeySize.Key_128).Decrypt(uncompressedFile)))
                 {
                     // now read the file
                     using (var db = new LiteDB.LiteDatabase(msi))

@@ -93,6 +93,11 @@
             EntityWorker will ignore serializing or derializing all properties that contain this attribute
             </summary>
         </member>
+        <member name="T:EntityWorker.Core.Attributes.KnownType">
+            <summary>
+            Use this when you have types that are unknown like interface wich it can takes more than one type
+            </summary>
+        </member>
         <member name="T:EntityWorker.Core.Attributes.NotNullable">
             <summary>
             https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
@@ -330,6 +335,11 @@
         <member name="P:EntityWorker.Core.GlobalConfiguration.DataEncode_Key">
             <summary>
             Default Value for DataEncode
+            </summary>
+        </member>
+        <member name="P:EntityWorker.Core.GlobalConfiguration.PackageDataEncode_Key">
+            <summary>
+            The Default Value for package encryption
             </summary>
         </member>
         <member name="P:EntityWorker.Core.GlobalConfiguration.CultureInfo">
@@ -913,6 +923,22 @@
         <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.HasJsonIgnore``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
             <summary>
             EntityWorker will ignore serializing or derializing all properties that contain this attribute
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.HasXmlIgnore``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+            EntityWorker will ignore serializing or derializing all properties that contain this attribute
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.HasKnownType``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Type)">
+            <summary>
+            Use this when you have types that are unknown like interface wich it can takes more than one type 
             </summary>
             <typeparam name="TP"></typeparam>
             <param name="action"></param>
@@ -6106,6 +6132,14 @@
         <member name="M:EntityWorker.Core.Object.Library.Modules.ObjectMapps`1.HasXmlIgnore``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
             <summary>
             EntityWorker will ignore serializing or derializing all properties that contain this attribute
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.Modules.ObjectMapps`1.HasKnownType``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Type)">
+            <summary>
+            Use this when you have types that are unknown like interface wich it can takes more than one type 
             </summary>
             <typeparam name="TP"></typeparam>
             <param name="action"></param>

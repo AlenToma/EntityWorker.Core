@@ -64,7 +64,9 @@ namespace EntityWorker.Core.FastDeepCloner
         /// <returns><c>true</c> if type is internal, else <c>false</c>.</returns>
         public static bool IsInternalType(this Type underlyingSystemType)
         {
-            return TypeDict.ContainsKey(underlyingSystemType) || !underlyingSystemType.GetTypeInfo().IsClass;
+            if (underlyingSystemType.IsInterface)
+                return false;
+            return  TypeDict.ContainsKey(underlyingSystemType) || !underlyingSystemType.GetTypeInfo().IsClass;
         }
     }
 }

@@ -36,6 +36,7 @@ namespace LightData.CMS.Modules.Repository
         {
             moduleBuilder.Entity<User>()
                 .TableName("Users")
+                .HasKnownType(x=> x.Person, typeof(Person))
                 .HasPrimaryKey(x => x.Id, false)
                 .NotNullable(x => x.UserName)
                 .HasDataEncode(x => x.UserName)
