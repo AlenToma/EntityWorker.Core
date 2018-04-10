@@ -4,6 +4,7 @@ We will execute a complicated query and see how it gets parsed.
 ```csharp
             using (var rep = new Repository())
             {
+               var id = Guid.NewGuid();
                ISqlQueriable<User> users =rep.Get<Person>().Where(x => x.FirstName.Contains("Admin") ||
                string.IsNullOrEmpty(x.FirstName) || string.IsNullOrEmpty(x.FirstName) == false && x.Id != id)
                List<User> userList = users.Execute();
@@ -20,7 +21,7 @@ SELECT   [Person].[id],
 FROM     person 
 WHERE    ((( 
                                     CASE 
-                                             WHEN person.firstname LIKE string[%Admin%] THEN 1 
+                                             WHEN person.firstname LIKE String[%Admin%] THEN 1 
                                              ELSE 0 
                                     END) = 1 
                   OR       (( 
@@ -28,7 +29,7 @@ WHERE    (((
                                                       WHEN person.firstname IS NULL THEN 1 
                                                       ELSE 
                                                                CASE 
-                                                                        WHEN person.firstname = string[] THEN 1
+                                                                        WHEN person.firstname = String[] THEN 1
                                                                         ELSE 0 
                                                                END 
                                              END)) = 0) 
@@ -37,12 +38,12 @@ WHERE    (((
                                                                WHEN person.firstname IS NULL THEN 1
                                                                ELSE 
                                                                         CASE 
-                                                                                 WHEN person.firstname = string[] THEN 1
+                                                                                 WHEN person.firstname = String[] THEN 1
                                                                                  ELSE 0 
                                                                         END 
                                                       END)) = 0) 
                   AND      ( 
-                                    person.id <> guid[51842663-16b5-40aa-8772-a8368733dd10]))) 
+                                    person.id <> Guid[51842663-16b5-40aa-8772-a8368733dd10]))) 
 GROUP BY [Person].[id], 
          [Person].[firstname], 
          [Person].[lastname], 
