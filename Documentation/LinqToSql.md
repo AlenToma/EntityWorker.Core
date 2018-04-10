@@ -4,29 +4,50 @@ We will execute a complicated query and see how it gets parsed.
 ```csharp
             using (var rep = new Repository())
             {
-               ISqlQueriable<User> users = rep.Get<User>().Where(x =>
-               (x.Role.Name.EndsWith("SuperAdmin") &&
-                x.UserName.Contains("alen")) ||
-                x.Address.Any(a => (a.AddressName.StartsWith("st") || a.AddressName.Contains("mt")) && a.Id > 0).
-                Skip(20).Take(100).Execute();  
-                );
-                
-                List<User> userList = users.Execute();
-                string sql = users.ParsedLinqToSql;
+               ISqlQueriable<User> users =rep.Get<Person>().Where(x => x.FirstName.Contains("Admin") ||
+               string.IsNullOrEmpty(x.FirstName) || string.IsNullOrEmpty(x.FirstName) == false && x.Id != id)
+               List<User> userList = users.Execute();
+               string sql = users.ParsedLinqToSql;
             }
 ```
 ### Generated sql result
 ```sql
           -- And here is the generated Sql Query
-             SELECT distinct Users.* FROM Users 
-             left join [Roles] CEjB on CEjB.[Id] = Users.[Role_Id]
-             WHERE (([CEjB].[Name] like String[%SuperAdmin] AND [Users].[UserName] like String[%alen%]) 
-             OR  EXISTS (SELECT 1 FROM [Address] 
-             INNER JOIN [Address] MJRhcYK on Users.[Id] = MJRhcYK.[User_Id]
-             WHERE (([Address].[AddressName] like String[st%] OR [Address].[AddressName] like String[%mt%]) 
-             AND ([Address].[Id] > 0))))
-             ORDER BY Id
-             OFFSET 20
-             ROWS FETCH NEXT 100 ROWS ONLY;
+SELECT   [Person].[id], 
+         [Person].[firstname], 
+         [Person].[lastname], 
+         [Person].[surename] 
+FROM     person 
+WHERE    ((( 
+                                    CASE 
+                                             WHEN person.firstname LIKE string[%Admin%] THEN 1 
+                                             ELSE 0 
+                                    END) = 1 
+                  OR       (( 
+                                             CASE 
+                                                      WHEN person.firstname IS NULL THEN 1 
+                                                      ELSE 
+                                                               CASE 
+                                                                        WHEN person.firstname = string[] THEN 1
+                                                                        ELSE 0 
+                                                               END 
+                                             END)) = 0) 
+         OR       (((( 
+                                                      CASE 
+                                                               WHEN person.firstname IS NULL THEN 1
+                                                               ELSE 
+                                                                        CASE 
+                                                                                 WHEN person.firstname = string[] THEN 1
+                                                                                 ELSE 0 
+                                                                        END 
+                                                      END)) = 0) 
+                  AND      ( 
+                                    person.id <> guid[51842663-16b5-40aa-8772-a8368733dd10]))) 
+GROUP BY [Person].[id], 
+         [Person].[firstname], 
+         [Person].[lastname], 
+         [Person].[surename] 
+ORDER BY id offset 0 rowsFETCH next 2147483647 rows only;
+ROWS FETCH NEXT 2147483647 ROWS ONLY;
           -- All String[], Date[] and Guid[] will be translated to Parameters later on.   
 ```
