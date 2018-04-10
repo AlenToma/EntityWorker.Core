@@ -44,8 +44,8 @@ namespace EntityWorker.Core
                     return CachedObjectColumn[key];
                 var table = type.TableName();
                 var cmd = _repository.GetSqlCommand(_repository.DataBaseTypes == DataBaseTypes.Mssql || _repository.DataBaseTypes == DataBaseTypes.PostgreSql
-                    ? "SELECT COLUMN_NAME as column_name, data_type FROM INFORMATION_SCHEMA.COLUMNS WHERE LOWER(TABLE_NAME) = LOWER(String[" + table + "])"
-                    : "SELECT name as column_name, type as data_type  FROM pragma_table_info(String[" + table + "]);");
+                    ? $"SELECT COLUMN_NAME as column_name, data_type FROM INFORMATION_SCHEMA.COLUMNS WHERE LOWER(TABLE_NAME) = LOWER(String[{table}])"
+                    : $"SELECT name as column_name, type as data_type  FROM pragma_table_info(String[{table}]);");
                 var data = _repository.GetLightDataTable(cmd, "column_name");
                 if (data.Rows.Any())
                     return CachedObjectColumn.GetOrAdd(key, data);
@@ -123,16 +123,22 @@ namespace EntityWorker.Core
         /// <returns></returns>
         public object GetById(object id, Type type)
         {
-            var k = type.FullName + _repository.DataBaseTypes.ToString();
-            var primaryKey = type.GetActualType().GetPrimaryKey();
-            if (!CachedSql.ContainsKey(k))
+            var entityKey = type.EntityKey(id);
+            if (_repository.IsAttached(entityKey))
+                return DeepCloner.Clone(_repository._attachedObjects[entityKey]);
+            else
             {
-                var key = primaryKey.GetPropertyName();
-                CachedSql.GetOrAdd(k, Querys.Select(type.GetActualType(), _repository.DataBaseTypes).Where.Column(key).Equal("@ID", true).Execute());
+                var k = type.FullName + _repository.DataBaseTypes.ToString();
+                var primaryKey = type.GetActualType().GetPrimaryKey();
+                if (!CachedSql.ContainsKey(k))
+                {
+                    var key = primaryKey.GetPropertyName();
+                    CachedSql.GetOrAdd(k, Querys.Select(type.GetActualType(), _repository.DataBaseTypes).Where.Column(key).Equal("@ID", true).Execute());
+                }
+                var cmd = _repository.GetSqlCommand(CachedSql[k]);
+                _repository.AddInnerParameter(cmd, "@ID", id.ConvertValue(primaryKey.PropertyType), _repository.GetSqlType(primaryKey.PropertyType));
+                return type.GetActualType() != type ? _repository.DataReaderConverter(cmd, type) : _repository.DataReaderConverter(cmd, type).Cast<object>().FirstOrDefault();
             }
-            var cmd = _repository.GetSqlCommand(CachedSql[k]);
-            _repository.AddInnerParameter(cmd, "@ID", id.ConvertValue(primaryKey.PropertyType), _repository.GetSqlType(primaryKey.PropertyType));
-            return type.GetActualType() != type ? _repository.DataReaderConverter(cmd, type) : _repository.DataReaderConverter(cmd, type).Cast<object>().FirstOrDefault();
         }
 
         /// <summary>
@@ -176,10 +182,12 @@ namespace EntityWorker.Core
 
         public T LoadChildren<T>(T item, bool onlyFirstLevel = false, List<string> classes = null, List<string> ignoreList = null, Dictionary<string, List<string>> pathLoaded = null, string parentProb = null, string id = null)
         {
+
             if (pathLoaded == null)
                 pathLoaded = new Dictionary<string, List<string>>();
             if (item == null)
                 return default(T);
+            GlobalConfiguration.Logg?.Info("Loading Children for " + item.GetType() + "", item);
             switch (item)
             {
                 case IList _:
@@ -221,7 +229,7 @@ namespace EntityWorker.Core
                         if (path?.Split('.').Length >= 2)
                             propertyName = string.Join(".", path.Split('.').Reverse().Take(3).Reverse()) + "." + parentProb.Split('.').Last() + "." + propertyName;
 
-                        var type =  prop.PropertyType.GetActualType();
+                        var type = prop.PropertyType.GetActualType();
 
                         var key = props.FirstOrDefault(x => x.ContainAttribute<ForeignKey>() && x.GetCustomAttribute<ForeignKey>().Type == type && (string.IsNullOrEmpty(x.GetCustomAttribute<ForeignKey>().PropertyName) || x.GetCustomAttribute<ForeignKey>().PropertyName == prop.Name));
                         if (key == null)
@@ -271,6 +279,7 @@ namespace EntityWorker.Core
 
         private List<string> DeleteAbstract(object o, bool save)
         {
+            GlobalConfiguration.Logg?.Info("Delete", o);
             var type = o.GetType().GetActualType();
             var props = DeepCloner.GetFastDeepClonerProperties(type);
             var table = "[" + (type.TableName()) + "]";
@@ -292,7 +301,7 @@ namespace EntityWorker.Core
                 if (value == null)
                     continue;
                 var subSql = new List<string>();
-                var propType =  prop.PropertyType.GetActualType();
+                var propType = prop.PropertyType.GetActualType();
                 var insertBefore = props.Any(x => x.GetCustomAttribute<ForeignKey>()?.Type == propType);
                 if (DeepCloner.GetFastDeepClonerProperties(propType).All(x => x.GetCustomAttribute<ForeignKey>()?.Type != type))
                     if (!insertBefore)
@@ -367,6 +376,7 @@ namespace EntityWorker.Core
         {
             try
             {
+                GlobalConfiguration.Logg?.Info("Save", o);
                 _repository.CreateTransaction();
                 var props = DeepCloner.GetFastDeepClonerProperties(o.GetType());
                 var primaryKey = o.GetPrimaryKey();
@@ -453,7 +463,7 @@ namespace EntityWorker.Core
                     var defaultOnEmpty = col.GetCustomAttribute<DefaultOnEmpty>();
                     if (col.ContainAttribute<ForeignKey>() && (v?.ObjectIsNew() ?? true))
                     {
-                        var ob = props.FirstOrDefault(x => x.PropertyType == col.GetCustomAttribute<ForeignKey>().Type  && (string.IsNullOrEmpty(col.GetCustomAttribute<ForeignKey>().PropertyName) || col.GetCustomAttribute<ForeignKey>().PropertyName == x.Name));
+                        var ob = props.FirstOrDefault(x => x.PropertyType == col.GetCustomAttribute<ForeignKey>().Type && (string.IsNullOrEmpty(col.GetCustomAttribute<ForeignKey>().PropertyName) || col.GetCustomAttribute<ForeignKey>().PropertyName == x.Name));
                         var obValue = ob?.GetValue(o);
                         var independentData = ob?.GetCustomAttribute<IndependentData>() != null;
                         if (obValue != null)
@@ -505,7 +515,7 @@ namespace EntityWorker.Core
                 foreach (var prop in props.Where(x => !x.IsInternalType && !x.ContainAttribute<ExcludeFromAbstract>()))
                 {
                     var independentData = prop.GetCustomAttribute<IndependentData>() != null;
-                    var type =   prop.PropertyType.GetActualType();
+                    var type = prop.PropertyType.GetActualType();
                     var oValue = prop.GetValue(o);
                     if (oValue == null)
                         continue;
@@ -533,8 +543,9 @@ namespace EntityWorker.Core
                 _repository.Attach(o, true);
                 return primaryKeyId;
             }
-            catch
+            catch(Exception e)
             {
+                GlobalConfiguration.Logg?.Error(e);
                 _repository.Rollback();
                 throw;
             }
@@ -734,11 +745,12 @@ namespace EntityWorker.Core
 
         public void RemoveTable(Type tableType, List<Type> tableRemoved = null, bool remove = true)
         {
-
+            
             if (tableRemoved == null)
                 tableRemoved = new List<Type>();
             if (tableRemoved.Any(x => x == tableType))
                 return;
+            GlobalConfiguration.Logg?.Info("Removig", tableType);
             tableRemoved.Insert(0, tableType);
             var props = DeepCloner.GetFastDeepClonerProperties(tableType);
 

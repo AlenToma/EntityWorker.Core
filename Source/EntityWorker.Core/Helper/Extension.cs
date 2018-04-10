@@ -371,7 +371,14 @@ namespace EntityWorker.Core.Helper
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public static string EntityKey(this object entity) => entity.GetType().FullName + entity.GetPrimaryKeyValue()?.ToString();
+        public static string EntityKey(this object entity) => entity.GetType().GetActualType().FullName + entity.GetPrimaryKeyValue()?.ToString();
+
+        /// <summary>
+        /// Generate an entityKey Primary Id cant be null or empty
+        /// </summary>
+        /// <param name="type">entitytyp</param>
+        /// <returns></returns>
+        public static string EntityKey(this Type type, object id) => type.GetActualType().FullName + id.ToString();
 
         /// <summary>
         /// Search and insert before identifier
@@ -509,6 +516,7 @@ namespace EntityWorker.Core.Helper
         /// <returns></returns>
         public static IFastDeepClonerProperty GetPrimaryKey(this Type type)
         {
+            type = type.GetActualType();
             if (CachedPrimaryKeys.ContainsKey(type))
                 return CachedPrimaryKeys[type];
             return CachedPrimaryKeys.GetOrAdd(type, DeepCloner.GetFastDeepClonerProperties(type).FirstOrDefault(x => x.ContainAttribute<PrimaryKey>()));

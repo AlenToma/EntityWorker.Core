@@ -142,15 +142,6 @@ namespace EntityWorker.Core.InterFace
         Task SaveAsync(object entity);
 
         /// <summary>
-        /// Attach an object to entityWorker.
-        /// this is only to validate two objects to get the changes between two objects.
-        /// You dont have to attach the object to save it to the database
-        /// </summary>
-        /// <param name="objcDbEntity"></param>
-        /// <param name="overwrite"> override if exist</param>
-        void Attach(object objcDbEntity, bool overwrite = false);
-
-        /// <summary>
         /// Get Entity 
         /// </summary>
         /// <typeparam name="T"></typeparam>

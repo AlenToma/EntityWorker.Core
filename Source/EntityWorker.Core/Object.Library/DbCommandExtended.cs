@@ -34,5 +34,10 @@ namespace EntityWorker.Core.Object.Library
         public IRepository Provider { get; set; }
 
         public DbCommand Command { get => _cmd; }
+
+        public override string ToString()
+        {
+            return _cmd.CommandText;
+        }
     }
 }

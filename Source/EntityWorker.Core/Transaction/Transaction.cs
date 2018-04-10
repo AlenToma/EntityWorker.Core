@@ -36,7 +36,7 @@ namespace EntityWorker.Core.Transaction
 
         internal readonly DbSchema _dbSchema;
 
-        private readonly Custom_ValueType<string, object> _attachedObjects;
+        internal readonly Custom_ValueType<string, object> _attachedObjects;
         /// <summary>
         /// DataBase FullConnectionString
         /// </summary>
@@ -378,6 +378,7 @@ namespace EntityWorker.Core.Transaction
         /// <returns></returns>
         public ISqlQueryable<T> DataReaderConverter<T>(DbCommandExtended command)
         {
+            GlobalConfiguration.Logg?.Info("Execute", command);
             return new SqlQueryable<T>(this, ((List<T>)DataReaderConverter(command, typeof(T))));
         }
 
@@ -391,6 +392,7 @@ namespace EntityWorker.Core.Transaction
         {
             IList result;
             ValidateConnection();
+            GlobalConfiguration.Logg?.Info("Execute", command);
             try
             {
                 var o = command.Command.ExecuteReader();
@@ -399,6 +401,7 @@ namespace EntityWorker.Core.Transaction
             }
             catch (Exception e)
             {
+                GlobalConfiguration.Logg?.Error(e);
                 throw e;
             }
             finally
@@ -577,6 +580,7 @@ namespace EntityWorker.Core.Transaction
         /// <returns></returns>
         protected List<ILightDataTable> GetLightDataTableList(DbCommandExtended cmd, string primaryKeyId = null)
         {
+            GlobalConfiguration.Logg?.Info("Execute", cmd);
             var returnList = new List<ILightDataTable>();
             var reader = cmd.Command.ExecuteReader();
             returnList.Add(new LightDataTable().ReadData(DataBaseTypes, reader, cmd, primaryKeyId, false));
@@ -593,7 +597,7 @@ namespace EntityWorker.Core.Transaction
         /// </summary>
         /// <param name="objcDbEntity"></param>
         /// <param name="overwrite"></param>
-        public void Attach(object objcDbEntity, bool overwrite = false)
+        internal void Attach(object objcDbEntity, bool overwrite = false)
         {
             if (objcDbEntity == null)
                 throw new NullReferenceException("DbEntity cant be null");
@@ -657,6 +661,7 @@ namespace EntityWorker.Core.Transaction
                     continue;
                 changes.Add(new EntityChanges
                 {
+                    EntityType = entity.GetType(),
                     PropertyName = prop.Name,
                     NewValue = prop.GetValue(entity),
                     OldValue = prop.GetValue(originalObject)
@@ -687,6 +692,7 @@ namespace EntityWorker.Core.Transaction
                     continue;
                 changes.Add(new EntityChanges
                 {
+                    EntityType = entityB.GetType(),
                     PropertyName = prop.Name,
                     NewValue = prop.GetValue(entityA),
                     OldValue = prop.GetValue(entityB)
@@ -707,6 +713,16 @@ namespace EntityWorker.Core.Transaction
         }
 
         /// <summary>
+        /// check if object is already attached
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns> primaryId >0 is mandatory </returns>
+        public bool IsAttached(string key)
+        {
+            return _attachedObjects.ContainsKey(key);
+        }
+
+        /// <summary>
         /// return LightDataTable e.g. DataTable
         /// </summary>
         /// <param name="cmd">sqlCommand that are create from GetSqlCommand</param>
@@ -714,6 +730,7 @@ namespace EntityWorker.Core.Transaction
         /// <returns></returns>
         public ILightDataTable GetLightDataTable(DbCommandExtended cmd, string primaryKey = null)
         {
+            GlobalConfiguration.Logg?.Info("Execute", cmd);
             ValidateConnection();
             var reader = cmd.Command.ExecuteReader();
             return new LightDataTable().ReadData(DataBaseTypes, reader, cmd, primaryKey);

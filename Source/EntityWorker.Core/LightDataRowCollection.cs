@@ -47,7 +47,7 @@ namespace EntityWorker.Core
             return new LightDataRowCollection(this.Select(x => new LightDataTableRow(x, cols, colsIndex)).ToList());
         }
 
-        public IList ToObject(Type type, IRepository repository = null)
+        public IList ToObject(Type type, Transaction.Transaction repository = null)
         {
             var tType = type.GetActualType();
             var baseListType = typeof(List<>);
@@ -63,7 +63,7 @@ namespace EntityWorker.Core
             return iList;
         }
 
-        public List<T> ToObject<T>(IRepository repository)
+        public List<T> ToObject<T>(Transaction.Transaction repository)
         {
             var tType = typeof(T).GetActualType();
             var baseListType = typeof(List<>);

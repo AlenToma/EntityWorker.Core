@@ -1,4 +1,5 @@
 ﻿using EntityWorker.Core.Helper;
+using EntityWorker.Core.Interface;
 using System.Globalization;
 
 namespace EntityWorker.Core
@@ -32,7 +33,11 @@ namespace EntityWorker.Core
         /// </summary>
         public static CultureInfo CultureInfo { get; set; } = new CultureInfo("en");
 
-
+        /// <summary>
+        /// Assign the Logger class.
+        /// the class must inherit from ILogg
+        /// </summary>
+        public static ILog Logg { get; set; }
 
     }
 }

@@ -1,10 +1,18 @@
-﻿namespace EntityWorker.Core.Object.Library
+﻿using System;
+
+namespace EntityWorker.Core.Object.Library
 {
     /// <summary>
     /// DataChanges
     /// </summary>
-    public class EntityChanges
+    public sealed class EntityChanges
     {
+
+        /// <summary>
+        /// Entity Type
+        /// </summary>
+        public Type EntityType { get; set; }
+
         /// <summary>
         /// PropertyType
         /// </summary>

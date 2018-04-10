@@ -5,6 +5,8 @@ using System.Linq;
 using System.Diagnostics;
 using System.Collections.Generic;
 using EntityWorker.Core.Helper;
+using EntityWorker.Core;
+using LightData.CMS.Modules.Library.Internal;
 
 namespace ConsoleApp1
 {
@@ -13,6 +15,10 @@ namespace ConsoleApp1
         private static Stopwatch sw = new Stopwatch();
         static void Main(string[] args)
         {
+            GlobalConfiguration.Logg = new Logger((object sender, EventArgs arg) =>
+            {
+                //Console.WriteLine((arg as Args).Data);
+            });
             PackageTest();
             TestSave();
             ExpressionTest();
@@ -44,6 +50,7 @@ namespace ConsoleApp1
                 var r = q.Execute();
                 Console.WriteLine("Success");
                 Console.WriteLine(" ");
+                var sql = q.ParsedLinqToSql;
                 stop();
             }
             catch (Exception ex)
