@@ -48,7 +48,6 @@ GROUP BY [Person].[id],
          [Person].[firstname], 
          [Person].[lastname], 
          [Person].[surename] 
-ORDER BY id offset 0 rowsFETCH next 2147483647 rows only;
-ROWS FETCH NEXT 2147483647 ROWS ONLY;
+ORDER BY id offset 0 ROWS FETCH NEXT 2147483647 ROWS ONLY;
           -- All String[], Date[] and Guid[] will be translated to Parameters later on.   
 ```
