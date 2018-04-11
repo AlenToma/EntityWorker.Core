@@ -81,7 +81,7 @@ namespace EntityWorker.Core.Transaction
             _attachedObjects = new Custom_ValueType<string, object>();
             if (string.IsNullOrEmpty(connectionString))
                 if (string.IsNullOrEmpty(connectionString))
-                    throw new Exception("ConnectionString can not be empty");
+                    throw new EntityException("ConnectionString can not be empty");
 
             ConnectionString = connectionString;
             DataBaseTypes = dataBaseTypes;
@@ -127,7 +127,7 @@ namespace EntityWorker.Core.Transaction
                 IMigrationConfig config;
                 if (assembly.DefinedTypes.Any(a => typeof(IMigrationConfig).IsAssignableFrom(a)))
                     config = Activator.CreateInstance(assembly.DefinedTypes.First(a => typeof(IMigrationConfig).IsAssignableFrom(a))) as IMigrationConfig;
-                else throw new Exception($"EntityWorker.Core could not find IMigrationConfig in the current Assembly {assembly.GetName()}");
+                else throw new EntityException($"EntityWorker.Core could not find IMigrationConfig in the current Assembly {assembly.GetName()}");
                 MigrationConfig(config);
             }
         }
@@ -162,10 +162,10 @@ namespace EntityWorker.Core.Transaction
             var npSqlBuilder = DataBaseTypes == DataBaseTypes.PostgreSql ? new NpgsqlConnectionStringBuilder(ConnectionString) : null;
             var dbName = DataBaseTypes == DataBaseTypes.Mssql ? sqlBuild.InitialCatalog : sqlBuild?.DataSource;
             if (string.IsNullOrEmpty(dbName) && DataBaseTypes != DataBaseTypes.PostgreSql)
-                throw new Exception("InitialCatalog can not be null or empty");
+                throw new EntityException("InitialCatalog can not be null or empty");
 
             if (DataBaseTypes == DataBaseTypes.PostgreSql && string.IsNullOrEmpty(npSqlBuilder.Database))
-                throw new Exception("Database can not be null or empty");
+                throw new EntityException("Database can not be null or empty");
 
             if (DataBaseTypes == DataBaseTypes.Mssql)
             {
@@ -215,10 +215,10 @@ namespace EntityWorker.Core.Transaction
                 var npSqlBuilder = DataBaseTypes == DataBaseTypes.PostgreSql ? new NpgsqlConnectionStringBuilder(ConnectionString) : null;
                 var dbName = DataBaseTypes == DataBaseTypes.Mssql ? sqlBuild?.InitialCatalog : sqlBuild?.DataSource;
                 if (string.IsNullOrEmpty(dbName) && DataBaseTypes != DataBaseTypes.PostgreSql)
-                    throw new Exception("InitialCatalog can not be null or empty");
+                    throw new EntityException("InitialCatalog can not be null or empty");
 
                 if (DataBaseTypes == DataBaseTypes.PostgreSql && string.IsNullOrEmpty(npSqlBuilder.Database))
-                    throw new Exception("Database can not be null or empty");
+                    throw new EntityException("Database can not be null or empty");
 
                 if (DataBaseTypes == DataBaseTypes.Mssql)
                 {
@@ -275,6 +275,7 @@ namespace EntityWorker.Core.Transaction
         {
             try
             {
+                GlobalConfiguration.Logg?.Info("Migration", "Initialize");
                 this.CreateTable<DBMigration>(false);
                 var migrations = config.GetMigrations(this) ?? new List<Migration>();
                 this.CreateTransaction();
@@ -295,8 +296,9 @@ namespace EntityWorker.Core.Transaction
                 }
                 SaveChanges();
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                GlobalConfiguration.Logg?.Error(e);
                 Rollback();
                 throw;
             }
@@ -599,11 +601,13 @@ namespace EntityWorker.Core.Transaction
         /// <param name="overwrite"></param>
         internal void Attach(object objcDbEntity, bool overwrite = false)
         {
-            if (objcDbEntity == null)
-                throw new NullReferenceException("DbEntity cant be null");
-            if (Extension.ObjectIsNew(objcDbEntity.GetPrimaryKeyValue()))
-                throw new NullReferenceException("Id is IsNullOrEmpty, it cant be attached");
             var key = objcDbEntity.EntityKey();
+            GlobalConfiguration.Logg?.Info("Attaching", key);
+            if (objcDbEntity == null)
+                throw new EntityException("DbEntity cant be null");
+            if (Extension.ObjectIsNew(objcDbEntity.GetPrimaryKeyValue()))
+                throw new EntityException("Id is IsNullOrEmpty, it cant be attached");
+
 
             if (_attachedObjects.ContainsKey(key))
             {
@@ -623,11 +627,12 @@ namespace EntityWorker.Core.Transaction
         /// <param name="overwrite"></param>
         internal void AttachNew(object objcDbEntity, bool overwrite = false)
         {
-            if (objcDbEntity == null)
-                throw new NullReferenceException("DbEntity cant be null");
-            if (Extension.ObjectIsNew(objcDbEntity.GetPrimaryKeyValue()))
-                throw new NullReferenceException("Id is IsNullOrEmpty, it cant be attached");
             var key = objcDbEntity.EntityKey();
+            GlobalConfiguration.Logg?.Info("Attaching", key);
+            if (objcDbEntity == null)
+                throw new EntityException("DbEntity cant be null");
+            if (Extension.ObjectIsNew(objcDbEntity.GetPrimaryKeyValue()))
+                throw new EntityException("Id is IsNullOrEmpty, it cant be attached");
             if (_attachedObjects.ContainsKey(key))
             {
                 if (overwrite)
@@ -647,10 +652,10 @@ namespace EntityWorker.Core.Transaction
         {
             var changes = new List<EntityChanges>();
             if (!IsAttached(entity))
-                throw new NullReferenceException("Object is not attached");
+                throw new EntityException("Object is not attached");
             var originalObject = _attachedObjects[entity.EntityKey()];
             if (originalObject == null)
-                throw new Exception("Object need to be attached");
+                throw new EntityException("Object need to be attached");
             foreach (var prop in DeepCloner.GetFastDeepClonerProperties(entity.GetType()))
             {
                 var aValue = prop.GetValue(entity);
@@ -681,7 +686,7 @@ namespace EntityWorker.Core.Transaction
             var changes = new List<EntityChanges>();
             var originalObject = entityA;
             if (originalObject == null)
-                throw new Exception("Object need to be attached");
+                throw new EntityException("Object need to be attached");
             foreach (var prop in DeepCloner.GetFastDeepClonerProperties(entityA.GetType()))
             {
                 var aValue = prop.GetValue(entityB);
@@ -948,7 +953,7 @@ namespace EntityWorker.Core.Transaction
         public ISqlQueryable<T> Get<T>()
         {
             if (typeof(T).GetPrimaryKey() == null)
-                throw new ArgumentNullException("Primary Id not found for object " + typeof(T).FullName);
+                throw new EntityException("Primary Id not found for object " + typeof(T).FullName);
             return new SqlQueryable<T>(null, this);
         }
 
@@ -962,7 +967,7 @@ namespace EntityWorker.Core.Transaction
         public ISqlQueryable<T> FromJson<T>(string json) where T : class
         {
             if (typeof(T).GetPrimaryKey() == null)
-                throw new ArgumentNullException("Primary Id not found for object " + typeof(T).FullName);
+                throw new EntityException("Primary Id not found for object " + typeof(T).FullName);
             return new SqlQueryable<T>(this, json.FromJson<List<T>>(this));
         }
 
@@ -975,7 +980,7 @@ namespace EntityWorker.Core.Transaction
         public async Task<ISqlQueryable<T>> FromJsonAsync<T>(string json) where T : class
         {
             if (typeof(T).GetPrimaryKey() == null)
-                throw new ArgumentNullException("Primary Id not found for object " + typeof(T).FullName);
+                throw new EntityException("Primary Id not found for object " + typeof(T).FullName);
             return await Task.FromResult<ISqlQueryable<T>>(new SqlQueryable<T>(this, json.FromJson<List<T>>(this)));
         }
 
@@ -988,7 +993,7 @@ namespace EntityWorker.Core.Transaction
         public ISqlQueryable<T> FromXml<T>(string xmlString) where T : class
         {
             if (typeof(T).GetPrimaryKey() == null)
-                throw new ArgumentNullException("Primary Id not found for object " + typeof(T).FullName);
+                throw new EntityException("Primary Id not found for object " + typeof(T).FullName);
             return new SqlQueryable<T>(this, xmlString.FromXml<List<T>>(this));
         }
 
@@ -1001,7 +1006,7 @@ namespace EntityWorker.Core.Transaction
         public async Task<ISqlQueryable<T>> FromXmlAsync<T>(string xmlString) where T : class
         {
             if (typeof(T).GetPrimaryKey() == null)
-                throw new ArgumentNullException("Primary Id not found for object " + typeof(T).FullName);
+                throw new EntityException("Primary Id not found for object " + typeof(T).FullName);
             return await Task.FromResult<ISqlQueryable<T>>(new SqlQueryable<T>(this, xmlString.FromXml<List<T>>(this)));
         }
 
@@ -1070,7 +1075,7 @@ namespace EntityWorker.Core.Transaction
         {
 
             if (package == null)
-                throw new NullReferenceException("Package cant be null");
+                throw new EntityException("Package cant be null");
             using (var mem = new MemoryStream())
             {
                 using (var db = new LiteDB.LiteDatabase(mem))
@@ -1108,7 +1113,7 @@ namespace EntityWorker.Core.Transaction
             }
             catch (Exception exception)
             {
-                throw new Exception($"Error the package structure is not valid.\n Orginal exception\n{exception.Message}");
+                throw new EntityException($"Error the package structure is not valid.\n Orginal exception\n{exception.Message}");
             }
         }
 

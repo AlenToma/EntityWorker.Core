@@ -39,7 +39,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         public IObjectMapps<T> HasRule<Source>()
         {
             if (typeof(Source).GetInterfaces().Length <= 0 || !typeof(Source).GetInterfaces().Any(x => x.ToString().Contains("IDbRuleTrigger") && x.ToString().Contains(typeof(T).FullName)))
-                throw new Exception($"Source dose not implement interface IDbRuleTrigger<{typeof(T).Name }>");
+                throw new EntityException($"Source dose not implement interface IDbRuleTrigger<{typeof(T).Name }>");
             var rule = typeof(Source).CreateInstance();
             DbSchema.CachedIDbRuleTrigger.GetOrAdd(typeof(T), rule);
             return this;
@@ -56,7 +56,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         {
             var prop = FastDeepCloner.DeepCloner.GetProperty(typeof(T), Extension.GetMemberName(action));
             if (prop == null)
-                throw new Exception($"Could not find Property{Extension.GetMemberName(action)}");
+                throw new EntityException($"Could not find Property{Extension.GetMemberName(action)}");
             prop.Add(new JsonIgnore());
             return this;
         }
@@ -71,7 +71,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         {
             var prop = FastDeepCloner.DeepCloner.GetProperty(typeof(T), Extension.GetMemberName(action));
             if (prop == null)
-                throw new Exception($"Could not find Property{Extension.GetMemberName(action)}");
+                throw new EntityException($"Could not find Property{Extension.GetMemberName(action)}");
             prop.Add(new XmlIgnore());
             return this;
         }
@@ -86,7 +86,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         {
             var prop = FastDeepCloner.DeepCloner.GetProperty(typeof(T), Extension.GetMemberName(action));
             if (prop == null)
-                throw new Exception($"Could not find Property{Extension.GetMemberName(action)}");
+                throw new EntityException($"Could not find Property{Extension.GetMemberName(action)}");
             prop.Add(new KnownType(objectType));
             return this;
         }
@@ -102,7 +102,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         {
             var prop = FastDeepCloner.DeepCloner.GetProperty(typeof(T), Extension.GetMemberName(action));
             if (prop == null || !prop.IsInternalType || (prop.PropertyType != typeof(string) && !prop.PropertyType.IsNumeric() && prop.PropertyType != typeof(Guid) && prop.PropertyType != typeof(Guid?)))
-                throw new Exception($"PrimaryKey for Property { prop?.FullName } kan only be of type string or numeric or Guid");
+                throw new EntityException($"PrimaryKey for Property { prop?.FullName } kan only be of type string or numeric or Guid");
             prop.Add(new PrimaryKey(autoGenerate));
             return this;
         }
@@ -119,7 +119,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         {
             var prop = FastDeepCloner.DeepCloner.GetProperty(typeof(T), Extension.GetMemberName(action));
             if (prop == null || !prop.IsInternalType || (prop.PropertyType != typeof(string) && !prop.PropertyType.IsNumeric() && prop.PropertyType != typeof(Guid) && prop.PropertyType != typeof(Guid?)))
-                throw new Exception($"ForeignKey for Property { prop?.Name } kan only be of type string or numeric or Guid");
+                throw new EntityException($"ForeignKey for Property { prop?.Name } kan only be of type string or numeric or Guid");
 
             prop.Add(new ForeignKey(typeof(Source), propertyName));
             return this;
@@ -136,7 +136,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         {
             var prop = FastDeepCloner.DeepCloner.GetProperty(typeof(T), Extension.GetMemberName(action));
             if (prop == null)
-                throw new Exception($"Could not find Property {Extension.GetMemberName(action)}");
+                throw new EntityException($"Could not find Property {Extension.GetMemberName(action)}");
 
             prop.Add(new ColumnType(dataType, dataBaseTypes));
             return this;
@@ -154,7 +154,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         {
             var prop = FastDeepCloner.DeepCloner.GetProperty(typeof(T), Extension.GetMemberName(action));
             if (prop == null || prop.PropertyType != typeof(string))
-                throw new Exception($"DataEncode for Property {prop?.FullName} kan only be of type string");
+                throw new EntityException($"DataEncode for Property {prop?.FullName} kan only be of type string");
 
             prop.Add(new DataEncode(key, keySize));
             return this;
@@ -170,7 +170,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         {
             var prop = FastDeepCloner.DeepCloner.GetProperty(typeof(T), Extension.GetMemberName(action));
             if (prop == null || prop.IsInternalType)
-                throw new Exception($"IndependentData for Property {prop?.FullName} kan only be of type class, eg an object");
+                throw new EntityException($"IndependentData for Property {prop?.FullName} kan only be of type class, eg an object");
 
             prop.Add(new IndependentData());
             return this;
@@ -186,7 +186,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         {
             var prop = FastDeepCloner.DeepCloner.GetProperty(typeof(T), Extension.GetMemberName(action));
             if (prop == null)
-                throw new Exception($"Could not find Property{Extension.GetMemberName(action)}");
+                throw new EntityException($"Could not find Property{Extension.GetMemberName(action)}");
 
             prop.Add(new NotNullable());
             return this;
@@ -204,7 +204,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         {
             var prop = FastDeepCloner.DeepCloner.GetProperty(typeof(T), Extension.GetMemberName(action));
             if (prop == null)
-                throw new Exception($"Could not find Property{Extension.GetMemberName(action)}");
+                throw new EntityException($"Could not find Property{Extension.GetMemberName(action)}");
 
             prop.Add(new PropertyName(name, displayName));
             return this;
@@ -220,7 +220,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         {
             var prop = FastDeepCloner.DeepCloner.GetProperty(typeof(T), Extension.GetMemberName(action));
             if (prop == null)
-                throw new Exception($"Could not find Property{Extension.GetMemberName(action)}");
+                throw new EntityException($"Could not find Property{Extension.GetMemberName(action)}");
 
             prop.Add(new Stringify());
             return this;
@@ -236,7 +236,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         {
             var prop = FastDeepCloner.DeepCloner.GetProperty(typeof(T), Extension.GetMemberName(action));
             if (prop == null)
-                throw new Exception($"Could not find Property{Extension.GetMemberName(action)}");
+                throw new EntityException($"Could not find Property{Extension.GetMemberName(action)}");
 
             prop.Add(new ExcludeFromAbstract());
             return this;
@@ -253,7 +253,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         {
             var prop = FastDeepCloner.DeepCloner.GetProperty(typeof(T), Extension.GetMemberName(action));
             if (prop == null)
-                throw new Exception($"Could not find Property{Extension.GetMemberName(action)}");
+                throw new EntityException($"Could not find Property{Extension.GetMemberName(action)}");
 
             prop.Add(new DefaultOnEmpty(value));
             return this;
@@ -269,7 +269,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         {
             var prop = FastDeepCloner.DeepCloner.GetProperty(typeof(T), Extension.GetMemberName(action));
             if (prop == null || prop.PropertyType != typeof(string))
-                throw new Exception($"ToBase64String for Property {prop?.FullName} kan only be of type string");
+                throw new EntityException($"ToBase64String for Property {prop?.FullName} kan only be of type string");
 
             prop.Add(new ToBase64String());
             return this;

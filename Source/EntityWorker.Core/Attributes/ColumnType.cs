@@ -22,10 +22,18 @@ namespace EntityWorker.Core.Attributes
         /// <param name="dataBaseTypes">null for all providers</param>
         public ColumnType(string dataType, DataBaseTypes? dataBaseTypes = null)
         {
-            if (string.Equals(dataType, "text", StringComparison.CurrentCulture) && (!dataBaseTypes.HasValue || dataBaseTypes == Helper.DataBaseTypes.Mssql))
-                throw new Exception("EntityWorker.Core cant handle text as a columnDataType for mssql, Microssoft will remove this DataType in the future so avoid using it.\n https://docs.microsoft.com/en-us/sql/t-sql/data-types/ntext-text-and-image-transact-sql");
-            DataBaseTypes = dataBaseTypes;
-            DataType = dataType;
+            try
+            {
+                if (string.Equals(dataType, "text", StringComparison.CurrentCulture) && (!dataBaseTypes.HasValue || dataBaseTypes == Helper.DataBaseTypes.Mssql))
+                    throw new Exception("EntityWorker.Core cant handle text as a columnDataType for mssql, Microssoft will remove this DataType in the future so avoid using it.\n https://docs.microsoft.com/en-us/sql/t-sql/data-types/ntext-text-and-image-transact-sql");
+                DataBaseTypes = dataBaseTypes;
+                DataType = dataType;
+            }
+            catch (Exception e)
+            {
+                GlobalConfiguration.Logg?.Error(e);
+                throw;
+            }
         }
 
     }

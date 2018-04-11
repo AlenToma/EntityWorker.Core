@@ -5,6 +5,7 @@ namespace EntityWorker.Core.Attributes
 {
     /// <summary>
     /// Use this when you have types that are unknown like interface wich it can takes more than one type
+    /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
     /// </summary>
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
     public class KnownType : Attribute
@@ -13,10 +14,17 @@ namespace EntityWorker.Core.Attributes
 
         public KnownType(Type objectType)
         {
-            if (objectType == null)
-                throw new Exception("KnownType must have objectType, object type cant be null");
-            ObjectType = objectType.GetActualType();
-
+            try
+            {
+                if (objectType == null)
+                    throw new Exception("KnownType must have objectType, object type cant be null");
+                ObjectType = objectType.GetActualType();
+            }
+            catch (Exception e)
+            {
+                GlobalConfiguration.Logg?.Error(e);
+                throw;
+            }
         }
 
     }

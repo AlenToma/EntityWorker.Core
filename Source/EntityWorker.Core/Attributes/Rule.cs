@@ -23,9 +23,17 @@ namespace EntityWorker.Core.Attributes
         /// <param name="ruleType"></param>
         public Rule(Type ruleType)
         {
-            RuleType = ruleType;
-            if (ruleType.GetInterfaces().Length <= 0 || !ruleType.GetInterfaces().Any(x => x.ToString().Contains("IDbRuleTrigger")))
-                throw new Exception("RuleType dose not implement interface IDbRuleTrigger<>");
+            try
+            {
+                RuleType = ruleType;
+                if (ruleType.GetInterfaces().Length <= 0 || !ruleType.GetInterfaces().Any(x => x.ToString().Contains("IDbRuleTrigger")))
+                    throw new Exception("RuleType dose not implement interface IDbRuleTrigger<>");
+            }
+            catch (Exception e)
+            {
+                GlobalConfiguration.Logg?.Error(e);
+                throw;
+            }
         }
     }
 }

@@ -382,7 +382,7 @@ namespace EntityWorker.Core
                 var primaryKey = o.GetPrimaryKey();
 
                 if (primaryKey == null)
-                    throw new NullReferenceException("Object must have a PrimaryKey");
+                    throw new EntityException("Object must have a PrimaryKey");
 
                 var primaryKeyId = !Extension.ObjectIsNew(o.GetPrimaryKeyValue()) ? o.GetPrimaryKeyValue() : null;
                 var availableColumns = ObjectColumns(o.GetType());
@@ -489,13 +489,13 @@ namespace EntityWorker.Core
                     if (col.ContainAttribute<DataEncode>())
                     {
                         if (col.PropertyType != typeof(string))
-                            throw new NoNullAllowedException(string.Format("Property {0} Contain DataEncode. PropertyType must be of type String .", col.FullName));
+                            throw new EntityException(string.Format("Property {0} Contain DataEncode. PropertyType must be of type String .", col.FullName));
                         v = new DataCipher(col.GetCustomAttribute<DataEncode>().Key, col.GetCustomAttribute<DataEncode>().KeySize).Encrypt(v.ToString());
 
                     }
 
                     if (col.ContainAttribute<NotNullable>() && v == null && defaultOnEmpty == null)
-                        throw new NoNullAllowedException(string.Format("Property {0} dose not allow null.", col.FullName));
+                        throw new EntityException(string.Format("Property {0} dose not allow null.", col.FullName));
 
 
                     if (v == null && defaultOnEmpty != null)
@@ -572,7 +572,7 @@ namespace EntityWorker.Core
             var codeToDataBaseMerge = new CodeToDataBaseMerge() { Object_Type = tableType };
             var isPrimaryKey = "";
             if (!IsValidName(tableName))
-                throw new Exception(tableName + " is not a valid Name for the current provider " + _repository.DataBaseTypes);
+                throw new EntityException(tableName + " is not a valid Name for the current provider " + _repository.DataBaseTypes);
 
 
             if (!table.Rows.Any())
