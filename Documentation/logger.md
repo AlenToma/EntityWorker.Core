@@ -19,6 +19,6 @@ public class Logger : EntityWorker.Core.Interface.Ilog
 }
 // now that we create the logg class we can now tell Entityworker to begin logging
 // in GlobalConfiguration we assign the new created class to ILog. only exist in nuget => 2.0.0
- GlobalConfiguration.Logg = new Logger();
+ GlobalConfiguration.Log = new Logger();
  // thats all 
 ```
