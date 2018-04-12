@@ -49,7 +49,7 @@ See Code Example for more info.
 - [x] [2.0.1]
  1. Rename GlobalConfigration.Logg => GlobalConfigration.Log
  2. Optimizing Queries
-- [] [2.0.0]
+- [ ] [2.0.0]
  1. Addding KnownType attribute wich can handle unknown protery types like interface wich can takes more then one type.
  2. Adding GlobalConfigration.Logg for logging
 ## Issues
