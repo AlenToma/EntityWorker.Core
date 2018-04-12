@@ -46,10 +46,10 @@ See Code Example for more info.
 * [Attributes](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md)
 
 ## Updates
-- [x] [2.0.1]
+- [x] [2.0.1](https://www.nuget.org/packages/EntityWorker.Core/)
  1. Rename GlobalConfigration.Logg => GlobalConfigration.Log
  2. Optimizing Queries
-- [ ] [2.0.0]
+- [ ] [2.0.0](https://www.nuget.org/packages/EntityWorker.Core/)
  1. Addding KnownType attribute wich can handle unknown protery types like interface wich can takes more then one type.
  2. Adding GlobalConfigration.Logg for logging
 ## Issues
