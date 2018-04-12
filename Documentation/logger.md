@@ -5,12 +5,20 @@ Here is how
 // create a class that inherit from EntityWorker.Core.Interface.ILog 
 public class Logger : EntityWorker.Core.Interface.Ilog
 {
-       
+        /// <summary>
+        /// Here we log errors
+        /// </summary>
+        /// <param name="exception"></param>
         public void Error(Exception exception)
         {
           /// here do what you want with it 
         }
-
+        
+        /// <summary>
+        /// Here we log data like executed sql information
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="infoData"></param>
         public void Info(string message, object infoData)
         {
           /// here do what you want with it 
