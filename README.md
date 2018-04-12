@@ -50,7 +50,7 @@ See Code Example for more info.
  1. Rename GlobalConfigration.Logg => GlobalConfigration.Log
  2. Optimizing Queries
 - [ ] [2.0.0](https://www.nuget.org/packages/EntityWorker.Core/)
- 1. Addding KnownType attribute wich can handle unknown protery types like interface wich can takes more then one type.
+ 1. Addding KnownType attribute wich can handle unknown property types like interface wich can takes more then one type.
  2. Adding GlobalConfigration.Logg for logging
 ## Issues
 Please report any bugs or improvement you might find.
