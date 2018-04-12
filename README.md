@@ -46,6 +46,6 @@ See Code Example for more info.
 * [Attributes](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md)
 
 ## Updates
-2.0.0 Addding KnownType attribute wich can handle unknown protery types like interface wich can takes more then one type
+[2.0.0] Addding KnownType attribute wich can handle unknown protery types like interface wich can takes more then one type
 ## Issues
 Please report any bugs or improvement you might find.
