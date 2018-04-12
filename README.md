@@ -44,13 +44,5 @@ See Code Example for more info.
 * [Package](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Package.md)
 * [Example of Many to Many Relationships](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Many%20to%20Many%20Relationships.md)
 * [Attributes](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md)
-
-## Updates
-- [x] [2.0.1](https://www.nuget.org/packages/EntityWorker.Core/)
- 1. Rename GlobalConfigration.Logg => GlobalConfigration.Log
- 2. Optimizing Queries
-- [ ] [2.0.0](https://www.nuget.org/packages/EntityWorker.Core/)
- 1. Addding KnownType attribute wich can handle unknown property types like interface wich can takes more then one type.
- 2. Adding GlobalConfigration.Logg for logging
 ## Issues
 Please report any bugs or improvement you might find.
