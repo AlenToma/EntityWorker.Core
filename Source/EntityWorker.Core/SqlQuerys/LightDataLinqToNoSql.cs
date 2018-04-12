@@ -809,6 +809,15 @@ namespace EntityWorker.Core.SqlQuerys
                     _overridedNodeType = null;
                     var key = string.Join("", m.ToString().Split('.').Take(m.ToString().Split('.').Length - 1));
                     var cl = m.Expression.Type;
+                    if (cl.IsInterface)
+                    {
+                        var pr = (m.Expression as MemberExpression).Expression.Type;
+                        var tb = m.Expression.ToString().Split('.').Last();
+                        cl = DeepCloner.GetProperty(pr, tb)?.PropertyType ?? cl;
+
+                    }
+
+
                     var prop = DeepCloner.GetFastDeepClonerProperties(cl).First(x => x.Name == m.Member.Name);
                     var name = prop.GetPropertyName();
                     var table = cl.TableName();
@@ -854,6 +863,13 @@ namespace EntityWorker.Core.SqlQuerys
                     _overridedNodeType = null;
                     var key = string.Join("", m.ToString().Split('.').Take(m.ToString().Split('.').Length - 1));
                     var cl = m.Expression.Type;
+                    if (cl.IsInterface)
+                    {
+                        var pr = (m.Expression as MemberExpression).Expression.Type.GetActualType();
+                        var tb = m.Expression.ToString().Split('.').Last();
+                        cl = DeepCloner.GetProperty(pr, tb)?.PropertyType ?? cl;
+                    }
+
                     var prop = DeepCloner.GetFastDeepClonerProperties(cl).First(x => x.Name == m.Member.Name);
                     var table = cl.TableName();
                     var randomTableName = JoinClauses.ContainsKey(key) ? JoinClauses[key].Item1 : RandomKey();

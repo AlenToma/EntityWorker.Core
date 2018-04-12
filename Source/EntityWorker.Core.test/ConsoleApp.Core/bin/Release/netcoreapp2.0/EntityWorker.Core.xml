@@ -93,6 +93,12 @@
             EntityWorker will ignore serializing or derializing all properties that contain this attribute
             </summary>
         </member>
+        <member name="T:EntityWorker.Core.Attributes.KnownType">
+            <summary>
+            Use this when you have types that are unknown like interface wich it can takes more than one type
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
+            </summary>
+        </member>
         <member name="T:EntityWorker.Core.Attributes.NotNullable">
             <summary>
             https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
@@ -332,10 +338,21 @@
             Default Value for DataEncode
             </summary>
         </member>
+        <member name="P:EntityWorker.Core.GlobalConfiguration.PackageDataEncode_Key">
+            <summary>
+            The Default Value for package encryption
+            </summary>
+        </member>
         <member name="P:EntityWorker.Core.GlobalConfiguration.CultureInfo">
             <summary>
             EntityWorker will Use this CultureInfo to convert the data eg decimal, datetime and so on, from the database 
             Default is EN;
+            </summary>
+        </member>
+        <member name="P:EntityWorker.Core.GlobalConfiguration.Logg">
+            <summary>
+            Assign the Logger class.
+            the class must inherit from ILogg
             </summary>
         </member>
         <member name="T:EntityWorker.Core.Helper.DataCipherKeySize">
@@ -470,6 +487,13 @@
             Generate an entityKey Primary Id cant be null or empty
             </summary>
             <param name="entity"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.Extension.EntityKey(System.Type,System.Object)">
+            <summary>
+            Generate an entityKey Primary Id cant be null or empty
+            </summary>
+            <param name="type">entitytyp</param>
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Helper.Extension.InsertBefore(System.Text.StringBuilder,System.String,System.String,System.Boolean)">
@@ -849,6 +873,19 @@
             <param name="func"></param>
             <returns></returns>
         </member>
+        <member name="M:EntityWorker.Core.Interface.ILog.Error(System.Exception)">
+            <summary>
+            Here we log errors
+            </summary>
+            <param name="exception"></param>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ILog.Info(System.String,System.Object)">
+            <summary>
+            Here we log data like executed sql information
+            </summary>
+            <param name="message"></param>
+            <param name="infoData"></param>
+        </member>
         <member name="T:EntityWorker.Core.Interface.IMigration">
             <summary>
             Inhert from this class and create a migration File
@@ -913,6 +950,22 @@
         <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.HasJsonIgnore``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
             <summary>
             EntityWorker will ignore serializing or derializing all properties that contain this attribute
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.HasXmlIgnore``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+            EntityWorker will ignore serializing or derializing all properties that contain this attribute
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.HasKnownType``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Type)">
+            <summary>
+            Use this when you have types that are unknown like interface wich it can takes more than one type 
             </summary>
             <typeparam name="TP"></typeparam>
             <param name="action"></param>
@@ -1340,15 +1393,6 @@
             SaveChanges is needed after
             </summary>
             <param name="entity"></param>
-        </member>
-        <member name="M:EntityWorker.Core.InterFace.IRepository.Attach(System.Object,System.Boolean)">
-            <summary>
-            Attach an object to entityWorker.
-            this is only to validate two objects to get the changes between two objects.
-            You dont have to attach the object to save it to the database
-            </summary>
-            <param name="objcDbEntity"></param>
-            <param name="overwrite"> override if exist</param>
         </member>
         <member name="M:EntityWorker.Core.InterFace.IRepository.Get``1">
             <summary>
@@ -5780,6 +5824,11 @@
             DataChanges
             </summary>
         </member>
+        <member name="P:EntityWorker.Core.Object.Library.EntityChanges.EntityType">
+            <summary>
+            Entity Type
+            </summary>
+        </member>
         <member name="P:EntityWorker.Core.Object.Library.EntityChanges.PropertyName">
             <summary>
             PropertyType
@@ -5793,6 +5842,11 @@
         <member name="P:EntityWorker.Core.Object.Library.EntityChanges.OldValue">
             <summary>
             Old Value
+            </summary>
+        </member>
+        <member name="T:EntityWorker.Core.Object.Library.EntityException">
+            <summary>
+            CustomException
             </summary>
         </member>
         <member name="F:EntityWorker.Core.Object.Library.JSON.JSONParameters.UseOptimizedDatasetSchema">
@@ -6106,6 +6160,14 @@
         <member name="M:EntityWorker.Core.Object.Library.Modules.ObjectMapps`1.HasXmlIgnore``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
             <summary>
             EntityWorker will ignore serializing or derializing all properties that contain this attribute
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.Modules.ObjectMapps`1.HasKnownType``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Type)">
+            <summary>
+            Use this when you have types that are unknown like interface wich it can takes more than one type 
             </summary>
             <typeparam name="TP"></typeparam>
             <param name="action"></param>
@@ -14890,6 +14952,13 @@
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Transaction.Transaction.IsAttached(System.Object)">
+            <summary>
+            check if object is already attached
+            </summary>
+            <param name="entity"></param>
+            <returns> primaryId >0 is mandatory </returns>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.IsAttached(System.String)">
             <summary>
             check if object is already attached
             </summary>
