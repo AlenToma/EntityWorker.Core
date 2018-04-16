@@ -2,6 +2,10 @@
 You could get all entityworker logs by creating and Assigning logger in global configration
 Here is how
 ```csharp
+using EntityWorker.Core.Helper;
+using EntityWorker.Core.Interface;
+using System;
+using System.IO;
 // create a class that inherit from EntityWorker.Core.Interface.ILog 
 public class Logger : EntityWorker.Core.Interface.Ilog
 {
