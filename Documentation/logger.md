@@ -1,5 +1,5 @@
 ## Logger
-You could get all entityworker logs by creating Assigning logger i global configration
+You could get all entityworker logs by creating and Assigning logger i global configration
 Here is how
 ```csharp
 // create a class that inherit from EntityWorker.Core.Interface.ILog 
