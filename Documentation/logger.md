@@ -43,15 +43,19 @@ public class Logger : EntityWorker.Core.Interface.Ilog
 
         public void Error(Exception exception)
         {
-            using (StreamWriter stream = new StreamWriter(logIdentifier))
+            lock (this){
+             using (StreamWriter stream = new StreamWriter(logIdentifier, append:true))
                 stream.WriteLine($"{DateTime.Now} - {exception.Message}");
+                }
         }
 
         public void Info(string message, object infoData)
         {
 #if DEBUG
-            using (StreamWriter stream = new StreamWriter(logIdentifier))
+           lock (this){
+            using (StreamWriter stream = new StreamWriter(logIdentifier, append:true))
                 stream.WriteLine($"{DateTime.Now} - {message} - \n {infoData}");
+                }
 #endif
         }
     }
