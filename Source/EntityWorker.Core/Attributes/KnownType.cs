@@ -22,7 +22,7 @@ namespace EntityWorker.Core.Attributes
             }
             catch (Exception e)
             {
-                GlobalConfiguration.Logg?.Error(e);
+                GlobalConfiguration.Log?.Error(e);
                 throw;
             }
         }

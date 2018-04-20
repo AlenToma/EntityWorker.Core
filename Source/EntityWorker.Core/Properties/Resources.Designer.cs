@@ -84,7 +84,15 @@ namespace EntityWorker.Core.Properties {
                 return ResourceManager.GetString("DataTypes", resourceCulture);
             }
         }
-        
+
+        internal static string DropContraine
+        {
+            get
+            {
+                return ResourceManager.GetString("dropConstraine", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to ABORT,ACTION,ADD,AFTER,ALL,ALTER,ANALYZE,AND,AS,ASC,ATTACH,AUTOINCREMENT,BEFORE,BEGIN,BETWEEN,BY,CASCADE,CASE,CAST,CHECK,COLLATE,COLUMN,COMMIT,CONFLICT,CONSTRAINT,CREATE,CROSS,CURRENT_DATE,CURRENT_TIME,CURRENT_TIMESTAMP,DATABASE,DEFAULT,DEFERRABLE,DEFERRED,DELETE,DESC,DETACH,DISTINCT,DROP,EACH,ELSE,END,ESCAPE,EXCEPT,EXCLUSIVE,EXISTS,EXPLAIN,FAIL,FOR,FOREIGN,FROM,FULL,GLOB,GROUP,HAVING,IF,IGNORE,IMMEDIATE,IN,INDEX,INDEXED,INITIALLY,INNER,INSERT,INSTEAD,INTERSECT,INTO,IS,ISNULL,JOIN,KEY,LEFT,LIKE,LIMIT,MATCH, [rest of string was truncated]&quot;;.
         /// </summary>

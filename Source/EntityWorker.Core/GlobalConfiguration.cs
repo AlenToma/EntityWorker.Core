@@ -1,5 +1,6 @@
 ﻿using EntityWorker.Core.Helper;
 using EntityWorker.Core.Interface;
+using EntityWorker.Core.Object.Library.JSON;
 using System.Globalization;
 
 namespace EntityWorker.Core
@@ -37,7 +38,13 @@ namespace EntityWorker.Core
         /// Assign the Logger class.
         /// the class must inherit from ILogg
         /// </summary>
-        public static ILog Logg { get; set; }
+        public static ILog Log { get; set; }
+
+
+        /// <summary>
+        /// Json globalConfig settings
+        /// </summary>
+        public static JSONParameters JSONParameters { get; set; } = new JSONParameters();
 
     }
 }

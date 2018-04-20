@@ -2,7 +2,7 @@
 
 namespace EntityWorker.Core.Interface
 {
-    public interface ILog
+    public interface ILog : IDisposable
     {
         /// <summary>
         /// Here we log errors

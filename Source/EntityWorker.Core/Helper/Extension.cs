@@ -796,7 +796,7 @@ namespace EntityWorker.Core.Helper
                         if (prop == null)
                             prop = props.FirstOrDefault(x => string.Equals(x.GetPropertyName(), columnName, StringComparison.CurrentCultureIgnoreCase) || x.GetPropertyName().ToLower() == columnName);
 
-                        if (value != null && prop != null && prop.CanRead)
+                        if (value != DBNull.Value && value != null && prop != null && prop.CanRead)
                         {
                             if (value as byte[] != null && prop.PropertyType.FullName.Contains("Guid"))
                                 value = new Guid(value as byte[]);
@@ -808,6 +808,7 @@ namespace EntityWorker.Core.Helper
                             {
                                 if (value.ConvertValue<string>().IsBase64String())
                                     value = MethodHelper.DecodeStringFromBase64(value.ConvertValue<string>());
+                                else value = MethodHelper.ConvertValue(value, prop.PropertyType);
                             }
                             else if (dataEncode != null)
                                 value = new DataCipher(dataEncode.Key, dataEncode.KeySize).Decrypt(value.ConvertValue<string>());

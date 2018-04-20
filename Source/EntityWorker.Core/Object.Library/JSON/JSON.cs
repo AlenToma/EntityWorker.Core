@@ -13,7 +13,7 @@ namespace EntityWorker.Core.Object.Library.JSON
     public delegate string Serialize(object data);
     public delegate object Deserialize(string data);
 
-    internal sealed class JSONParameters
+    public sealed class JSONParameters
     {
         /// <summary>
         /// Use the optimized fast Dataset Schema format (default = True)
@@ -108,7 +108,7 @@ namespace EntityWorker.Core.Object.Library.JSON
         /// <summary>
         /// Globally set-able parameters for controlling the serializer
         /// </summary>
-        public static JSONParameters Parameters = new JSONParameters();
+        public static JSONParameters Parameters = GlobalConfiguration.JSONParameters;
         /// <summary>
         /// Create a formatted json string (beautified) from an object
         /// </summary>

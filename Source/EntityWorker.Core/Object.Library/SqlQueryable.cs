@@ -180,6 +180,49 @@ namespace EntityWorker.Core.Object.Library
         }
 
         /// <summary>
+        /// Order By Column
+        /// </summary>
+        /// <param name="exp"></param>
+        /// <returns></returns>
+        public ISqlQueryable<T> OrderBy(string columnName)
+        {
+            var prop = FastDeepCloner.DeepCloner.GetFastDeepClonerProperties(typeof(T)).FirstOrDefault(x => string.Equals(columnName, x.Name, StringComparison.CurrentCultureIgnoreCase));
+            if (prop == null)
+            {
+
+                throw new EntityException($"T dose not containe property {columnName}");
+            }
+            var param = Expression.Parameter(typeof(T));
+            var field = Expression.PropertyOrField(param, prop.Name);
+            var list = Expression.Parameter(typeof(IEnumerable<T>), "list");
+            Expression exp = Expression.Lambda<Func<T, object>>(field, param);
+            var orderByExp = Expression.Call(typeof(Enumerable), "OrderBy", new Type[] { typeof(T), typeof(object) }, list, exp);
+            _matches.Add(orderByExp);
+            return this;
+        }
+
+        /// <summary>
+        /// OrderByDescending Column
+        /// </summary>
+        /// <param name="exp"></param>
+        /// <returns></returns>
+        public ISqlQueryable<T> OrderByDescending(string columnName)
+        {
+            var prop = FastDeepCloner.DeepCloner.GetFastDeepClonerProperties(typeof(T)).FirstOrDefault(x => string.Equals(columnName, x.Name, StringComparison.CurrentCultureIgnoreCase));
+            if (prop == null)
+            {
+                throw new EntityException($"T dose not containe property {columnName}");
+            }
+            var param = Expression.Parameter(typeof(T));
+            var field = Expression.PropertyOrField(param, prop.Name);
+            var list = Expression.Parameter(typeof(IEnumerable<T>), "list");
+            Expression exp = Expression.Lambda<Func<T, object>>(field, param);
+            var orderByExp = Expression.Call(typeof(Enumerable), "OrderByDescending", new Type[] { typeof(T), typeof(object) }, list, exp);
+            _matches.Add(orderByExp);
+            return this;
+        }
+
+        /// <summary>
         /// OrderByDescending Column
         /// </summary>
         /// <param name="exp"></param>

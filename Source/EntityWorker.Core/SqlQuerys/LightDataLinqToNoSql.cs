@@ -138,6 +138,7 @@ namespace EntityWorker.Core.SqlQuerys
             this.sb = new StringBuilder();
             this.Visit(expression);
             validateBinaryExpression(null, null);
+            CleanDecoder(string.Empty);
             WhereClause.Add(this.sb.ToString());
         }
 
@@ -159,12 +160,17 @@ namespace EntityWorker.Core.SqlQuerys
         }
 
 
-        protected object GetSingleValue(Expression ex)
+        protected object GetSingleValue(Expression ex, string memName = null)
         {
             if (ex.NodeType == ExpressionType.MemberAccess)
             {
+
                 var member = (ex as MemberExpression).Expression as ConstantExpression;
-                return member?.Value.GetType().GetFields().First().GetValue(member.Value);
+                if (member?.Value.GetType().GetFields().Length > 0)
+                    return member?.Value.GetType().GetFields().First().GetValue(member.Value);
+                else if (member?.Value.GetType().GetProperties().Length > 0)
+                    return member?.Value.GetType().GetProperties().First().GetValue(member.Value);
+                else return null;
             }
             else
             {
@@ -378,10 +384,10 @@ namespace EntityWorker.Core.SqlQuerys
             }
             else if (m.Method.ReturnType.IsInternalType())
             {
-                sb.Append(ValuetoSql(Expression.Lambda(m).Compile().DynamicInvoke()));
+                CleanDecoder(ValuetoSql(Expression.Lambda(m).Compile().DynamicInvoke()));
             }
 
-            throw new NotSupportedException(string.Format("The method '{0}' is not supported", m.Method.Name));
+            throw new EntityException(string.Format("The method '{0}' is not supported", m.Method.Name));
         }
 
         protected override Expression VisitUnary(UnaryExpression u)
@@ -396,7 +402,7 @@ namespace EntityWorker.Core.SqlQuerys
                     this.Visit(u.Operand);
                     break;
                 default:
-                    throw new NotSupportedException(string.Format("The unary operator '{0}' is not supported", u.NodeType));
+                    throw new EntityException(string.Format("The unary operator '{0}' is not supported", u.NodeType));
             }
             return u;
         }
@@ -615,7 +621,7 @@ namespace EntityWorker.Core.SqlQuerys
                     break;
 
                 default:
-                    throw new NotSupportedException(string.Format("The binary operator '{0}' is not supported", b.NodeType));
+                    throw new EntityException(string.Format("The binary operator '{0}' is not supported", b.NodeType));
 
             }
 
@@ -707,12 +713,24 @@ namespace EntityWorker.Core.SqlQuerys
 
                     case TypeCode.Object:
 
-                        var field = string.IsNullOrEmpty(memName)
-                            ? c.Value.GetType().GetFields().FirstOrDefault()
-                            : c.Value.GetType().GetFields().FirstOrDefault(x => x.Name == memName);
-
                         object value = null;
-                        value = field?.GetValue(c.Value) ?? c.Value.GetType().GetFields().FirstOrDefault()?.GetValue(c.Value);
+                        if (c.Value.GetType().GetFields().Length > 0)
+                        {
+                            var field = string.IsNullOrEmpty(memName)
+                                 ? c.Value.GetType().GetFields().FirstOrDefault()
+                                 : c.Value.GetType().GetFields().FirstOrDefault(x => x.Name == memName);
+
+                            value = field?.GetValue(c.Value) ?? c.Value.GetType().GetFields().FirstOrDefault()?.GetValue(c.Value);
+                        }
+                        else
+                        {
+                            var field = string.IsNullOrEmpty(memName)
+                            ? c.Value.GetType().GetProperties().FirstOrDefault()
+                            : c.Value.GetType().GetProperties().FirstOrDefault(x => x.Name == memName);
+                            value = field?.GetValue(c.Value) ?? c.Value.GetType().GetProperties().FirstOrDefault()?.GetValue(c.Value);
+                        }
+
+
 
                         if (value == null)
                             break;
@@ -789,7 +807,7 @@ namespace EntityWorker.Core.SqlQuerys
                     if (isNot)
                     {
                         if (!hasValueAttr)
-                            columnName = $"(CASE WHEN { columnName } = 0 THEN 1 ELSE 0 END) {boolString.Replace("#", "0")}";
+                            columnName = $"(CASE WHEN {columnName} = 0 THEN 1 ELSE 0 END) {boolString.Replace("#", "0")}";
                         else columnName = $"(CASE WHEN {columnName} IS NULL THEN 1 ELSE 0 END) {boolString.Replace("#", "0")}";
                     }
                     else if (hasValueAttr)
@@ -848,7 +866,7 @@ namespace EntityWorker.Core.SqlQuerys
                     if (string.IsNullOrEmpty(v))
                     {
                         sb = sb.Remove(sb.Length - columnName.Length, columnName.Length);
-                        sb.Append(ValuetoSql(GetValue(m)));
+                        CleanDecoder(ValuetoSql(GetValue(m)));
                     }
                     else
                     {
@@ -887,7 +905,7 @@ namespace EntityWorker.Core.SqlQuerys
                     }
                     else
                     {
-                        throw new NotSupportedException(string.Format("Expression STRUCTURE IS NOT SUPPORTED MEMBER{0} for EntityWorker", m.Member.Name));
+                        throw new EntityException(string.Format("Expression STRUCTURE IS NOT SUPPORTED MEMBER{0} for EntityWorker", m.Member.Name));
                     }
 
                     if (!string.IsNullOrEmpty(v))
@@ -898,15 +916,15 @@ namespace EntityWorker.Core.SqlQuerys
             }
             catch
             {
-                throw new NotSupportedException(string.Format("Expression '{0}' is not supported", m.ToString()));
+                throw new EntityException(string.Format("Expression '{0}' is not supported", m.ToString()));
             }
 
             if (m.Type.IsInternalType() && m.Expression.NodeType == ExpressionType.Call)
             {
-                sb.Append(ValuetoSql(Expression.Lambda(m).Compile().DynamicInvoke()));
+                CleanDecoder(ValuetoSql(Expression.Lambda(m).Compile().DynamicInvoke()));
                 return m;
             }
-            throw new NotSupportedException(string.Format("The member '{0}' is not supported", m.Member.Name));
+            throw new EntityException(string.Format("The member '{0}' is not supported", m.Member.Name));
         }
 
 
@@ -933,8 +951,8 @@ namespace EntityWorker.Core.SqlQuerys
             if (body == null) return false;
             var col = VisitMember(body, true)?.ToString();
             var column = col + " as temp" + _columns.Count;
-            if (_columns.All(x => x != column))
-                _columns.Add(col + " as temp" + _columns.Count);
+            //if (_columns.All(x => x != column))
+            //    _columns.Add(col + " as temp" + _columns.Count);
             if (string.IsNullOrEmpty(OrderBy))
             {
                 OrderBy = string.Format("{0} {1}", col, order);

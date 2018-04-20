@@ -349,10 +349,15 @@
             Default is EN;
             </summary>
         </member>
-        <member name="P:EntityWorker.Core.GlobalConfiguration.Logg">
+        <member name="P:EntityWorker.Core.GlobalConfiguration.Log">
             <summary>
             Assign the Logger class.
             the class must inherit from ILogg
+            </summary>
+        </member>
+        <member name="P:EntityWorker.Core.GlobalConfiguration.JSONParameters">
+            <summary>
+            Json globalConfig settings
             </summary>
         </member>
         <member name="T:EntityWorker.Core.Helper.DataCipherKeySize">

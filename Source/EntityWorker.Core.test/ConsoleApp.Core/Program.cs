@@ -25,8 +25,8 @@ namespace ConsoleApp.Core
             {
                 ////execute(rep.Get<User>().Where(x => string.IsNullOrEmpty(x.UserName)), "IsNullOrEmpty");
                 //execute(rep.Get<User>().Where(x => string.IsNullOrEmpty(x.Person.FirstName)), "IsNullOrEmpty");
-
-                execute(rep.Get<Person>().Where(x =>  !x.Addresses.Any(a=> a.Name.StartsWith("a"))), "!IsNullOrEmpty");
+                var id = Guid.NewGuid();
+                execute(rep.Get<Person>().Where(x => x.FirstName.Contains("Admin") || string.IsNullOrEmpty(x.FirstName) || string.IsNullOrEmpty(x.FirstName) == false && x.Id != id) , "!IsNullOrEmpty");
             }
 
         }

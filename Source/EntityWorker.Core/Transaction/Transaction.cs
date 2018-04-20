@@ -275,7 +275,7 @@ namespace EntityWorker.Core.Transaction
         {
             try
             {
-                GlobalConfiguration.Logg?.Info("Migration", "Initialize");
+                GlobalConfiguration.Log?.Info("Migration", "Initialize");
                 this.CreateTable<DBMigration>(false);
                 var migrations = config.GetMigrations(this) ?? new List<Migration>();
                 this.CreateTransaction();
@@ -298,7 +298,7 @@ namespace EntityWorker.Core.Transaction
             }
             catch (Exception e)
             {
-                GlobalConfiguration.Logg?.Error(e);
+                GlobalConfiguration.Log?.Error(e);
                 Rollback();
                 throw;
             }
@@ -380,7 +380,7 @@ namespace EntityWorker.Core.Transaction
         /// <returns></returns>
         public ISqlQueryable<T> DataReaderConverter<T>(DbCommandExtended command)
         {
-            GlobalConfiguration.Logg?.Info("Execute", command);
+            GlobalConfiguration.Log?.Info("Execute", command);
             return new SqlQueryable<T>(this, ((List<T>)DataReaderConverter(command, typeof(T))));
         }
 
@@ -394,7 +394,7 @@ namespace EntityWorker.Core.Transaction
         {
             IList result;
             ValidateConnection();
-            GlobalConfiguration.Logg?.Info("Execute", command);
+            GlobalConfiguration.Log?.Info("Execute", command);
             try
             {
                 var o = command.Command.ExecuteReader();
@@ -403,7 +403,7 @@ namespace EntityWorker.Core.Transaction
             }
             catch (Exception e)
             {
-                GlobalConfiguration.Logg?.Error(e);
+                GlobalConfiguration.Log?.Error(e);
                 throw e;
             }
             finally
@@ -582,7 +582,7 @@ namespace EntityWorker.Core.Transaction
         /// <returns></returns>
         protected List<ILightDataTable> GetLightDataTableList(DbCommandExtended cmd, string primaryKeyId = null)
         {
-            GlobalConfiguration.Logg?.Info("Execute", cmd);
+            GlobalConfiguration.Log?.Info("Execute", cmd);
             var returnList = new List<ILightDataTable>();
             var reader = cmd.Command.ExecuteReader();
             returnList.Add(new LightDataTable().ReadData(DataBaseTypes, reader, cmd, primaryKeyId, false));
@@ -602,7 +602,7 @@ namespace EntityWorker.Core.Transaction
         internal void Attach(object objcDbEntity, bool overwrite = false)
         {
             var key = objcDbEntity.EntityKey();
-            GlobalConfiguration.Logg?.Info("Attaching", key);
+            GlobalConfiguration.Log?.Info("Attaching", key);
             if (objcDbEntity == null)
                 throw new EntityException("DbEntity cant be null");
             if (Extension.ObjectIsNew(objcDbEntity.GetPrimaryKeyValue()))
@@ -628,7 +628,7 @@ namespace EntityWorker.Core.Transaction
         internal void AttachNew(object objcDbEntity, bool overwrite = false)
         {
             var key = objcDbEntity.EntityKey();
-            GlobalConfiguration.Logg?.Info("Attaching", key);
+            GlobalConfiguration.Log?.Info("Attaching", key);
             if (objcDbEntity == null)
                 throw new EntityException("DbEntity cant be null");
             if (Extension.ObjectIsNew(objcDbEntity.GetPrimaryKeyValue()))
@@ -735,7 +735,7 @@ namespace EntityWorker.Core.Transaction
         /// <returns></returns>
         public ILightDataTable GetLightDataTable(DbCommandExtended cmd, string primaryKey = null)
         {
-            GlobalConfiguration.Logg?.Info("Execute", cmd);
+            GlobalConfiguration.Log?.Info("Execute", cmd);
             ValidateConnection();
             var reader = cmd.Command.ExecuteReader();
             return new LightDataTable().ReadData(DataBaseTypes, reader, cmd, primaryKey);
@@ -748,7 +748,7 @@ namespace EntityWorker.Core.Transaction
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task DeleteAsync(object entity)
+        public virtual async Task DeleteAsync(object entity)
         {
             await Task.Run(() =>
             {
@@ -760,7 +760,7 @@ namespace EntityWorker.Core.Transaction
         /// Remove Row
         /// </summary>
         /// <param name="entity"></param>
-        public void Delete(object entity)
+        public virtual void Delete(object entity)
         {
             _dbSchema.DeleteAbstract(entity);
         }
@@ -770,7 +770,7 @@ namespace EntityWorker.Core.Transaction
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task SaveAsync(object entity)
+        public virtual async Task SaveAsync(object entity)
         {
             await Task.Run(() =>
             {
@@ -782,7 +782,7 @@ namespace EntityWorker.Core.Transaction
         /// Save object
         /// </summary>
         /// <param name="entity"></param>
-        public void Save(object entity)
+        public virtual void Save(object entity)
         {
             _dbSchema.Save(entity);
         }

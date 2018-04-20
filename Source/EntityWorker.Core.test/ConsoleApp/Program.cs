@@ -15,7 +15,7 @@ namespace ConsoleApp1
         private static Stopwatch sw = new Stopwatch();
         static void Main(string[] args)
         {
-            GlobalConfiguration.Logg = new Logger((object sender, EventArgs arg) =>
+            GlobalConfiguration.Log = new Logger((object sender, EventArgs arg) =>
             {
                 //Console.WriteLine((arg as Args).Data);
             });

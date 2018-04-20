@@ -187,7 +187,7 @@ namespace EntityWorker.Core
                 pathLoaded = new Dictionary<string, List<string>>();
             if (item == null)
                 return default(T);
-            GlobalConfiguration.Logg?.Info("Loading Children for " + item.GetType() + "", item);
+            GlobalConfiguration.Log?.Info("Loading Children for " + item.GetType() + "", item);
             switch (item)
             {
                 case IList _:
@@ -279,7 +279,7 @@ namespace EntityWorker.Core
 
         private List<string> DeleteAbstract(object o, bool save)
         {
-            GlobalConfiguration.Logg?.Info("Delete", o);
+            GlobalConfiguration.Log?.Info("Delete", o);
             var type = o.GetType().GetActualType();
             var props = DeepCloner.GetFastDeepClonerProperties(type);
             var table = "[" + (type.TableName()) + "]";
@@ -376,7 +376,7 @@ namespace EntityWorker.Core
         {
             try
             {
-                GlobalConfiguration.Logg?.Info("Save", o);
+                GlobalConfiguration.Log?.Info("Save", o);
                 _repository.CreateTransaction();
                 var props = DeepCloner.GetFastDeepClonerProperties(o.GetType());
                 var primaryKey = o.GetPrimaryKey();
@@ -543,9 +543,9 @@ namespace EntityWorker.Core
                 _repository.Attach(o, true);
                 return primaryKeyId;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                GlobalConfiguration.Logg?.Error(e);
+                GlobalConfiguration.Log?.Error(e);
                 _repository.Rollback();
                 throw;
             }
@@ -672,6 +672,8 @@ namespace EntityWorker.Core
 
                         if (_repository.DataBaseTypes != DataBaseTypes.Sqllight && !(prop.GetDbTypeListByType(_repository.DataBaseTypes).Any(x => x.ToLower().Contains(modify.Value<string>("data_type").ToLower()))) && _repository.DataBaseTypes != DataBaseTypes.PostgreSql)
                         {
+                            var constraine = Properties.Resources.DropContraine.Replace("@tb", $"'{tableName}'").Replace("@col", $"'{prop.GetPropertyName()}'");
+                            codeToDataBaseMerge.Sql.Append(constraine);
                             codeToDataBaseMerge.Sql.Append($"\nALTER TABLE [{tableName}] ALTER COLUMN [{prop.GetPropertyName()}] {prop.GetDbTypeByType(_repository.DataBaseTypes)} {((Nullable.GetUnderlyingType(propType) != null || propType == typeof(string)) && !prop.ContainAttribute<NotNullable>() ? " NULL" : " NOT NULL")}");
                         }
                         else
@@ -702,8 +704,13 @@ namespace EntityWorker.Core
                 if (_repository.DataBaseTypes != DataBaseTypes.Sqllight)
                 {
                     if (_repository.DataBaseTypes == DataBaseTypes.Mssql)
-                        colRemove.Sql.Append("IF EXISTS (SELECT name FROM sys.objects  WHERE name = 'datedflt' AND type = 'D') DROP DEFAULT datedflt;");
-                    colRemove.Sql.Append(string.Format("\nALTER TABLE [{0}] DROP COLUMN [{1}];", tableName, col.Value<string>("column_name")));
+                    {
+                        var constraine = Properties.Resources.DropContraine.Replace("@tb", $"'{tableName}'").Replace("@col", $"'{col.Value<string>("column_name")}'");
+                        colRemove.Sql.Append(constraine);
+
+                    }
+                    //colRemove.Sql.Append("IF EXISTS (SELECT name FROM sys.objects  WHERE name = 'datedflt' AND type = 'D') DROP DEFAULT datedflt;");
+                    colRemove.Sql.Append(string.Format("\nALTER TABLE [{0}] DROP COLUMN IF EXISTS [{1}];", tableName, col.Value<string>("column_name")));
 
                 }
                 else
@@ -745,12 +752,12 @@ namespace EntityWorker.Core
 
         public void RemoveTable(Type tableType, List<Type> tableRemoved = null, bool remove = true)
         {
-            
+
             if (tableRemoved == null)
                 tableRemoved = new List<Type>();
             if (tableRemoved.Any(x => x == tableType))
                 return;
-            GlobalConfiguration.Logg?.Info("Removig", tableType);
+            GlobalConfiguration.Log?.Info("Removig", tableType);
             tableRemoved.Insert(0, tableType);
             var props = DeepCloner.GetFastDeepClonerProperties(tableType);
 

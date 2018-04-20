@@ -93,6 +93,21 @@ namespace EntityWorker.Core.Interface
         /// <returns></returns>
         ISqlQueryable<T> OrderBy(Expression<Func<T, object>> exp);
 
+
+        /// <summary>
+        /// Order By Column
+        /// </summary>
+        /// <param name="exp"></param>
+        /// <returns></returns>
+        ISqlQueryable<T> OrderBy(string columnName);
+
+
+        /// <summary>
+        /// OrderByDescending Column
+        /// </summary>
+        /// <param name="exp"></param>
+        /// <returns></returns>
+        ISqlQueryable<T> OrderByDescending(string columnName);
         /// <summary>
         /// OrderByDescending Column
         /// </summary>

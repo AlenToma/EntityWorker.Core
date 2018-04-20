@@ -11,7 +11,7 @@ namespace EntityWorker.Core.Object.Library
     {
         public EntityException(string message) : base(message)
         {
-            GlobalConfiguration.Logg?.Error(this);
+            GlobalConfiguration.Log?.Error(this);
         }
     }
 }

@@ -10,7 +10,7 @@ namespace EntityWorker.Core.SqlQuerys
         internal static string GetValueByType(object value, DataBaseTypes dbType)
         {
             if (value == null)
-                return string.Format("String[{0}]", "null");
+                return string.Format("String[{0}]", "NULL");
             var type = value.GetType();
             if (Nullable.GetUnderlyingType(type) != null)
                 type = Nullable.GetUnderlyingType(type);
@@ -23,13 +23,16 @@ namespace EntityWorker.Core.SqlQuerys
             }
             if (type == typeof(Guid))
                 return string.Format("Guid[{0}]", value);
+
+            if (type.IsEnum)
+                return ((int)(value)).ToString();
             return string.Format("String[{0}]", value);
         }
 
         internal static string GetValueByTypeSTRING(object value, DataBaseTypes dbType)
         {
             if (value == null)
-                return string.Format("'{0}'", "null");
+                return string.Format("{0}", "NULL");
             var type = value.GetType();
             if (Nullable.GetUnderlyingType(type) != null)
                 type = Nullable.GetUnderlyingType(type);
@@ -42,6 +45,8 @@ namespace EntityWorker.Core.SqlQuerys
             }
             if (type == typeof(Guid))
                 return string.Format("'{0}'", value);
+            if (type.IsEnum)
+                return ((int)(value)).ToString();
             return string.Format("'{0}'", value);
 
         }

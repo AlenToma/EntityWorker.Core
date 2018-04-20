@@ -49,6 +49,9 @@ namespace EntityWorker.Core
                     return defaultValue;
             }
 
+            if (propertyType.IsEnum)
+                return Activator.CreateInstance(propertyType);
+            
 
             if (propertyType == typeof(int?))
                 return new int?();
