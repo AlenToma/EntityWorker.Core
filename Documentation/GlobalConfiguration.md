@@ -20,5 +20,8 @@ EntityWorker.Core.GlobalConfiguration.PackageDataEncode_Key = "packageSecurityKe
 EntityWorker.Core.GlobalConfiguration.CultureInfo = new CultureInfo("en");
 
 /// read logger section to know how to setup
-EntityWorker.Core.GlobalConfiguration.GlobalConfiguration.Logg = null;
+EntityWorker.Core.GlobalConfiguration.GlobalConfiguration.Log = null;
+
+/// Settings for JsonParser
+EntityWorker.Core.GlobalConfiguration.JSONParameters.SerializeToLowerCaseNames = true;
 ```

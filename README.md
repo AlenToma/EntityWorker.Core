@@ -44,8 +44,5 @@ See Code Example for more info.
 * [Package](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Package.md)
 * [Example of Many to Many Relationships](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Many%20to%20Many%20Relationships.md)
 * [Attributes](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md)
-
-## Updates
-[2.0.0] Addding KnownType attribute wich can handle unknown protery types like interface wich can takes more then one type
 ## Issues
 Please report any bugs or improvement you might find.
