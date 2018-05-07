@@ -105,7 +105,7 @@ namespace EntityWorker.Core.Object.Library
                         _provider.ExecuteNonQuery(cmd);
 
                     }
-                    DbSchema.CachedObjectColumn.Clear();
+                    DataBase.Database.CachedColumnSchema.Clear();
                     LightDataLinqToNoSql.CachedColumns.Clear();
                     DbSchema.CachedSql.Clear();
                     Extension.CachedDataRecord.Clear();

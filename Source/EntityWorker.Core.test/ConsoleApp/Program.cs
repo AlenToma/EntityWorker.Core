@@ -78,6 +78,7 @@ namespace ConsoleApp1
         public static void TestSave()
         {
 
+
             Console.WriteLine("----------------Postgresql------------------");
             using (var rep = new Repository(DataBaseTypes.PostgreSql))
             {
@@ -209,8 +210,6 @@ namespace ConsoleApp1
 
         public static void ExpressionTest()
         {
-
-
             Console.WriteLine("POSTGRESQL");
             using (var rep = new Repository(DataBaseTypes.PostgreSql))
             {

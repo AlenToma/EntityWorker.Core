@@ -22,4 +22,4 @@ D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\ConsoleApp\bin\Relea
 D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\ConsoleApp\bin\Release\LightData.CMS.Modules.pdb
 D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\ConsoleApp\obj\Release\ConsoleApp.net46.csproj.CopyComplete
 D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\ConsoleApp\obj\Release\ConsoleApp1.pdb
-D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\ConsoleApp\obj\Release\ConsoleApp.net46.csprojResolveAssemblyReference.cache
+D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\ConsoleApp\obj\Release\ConsoleApp.net46.csprojAssemblyReference.cache

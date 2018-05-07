@@ -10,6 +10,7 @@ namespace EntityWorker.Core.Object.Library
                 foreach (var item in dic)
                     TryAdd(item.Key, item.Value);
         }
+
         public bool TryAdd(T key, P item, bool overwrite = false)
         {
             if (base.ContainsKey(key) && !overwrite)
@@ -38,6 +39,14 @@ namespace EntityWorker.Core.Object.Library
 
             }
             return base[key];
+        }
+
+        public P Get(T key)
+        {
+            object o = null;
+            if (this.ContainsKey(key))
+                return this[key];
+            return (P)o;
         }
     }
 }

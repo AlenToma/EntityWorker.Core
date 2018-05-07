@@ -15,6 +15,7 @@ namespace EntityWorker.Core.SqlQuerys
 {
     internal class LightDataLinqToNoSql : ExpressionVisitor
     {
+        BindingFlags _bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
         private Transaction.Transaction _transaction;
         private StringBuilder sb;
         private ExpressionType? _overridedNodeType;
@@ -46,10 +47,11 @@ namespace EntityWorker.Core.SqlQuerys
 
         public LightDataLinqToNoSql(Type type, Transaction.Transaction transaction)
         {
+
             _transaction = transaction;
             _obType = type.GetActualType();
             if (!CachedColumns.ContainsKey(_obType))
-                _columns = CachedColumns.GetOrAdd(_obType, _transaction._dbSchema.ObjectColumns(_obType).Rows.Select(x => $"[{_obType.TableName()}].[{x.Value<string>("column_name")}]").ToList());
+                _columns = CachedColumns.GetOrAdd(_obType, _transaction.GetColumnSchema(_obType).Select(x => $"[{_obType.TableName()}].[{x.Key}]").ToList());
             else
                 _columns = CachedColumns[_obType];
             _primaryId = OrderBy = _obType.GetPrimaryKey()?.GetPropertyName();
@@ -60,7 +62,7 @@ namespace EntityWorker.Core.SqlQuerys
         {
             DataBaseTypes = dataBaseTypes;
             if (!CachedColumns.ContainsKey(_obType))
-                _columns = CachedColumns.GetOrAdd(_obType, _transaction._dbSchema.ObjectColumns(_obType).Rows.Select(x => $"[{_obType.TableName()}].[{x.Value<string>("column_name")}]").ToList());
+                _columns = CachedColumns.GetOrAdd(_obType, _transaction.GetColumnSchema(_obType).Select(x => $"[{_obType.TableName()}].[{x.Key}]").ToList());
             else
                 _columns = CachedColumns[_obType];
             OrderBy = _obType.GetPrimaryKey().GetPropertyName();
@@ -160,14 +162,14 @@ namespace EntityWorker.Core.SqlQuerys
         }
 
 
-        protected object GetSingleValue(Expression ex, string memName = null)
+        protected object GetSingleValue(Expression ex)
         {
             if (ex.NodeType == ExpressionType.MemberAccess)
             {
 
                 var member = (ex as MemberExpression).Expression as ConstantExpression;
-                if (member?.Value.GetType().GetFields().Length > 0)
-                    return member?.Value.GetType().GetFields().First().GetValue(member.Value);
+                if (member?.Value.GetType().GetFields(_bindingFlags).Length > 0)
+                    return member?.Value.GetType().GetFields(_bindingFlags).First().GetValue(member.Value);
                 else if (member?.Value.GetType().GetProperties().Length > 0)
                     return member?.Value.GetType().GetProperties().First().GetValue(member.Value);
                 else return null;
@@ -714,13 +716,13 @@ namespace EntityWorker.Core.SqlQuerys
                     case TypeCode.Object:
 
                         object value = null;
-                        if (c.Value.GetType().GetFields().Length > 0)
+                        if (c.Value.GetType().GetFields(_bindingFlags).Length > 0 && (string.IsNullOrEmpty(memName) || c.Value.GetType().GetFields(_bindingFlags).Any(x => x.Name == memName)))
                         {
                             var field = string.IsNullOrEmpty(memName)
-                                 ? c.Value.GetType().GetFields().FirstOrDefault()
-                                 : c.Value.GetType().GetFields().FirstOrDefault(x => x.Name == memName);
+                                 ? c.Value.GetType().GetFields(_bindingFlags).FirstOrDefault()
+                                 : c.Value.GetType().GetFields(_bindingFlags).FirstOrDefault(x => x.Name == memName);
 
-                            value = field?.GetValue(c.Value) ?? c.Value.GetType().GetFields().FirstOrDefault()?.GetValue(c.Value);
+                            value = field?.GetValue(c.Value) ?? c.Value.GetType().GetFields(_bindingFlags).FirstOrDefault()?.GetValue(c.Value);
                         }
                         else
                         {

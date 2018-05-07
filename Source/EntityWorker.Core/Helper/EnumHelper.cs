@@ -10,7 +10,7 @@
     {
         Mssql,
         Sqllight,
-        PostgreSql
+        PostgreSql,
     }
 
     public enum RoundingConvention

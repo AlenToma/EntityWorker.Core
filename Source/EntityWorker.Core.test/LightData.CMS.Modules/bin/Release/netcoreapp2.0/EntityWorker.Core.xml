@@ -1159,6 +1159,20 @@
             <param name="exp"></param>
             <returns></returns>
         </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.OrderBy(System.String)">
+            <summary>
+            Order By Column
+            </summary>
+            <param name="exp"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.OrderByDescending(System.String)">
+            <summary>
+            OrderByDescending Column
+            </summary>
+            <param name="exp"></param>
+            <returns></returns>
+        </member>
         <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.OrderByDescending(System.Linq.Expressions.Expression{System.Func{`0,System.Object}})">
             <summary>
             OrderByDescending Column
@@ -5814,6 +5828,25 @@
             Execute changes
             </summary>
         </member>
+        <member name="P:EntityWorker.Core.Object.Library.DataBase.Database.ConnectionString">
+            <summary>
+            DataBase FullConnectionString
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.DataBase.Database.GetColumnSchema(System.Type)">
+            <summary>
+            Get the ColumnSchema  
+            </summary>
+            <param name="datatype"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.DataBase.Database.GetColumnSchema``1">
+            <summary>
+            Get the ColumnSchema  
+            </summary>
+            <typeparam name="T"> datatype ed Users</typeparam>
+            <returns></returns>
+        </member>
         <member name="P:EntityWorker.Core.Object.Library.DbCommandExtended.DataStructure">
             <summary>
             This is initialized after TableType
@@ -6389,6 +6422,20 @@
         <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.OrderBy(System.Linq.Expressions.Expression{System.Func{`0,System.Object}})">
             <summary>
             Order By Column
+            </summary>
+            <param name="exp"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.OrderBy(System.String)">
+            <summary>
+            Order By Column
+            </summary>
+            <param name="exp"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.OrderByDescending(System.String)">
+            <summary>
+            OrderByDescending Column
             </summary>
             <param name="exp"></param>
             <returns></returns>
@@ -14753,11 +14800,6 @@
             <summary>
             https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Repository.md
             EntityWorker.Core Repository
-            </summary>
-        </member>
-        <member name="F:EntityWorker.Core.Transaction.Transaction.ConnectionString">
-            <summary>
-            DataBase FullConnectionString
             </summary>
         </member>
         <member name="P:EntityWorker.Core.Transaction.Transaction.DataBaseTypes">

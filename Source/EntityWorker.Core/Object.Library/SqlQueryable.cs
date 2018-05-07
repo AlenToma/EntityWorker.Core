@@ -255,7 +255,7 @@ namespace EntityWorker.Core.Object.Library
                     result.AddRange(await _repository.SelectAsync<T>(ParsedLinqToSql));
                 if (_childrenToLoad.Any() || _landholderOnlyFirstLevel.HasValue)
                 {
-                    foreach (var item in result)
+                    foreach (var item in PartExecuted ? this : result)
                     {
                         if (_childrenToLoad.Any())
                             await _repository.LoadChildrenAsync(item, false, _ignoreActions, _childrenToLoad.ToArray());
@@ -299,7 +299,7 @@ namespace EntityWorker.Core.Object.Library
                     result.AddRange(_repository.Select<T>(ParsedLinqToSql));
                 if (_childrenToLoad.Any() || _landholderOnlyFirstLevel.HasValue)
                 {
-                    foreach (var item in result)
+                    foreach (var item in PartExecuted ? this : result)
                     {
                         if (_childrenToLoad.Any())
                             _repository.LoadChildren(item, false, _ignoreActions, _childrenToLoad.ToArray());
@@ -332,7 +332,7 @@ namespace EntityWorker.Core.Object.Library
                     result.AddRange(_repository.Select<T>(ParsedLinqToSql));
                 if (_childrenToLoad.Any() || _landholderOnlyFirstLevel.HasValue)
                 {
-                    foreach (var item in result)
+                    foreach (var item in PartExecuted ? this : result)
                     {
                         if (_childrenToLoad.Any())
                             _repository.LoadChildren(item, false, _ignoreActions, _childrenToLoad.ToArray());
@@ -486,7 +486,7 @@ namespace EntityWorker.Core.Object.Library
         /// <returns></returns>
         public string Xml()
         {
-           return Execute().ToXml();
+            return Execute().ToXml();
         }
 
         /// <summary>

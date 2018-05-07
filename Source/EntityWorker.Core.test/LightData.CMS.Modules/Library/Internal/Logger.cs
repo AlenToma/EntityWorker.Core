@@ -21,5 +21,10 @@ namespace LightData.CMS.Modules.Library.Internal
         {
             onLog?.Invoke(this, new Args(message, infoData));
         }
+
+        public void Dispose()
+        {
+      
+        }
     }
 }

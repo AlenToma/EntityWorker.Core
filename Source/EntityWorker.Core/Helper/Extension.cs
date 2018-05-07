@@ -33,7 +33,7 @@ namespace EntityWorker.Core.Helper
         {
             {typeof(int), new List<string>(){ "BIGINT" , "int", "single", "smallint", "tinyint" } },
             {typeof(long), new List<string>(){ "BIGINT" } },
-            {typeof(string), new List<string>(){ "NVARCHAR(4000)" , "varchar", "xml" } },
+            {typeof(string), new List<string>(){ "NVARCHAR(MAX)" , "varchar", "xml" } },
             {typeof(bool), new List<string>(){ "BIT"} },
             {typeof(DateTime), new List<string>(){ "DATETIME" , "date", "datetime2", "datetimeoffset", "smalldatetime" } },
             {typeof(TimeSpan), new List<string>(){ "DATETIME" , "time" } },

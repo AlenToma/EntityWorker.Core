@@ -21,6 +21,7 @@ using EntityWorker.Core.Object.Library.Modules;
 using System.IO;
 using System.IO.Compression;
 using EntityWorker.Core.Object.Library.Gzip;
+using EntityWorker.Core.Object.Library.DataBase;
 
 namespace EntityWorker.Core.Transaction
 {
@@ -28,7 +29,7 @@ namespace EntityWorker.Core.Transaction
     /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Repository.md
     /// EntityWorker.Core Repository
     /// </summary>
-    public abstract class Transaction : IRepository
+    public abstract class Transaction : Database, IRepository
     {
         internal Custom_ValueType<IDataReader, bool> OpenedDataReaders = new Custom_ValueType<IDataReader, bool>();
 
@@ -37,18 +38,6 @@ namespace EntityWorker.Core.Transaction
         internal readonly DbSchema _dbSchema;
 
         internal readonly Custom_ValueType<string, object> _attachedObjects;
-        /// <summary>
-        /// DataBase FullConnectionString
-        /// </summary>
-        public readonly string ConnectionString;
-
-
-        private static Dictionary<DataBaseTypes, bool> _moduleIni = new Dictionary<DataBaseTypes, bool>()
-        {
-            { DataBaseTypes.Mssql, false },
-            { DataBaseTypes.Sqllight, false },
-            { DataBaseTypes.PostgreSql, false }
-        };
 
         /// <summary>
         /// DataBase Type
@@ -62,22 +51,15 @@ namespace EntityWorker.Core.Transaction
         /// </summary>
         protected DbConnection SqlConnection { get; private set; }
 
-        private static Dictionary<DataBaseTypes, bool> _tableMigrationCheck = new Dictionary<DataBaseTypes, bool>()
-        {
-            { DataBaseTypes.Mssql, false },
-            { DataBaseTypes.Sqllight, false },
-            { DataBaseTypes.PostgreSql, false }
-        };
-
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="connectionString">Full connection string</param>
         /// <param name="dataBaseTypes">The type of the database Ms-sql or Sql-light</param>
-        public Transaction(string connectionString, DataBaseTypes dataBaseTypes)
+        public Transaction(string connectionString, DataBaseTypes dataBaseTypes) : base()
         {
-
+            base._transaction = this;
             _attachedObjects = new Custom_ValueType<string, object>();
             if (string.IsNullOrEmpty(connectionString))
                 if (string.IsNullOrEmpty(connectionString))
@@ -632,7 +614,7 @@ namespace EntityWorker.Core.Transaction
             if (objcDbEntity == null)
                 throw new EntityException("DbEntity cant be null");
             if (Extension.ObjectIsNew(objcDbEntity.GetPrimaryKeyValue()))
-                throw new EntityException("Id is IsNullOrEmpty, it cant be attached");
+                return;
             if (_attachedObjects.ContainsKey(key))
             {
                 if (overwrite)

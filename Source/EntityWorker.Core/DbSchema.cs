@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -13,13 +12,12 @@ using EntityWorker.Core.SqlQuerys;
 using EntityWorker.Core.FastDeepCloner;
 using EntityWorker.Core.Postgres;
 using Rule = EntityWorker.Core.Attributes.Rule;
+using EntityWorker.Core.Object.Library.DataBase;
 
 namespace EntityWorker.Core
 {
     internal class DbSchema
     {
-        internal static readonly Custom_ValueType<string, ILightDataTable> CachedObjectColumn = new Custom_ValueType<string, ILightDataTable>();
-
         internal static readonly Custom_ValueType<Type, object> CachedIDbRuleTrigger = new Custom_ValueType<Type, object>();
 
         internal static readonly Custom_ValueType<string, string> CachedSql = new Custom_ValueType<string, string>();
@@ -33,29 +31,6 @@ namespace EntityWorker.Core
         public DbSchema(Transaction.Transaction repository)
         {
             _repository = repository;
-        }
-
-        public ILightDataTable ObjectColumns(Type type)
-        {
-            var key = type.FullName + _repository.DataBaseTypes.ToString();
-            try
-            {
-                if (CachedObjectColumn.ContainsKey(key))
-                    return CachedObjectColumn[key];
-                var table = type.TableName();
-                var cmd = _repository.GetSqlCommand(_repository.DataBaseTypes == DataBaseTypes.Mssql || _repository.DataBaseTypes == DataBaseTypes.PostgreSql
-                    ? $"SELECT COLUMN_NAME as column_name, data_type FROM INFORMATION_SCHEMA.COLUMNS WHERE LOWER(TABLE_NAME) = LOWER(String[{table}])"
-                    : $"SELECT name as column_name, type as data_type  FROM pragma_table_info(String[{table}]);");
-                var data = _repository.GetLightDataTable(cmd, "column_name");
-                if (data.Rows.Any())
-                    return CachedObjectColumn.GetOrAdd(key, data);
-                else return data;
-            }
-            catch (NpgsqlException)
-            {
-                _repository.Renew();
-                return ObjectColumns(type);
-            }
         }
 
         public bool IsValidName(string column)
@@ -385,7 +360,7 @@ namespace EntityWorker.Core
                     throw new EntityException("Object must have a PrimaryKey");
 
                 var primaryKeyId = !Extension.ObjectIsNew(o.GetPrimaryKeyValue()) ? o.GetPrimaryKeyValue() : null;
-                var availableColumns = ObjectColumns(o.GetType());
+                var availableColumns = _repository.GetColumnSchema(o.GetType());
                 var objectRules = o.GetType().GetCustomAttribute<Rule>();
                 var tableName = o.GetType().TableName();
                 var primaryKeySubstitut = !primaryKey.GetCustomAttribute<PrimaryKey>().AutoGenerate ? primaryKeyId : null;
@@ -422,7 +397,7 @@ namespace EntityWorker.Core
                     dbTrigger?.GetType().GetMethod("BeforeSave").Invoke(dbTrigger, new List<object>() { _repository, o }.ToArray()); // Check the Rule before save
                 object tempPrimaryKey = null;
                 var sql = "UPDATE [" + (o.GetType().TableName()) + "] SET ";
-                var cols = props.FindAll(x => (availableColumns.FindByPrimaryKey<bool>(x.GetPropertyName()) || availableColumns.FindByPrimaryKey<bool>(x.GetPropertyName().ToLower())) && x.IsInternalType && !x.ContainAttribute<ExcludeFromAbstract>() && x.GetCustomAttribute<PrimaryKey>() == null);
+                var cols = props.FindAll(x => (availableColumns.ContainsKey(x.GetPropertyName()) || availableColumns.ContainsKey(x.GetPropertyName().ToLower())) && x.IsInternalType && !x.ContainAttribute<ExcludeFromAbstract>() && x.GetCustomAttribute<PrimaryKey>() == null);
                 if (primaryKeyId == null)
                 {
                     if (primaryKey.PropertyType.IsNumeric() && primaryKey.GetCustomAttribute<PrimaryKey>().AutoGenerate)
@@ -566,7 +541,7 @@ namespace EntityWorker.Core
                 return str;
 
             createdTables.Add(tableType);
-            var table = ObjectColumns(tableType);
+            var table = _repository.GetColumnSchema(tableType);
             var tableName = tableType.TableName();
             var props = DeepCloner.GetFastDeepClonerProperties(tableType).Where(x => !x.ContainAttribute<ExcludeFromAbstract>());
             var codeToDataBaseMerge = new CodeToDataBaseMerge() { Object_Type = tableType };
@@ -575,7 +550,7 @@ namespace EntityWorker.Core
                 throw new EntityException(tableName + " is not a valid Name for the current provider " + _repository.DataBaseTypes);
 
 
-            if (!table.Rows.Any())
+            if (!table.Values.Any())
             {
                 codeToDataBaseMerge.Sql = new StringBuilder("CREATE TABLE " + (_repository.DataBaseTypes == DataBaseTypes.Mssql ? "[dbo]." : "") + _repository.DataBaseTypes.GetValidSqlName(tableName) + "(");
                 foreach (var prop in props.Where(x => (x.GetDbTypeByType(_repository.DataBaseTypes) != null || !x.IsInternalType) && !x.ContainAttribute<ExcludeFromAbstract>()).GroupBy(x => x.Name).Select(x => x.First())
@@ -666,11 +641,11 @@ namespace EntityWorker.Core
                     if (prop.ContainAttribute<Stringify>() || prop.ContainAttribute<DataEncode>() || prop.ContainAttribute<ToBase64String>())
                         propType = typeof(string);
 
-                    var modify = prop.IsInternalType ? (_repository.DataBaseTypes == DataBaseTypes.PostgreSql ? table.FindByPrimaryKey<LightDataTableRow>(prop.GetPropertyName().ToLower()) : table.FindByPrimaryKey<LightDataTableRow>(prop.GetPropertyName())) : null;
+                    var modify = prop.IsInternalType ? (_repository.DataBaseTypes == DataBaseTypes.PostgreSql ? table.Get(prop.GetPropertyName().ToLower()) : table.Get(prop.GetPropertyName())) : null;
                     if (modify != null)
                     {
 
-                        if (_repository.DataBaseTypes != DataBaseTypes.Sqllight && !(prop.GetDbTypeListByType(_repository.DataBaseTypes).Any(x => x.ToLower().Contains(modify.Value<string>("data_type").ToLower()))) && _repository.DataBaseTypes != DataBaseTypes.PostgreSql)
+                        if (_repository.DataBaseTypes != DataBaseTypes.Sqllight && !(prop.GetDbTypeListByType(_repository.DataBaseTypes).Any(x => x.ToLower().Contains(modify.DataType.ToLower()))) && _repository.DataBaseTypes != DataBaseTypes.PostgreSql)
                         {
                             var constraine = Properties.Resources.DropContraine.Replace("@tb", $"'{tableName}'").Replace("@col", $"'{prop.GetPropertyName()}'");
                             codeToDataBaseMerge.Sql.Append(constraine);
@@ -678,7 +653,7 @@ namespace EntityWorker.Core
                         }
                         else
                         {
-                            if (!(prop.GetDbTypeListByType(_repository.DataBaseTypes).Any(x => x.ToLower().Contains(modify.Value<string>("data_type").ToLower()))) && _repository.DataBaseTypes == DataBaseTypes.PostgreSql)
+                            if (!(prop.GetDbTypeListByType(_repository.DataBaseTypes).Any(x => x.ToLower().Contains(modify.DataType.ToLower()))) && _repository.DataBaseTypes == DataBaseTypes.PostgreSql)
                                 codeToDataBaseMerge.Sql.Append($"\nALTER TABLE [{tableName}] ALTER COLUMN [{prop.GetPropertyName()}] TYPE {prop.GetDbTypeByType(_repository.DataBaseTypes)}, ALTER COLUMN [{prop.GetPropertyName()}] SET DEFAULT {Querys.GetValueByTypeSTRING(MethodHelper.ConvertValue(null, propType), _repository.DataBaseTypes)};");
 
 
@@ -696,8 +671,8 @@ namespace EntityWorker.Core
 
             var colRemove = new CodeToDataBaseMerge() { Object_Type = tableType };
             // Now lets clean the table and remove unused columns
-            foreach (LightDataTableRow col in table.SelectMany<LightDataRowCollection>(x =>
-             !props.Any(a => string.Equals(x.Value<string>("column_name"), a.GetPropertyName(), StringComparison.CurrentCultureIgnoreCase) &&
+            foreach (var col in table.Values.Where(x =>
+             !props.Any(a => string.Equals(x.ColumnName, a.GetPropertyName(), StringComparison.CurrentCultureIgnoreCase) &&
              (a.GetDbTypeByType(_repository.DataBaseTypes) != null || !a.IsInternalType) &&
              !a.ContainAttribute<ExcludeFromAbstract>())))
             {
@@ -705,20 +680,20 @@ namespace EntityWorker.Core
                 {
                     if (_repository.DataBaseTypes == DataBaseTypes.Mssql)
                     {
-                        var constraine = Properties.Resources.DropContraine.Replace("@tb", $"'{tableName}'").Replace("@col", $"'{col.Value<string>("column_name")}'");
+                        var constraine = Properties.Resources.DropContraine.Replace("@tb", $"'{tableName}'").Replace("@col", $"'{col.ColumnName}'");
                         colRemove.Sql.Append(constraine);
 
                     }
                     //colRemove.Sql.Append("IF EXISTS (SELECT name FROM sys.objects  WHERE name = 'datedflt' AND type = 'D') DROP DEFAULT datedflt;");
-                    colRemove.Sql.Append(string.Format("\nALTER TABLE [{0}] DROP COLUMN IF EXISTS [{1}];", tableName, col.Value<string>("column_name")));
+                    colRemove.Sql.Append(string.Format("\nALTER TABLE [{0}] DROP COLUMN IF EXISTS [{1}];", tableName, col.ColumnName));
 
                 }
                 else
                 {
-                    colRemove.Sql.Append(string.Format("DROP TABLE IF exists [{0}_temp];\nCREATE TABLE [{0}_temp] AS SELECT {1} FROM [{0}];", tableName, string.Join(",", table.SelectMany<LightDataRowCollection>(x =>
-                    props.Any(a => string.Equals(x.Value<string>("column_name"), a.GetPropertyName(), StringComparison.CurrentCultureIgnoreCase) &&
+                    colRemove.Sql.Append(string.Format("DROP TABLE IF exists [{0}_temp];\nCREATE TABLE [{0}_temp] AS SELECT {1} FROM [{0}];", tableName, string.Join(",", table.Values.ToList().FindAll(x =>
+                    props.Any(a => string.Equals(x.ColumnName, a.GetPropertyName(), StringComparison.CurrentCultureIgnoreCase) &&
                     (a.GetDbTypeByType(_repository.DataBaseTypes) != null || !a.IsInternalType) &&
-                    !a.ContainAttribute<ExcludeFromAbstract>())).Select(x => x.Value<string>("column_name")))));
+                    !a.ContainAttribute<ExcludeFromAbstract>())).Select(x => x.ColumnName))));
                     colRemove.Sql.Append(string.Format("DROP TABLE [{0}];\n", tableName));
                     colRemove.Sql.Append(string.Format("ALTER TABLE [{0}_temp] RENAME TO [{0}]; ", tableName));
                 }
@@ -741,8 +716,8 @@ namespace EntityWorker.Core
         public void CreateTable(Type tableType, List<Type> createdTables = null, bool force = false)
         {
             tableType = tableType.GetActualType();
-            var tableData = ObjectColumns(tableType);
-            if (!force && tableData.Rows.Any())
+            var tableData = _repository.GetColumnSchema(tableType);
+            if (!force && tableData.Values.Any())
                 return;
             RemoveTable(tableType);
             var data = GetDatabase_Diff(tableType);
@@ -775,8 +750,8 @@ namespace EntityWorker.Core
             if (!remove)
                 return;
 
-            var tableData = ObjectColumns(tableType);
-            if (!tableData.Rows.Any())
+            var tableData = _repository.GetColumnSchema(tableType);
+            if (!tableData.Values.Any())
                 return;
             var c = tableRemoved.Count;
             _repository.CreateTransaction();
@@ -787,17 +762,16 @@ namespace EntityWorker.Core
                     try
                     {
                         var tType = tableRemoved[i];
-                        if (ObjectColumns(tType).Rows.Any())
+                        if (_repository.GetColumnSchema(tType).Values.Any())
                         {
-
-                            CachedObjectColumn.Remove(tType.FullName + _repository.DataBaseTypes.ToString());
+                            Database.CachedColumnSchema.Remove(tType.FullName + _repository.DataBaseTypes.ToString());
                             if (Extension.CachedDataRecord.ContainsKey(tType))
                                 Extension.CachedDataRecord.Remove(tType);
                             var tableName = tType.TableName();
                             _repository.ExecuteNonQuery(_repository.GetSqlCommand("DELETE FROM [" + tableName + "];"));
                             var cmd = _repository.GetSqlCommand("DROP TABLE [" + tableName + "];");
                             _repository.ExecuteNonQuery(cmd);
-                            CachedObjectColumn.Remove(tType.FullName + _repository.DataBaseTypes.ToString());
+                            Database.CachedColumnSchema.Remove(tType.FullName + _repository.DataBaseTypes.ToString());
                         }
 
 

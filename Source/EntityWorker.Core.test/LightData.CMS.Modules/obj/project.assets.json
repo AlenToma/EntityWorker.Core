@@ -344,7 +344,7 @@
           }
         }
       },
-      "EntityWorker.Core/2.0.4": {
+      "EntityWorker.Core/2.0.8": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v2.0",
         "dependencies": {
@@ -383,7 +383,7 @@
           }
         }
       },
-      "EntityWorker.Core/2.0.4": {
+      "EntityWorker.Core/2.0.8": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5.1",
         "dependencies": {
@@ -703,7 +703,7 @@
           "ref/netstandard1.3/_._": {}
         }
       },
-      "EntityWorker.Core/2.0.4": {
+      "EntityWorker.Core/2.0.8": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -2439,7 +2439,7 @@
         "system.threading.tasks.nuspec"
       ]
     },
-    "EntityWorker.Core/2.0.4": {
+    "EntityWorker.Core/2.0.8": {
       "type": "project",
       "path": "../../EntityWorker.Core/EntityWorker.Core.csproj",
       "msbuildProject": "../../EntityWorker.Core/EntityWorker.Core.csproj"
@@ -2447,20 +2447,19 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.0": [
-      "EntityWorker.Core >= 2.0.4",
+      "EntityWorker.Core >= 2.0.8",
       "Microsoft.NETCore.App >= 2.0.0"
     ],
     ".NETFramework,Version=v4.6.1": [
-      "EntityWorker.Core >= 2.0.4"
+      "EntityWorker.Core >= 2.0.8"
     ],
     ".NETStandard,Version=v2.0": [
-      "EntityWorker.Core >= 2.0.4",
+      "EntityWorker.Core >= 2.0.8",
       "NETStandard.Library >= 2.0.1"
     ]
   },
   "packageFolders": {
     "C:\\Users\\Alen.Toma\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackagesFallback\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
@@ -2474,13 +2473,11 @@
       "projectStyle": "PackageReference",
       "crossTargeting": true,
       "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackagesFallback\\",
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
         "C:\\Users\\Alen.Toma\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.Fallback.config"
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net461",
