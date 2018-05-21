@@ -17,7 +17,6 @@ There are many attributes you could use to improve the code
 /// </summary>
 [JsonDocument]
 
-
 /// <summary>
 /// Assign a diffrent database type for the property. 
 /// Attibutes Stringify, DataEncode and ToBase64String will override this attribute. 
