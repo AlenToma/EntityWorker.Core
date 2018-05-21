@@ -11,6 +11,14 @@ There are many attributes you could use to improve the code
 [KnownType]
 
 /// <summary>
+/// Save the property as Json object in the database
+/// For the moment those values cant be searched by linq.
+/// you will have to use row sql(JSON_VALUE) to seach them
+/// </summary>
+[JsonDocument]
+
+
+/// <summary>
 /// Assign a diffrent database type for the property. 
 /// Attibutes Stringify, DataEncode and ToBase64String will override this attribute. 
 /// </summary>
