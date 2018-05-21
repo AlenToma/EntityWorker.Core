@@ -9,8 +9,6 @@ using System.IO;
 // create a class that inherit from EntityWorker.Core.Interface.ILog 
 public class Logger : EntityWorker.Core.Interface.Ilog
 {
-    public class Logger : ILog
-    {
         private string logIdentifier = $"{DateTime.Now.ToString("yyyy-MM-dd")} Ilog.txt";
         private string logPath = AppDomain.CurrentDomain.BaseDirectory;
         public Logger()
