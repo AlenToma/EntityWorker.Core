@@ -91,7 +91,7 @@ namespace EntityWorker.Core.Interface
         /// </summary>
         /// <param name="exp"></param>
         /// <returns></returns>
-        ISqlQueryable<T> OrderBy(Expression<Func<T, object>> exp);
+        ISqlQueryable<T> OrderBy<P>(Expression<Func<T, P>> exp);
 
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace EntityWorker.Core.Interface
         /// </summary>
         /// <param name="exp"></param>
         /// <returns></returns>
-        ISqlQueryable<T> OrderByDescending(Expression<Func<T, object>> exp);
+        ISqlQueryable<T> OrderByDescending<P>(Expression<Func<T, P>> exp);
 
         /// <summary>
         /// Execute the search Command

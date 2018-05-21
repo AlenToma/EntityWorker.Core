@@ -171,10 +171,10 @@ namespace EntityWorker.Core.Object.Library
         /// </summary>
         /// <param name="exp"></param>
         /// <returns></returns>
-        public ISqlQueryable<T> OrderBy(Expression<Func<T, object>> exp)
+        public ISqlQueryable<T> OrderBy<P>(Expression<Func<T, P>> exp)
         {
             var list = Expression.Parameter(typeof(IEnumerable<T>), "list");
-            var orderByExp = Expression.Call(typeof(Enumerable), "OrderBy", new Type[] { typeof(T), typeof(object) }, list, exp);
+            var orderByExp = Expression.Call(typeof(Enumerable), "OrderBy", new Type[] { typeof(T), exp.ReturnType }, list, exp);
             _matches.Add(orderByExp);
             return this;
         }
@@ -195,8 +195,9 @@ namespace EntityWorker.Core.Object.Library
             var param = Expression.Parameter(typeof(T));
             var field = Expression.PropertyOrField(param, prop.Name);
             var list = Expression.Parameter(typeof(IEnumerable<T>), "list");
-            Expression exp = Expression.Lambda<Func<T, object>>(field, param);
-            var orderByExp = Expression.Call(typeof(Enumerable), "OrderBy", new Type[] { typeof(T), typeof(object) }, list, exp);
+            var funcType = typeof(Func<,>).MakeGenericType(typeof(T), prop.PropertyType);
+            Expression exp = Expression.Lambda(funcType, field, param);
+            var orderByExp = Expression.Call(typeof(Enumerable), "OrderBy", new Type[] { typeof(T),prop.PropertyType }, list, exp);
             _matches.Add(orderByExp);
             return this;
         }
@@ -216,8 +217,9 @@ namespace EntityWorker.Core.Object.Library
             var param = Expression.Parameter(typeof(T));
             var field = Expression.PropertyOrField(param, prop.Name);
             var list = Expression.Parameter(typeof(IEnumerable<T>), "list");
-            Expression exp = Expression.Lambda<Func<T, object>>(field, param);
-            var orderByExp = Expression.Call(typeof(Enumerable), "OrderByDescending", new Type[] { typeof(T), typeof(object) }, list, exp);
+            var funcType = typeof(Func<,>).MakeGenericType(typeof(T), prop.PropertyType);
+            Expression exp = Expression.Lambda(funcType, field, param);
+            var orderByExp = Expression.Call(typeof(Enumerable), "OrderByDescending", new Type[] { typeof(T), prop.PropertyType }, list, exp);
             _matches.Add(orderByExp);
             return this;
         }
@@ -227,10 +229,10 @@ namespace EntityWorker.Core.Object.Library
         /// </summary>
         /// <param name="exp"></param>
         /// <returns></returns>
-        public ISqlQueryable<T> OrderByDescending(Expression<Func<T, object>> exp)
+        public ISqlQueryable<T> OrderByDescending<P>(Expression<Func<T, P>> exp)
         {
             var list = Expression.Parameter(typeof(IEnumerable<T>), "list");
-            var orderByExp = Expression.Call(typeof(Enumerable), "OrderByDescending", new Type[] { typeof(T), typeof(object) }, list, exp);
+            var orderByExp = Expression.Call(typeof(Enumerable), "OrderByDescending", new Type[] { typeof(T), exp.ReturnType }, list, exp);
             _matches.Add(orderByExp);
             return this;
         }

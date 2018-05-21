@@ -159,7 +159,8 @@ namespace EntityWorker.Core.Helper
                                 data = new DataCipher(prop.GetCustomAttribute<DataEncode>().Key, prop.GetCustomAttribute<DataEncode>().KeySize).Decrypt(data.ToString());
                             else if (prop.ContainAttribute<ToBase64String>() && data.ToString().IsBase64String())
                                 data = MethodHelper.DecodeStringFromBase64(data.ToString());
-
+                            else if (prop.ContainAttribute<JsonDocument>())
+                                data = data?.ToString().FromJson(prop.PropertyType);
                             prop.SetValue(item, data.ConvertValue(prop.PropertyType));
                         }
                         else if (value != null) LoadJsonIgnoreProperties(value);
@@ -177,6 +178,7 @@ namespace EntityWorker.Core.Helper
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="json"></param>
+        /// <param name="type"></param>
         /// <returns></returns>
         public static object FromJson(this string json, Type type)
         {
@@ -202,7 +204,7 @@ namespace EntityWorker.Core.Helper
         /// <param name="xml"></param>
         /// <param name="repository"> Assign repository to load XmlIgnored properties</param>
         /// <returns></returns>
-        public static T FromXml<T>(this string xml, IRepository repository = null)  where T : class
+        public static T FromXml<T>(this string xml, IRepository repository = null) where T : class
         {
             return XmlUtility.FromXml<T>(xml, repository);
         }
@@ -215,7 +217,7 @@ namespace EntityWorker.Core.Helper
         public static string ToXml(this object o)
         {
             return XmlUtility.ToXml(o);
-        } 
+        }
 
         /// <summary>
         /// Get PropertyName of the expression
@@ -425,7 +427,7 @@ namespace EntityWorker.Core.Helper
         {
             var type = prop.PropertyType;
 
-            if (prop.ContainAttribute<Stringify>() || prop.ContainAttribute<DataEncode>() || prop.ContainAttribute<ToBase64String>())
+            if (prop.ContainAttribute<Stringify>() || prop.ContainAttribute<DataEncode>() || prop.ContainAttribute<ToBase64String>() || prop.ContainAttribute<JsonDocument>())
                 return typeof(string).GetDbTypeByType(dbType);
 
             if (prop.ContainAttribute<ColumnType>() && prop.Attributes.Any(x => x is ColumnType && !string.IsNullOrEmpty((x as ColumnType).DataType) && ((x as ColumnType).DataBaseTypes == dbType) || !(x as ColumnType).DataBaseTypes.HasValue))
@@ -454,7 +456,7 @@ namespace EntityWorker.Core.Helper
         {
             var type = prop.PropertyType;
 
-            if (prop.ContainAttribute<Stringify>() || prop.ContainAttribute<DataEncode>() || prop.ContainAttribute<ToBase64String>())
+            if (prop.ContainAttribute<Stringify>() || prop.ContainAttribute<DataEncode>() || prop.ContainAttribute<ToBase64String>() || prop.ContainAttribute<JsonDocument>())
                 return new List<string>() { typeof(string).GetDbTypeByType(dbType) };
 
             if (prop.ContainAttribute<ColumnType>() && prop.Attributes.Any(x => x is ColumnType && !string.IsNullOrEmpty((x as ColumnType).DataType) && ((x as ColumnType).DataBaseTypes == dbType) || !(x as ColumnType).DataBaseTypes.HasValue))
@@ -812,6 +814,8 @@ namespace EntityWorker.Core.Helper
                             }
                             else if (dataEncode != null)
                                 value = new DataCipher(dataEncode.Key, dataEncode.KeySize).Decrypt(value.ConvertValue<string>());
+                            else if (prop.ContainAttribute<JsonDocument>())
+                                value = value?.ToString().FromJson(prop.PropertyType);
                             else value = MethodHelper.ConvertValue(value, prop.PropertyType);
 
                             prop.SetValue(item, value);

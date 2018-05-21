@@ -642,7 +642,7 @@ namespace EntityWorker.Core.Transaction
             {
                 var aValue = prop.GetValue(entity);
                 var bValue = prop.GetValue(originalObject);
-                if (!prop.IsInternalType || prop.ContainAttribute<ExcludeFromAbstract>() || prop.ContainAttribute<PrimaryKey>() || (aValue == null && bValue == null))
+                if ((!prop.IsInternalType && !prop.ContainAttribute<JsonDocument>()) || prop.ContainAttribute<ExcludeFromAbstract>() || prop.ContainAttribute<PrimaryKey>() || (aValue == null && bValue == null))
                     continue;
                 if ((aValue != null && aValue.Equals(bValue)) || (bValue != null && bValue.Equals(aValue)))
                     continue;
@@ -673,7 +673,7 @@ namespace EntityWorker.Core.Transaction
             {
                 var aValue = prop.GetValue(entityB);
                 var bValue = prop.GetValue(originalObject);
-                if (!prop.IsInternalType || prop.ContainAttribute<ExcludeFromAbstract>() || prop.ContainAttribute<PrimaryKey>() || (aValue == null && bValue == null))
+                if ((!prop.IsInternalType && !prop.ContainAttribute<JsonDocument>()) || prop.ContainAttribute<ExcludeFromAbstract>() || prop.ContainAttribute<PrimaryKey>() || (aValue == null && bValue == null))
                     continue;
                 if ((aValue != null && aValue.Equals(bValue)) || (bValue != null && bValue.Equals(aValue)))
                     continue;

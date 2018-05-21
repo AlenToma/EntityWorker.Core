@@ -19,6 +19,7 @@ namespace ConsoleApp1
             {
                 //Console.WriteLine((arg as Args).Data);
             });
+            SaveJson();
             PackageTest();
             TestSave();
             ExpressionTest();
@@ -33,6 +34,69 @@ namespace ConsoleApp1
             sw = new Stopwatch();
             sw.Start();
         }
+
+        public static void SaveJson()
+        {
+            Console.WriteLine("test jsonValue Attributes");
+
+            Console.WriteLine("Mssql");
+            using (var rep = new Repository(DataBaseTypes.Mssql))
+            {
+                var user = rep.Get<User>().LoadChildren().ExecuteFirstOrDefault();
+                var jsonUser = new UserTemp()
+                {
+                    User = user
+                };
+                rep.Save(jsonUser);
+
+                var userJson = rep.Get<UserTemp>().ExecuteFirstOrDefault();
+
+                jsonUser.User.UserName = "test";
+                rep.Save(jsonUser);
+                rep.SaveChanges();
+                userJson = rep.Get<UserTemp>().ExecuteFirstOrDefault();
+                Console.WriteLine((jsonUser.User.UserName == "test" ? "Success" : "Failed"));
+            }
+
+            Console.WriteLine("PostgreSql");
+            using (var rep = new Repository(DataBaseTypes.PostgreSql))
+            {
+                var user = rep.Get<User>().LoadChildren().ExecuteFirstOrDefault();
+                var jsonUser = new UserTemp()
+                {
+                    User = user
+                };
+                rep.Save(jsonUser);
+
+                var userJson = rep.Get<UserTemp>().ExecuteFirstOrDefault();
+
+                jsonUser.User.UserName = "test";
+                rep.Save(jsonUser);
+                rep.SaveChanges();
+                userJson = rep.Get<UserTemp>().ExecuteFirstOrDefault();
+                Console.WriteLine((jsonUser.User.UserName == "test" ? "Success" : "Failed"));
+            }
+
+            Console.WriteLine("Sqlite");
+            using (var rep = new Repository(DataBaseTypes.Sqllight))
+            {
+                var user = rep.Get<User>().LoadChildren().ExecuteFirstOrDefault();
+                var jsonUser = new UserTemp()
+                {
+                    User = user
+                };
+                rep.Save(jsonUser);
+
+                var userJson = rep.Get<UserTemp>().ExecuteFirstOrDefault();
+
+                jsonUser.User.UserName = "test";
+                rep.Save(jsonUser);
+                rep.SaveChanges();
+                userJson = rep.Get<UserTemp>().ExecuteFirstOrDefault();
+                Console.WriteLine((jsonUser.User.UserName == "test" ? "Success" : "Failed"));
+            }
+        }
+
 
         public static void stop()
         {

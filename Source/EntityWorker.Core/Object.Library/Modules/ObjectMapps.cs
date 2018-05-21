@@ -62,6 +62,21 @@ namespace EntityWorker.Core.Object.Library.Modules
         }
 
         /// <summary>
+        /// Add JsonDocument for property
+        /// </summary>
+        /// <typeparam name="TP"></typeparam>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public IObjectMapps<T> HasJsonDocument<TP>(Expression<Func<T, TP>> action)
+        {
+            var prop = FastDeepCloner.DeepCloner.GetProperty(typeof(T), Extension.GetMemberName(action));
+            if (prop == null)
+                throw new EntityException($"Could not find Property{Extension.GetMemberName(action)}");
+            prop.Add(new JsonDocument());
+            return this;
+        }
+
+        /// <summary>
         /// EntityWorker will ignore serializing or derializing all properties that contain this attribute
         /// </summary>
         /// <typeparam name="TP"></typeparam>

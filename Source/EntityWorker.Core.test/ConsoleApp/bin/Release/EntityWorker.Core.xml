@@ -13,7 +13,7 @@
         <member name="M:EntityWorker.Core.Attributes.ColumnType.#ctor(System.String,System.Nullable{EntityWorker.Core.Helper.DataBaseTypes})">
             <summary>
             Assign a diffrent database type for the property
-            Attibutes Stringify, DataEncode and ToBase64String will override this attribute. 
+            Attibutes Stringify, DataEncode, JsonDocument and ToBase64String will override this attribute. 
             </summary>
             <param name="dataType">The database type ex nvarchar(4000)</param>
             <param name="dataBaseTypes">null for all providers</param>
@@ -85,6 +85,14 @@
             <summary>
             https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
             This attr will tell LightDataTable abstract to not auto Delete this object when deleting parent, it will however try to create new or update  
+            </summary>
+        </member>
+        <member name="T:EntityWorker.Core.Attributes.JsonDocument">
+            <summary>
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
+            Save the property as Json object in the database
+            For the moment those values cant be searched by linq.
+            you will have to use row sql to seach them
             </summary>
         </member>
         <member name="T:EntityWorker.Core.Attributes.JsonIgnore">
@@ -399,6 +407,7 @@
             </summary>
             <typeparam name="T"></typeparam>
             <param name="json"></param>
+            <param name="type"></param>
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Helper.Extension.FromJson(System.String)">
@@ -979,8 +988,9 @@
         <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.HasColumnType``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.String,System.Nullable{EntityWorker.Core.Helper.DataBaseTypes})">
             <summary>
             Assign a diffrent database type for the property
-            Attibutes Stringify, DataEncode and ToBase64String will override this attribute.
+            Attibutes Stringify, DataEncode, JsonDocument and ToBase64String will override this attribute.
             </summary>
+            <param name="action"></param>
             <param name="dataType">The database type ex nvarchar(4000)</param>
             <param name="dataBaseTypes">null for all providers</param>
             <returns></returns>
@@ -1073,6 +1083,14 @@
             <param name="action"></param>
             <returns></returns>
         </member>
+        <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.HasJsonDocument``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+            Add JsonDocument for property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
         <member name="T:EntityWorker.Core.Interface.ISqlQueryable`1">
             <summary>
             quaryProvider for EntityWorker.Core
@@ -1152,7 +1170,7 @@
             <param name="value"></param>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.OrderBy(System.Linq.Expressions.Expression{System.Func{`0,System.Object}})">
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.OrderBy``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
             <summary>
             Order By Column
             </summary>
@@ -1173,7 +1191,7 @@
             <param name="exp"></param>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.OrderByDescending(System.Linq.Expressions.Expression{System.Func{`0,System.Object}})">
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.OrderByDescending``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
             <summary>
             OrderByDescending Column
             </summary>
@@ -6195,6 +6213,14 @@
             <param name="action"></param>
             <returns></returns>
         </member>
+        <member name="M:EntityWorker.Core.Object.Library.Modules.ObjectMapps`1.HasJsonDocument``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+            Add JsonDocument for property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
         <member name="M:EntityWorker.Core.Object.Library.Modules.ObjectMapps`1.HasXmlIgnore``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
             <summary>
             EntityWorker will ignore serializing or derializing all properties that contain this attribute
@@ -6419,7 +6445,7 @@
             <param name="value"></param>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.OrderBy(System.Linq.Expressions.Expression{System.Func{`0,System.Object}})">
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.OrderBy``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
             <summary>
             Order By Column
             </summary>
@@ -6440,7 +6466,7 @@
             <param name="exp"></param>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.OrderByDescending(System.Linq.Expressions.Expression{System.Func{`0,System.Object}})">
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.OrderByDescending``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
             <summary>
             OrderByDescending Column
             </summary>

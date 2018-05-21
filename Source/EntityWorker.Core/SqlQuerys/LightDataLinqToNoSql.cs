@@ -54,7 +54,7 @@ namespace EntityWorker.Core.SqlQuerys
                 _columns = CachedColumns.GetOrAdd(_obType, _transaction.GetColumnSchema(_obType).Select(x => $"[{_obType.TableName()}].[{x.Key}]").ToList());
             else
                 _columns = CachedColumns[_obType];
-            _primaryId = OrderBy = _obType.GetPrimaryKey()?.GetPropertyName();
+            _primaryId  = _obType.GetPrimaryKey()?.GetPropertyName();
 
         }
 
@@ -65,7 +65,6 @@ namespace EntityWorker.Core.SqlQuerys
                 _columns = CachedColumns.GetOrAdd(_obType, _transaction.GetColumnSchema(_obType).Select(x => $"[{_obType.TableName()}].[{x.Key}]").ToList());
             else
                 _columns = CachedColumns[_obType];
-            OrderBy = _obType.GetPrimaryKey().GetPropertyName();
         }
 
         public string Quary
@@ -83,7 +82,7 @@ namespace EntityWorker.Core.SqlQuerys
 
                 if (!string.IsNullOrEmpty(OrderBy))
                     query += Environment.NewLine + "ORDER BY " + OrderBy;
-                else query += Environment.NewLine + "ORDER BY 1 ASC";
+                else query += Environment.NewLine + "ORDER BY "+ _obType.GetPrimaryKey().GetPropertyName() + " ASC";
 
                 if (DataBaseTypes == DataBaseTypes.Mssql || DataBaseTypes == DataBaseTypes.PostgreSql)
                     query += Environment.NewLine + "OFFSET " + Skip + Environment.NewLine + "ROWS FETCH NEXT " + Take + " ROWS ONLY;";
@@ -952,9 +951,6 @@ namespace EntityWorker.Core.SqlQuerys
             var body = lambdaExpression.Body as MemberExpression;
             if (body == null) return false;
             var col = VisitMember(body, true)?.ToString();
-            var column = col + " as temp" + _columns.Count;
-            //if (_columns.All(x => x != column))
-            //    _columns.Add(col + " as temp" + _columns.Count);
             if (string.IsNullOrEmpty(OrderBy))
             {
                 OrderBy = string.Format("{0} {1}", col, order);

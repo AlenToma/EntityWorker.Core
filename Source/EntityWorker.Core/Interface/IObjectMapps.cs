@@ -54,8 +54,9 @@ namespace EntityWorker.Core.Interface
 
         /// <summary>
         /// Assign a diffrent database type for the property
-        /// Attibutes Stringify, DataEncode and ToBase64String will override this attribute.
+        /// Attibutes Stringify, DataEncode, JsonDocument and ToBase64String will override this attribute.
         /// </summary>
+        /// <param name="action"></param>
         /// <param name="dataType">The database type ex nvarchar(4000)</param>
         /// <param name="dataBaseTypes">null for all providers</param>
         /// <returns></returns>
@@ -148,5 +149,13 @@ namespace EntityWorker.Core.Interface
         /// <param name="action"></param>
         /// <returns></returns>
         IObjectMapps<T> HasToBase64String<TP>(Expression<Func<T, TP>> action);
+
+        /// <summary>
+        /// Add JsonDocument for property
+        /// </summary>
+        /// <typeparam name="TP"></typeparam>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        IObjectMapps<T> HasJsonDocument<TP>(Expression<Func<T, TP>> action);
     }
 }
