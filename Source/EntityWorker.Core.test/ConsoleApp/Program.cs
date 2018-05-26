@@ -112,7 +112,7 @@ namespace ConsoleApp1
                 Console.WriteLine("----------------" + identifier + "------------------");
                 start();
                 var r = q.Execute();
-                Console.WriteLine("Success");
+                Console.WriteLine("Success Count:" +r.Count );
                 Console.WriteLine(" ");
                 var sql = q.ParsedLinqToSql;
                 stop();
@@ -146,7 +146,7 @@ namespace ConsoleApp1
             Console.WriteLine("----------------Postgresql------------------");
             using (var rep = new Repository(DataBaseTypes.PostgreSql))
             {
-
+              
 
                 var role = rep.Get<Role>().ExecuteFirstOrDefault();
 
@@ -193,7 +193,6 @@ namespace ConsoleApp1
             Console.WriteLine("----------------MSSQL------------------");
             using (var rep = new Repository())
             {
-
                 var role = rep.Get<Role>().ExecuteFirstOrDefault();
 
                 var user = new User("") { UserName = "test", Password = "test", Role = role, Person = new Person() { FirstName = "asd" } };

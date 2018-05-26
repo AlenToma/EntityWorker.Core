@@ -83,7 +83,7 @@ namespace EntityWorker.Core.Helper
         private static Regex stringExp = new Regex(@"String\[.*?\]|String\[.?\]");
         private static Regex dateExp = new Regex(@"Date\[.*?\]|Date\[.?\]");
         private static Regex guidExp = new Regex(@"Guid\[.*?\]|Guid\[.?\]");
-        internal static DbCommandExtended ProcessSql(this IRepository repository, IDbConnection connection, IDbTransaction tran, string sql, Type type)
+        internal static DbCommandExtended ProcessSql(this IRepository repository, IDbConnection connection, IDbTransaction tran, string sql)
         {
             var i = 1;
             var dicCols = new Custom_ValueType<string, Tuple<object, SqlDbType>>();
@@ -128,7 +128,7 @@ namespace EntityWorker.Core.Helper
             else if (repository.DataBaseTypes == DataBaseTypes.Sqllight)
                 cmd = tran == null ? new SQLiteCommand(sql, connection as SQLiteConnection) : new SQLiteCommand(sql, connection as SQLiteConnection, tran as SQLiteTransaction);
             else cmd = tran == null ? new NpgsqlCommand(sql, connection as NpgsqlConnection) : new NpgsqlCommand(sql, connection as NpgsqlConnection, tran as NpgsqlTransaction);
-            var dbCommandExtended = new DbCommandExtended(cmd, repository, type);
+            var dbCommandExtended = new DbCommandExtended(cmd, repository);
             foreach (var dic in dicCols)
                 repository.AddInnerParameter(dbCommandExtended, dic.Key, dic.Value.Item1, dic.Value.Item2);
             return dbCommandExtended;

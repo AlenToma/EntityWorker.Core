@@ -1340,7 +1340,7 @@
             <param name="primaryKey"></param>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.InterFace.IRepository.GetSqlCommand(System.String,System.Type)">
+        <member name="M:EntityWorker.Core.InterFace.IRepository.GetSqlCommand(System.String)">
             <summary>
             Return SqlCommand that already contain SQLConnection
             </summary>
@@ -1348,7 +1348,7 @@
             <param name="type">Set for faster Converting of dbreader to object</param>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.InterFace.IRepository.GetStoredProcedure(System.String,System.Type)">
+        <member name="M:EntityWorker.Core.InterFace.IRepository.GetStoredProcedure(System.String)">
             <summary>
             Return SqlCommand that already contain SQLConnection
             </summary>
@@ -5870,10 +5870,13 @@
             This is initialized after TableType
             </summary>
         </member>
-        <member name="P:EntityWorker.Core.Object.Library.DbCommandExtended.TableType">
+        <member name="M:EntityWorker.Core.Object.Library.DbCommandExtended.#ctor(System.Data.Common.DbCommand,EntityWorker.Core.InterFace.IRepository)">
             <summary>
-            Set This for faster reading of sql
+            
             </summary>
+            <param name="cmd"></param>
+            <param name="provider"></param>
+            <param name="tableType"></param>
         </member>
         <member name="T:EntityWorker.Core.Object.Library.EntityChanges">
             <summary>
@@ -14979,7 +14982,7 @@
             <param name="value"></param>
             <param name="dbType"></param>
         </member>
-        <member name="M:EntityWorker.Core.Transaction.Transaction.GetSqlCommand(System.String,System.Type)">
+        <member name="M:EntityWorker.Core.Transaction.Transaction.GetSqlCommand(System.String)">
             <summary>
             Return SqlCommand that already contain SQLConnection
             </summary>
@@ -14987,7 +14990,7 @@
             <param name="type">Set for faster Converting of dbreader to object</param>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.Transaction.Transaction.GetStoredProcedure(System.String,System.Type)">
+        <member name="M:EntityWorker.Core.Transaction.Transaction.GetStoredProcedure(System.String)">
             <summary>
             Return SqlCommand that already contain SQLConnection
             </summary>

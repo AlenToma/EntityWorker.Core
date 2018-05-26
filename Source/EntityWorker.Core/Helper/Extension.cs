@@ -765,7 +765,6 @@ namespace EntityWorker.Core.Helper
             return ((List<T>)DataReaderConverter(repository, reader, command, typeof(T)));
         }
 
-        internal static Custom_ValueType<Type, DynamicBuilder> CachedDataRecord = new Custom_ValueType<Type, DynamicBuilder>();
         internal static IList DataReaderConverter(Transaction.Transaction repository, IDataReader reader, DbCommandExtended command, Type type)
         {
             var tType = type.GetActualType();
@@ -777,6 +776,8 @@ namespace EntityWorker.Core.Helper
             //#endif
             try
             {
+                var colNames = new Custom_ValueType<int, string>();
+                var pp = new Custom_ValueType<int, FastDeepCloner.IFastDeepClonerProperty>();
                 while (reader.Read())
                 {
                     object item = null;
@@ -790,15 +791,27 @@ namespace EntityWorker.Core.Helper
                     while (col < reader.FieldCount)
                     {
 
-                        var columnName = reader.GetName(col);
+                        string columnName;
+                        if (colNames.ContainsKey(col))
+                            columnName = colNames[col];
+                        else
+                        {
+                            columnName = reader.GetName(col);
+                            colNames.TryAdd(col, columnName);
+                        }
+
                         var value = reader[columnName];
 
-                        var prop = DeepCloner.GetProperty(tType, columnName);
-
-                        if (prop == null)
-                            prop = props.FirstOrDefault(x => string.Equals(x.GetPropertyName(), columnName, StringComparison.CurrentCultureIgnoreCase) || x.GetPropertyName().ToLower() == columnName);
-
-                        if (value != DBNull.Value && value != null && prop != null && prop.CanRead)
+                        IFastDeepClonerProperty prop;
+                        if (!pp.ContainsKey(col))
+                        {
+                            prop = DeepCloner.GetProperty(tType, columnName);
+                            if (prop == null)
+                                prop = props.FirstOrDefault(x => string.Equals(x.GetPropertyName(), columnName, StringComparison.CurrentCultureIgnoreCase) || x.GetPropertyName().ToLower() == columnName);
+                            pp.TryAdd(col, prop);
+                        }
+                        else prop = pp[col];
+                        if (prop != null && value != DBNull.Value && value != null  && prop.CanRead)
                         {
                             if (value as byte[] != null && prop.PropertyType.FullName.Contains("Guid"))
                                 value = new Guid(value as byte[]);
@@ -823,14 +836,6 @@ namespace EntityWorker.Core.Helper
                         }
                         col++;
                     }
-                    //#else
-                    //                    var cmReader = new DataRecordExtended(reader);
-                    //                    if (!CachedDataRecord.ContainsKey(tType))
-                    //                        CachedDataRecord.GetOrAdd(tType, DynamicBuilder.CreateBuilder(cmReader, tType));
-                    //                    var x = CachedDataRecord[tType];
-                    //                    item = x.Build(cmReader);
-                    //                    clItem = !(repository?.IsAttached(item) ?? true) ? x.Build(cmReader) : null;
-                    //#endif
 
                     if (clItem != null && !(repository?.IsAttached(clItem) ?? true))
                         repository?.AttachNew(clItem);
@@ -871,55 +876,47 @@ namespace EntityWorker.Core.Helper
                 }
                 return data;
             }
-            if (command.TableType == null)
+
+            try
             {
-                try
+
+                var key = command.Command.CommandText;
+                if (!CachedSqlException.ContainsKey(command.Command.CommandText))
                 {
+                    if (!CachedGetSchemaTable.ContainsKey(key))
+                        CachedGetSchemaTable.Add(key, new LightDataTable(reader.GetSchemaTable()));
 
-                    var key = command?.TableType != null ? command.TableType.FullName : command.Command.CommandText;
-                    if (!CachedSqlException.ContainsKey(command.Command.CommandText))
+                    foreach (var item in CachedGetSchemaTable[key].Rows)
                     {
-                        if (!CachedGetSchemaTable.ContainsKey(key))
-                            CachedGetSchemaTable.Add(key, new LightDataTable(reader.GetSchemaTable()));
+                        var columnName = item.Value<string>("ColumnName");
+                        data.TablePrimaryKey = data.TablePrimaryKey == null && item.Columns.ContainsKey("IsKey") && item.TryValueAndConvert<bool>("IsKey", false) ? columnName : data.TablePrimaryKey;
+                        var dataType = TypeByTypeAndDbIsNull(item["DataType"] as Type,
+                            item.TryValueAndConvert<bool>("AllowDBNull", true));
+                        if (data.Columns.ContainsKey(columnName))
+                            columnName = columnName + i;
+                        data.AddColumn(columnName, dataType);
 
-                        foreach (var item in CachedGetSchemaTable[key].Rows)
-                        {
-                            var columnName = item.Value<string>("ColumnName");
-                            data.TablePrimaryKey = data.TablePrimaryKey == null && item.Columns.ContainsKey("IsKey") && item.TryValueAndConvert<bool>("IsKey", false) ? columnName : data.TablePrimaryKey;
-                            var dataType = TypeByTypeAndDbIsNull(item["DataType"] as Type,
-                                item.TryValueAndConvert<bool>("AllowDBNull", true));
-                            if (data.Columns.ContainsKey(columnName))
-                                columnName = columnName + i;
-                            data.AddColumn(columnName, dataType);
-
-                            i++;
-                        }
-                    }
-                    else
-                    {
-                        for (var col = 0; col < reader.FieldCount; col++)
-                        {
-                            var columnName = reader.GetName(col);
-                            var dataType = TypeByTypeAndDbIsNull(reader.GetFieldType(col) as Type, true);
-                            if (data.Columns.ContainsKey(columnName))
-                                columnName = columnName + i;
-                            data.AddColumn(columnName, dataType);
-                            i++;
-                        }
+                        i++;
                     }
                 }
-                catch (Exception e)
+                else
                 {
-                    if (!string.IsNullOrEmpty(command.Command.CommandText))
-                        CachedSqlException.Add(command.Command.CommandText, e);
-                    return ReadData(data, dbType, reader, command, primaryKey);
+                    for (var col = 0; col < reader.FieldCount; col++)
+                    {
+                        var columnName = reader.GetName(col);
+                        var dataType = TypeByTypeAndDbIsNull(reader.GetFieldType(col) as Type, true);
+                        if (data.Columns.ContainsKey(columnName))
+                            columnName = columnName + i;
+                        data.AddColumn(columnName, dataType);
+                        i++;
+                    }
                 }
-
             }
-            else
+            catch (Exception e)
             {
-                foreach (var c in command.DataStructure.Columns.Values)
-                    data.AddColumn(c.ColumnName, c.DataType, c.DefaultValue);
+                if (!string.IsNullOrEmpty(command.Command.CommandText))
+                    CachedSqlException.Add(command.Command.CommandText, e);
+                return ReadData(data, dbType, reader, command, primaryKey);
             }
 
             while (reader.Read())

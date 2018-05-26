@@ -108,7 +108,6 @@ namespace EntityWorker.Core.Object.Library
                     DataBase.Database.CachedColumnSchema.Clear();
                     LightDataLinqToNoSql.CachedColumns.Clear();
                     DbSchema.CachedSql.Clear();
-                    Extension.CachedDataRecord.Clear();
                     _provider.SaveChanges();
                 }
                 catch

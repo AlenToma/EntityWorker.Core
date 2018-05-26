@@ -536,10 +536,10 @@ namespace EntityWorker.Core.Transaction
         /// <param name="sql"></param>
         /// <param name="type">Set for faster Converting of dbreader to object</param>
         /// <returns></returns>
-        public DbCommandExtended GetSqlCommand(string sql, Type type = null)
+        public DbCommandExtended GetSqlCommand(string sql)
         {
             ValidateConnection();
-            return this.ProcessSql(SqlConnection, Trans, sql, type);
+            return this.ProcessSql(SqlConnection, Trans, sql);
         }
 
         /// <summary>
@@ -548,10 +548,10 @@ namespace EntityWorker.Core.Transaction
         /// <param name="storedProcedure"></param>
         /// <param name="type">Set for faster Converting of dbreader to object</param>
         /// <returns></returns>
-        public DbCommandExtended GetStoredProcedure(string storedProcedure, Type type = null)
+        public DbCommandExtended GetStoredProcedure(string storedProcedure)
         {
             ValidateConnection();
-            var cmd = this.ProcessSql(SqlConnection, Trans, storedProcedure, type);
+            var cmd = this.ProcessSql(SqlConnection, Trans, storedProcedure);
             cmd.Command.CommandType = CommandType.StoredProcedure;
             return cmd;
         }

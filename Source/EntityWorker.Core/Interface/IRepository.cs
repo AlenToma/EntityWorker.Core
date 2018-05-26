@@ -48,7 +48,7 @@ namespace EntityWorker.Core.InterFace
         /// <param name="sql"></param>
         /// <param name="type">Set for faster Converting of dbreader to object</param>
         /// <returns></returns>
-        DbCommandExtended GetSqlCommand(string sql, Type type = null);
+        DbCommandExtended GetSqlCommand(string sql);
 
         /// <summary>
         /// Return SqlCommand that already contain SQLConnection
@@ -56,7 +56,7 @@ namespace EntityWorker.Core.InterFace
         /// <param name="storedProcedure"></param>
         /// <param name="type">Set for faster Converting of dbreader to object</param>
         /// <returns></returns>
-        DbCommandExtended GetStoredProcedure(string storedProcedure, Type type = null);
+        DbCommandExtended GetStoredProcedure(string storedProcedure);
 
         /// <summary>
         /// Add Parameter to sqlCommand

@@ -770,8 +770,6 @@ namespace EntityWorker.Core
                         if (_repository.GetColumnSchema(tType).Values.Any())
                         {
                             Database.CachedColumnSchema.Remove(tType.FullName + _repository.DataBaseTypes.ToString());
-                            if (Extension.CachedDataRecord.ContainsKey(tType))
-                                Extension.CachedDataRecord.Remove(tType);
                             var tableName = tType.TableName();
                             _repository.ExecuteNonQuery(_repository.GetSqlCommand("DELETE FROM [" + tableName + "];"));
                             var cmd = _repository.GetSqlCommand("DROP TABLE [" + tableName + "];");
