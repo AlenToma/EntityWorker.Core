@@ -1,6 +1,7 @@
 ## Dynamic.Linq 
-Execute Expression of type string
-for expression way have a look at [Dynamic.Ling](https://github.com/kahanu/System.Linq.Dynamic)
+Execute Expression of type string.
+
+For expression way have a look at [Dynamic.Ling](https://github.com/kahanu/System.Linq.Dynamic)
 ```csharp
 using (var rep = new Repository())
 {
