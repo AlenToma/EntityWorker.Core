@@ -1,5 +1,5 @@
 ## Dynamic.Linq 
-Execute Expression of type string. and convert it to sql 
+Execute Expression of type string, and convert it to sql. 
 
 For expression way have a look at [Dynamic.Ling](https://github.com/kahanu/System.Linq.Dynamic)
 ```csharp
