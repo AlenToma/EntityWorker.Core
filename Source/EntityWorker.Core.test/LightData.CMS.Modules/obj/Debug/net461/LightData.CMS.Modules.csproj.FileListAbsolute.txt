@@ -24,7 +24,6 @@ D:\Projects\EntityWorker.Core.test\LightData.CMS.Modules\bin\Debug\net461\LightD
 D:\Projects\EntityWorker.Core.test\LightData.CMS.Modules\bin\Debug\net461\LightData.CMS.Modules.pdb
 D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\bin\Debug\net461\LightData.CMS.Modules.dll
 D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\bin\Debug\net461\LightData.CMS.Modules.pdb
-D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\bin\Debug\net461\System.Data.SqlClient.dll
 D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\bin\Debug\net461\EntityWorker.Core.dll
 D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\bin\Debug\net461\EntityWorker.Core.pdb
 D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\obj\Debug\net461\LightData.CMS.Modules.csproj.CoreCompileInputs.cache

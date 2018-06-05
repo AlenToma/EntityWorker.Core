@@ -1,25 +1,27 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netcoreapp2.0;netstandard2.0;net451</TargetFrameworks>
     <PackageId>EntityWorker.Core</PackageId>
     <AssemblyName>EntityWorker.Core</AssemblyName>
-    <AssemblyVersion>2.0.2.1</AssemblyVersion>
-    <FileVersion>2.0.2.1</FileVersion>
-    <Version>2.2.1</Version>
+    <AssemblyVersion>2.0.2.2</AssemblyVersion>
+    <FileVersion>2.0.2.2</FileVersion>
+    <Version>2.2.2</Version>
     <Authors>Alen Toma</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageProjectUrl>https://github.com/AlenToma/EntityWorker.Core</PackageProjectUrl>
     <PackageTags>Entity EntityWorker.Core sql object-relation mappar LinqToSql alternative-to-entityframework C# System.Reflection generic Microsoft EntityFramework EF Database Data O/RM ADO.NET sqlite postgres postgressql</PackageTags>
     <PackageLicenseUrl>https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/LICENSE</PackageLicenseUrl>
     <Copyright>Copyright (c) 2017 Alen Toma</Copyright>
-    <Description>EntityWorker is an object-relation mapper(ORM) that enable .NET developers to work with relations data using objects. EntityWorker is an alternative to entityframwork. is more flexible and much faster than entity framework.
-And it have support to multiple providers like mssql, sqlite and postgressql</Description>
+    <Description>
+      EntityWorker is an object-relation mapper(ORM) that enable .NET developers to work with relations data using objects. EntityWorker is an alternative to entityframwork. is more flexible and much faster than entity framework.
+      And it have support to multiple providers like mssql, sqlite and postgressql
+    </Description>
     <NeutralLanguage />
     <PackageIconUrl>https://raw.githubusercontent.com/AlenToma/EntityWorker.Core/master/icon.gif</PackageIconUrl>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <!--<TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeP2POutput;</TargetsForTfmSpecificBuildOutput>-->
     <!--<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);CustomContentTarget</TargetsForTfmSpecificContentInPackage>-->
-    <PackageReleaseNotes>Performance fix</PackageReleaseNotes>
+    <PackageReleaseNotes>Implement Dynamic linq</PackageReleaseNotes>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>7.2</LangVersion>
   </PropertyGroup>
@@ -56,7 +58,7 @@ And it have support to multiple providers like mssql, sqlite and postgressql</De
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <!--<PackageReference Include="Microsoft.CSharp" Version="4.4.1" />-->
+    <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net451'">
@@ -65,6 +67,7 @@ And it have support to multiple providers like mssql, sqlite and postgressql</De
     <Reference Include="System.Security" />
     <Reference Include="System.Configuration" />
   </ItemGroup>
+
 
   <!--<ItemGroup Condition="'$(Configuration)'=='Debug'">
     <Content Include="SQLite.Interop.dll">

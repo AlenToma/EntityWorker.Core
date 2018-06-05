@@ -13,7 +13,7 @@ namespace EntityWorker.Core.Helper
             Assembly assem = Assembly.GetExecutingAssembly();
             if (IntPtr.Size == 8)
             {
-                var path = Path.Combine(string.Join("\\", assem.Location.Split('\\').Reverse().Skip(1).Reverse()), "x64");
+                var path = Path.Combine(string.Join("\\", assem.Location.Split('\\').Reverse().Skip(1).Cast<string>().Reverse()), "x64");
 
                 if (!Directory.Exists(path))
                     Directory.CreateDirectory(path);
@@ -25,7 +25,7 @@ namespace EntityWorker.Core.Helper
             }
             else if (IntPtr.Size == 4)
             {
-                var path = Path.Combine(string.Join("\\", assem.Location.Split('\\').Reverse().Skip(1).Reverse()), "x86");
+                var path = Path.Combine(string.Join("\\", assem.Location.Split('\\').Reverse().Skip(1).Cast<string>().Reverse()), "x86");
 
                 if (!Directory.Exists(path))
                     Directory.CreateDirectory(path);

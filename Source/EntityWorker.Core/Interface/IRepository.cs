@@ -69,11 +69,28 @@ namespace EntityWorker.Core.InterFace
         IRepository AddInnerParameter(DbCommandExtended cmd, string attrName, object value, SqlDbType dbType = SqlDbType.NVarChar);
 
         /// <summary>
+        /// Add parameters to SqlCommand
+        /// </summary>
+        /// <param name="cmd"></param>
+        /// <param name="attrName"></param>
+        /// <param name="value"></param>
+        /// <param name="dbType"></param>
+        IRepository AddInnerParameter(DbCommandExtended cmd, string attrName, object value, DbType dbType);
+
+        /// <summary>
         /// Get SqlDbType By system Type
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
         SqlDbType GetSqlType(Type type);
+
+
+        /// <summary>
+        /// DbType By System.Type
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        DbType GetDbType(Type type);
 
         /// <summary>
         /// ExecuteScale with return value

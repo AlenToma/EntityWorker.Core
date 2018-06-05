@@ -368,6 +368,21 @@
             Json globalConfig settings
             </summary>
         </member>
+        <member name="T:EntityWorker.Core.Helper.DynamicQueryable">
+            <summary>
+            Microsoft provided class. It allows dynamic string based querying. 
+            Very handy when, at compile time, you don't know the type of queries that will be generated.
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.DynamicQueryable.Aggregate(System.Linq.IQueryable,System.String,System.String)">
+            <summary>
+            Dynamically runs an aggregate function on the IQueryable.
+            </summary>
+            <param name="source">The IQueryable data source.</param>
+            <param name="function">The name of the function to run. Can be Sum, Average, Min, Max.</param>
+            <param name="member">The name of the property to aggregate over.</param>
+            <returns>The value of the aggregate function run over the specified property.</returns>
+        </member>
         <member name="T:EntityWorker.Core.Helper.DataCipherKeySize">
             <summary>
             Default = GlobalConfiguration.DataEncode_Key_Size
@@ -1156,6 +1171,15 @@
             <param name="match"></param>
             <returns></returns>
         </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.Where(System.String)">
+            <summary>
+            expression of type string, the expression have to be the same type as T
+            </summary>
+            <Entityworker.linq>https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Dynamic.Linq.md</Entityworker.linq>
+            <DynamicLing>https://github.com/kahanu/System.Linq.Dynamic</DynamicLing>
+            <param name="expression"> eg "x.UserName.EndWith("test") And x.Name.Containe("test")"</param>
+            <returns></returns>
+        </member>
         <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.Take(System.Int32)">
             <summary>
             Take only the selected rows 
@@ -1365,9 +1389,25 @@
             <param name="value"></param>
             <param name="dbType"></param>
         </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.AddInnerParameter(EntityWorker.Core.Object.Library.DbCommandExtended,System.String,System.Object,System.Data.DbType)">
+            <summary>
+            Add parameters to SqlCommand
+            </summary>
+            <param name="cmd"></param>
+            <param name="attrName"></param>
+            <param name="value"></param>
+            <param name="dbType"></param>
+        </member>
         <member name="M:EntityWorker.Core.InterFace.IRepository.GetSqlType(System.Type)">
             <summary>
             Get SqlDbType By system Type
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.InterFace.IRepository.GetDbType(System.Type)">
+            <summary>
+            DbType By System.Type
             </summary>
             <param name="type"></param>
             <returns></returns>
@@ -5865,11 +5905,6 @@
             <typeparam name="T"> datatype ed Users</typeparam>
             <returns></returns>
         </member>
-        <member name="P:EntityWorker.Core.Object.Library.DbCommandExtended.DataStructure">
-            <summary>
-            This is initialized after TableType
-            </summary>
-        </member>
         <member name="M:EntityWorker.Core.Object.Library.DbCommandExtended.#ctor(System.Data.Common.DbCommand,EntityWorker.Core.InterFace.IRepository)">
             <summary>
             
@@ -6432,6 +6467,15 @@
             Search 
             </summary>
             <param name="match"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.Where(System.String)">
+            <summary>
+            expression of type string, the expression have to be the same type as T
+            </summary>
+            <Entityworker.linq>https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Dynamic.Linq.md</Entityworker.linq>
+            <DynamicLing>https://github.com/kahanu/System.Linq.Dynamic</DynamicLing>
+            <param name="expression"> eg "x.UserName.EndWith("test") And x.Name.Containe("test")"</param>
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.Take(System.Int32)">
@@ -14965,7 +15009,23 @@
             <param name="type"></param>
             <returns></returns>
         </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.GetDbType(System.Type)">
+            <summary>
+            DbType By System.Type
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
         <member name="M:EntityWorker.Core.Transaction.Transaction.AddInnerParameter(EntityWorker.Core.Object.Library.DbCommandExtended,System.String,System.Object,System.Data.SqlDbType)">
+            <summary>
+            Add parameters to SqlCommand
+            </summary>
+            <param name="cmd"></param>
+            <param name="attrName"></param>
+            <param name="value"></param>
+            <param name="dbType"></param>
+        </member>
+        <member name="M:EntityWorker.Core.Transaction.Transaction.AddInnerParameter(EntityWorker.Core.Object.Library.DbCommandExtended,System.String,System.Object,System.Data.DbType)">
             <summary>
             Add parameters to SqlCommand
             </summary>
@@ -14979,15 +15039,13 @@
             Return SqlCommand that already contain SQLConnection
             </summary>
             <param name="sql"></param>
-            <param name="type">Set for faster Converting of dbreader to object</param>
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Transaction.Transaction.GetStoredProcedure(System.String)">
             <summary>
             Return SqlCommand that already contain SQLConnection
             </summary>
-            <param name="storedProcedure"></param>
-            <param name="type">Set for faster Converting of dbreader to object</param>
+            <param name="storedProcedure">Name</param>
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Transaction.Transaction.GetLightDataTableList(EntityWorker.Core.Object.Library.DbCommandExtended,System.String)">

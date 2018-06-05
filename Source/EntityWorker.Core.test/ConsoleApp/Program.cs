@@ -19,6 +19,7 @@ namespace ConsoleApp1
             {
                 //Console.WriteLine((arg as Args).Data);
             });
+            DynamicLinq();
             SaveJson();
             PackageTest();
             TestSave();
@@ -27,6 +28,17 @@ namespace ConsoleApp1
             Console.Clear();
             Main(null);
 
+        }
+
+        public static void DynamicLinq()
+        {
+            using (var rep = new Repository())
+            {
+                var id = Guid.NewGuid();
+
+                execute(rep.Get<User>().Where("x.Person.FirstName.EndsWith(\"n\") And (x.Person.FirstName.Contains(\"a\") OR x.Person.FirstName.StartsWith(\"a\"))").LoadChildren(), "Dynamic exp");
+
+            }
         }
 
         public static void start()
@@ -112,7 +124,7 @@ namespace ConsoleApp1
                 Console.WriteLine("----------------" + identifier + "------------------");
                 start();
                 var r = q.Execute();
-                Console.WriteLine("Success Count:" +r.Count );
+                Console.WriteLine("Success Count:" + r.Count);
                 Console.WriteLine(" ");
                 var sql = q.ParsedLinqToSql;
                 stop();
@@ -146,7 +158,6 @@ namespace ConsoleApp1
             Console.WriteLine("----------------Postgresql------------------");
             using (var rep = new Repository(DataBaseTypes.PostgreSql))
             {
-              
 
                 var role = rep.Get<Role>().ExecuteFirstOrDefault();
 

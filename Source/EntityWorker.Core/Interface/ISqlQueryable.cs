@@ -73,6 +73,15 @@ namespace EntityWorker.Core.Interface
         ISqlQueryable<T> Where(Expression<Predicate<T>> match);
 
         /// <summary>
+        /// expression of type string, the expression have to be the same type as T
+        /// </summary>
+        /// <Entityworker.linq>https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Dynamic.Linq.md</Entityworker.linq>
+        /// <DynamicLing>https://github.com/kahanu/System.Linq.Dynamic</DynamicLing>
+        /// <param name="expression"> eg "x.UserName.EndWith("test") And x.Name.Containe("test")"</param>
+        /// <returns></returns>
+        ISqlQueryable<T> Where(string expression);
+
+        /// <summary>
         /// Take only the selected rows 
         /// </summary>
         /// <param name="value"></param>

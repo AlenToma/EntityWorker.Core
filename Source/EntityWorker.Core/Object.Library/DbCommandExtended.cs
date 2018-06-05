@@ -10,11 +10,6 @@ namespace EntityWorker.Core.Object.Library
     public class DbCommandExtended
     {
         private DbCommand _cmd;
-
-        /// <summary>
-        /// This is initialized after TableType
-        /// </summary>
-        public ILightDataTable DataStructure { get; private set; }
  
         /// <summary>
         /// 

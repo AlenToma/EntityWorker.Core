@@ -709,7 +709,7 @@ namespace EntityWorker.Core.Helper
                 else if (tempList.Any())
                 {
                     var str = tempList.Last();
-                    str = str?.Split('.').Length >= 2 ? string.Join(".", str.Split('.').Reverse().Take(2).Reverse()) : str;
+                    str = str?.Split('.').Length >= 2 ? string.Join(".", str.Split('.').Reverse().Take(2).Cast<string>().Reverse()) : str;
                     result.Add(str);
                 }
             }
@@ -863,10 +863,7 @@ namespace EntityWorker.Core.Helper
         internal static ILightDataTable ReadData(this ILightDataTable data, DataBaseTypes dbType, IDataReader reader, DbCommandExtended command, string primaryKey = null, bool closeReader = true)
         {
             var i = 0;
-            if (reader.FieldCount <= 0)
-                return data;
             data.TablePrimaryKey = primaryKey;
-
             if (reader.FieldCount <= 0)
             {
                 if (closeReader)
@@ -876,12 +873,10 @@ namespace EntityWorker.Core.Helper
                 }
                 return data;
             }
-
+            var key = command.Command.CommandText;
             try
             {
-
-                var key = command.Command.CommandText;
-                if (!CachedSqlException.ContainsKey(command.Command.CommandText))
+                if (!CachedSqlException.ContainsKey(key))
                 {
                     if (!CachedGetSchemaTable.ContainsKey(key))
                         CachedGetSchemaTable.Add(key, new LightDataTable(reader.GetSchemaTable()));
@@ -895,7 +890,6 @@ namespace EntityWorker.Core.Helper
                         if (data.Columns.ContainsKey(columnName))
                             columnName = columnName + i;
                         data.AddColumn(columnName, dataType);
-
                         i++;
                     }
                 }
@@ -914,9 +908,12 @@ namespace EntityWorker.Core.Helper
             }
             catch (Exception e)
             {
-                if (!string.IsNullOrEmpty(command.Command.CommandText))
-                    CachedSqlException.Add(command.Command.CommandText, e);
-                return ReadData(data, dbType, reader, command, primaryKey);
+                if (!string.IsNullOrEmpty(key))
+                {
+                    CachedSqlException.Add(key, e);
+                    return ReadData(data, dbType, reader, command, primaryKey);
+                }
+                else throw new EntityException(e.Message);
             }
 
             while (reader.Read())

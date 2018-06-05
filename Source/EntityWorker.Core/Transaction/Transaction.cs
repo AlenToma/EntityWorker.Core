@@ -177,7 +177,6 @@ namespace EntityWorker.Core.Transaction
                 var tr = new DbRepository(npSqlBuilder.ToString(), DataBaseTypes);
                 var cmd = tr.GetSqlCommand($"SELECT CAST(CASE WHEN datname is not null THEN 1 ELSE 0 END AS BIT) from pg_database WHERE lower(datname) = lower(String[{dbName}])");
                 return tr.ExecuteScalar(cmd).ConvertValue<bool>();
-
             }
         }
 
@@ -190,8 +189,6 @@ namespace EntityWorker.Core.Transaction
             {
                 if (DataBaseExist())
                     return;
-
-
 
                 var sqlBuild = DataBaseTypes != DataBaseTypes.PostgreSql ? new SqlConnectionStringBuilder(ConnectionString) : null;
                 var npSqlBuilder = DataBaseTypes == DataBaseTypes.PostgreSql ? new NpgsqlConnectionStringBuilder(ConnectionString) : null;
@@ -272,6 +269,7 @@ namespace EntityWorker.Core.Transaction
                         Name = name,
                         DateCreated = DateTime.Now
                     };
+                    this.CreateTransaction();
                     migration.ExecuteMigration(this);
                     this.Save(item);
 
@@ -385,8 +383,7 @@ namespace EntityWorker.Core.Transaction
             }
             catch (Exception e)
             {
-                GlobalConfiguration.Log?.Error(e);
-                throw e;
+                throw new EntityException(e.Message);
             }
             finally
             {
@@ -437,10 +434,10 @@ namespace EntityWorker.Core.Transaction
             {
                 Trans?.Commit();
             }
-            catch
+            catch (Exception ex)
             {
                 Rollback();
-                throw;
+                throw new EntityException(ex.Message);
             }
             finally
             {
@@ -492,6 +489,32 @@ namespace EntityWorker.Core.Transaction
         }
 
         /// <summary>
+        /// DbType By System.Type
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public DbType GetDbType(Type type)
+        {
+            if (type == typeof(string))
+                return DbType.String;
+
+            if (type.GetTypeInfo().IsGenericType && type.GetTypeInfo().GetGenericTypeDefinition() == typeof(Nullable<>))
+                type = Nullable.GetUnderlyingType(type);
+            if (type.GetTypeInfo().IsEnum)
+                type = typeof(long);
+            try
+            {
+                var param = new SqlParameter("", type == typeof(byte[]) ? new byte[0] : type.CreateInstance(true));
+                return param.DbType;
+            }
+            catch
+            {
+                var param = new SqlParameter("", new object());
+                return param.DbType;
+            }
+        }
+
+        /// <summary>
         /// Add parameters to SqlCommand
         /// </summary>
         /// <param name="cmd"></param>
@@ -531,10 +554,58 @@ namespace EntityWorker.Core.Transaction
         }
 
         /// <summary>
+        /// Add parameters to SqlCommand
+        /// </summary>
+        /// <param name="cmd"></param>
+        /// <param name="attrName"></param>
+        /// <param name="value"></param>
+        /// <param name="dbType"></param>
+        public IRepository AddInnerParameter(DbCommandExtended cmd, string attrName, object value, DbType dbType)
+        {
+            if (attrName != null && attrName[0] != '@')
+                attrName = "@" + attrName;
+
+            if (value?.GetType().GetTypeInfo().IsEnum ?? false)
+                value = value.ConvertValue<long>();
+
+            var sqlDbTypeValue = value ?? DBNull.Value;
+
+            if (DataBaseTypes == DataBaseTypes.Mssql)
+            {
+                var param = new SqlParameter
+                {
+                    DbType = dbType,
+                    Value = sqlDbTypeValue,
+                    ParameterName = attrName
+                };
+                cmd.Command.Parameters.Add(param);
+            }
+            else if (DataBaseTypes == DataBaseTypes.Sqllight)
+            {
+                (cmd.Command as SQLiteCommand).Parameters.Add(new SQLiteParameter()
+                {
+                    DbType = dbType,
+                    Value = value ?? DBNull.Value,
+                    ParameterName = attrName
+                });
+            }
+            else
+            {
+                (cmd.Command as NpgsqlCommand).Parameters.Add(new NpgsqlParameter()
+                {
+                    DbType = dbType,
+                    Value = value ?? DBNull.Value,
+                    ParameterName = attrName
+                });
+            }
+
+            return this;
+        }
+
+        /// <summary>
         /// Return SqlCommand that already contain SQLConnection
         /// </summary>
         /// <param name="sql"></param>
-        /// <param name="type">Set for faster Converting of dbreader to object</param>
         /// <returns></returns>
         public DbCommandExtended GetSqlCommand(string sql)
         {
@@ -545,8 +616,7 @@ namespace EntityWorker.Core.Transaction
         /// <summary>
         /// Return SqlCommand that already contain SQLConnection
         /// </summary>
-        /// <param name="storedProcedure"></param>
-        /// <param name="type">Set for faster Converting of dbreader to object</param>
+        /// <param name="storedProcedure">Name</param>
         /// <returns></returns>
         public DbCommandExtended GetStoredProcedure(string storedProcedure)
         {
@@ -590,12 +660,10 @@ namespace EntityWorker.Core.Transaction
             if (Extension.ObjectIsNew(objcDbEntity.GetPrimaryKeyValue()))
                 throw new EntityException("Id is IsNullOrEmpty, it cant be attached");
 
-
             if (_attachedObjects.ContainsKey(key))
             {
                 if (overwrite)
                     _attachedObjects.GetOrAdd(key, this.Clone(objcDbEntity, CloneLevel.FirstLevelOnly), true);
-
             }
             else
                 _attachedObjects.GetOrAdd(key, this.Clone(objcDbEntity, CloneLevel.FirstLevelOnly));
@@ -827,7 +895,6 @@ namespace EntityWorker.Core.Transaction
             {
                 _dbSchema.LoadChildren(item, onlyFirstLevel, classes, ignoreList);
             });
-
         }
 
         /// <summary>
@@ -861,7 +928,6 @@ namespace EntityWorker.Core.Transaction
                 if (actions != null)
                     parames = actions.ConvertExpressionToIncludeList();
                 LoadChildren<T>(item, onlyFirstLevel, actions != null ? parames : null, ignoreList != null && ignoreList.Any() ? ignoreList : null);
-
             });
         }
 
@@ -938,7 +1004,6 @@ namespace EntityWorker.Core.Transaction
                 throw new EntityException("Primary Id not found for object " + typeof(T).FullName);
             return new SqlQueryable<T>(null, this);
         }
-
 
         /// <summary>
         /// Get ISqlQueryable from Json.
