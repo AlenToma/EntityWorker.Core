@@ -38,6 +38,7 @@ See Code Example for more info.
 * [Xml](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Xml.md)
 * [Save](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Save.md)
 * [LinqToSql](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/LinqToSql.md)
+* [Dynamic linq](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Dynamic.Linq.md)
 * [Custom ISqlQueryable](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/CustomQueries.md)
 * [Entity Mappings](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/EntityMappings.md)
 * [ObjectChanges](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/ObjectChanges.md)
