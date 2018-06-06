@@ -23,7 +23,7 @@ namespace EntityWorker.Core.Object.Library.XML
         {
             string xmlResult = "";
             ToXml(o, ref xmlResult);
-            XmlDocument xmlDoc = new XmlDocument();
+            var xmlDoc = new System.Xml.XmlDocument();
             StringWriter sw = new StringWriter();
             xmlDoc.LoadXml(xmlResult);
             xmlDoc.Save(sw);
@@ -37,11 +37,69 @@ namespace EntityWorker.Core.Object.Library.XML
         /// <param name="xml"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
+        public static object FromXml(this string xml, IRepository transaction = null)  
+        {
+            if (string.IsNullOrEmpty(xml))
+                return null;
+            var doc = new System.Xml.XmlDocument();
+            doc.LoadXml(xml);
+            var o = FromXml(doc.DocumentElement);
+            void LoadXmlIgnoreProperties(object item)
+            {
+                if (item is IList)
+                {
+                    foreach (var t in (IList)item)
+                        LoadXmlIgnoreProperties(t);
+                    return;
+                }
+
+                var type = item?.GetType().GetActualType();
+                if (type == null)
+                    return;
+                if (!(item?.GetPrimaryKeyValue().ObjectIsNew() ?? true))
+                {
+                    var primaryId = item.GetPrimaryKeyValue();
+                    foreach (var prop in DeepCloner.GetFastDeepClonerProperties(item.GetType()).Where(x => (x.ContainAttribute<XmlIgnore>() || !x.IsInternalType) && !x.ContainAttribute<ExcludeFromAbstract>() && x.CanRead))
+                    {
+                        var value = prop.GetValue(item);
+                        if (prop.PropertyType == typeof(string) && string.IsNullOrEmpty(value?.ToString()))
+                            value = string.Empty;
+                        if (prop.IsInternalType && value == LightDataTableShared.ValueByType(prop.PropertyType)) // Value is default
+                        {
+                            var cmd = transaction.GetSqlCommand($"SELECT [{prop.GetPropertyName()}] FROM [{type.TableName()}] WHERE [{item.GetPrimaryKey().GetPropertyName()}] = {Querys.GetValueByType(item.GetPrimaryKeyValue(), transaction.DataBaseTypes)}");
+                            var data = transaction.ExecuteScalar(cmd);
+                            if (data == null)
+                                continue;
+                            if (prop.ContainAttribute<DataEncode>())
+                                data = new DataCipher(prop.GetCustomAttribute<DataEncode>().Key, prop.GetCustomAttribute<DataEncode>().KeySize).Decrypt(data.ToString());
+                            else if (prop.ContainAttribute<ToBase64String>() && data.ToString().IsBase64String())
+                                data = MethodHelper.DecodeStringFromBase64(data.ToString());
+
+                            prop.SetValue(item, data.ConvertValue(prop.PropertyType));
+                        }
+                        else if (value != null) LoadXmlIgnoreProperties(value);
+                    }
+
+                }
+            }
+            if (transaction != null)
+                LoadXmlIgnoreProperties(o);
+            return o;
+
+        }
+
+        /// <summary>
+        /// DeSerilize Xml to IAnimal, this is supposed to handle all unknow object types but there has not been to many tests.
+        /// Only IAnimal test been done here.
+        /// </summary>
+        /// <param name="xml"></param>
+        /// <param name="transaction"></param>
+        /// <returns></returns>
         public static T FromXml<T>(this string xml, IRepository transaction) where T : class
         {
             if (string.IsNullOrEmpty(xml))
                 return (T)(new object());
-            XmlDocument doc = new XmlDocument();
+            var doc = new System.Xml.XmlDocument();
             doc.LoadXml(xml);
             var o = (T)FromXml(doc.DocumentElement);
             void LoadXmlIgnoreProperties(object item)

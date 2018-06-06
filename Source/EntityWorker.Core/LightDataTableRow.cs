@@ -492,7 +492,9 @@ namespace EntityWorker.Core
                         value = new DataCipher(pr.GetCustomAttribute<DataEncode>().Key, pr.GetCustomAttribute<DataEncode>().KeySize).Decrypt(value.ConvertValue<string>());
                     }
                     else if (pr.ContainAttribute<JsonDocument>())
-                        value?.ToString().FromJson(pr.PropertyType);
+                        value = value?.ToString().FromJson(pr.PropertyType);
+                    else if (pr.ContainAttribute<XmlDocument>())
+                        value = value?.ToString().FromXml();
                     TypeValidation(ref value, pr.PropertyType, true);
                 }
                 else
@@ -555,7 +557,9 @@ namespace EntityWorker.Core
                     else if (value != null && pr.ContainAttribute<DataEncode>())
                         value = new DataCipher(pr.GetCustomAttribute<DataEncode>().Key, pr.GetCustomAttribute<DataEncode>().KeySize).Decrypt(value.ConvertValue<string>());
                     else if (pr.ContainAttribute<JsonDocument>())
-                        value?.ToString().FromJson(pr.PropertyType);
+                        value = value?.ToString().FromJson(pr.PropertyType);
+                    else if (pr.ContainAttribute<XmlDocument>())
+                        value = value?.ToString().FromXml();
 
                     TypeValidation(ref value, pr.PropertyType, true);
                 }

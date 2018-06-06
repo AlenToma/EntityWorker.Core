@@ -14,5 +14,8 @@ namespace LightData.CMS.Modules.Library
         [JsonDocument]
         [PropertyName("UserJson")]
         public User User { get; set; }
+
+        [XmlDocument]
+        public User UserXml { get; set; }
     }
 }

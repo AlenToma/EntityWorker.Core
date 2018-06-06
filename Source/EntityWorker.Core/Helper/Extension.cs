@@ -161,6 +161,8 @@ namespace EntityWorker.Core.Helper
                                 data = MethodHelper.DecodeStringFromBase64(data.ToString());
                             else if (prop.ContainAttribute<JsonDocument>())
                                 data = data?.ToString().FromJson(prop.PropertyType);
+                            else if (prop.ContainAttribute<XmlDocument>())
+                                data = data?.ToString().FromXml();
                             prop.SetValue(item, data.ConvertValue(prop.PropertyType));
                         }
                         else if (value != null) LoadJsonIgnoreProperties(value);
@@ -207,6 +209,18 @@ namespace EntityWorker.Core.Helper
         public static T FromXml<T>(this string xml, IRepository repository = null) where T : class
         {
             return XmlUtility.FromXml<T>(xml, repository);
+        }
+
+        /// <summary>
+        /// Xml to object
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="xml"></param>
+        /// <param name="repository"> Assign repository to load XmlIgnored properties</param>
+        /// <returns></returns>
+        public static object FromXml(this string xml, IRepository repository = null)
+        {
+            return XmlUtility.FromXml(xml, repository);
         }
 
         /// <summary>
@@ -427,7 +441,11 @@ namespace EntityWorker.Core.Helper
         {
             var type = prop.PropertyType;
 
-            if (prop.ContainAttribute<Stringify>() || prop.ContainAttribute<DataEncode>() || prop.ContainAttribute<ToBase64String>() || prop.ContainAttribute<JsonDocument>())
+            if (prop.ContainAttribute<Stringify>() ||
+                prop.ContainAttribute<DataEncode>() ||
+                prop.ContainAttribute<ToBase64String>() ||
+                prop.ContainAttribute<JsonDocument>() ||
+                prop.ContainAttribute<XmlDocument>())
                 return typeof(string).GetDbTypeByType(dbType);
 
             if (prop.ContainAttribute<ColumnType>() && prop.Attributes.Any(x => x is ColumnType && !string.IsNullOrEmpty((x as ColumnType).DataType) && ((x as ColumnType).DataBaseTypes == dbType) || !(x as ColumnType).DataBaseTypes.HasValue))
@@ -456,7 +474,11 @@ namespace EntityWorker.Core.Helper
         {
             var type = prop.PropertyType;
 
-            if (prop.ContainAttribute<Stringify>() || prop.ContainAttribute<DataEncode>() || prop.ContainAttribute<ToBase64String>() || prop.ContainAttribute<JsonDocument>())
+            if (prop.ContainAttribute<Stringify>() ||
+                prop.ContainAttribute<DataEncode>() ||
+                prop.ContainAttribute<ToBase64String>() ||
+                prop.ContainAttribute<JsonDocument>() ||
+                prop.ContainAttribute<XmlDocument>())
                 return new List<string>() { typeof(string).GetDbTypeByType(dbType) };
 
             if (prop.ContainAttribute<ColumnType>() && prop.Attributes.Any(x => x is ColumnType && !string.IsNullOrEmpty((x as ColumnType).DataType) && ((x as ColumnType).DataBaseTypes == dbType) || !(x as ColumnType).DataBaseTypes.HasValue))
@@ -811,7 +833,7 @@ namespace EntityWorker.Core.Helper
                             pp.TryAdd(col, prop);
                         }
                         else prop = pp[col];
-                        if (prop != null && value != DBNull.Value && value != null  && prop.CanRead)
+                        if (prop != null && value != DBNull.Value && value != null && prop.CanRead)
                         {
                             if (value as byte[] != null && prop.PropertyType.FullName.Contains("Guid"))
                                 value = new Guid(value as byte[]);
@@ -829,6 +851,8 @@ namespace EntityWorker.Core.Helper
                                 value = new DataCipher(dataEncode.Key, dataEncode.KeySize).Decrypt(value.ConvertValue<string>());
                             else if (prop.ContainAttribute<JsonDocument>())
                                 value = value?.ToString().FromJson(prop.PropertyType);
+                            else if (prop.ContainAttribute<XmlDocument>())
+                                value = value?.ToString().FromXml();
                             else value = MethodHelper.ConvertValue(value, prop.PropertyType);
 
                             prop.SetValue(item, value);

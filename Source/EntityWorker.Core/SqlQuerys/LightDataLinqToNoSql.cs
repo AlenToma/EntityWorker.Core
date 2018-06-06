@@ -784,6 +784,10 @@ namespace EntityWorker.Core.SqlQuerys
                 {
                     VisitConstantFixed(m.Expression as ConstantExpression, m.Member?.Name);
                     return m;
+                }else if (m.Expression?.ToString().Contains("DisplayClass") ?? false)
+                {
+                    CleanDecoder(ValuetoSql(Expression.Lambda(m).Compile().DynamicInvoke()));
+                    return m;
                 }
                 else if (m.Expression != null && (m.Expression.NodeType == ExpressionType.Parameter || (m.ToString().EndsWith(".HasValue") && m.Expression.NodeType == ExpressionType.MemberAccess)) && (_overridedNodeType == null))
                 {

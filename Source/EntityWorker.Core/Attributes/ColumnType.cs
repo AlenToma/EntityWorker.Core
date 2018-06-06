@@ -16,7 +16,7 @@ namespace EntityWorker.Core.Attributes
 
         /// <summary>
         /// Assign a diffrent database type for the property
-        /// Attibutes Stringify, DataEncode, JsonDocument and ToBase64String will override this attribute. 
+        /// Attibutes Stringify, DataEncode, JsonDocument, XmlDocument and ToBase64String will override this attribute. 
         /// </summary>
         /// <param name="dataType">The database type ex nvarchar(4000)</param>
         /// <param name="dataBaseTypes">null for all providers</param>

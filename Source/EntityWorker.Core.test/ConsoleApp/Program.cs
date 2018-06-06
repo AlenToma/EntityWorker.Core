@@ -30,6 +30,15 @@ namespace ConsoleApp1
 
         }
 
+        public static void test()
+        {
+            using (var rep = new Repository())
+            {
+                var us = rep.Get<User>().LoadChildren().ExecuteFirstOrDefault();
+                var person = rep.Get<Person>().Where(x => x.Id == us.Person.Id).Execute();
+            }
+        }
+
         public static void DynamicLinq()
         {
             using (var rep = new Repository())
@@ -57,7 +66,8 @@ namespace ConsoleApp1
                 var user = rep.Get<User>().LoadChildren().ExecuteFirstOrDefault();
                 var jsonUser = new UserTemp()
                 {
-                    User = user
+                    User = user,
+                    UserXml = user
                 };
                 rep.Save(jsonUser);
 
@@ -76,7 +86,8 @@ namespace ConsoleApp1
                 var user = rep.Get<User>().LoadChildren().ExecuteFirstOrDefault();
                 var jsonUser = new UserTemp()
                 {
-                    User = user
+                    User = user,
+                    UserXml = user
                 };
                 rep.Save(jsonUser);
 
@@ -95,7 +106,8 @@ namespace ConsoleApp1
                 var user = rep.Get<User>().LoadChildren().ExecuteFirstOrDefault();
                 var jsonUser = new UserTemp()
                 {
-                    User = user
+                    User = user,
+                    UserXml = user
                 };
                 rep.Save(jsonUser);
 
@@ -108,6 +120,7 @@ namespace ConsoleApp1
                 Console.WriteLine((jsonUser.User.UserName == "test" ? "Success" : "Failed"));
             }
         }
+
 
 
         public static void stop()

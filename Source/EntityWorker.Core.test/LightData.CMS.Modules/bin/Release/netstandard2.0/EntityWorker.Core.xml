@@ -13,7 +13,7 @@
         <member name="M:EntityWorker.Core.Attributes.ColumnType.#ctor(System.String,System.Nullable{EntityWorker.Core.Helper.DataBaseTypes})">
             <summary>
             Assign a diffrent database type for the property
-            Attibutes Stringify, DataEncode, JsonDocument and ToBase64String will override this attribute. 
+            Attibutes Stringify, DataEncode, JsonDocument, XmlDocument and ToBase64String will override this attribute. 
             </summary>
             <param name="dataType">The database type ex nvarchar(4000)</param>
             <param name="dataBaseTypes">null for all providers</param>
@@ -172,6 +172,13 @@
             https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
             Will be saved to the database as base64string 
             and converted back to its original string when its read
+            </summary>
+        </member>
+        <member name="T:EntityWorker.Core.Attributes.XmlDocument">
+            <summary>
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
+            Save the property as Xml object in the database
+            For the moment those values cant be searched by linq.
             </summary>
         </member>
         <member name="T:EntityWorker.Core.Attributes.XmlIgnore">
@@ -435,6 +442,15 @@
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Helper.Extension.FromXml``1(System.String,EntityWorker.Core.InterFace.IRepository)">
+            <summary>
+            Xml to object
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="xml"></param>
+            <param name="repository"> Assign repository to load XmlIgnored properties</param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.Extension.FromXml(System.String,EntityWorker.Core.InterFace.IRepository)">
             <summary>
             Xml to object
             </summary>
@@ -1003,7 +1019,7 @@
         <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.HasColumnType``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.String,System.Nullable{EntityWorker.Core.Helper.DataBaseTypes})">
             <summary>
             Assign a diffrent database type for the property
-            Attibutes Stringify, DataEncode, JsonDocument and ToBase64String will override this attribute.
+            Attibutes Stringify, DataEncode, JsonDocument , XmlDocument and ToBase64String will override this attribute.
             </summary>
             <param name="action"></param>
             <param name="dataType">The database type ex nvarchar(4000)</param>
@@ -1101,6 +1117,16 @@
         <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.HasJsonDocument``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
             <summary>
             Add JsonDocument for property
+            Save the property as Json object in the database 
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.HasXmlDocument``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+            Add XmlDocument for property
+            Save the property as xml object in the database 
             </summary>
             <typeparam name="TP"></typeparam>
             <param name="action"></param>
@@ -6259,6 +6285,14 @@
             <param name="action"></param>
             <returns></returns>
         </member>
+        <member name="M:EntityWorker.Core.Object.Library.Modules.ObjectMapps`1.HasXmlDocument``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+            Add XmlDocument for property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
         <member name="M:EntityWorker.Core.Object.Library.Modules.ObjectMapps`1.HasXmlIgnore``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
             <summary>
             EntityWorker will ignore serializing or derializing all properties that contain this attribute
@@ -6637,6 +6671,15 @@
             serialize object to xml
             </summary>
             <param name="o"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.XML.XmlUtility.FromXml(System.String,EntityWorker.Core.InterFace.IRepository)">
+            <summary>
+            DeSerilize Xml to IAnimal, this is supposed to handle all unknow object types but there has not been to many tests.
+            Only IAnimal test been done here.
+            </summary>
+            <param name="xml"></param>
+            <param name="transaction"></param>
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Object.Library.XML.XmlUtility.FromXml``1(System.String,EntityWorker.Core.InterFace.IRepository)">
