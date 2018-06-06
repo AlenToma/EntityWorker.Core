@@ -1,7 +1,7 @@
 ## Dynamic.Linq 
-Execute Expression of type string.
+Execute Expression of type string, and convert it to sql. 
 
-For expression way have a look at [Dynamic.Ling](https://github.com/kahanu/System.Linq.Dynamic)
+For way to write expression have a look at [Dynamic.Ling](https://github.com/kahanu/System.Linq.Dynamic)
 ```csharp
 using (var rep = new Repository())
 {
