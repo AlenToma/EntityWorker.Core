@@ -11,6 +11,12 @@ There are many attributes you could use to improve the code
 [KnownType]
 
 /// <summary>
+/// Save the property as xml object in the database
+/// For the moment those values cant be searched by linq.
+/// </summary>
+[XmlDocument]
+
+/// <summary>
 /// Save the property as Json object in the database
 /// For the moment those values cant be searched by linq.
 /// you will have to use row sql(JSON_VALUE) to seach them
