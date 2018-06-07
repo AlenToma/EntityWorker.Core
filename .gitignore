@@ -13,3 +13,4 @@
 *.nupkg
 /Solution/packages/System.Data.SqlClient.4.4.2/lib
 /Solution/packages/System.Data.SqlClient.4.4.2/ref
+/Source/EntityWorkerTest/.vs/EntityWorkerTest/v15/Server/sqlite3
