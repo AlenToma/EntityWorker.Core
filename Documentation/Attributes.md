@@ -25,7 +25,7 @@ There are many attributes you could use to improve the code
 
 /// <summary>
 /// Assign a diffrent database type for the property. 
-/// Attibutes Stringify, DataEncode and ToBase64String will override this attribute. 
+/// Attibutes Stringify, DataEncode ,XmlDocument ,JsonDocument and ToBase64String will override this attribute. 
 /// </summary>
 /// <param name="dataType">The database type ex nvarchar(4000)</param>
 /// <param name="dataBaseTypes">(Optional)null for all providers</param>
