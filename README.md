@@ -9,6 +9,7 @@ EntityWorker is an alternative to entityframwork. is more flexible and much fast
 
 ## EntityWorker.Core in Action
 [LightData.CMS](https://github.com/AlenToma/LightData.CMS)
+[IProduct](https://github.com/AlenToma/IProduct)
 
 ## Support for Providers
 * Mssql
