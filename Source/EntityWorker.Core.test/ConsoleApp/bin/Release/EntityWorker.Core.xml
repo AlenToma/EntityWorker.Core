@@ -166,6 +166,14 @@
             Define diffrent name for the table
             </summary>
         </member>
+        <member name="M:EntityWorker.Core.Attributes.Table.#ctor(System.String,System.String)">
+            <summary>
+            schema works only for MSSQl and postGreSql
+            Database should allow Create Schema for this to work or the Schema should already be created
+            </summary>
+            <param name="name"></param>
+            <param name="schema"></param>
+        </member>
         <member name="T:EntityWorker.Core.Attributes.ToBase64String">
             <inheritdoc />
             <summary>
@@ -421,6 +429,7 @@
             </summary>
             <typeparam name="T"></typeparam>
             <param name="json"></param>
+            <param name="repository"></param>
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Helper.Extension.FromJson(System.String,System.Type)">
@@ -521,15 +530,15 @@
             <summary>
             Try to insert 
             </summary>
-            <param name="str"></param>
-            <param name="text"></param>
+            <param name="str">Source</param>
+            <param name="text">string to insert</param>
             <param name="identifier"></param>
             <param name="insertLastIfNotFound"></param>
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Helper.Extension.EntityKey(System.Object)">
             <summary>
-            Generate an entityKey Primary Id cant be null or empty
+            Generate an entityKey. Primary Id cant be null or empty
             </summary>
             <param name="entity"></param>
             <returns></returns>
@@ -539,6 +548,7 @@
             Generate an entityKey Primary Id cant be null or empty
             </summary>
             <param name="type">entitytyp</param>
+            <param name="id"></param>
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Helper.Extension.InsertBefore(System.Text.StringBuilder,System.String,System.String,System.Boolean)">
@@ -623,6 +633,7 @@
             <summary>
             Get the Primary key from type
             </summary>
+            <param name="item"></param>
             <param name="type"></param>
             <returns></returns>
         </member>
@@ -978,7 +989,7 @@
             </summary>
             <typeparam name="T"></typeparam>
         </member>
-        <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.TableName(System.String)">
+        <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.TableName(System.String,System.String)">
             <summary>
             Assign diffrent name for the object in the database
             </summary>
@@ -5917,6 +5928,12 @@
             DataBase FullConnectionString
             </summary>
         </member>
+        <member name="M:EntityWorker.Core.Object.Library.DataBase.Database.CreateSchema(System.Type)">
+            <summary>
+            create schema if not exist
+            </summary>
+            <param name="type"></param>
+        </member>
         <member name="M:EntityWorker.Core.Object.Library.DataBase.Database.GetColumnSchema(System.Type)">
             <summary>
             Get the ColumnSchema  
@@ -6255,7 +6272,7 @@
             </summary>
             <typeparam name="T"></typeparam>
         </member>
-        <member name="M:EntityWorker.Core.Object.Library.Modules.ObjectMapps`1.TableName(System.String)">
+        <member name="M:EntityWorker.Core.Object.Library.Modules.ObjectMapps`1.TableName(System.String,System.String)">
             <summary>
             Assign diffrent name for the object in the database
             </summary>
@@ -14962,7 +14979,7 @@
         </member>
         <member name="M:EntityWorker.Core.Transaction.Transaction.GetCodeLatestChanges(System.Reflection.Assembly)">
             <summary>
-            Return the new added column, tables or modified prooerty
+            Return the new added column, tables or modified Properties
             Property Rename is not supported. renaming a property x will end up removing the column x and adding column y so there will be dataloss
             Adding a primary key is not supported either
             Abstract classes are ignored by default
@@ -14994,7 +15011,7 @@
         <member name="M:EntityWorker.Core.Transaction.Transaction.MigrationConfig``1(``0)">
             <summary>
             Specifies the migrationConfig which contain a list Migration to migrate
-            the migration is executed automatic as long as you have class that inherit from IMigrationConfig
+            the migration is executed automatic(InitializeMigration()) as long as you have class that inherit from IMigrationConfig
             or you could manually execute a migration
             </summary>
             <typeparam name="T"></typeparam>
@@ -15002,7 +15019,7 @@
         </member>
         <member name="M:EntityWorker.Core.Transaction.Transaction.ValidateConnection">
             <summary>
-            Validate Connection is Open or broken
+            Validate Connection is Open or broken then reopen it
             </summary>
         </member>
         <member name="M:EntityWorker.Core.Transaction.Transaction.CreateTransaction">

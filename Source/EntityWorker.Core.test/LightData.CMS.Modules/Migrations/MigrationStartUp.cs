@@ -52,7 +52,6 @@ namespace LightData.CMS.Modules.Migrations
             {
                 new User("")
                 {
-                Id= "ADMIN",
                 UserName = "Admin",
                 Password = "Admin",
                 Role = role,

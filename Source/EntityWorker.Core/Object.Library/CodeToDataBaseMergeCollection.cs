@@ -91,11 +91,12 @@ namespace EntityWorker.Core.Object.Library
                         foreach (var key in Keys)
                         {
                             var type = key.Value.Item2.Type.GetActualType();
-                            var keyPrimary = type.GetPrimaryKey().GetPropertyName();
                             var tb = type.TableName();
+                            var keyPrimary = type.GetPrimaryKey().GetPropertyName();
+
                             if (_provider.DataBaseTypes == DataBaseTypes.Mssql)
-                                sql.Append("ALTER TABLE [" + key.Value.Item1 + "] ADD FOREIGN KEY (" + key.Key.Split('-')[0] + ") REFERENCES [" + tb + "](" + keyPrimary + ");");
-                            else sql.Append("ALTER TABLE " + key.Value.Item1 + " ADD CONSTRAINT fk_" + (tb + "_" + key.Key.Split('-')[0]) + " FOREIGN KEY (" + key.Key.Split('-')[0] + ") REFERENCES " + tb + "(" + keyPrimary + ");");
+                                sql.Append("ALTER TABLE " + key.Value.Item1 + " ADD FOREIGN KEY (" + key.Key.Split('-')[0] + ") REFERENCES " + tb.GetName(_provider.DataBaseTypes) + "(" + keyPrimary + ");");
+                            else sql.Append("ALTER TABLE " + key.Value.Item1 + " ADD CONSTRAINT fk_" + (tb.Name + "_" + key.Key.Split('-')[0]) + " FOREIGN KEY (" + key.Key.Split('-')[0] + ") REFERENCES " + tb.GetName(_provider.DataBaseTypes) + "(" + keyPrimary + ");");
 
                         }
                         var s = sql.ToString();

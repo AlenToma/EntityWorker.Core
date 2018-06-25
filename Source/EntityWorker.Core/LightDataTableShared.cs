@@ -266,8 +266,7 @@ namespace EntityWorker.Core
                         value = v;
                     else if (loadDefaultOnError)
                         value = ValueByType(dataType, defaultValue);
-                }
-                else if (dataType == typeof(string))
+                } else if (dataType == typeof(string))
                 {
                     value = value.ToString();
 

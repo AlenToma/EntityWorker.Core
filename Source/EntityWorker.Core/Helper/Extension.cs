@@ -27,7 +27,7 @@ namespace EntityWorker.Core.Helper
     {
         private static readonly Custom_ValueType<IFastDeepClonerProperty, string> CachedPropertyNames = new Custom_ValueType<IFastDeepClonerProperty, string>();
         private static readonly Custom_ValueType<Type, IFastDeepClonerProperty> CachedPrimaryKeys = new Custom_ValueType<Type, IFastDeepClonerProperty>();
-        internal static readonly Custom_ValueType<Type, string> CachedTableNames = new Custom_ValueType<Type, string>();
+        internal static readonly Custom_ValueType<Type, Table> CachedTableNames = new Custom_ValueType<Type, Table>();
 
         private static readonly Custom_ValueType<Type, List<string>> DbMsSqlMapper = new Custom_ValueType<Type, List<string>>()
         {
@@ -43,7 +43,6 @@ namespace EntityWorker.Core.Helper
             {typeof(byte[]), new List<string>(){ "varbinary(MAX)" , "image" , "rowversion", "timestamp" } },
             {typeof(char), new List<string>(){ "NVARCHAR(10)", "char" , "nchar" , "ntext" } },
             {typeof(double), new List<string>(){ "DECIMAL(18,5)", "money" , "numeric", "smallmoney" } },
-
         };
 
         private static readonly Custom_ValueType<Type, List<string>> DbSQLiteMapper = new Custom_ValueType<Type, List<string>>()
@@ -123,6 +122,7 @@ namespace EntityWorker.Core.Helper
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="json"></param>
+        /// <param name="repository"></param>
         /// <returns></returns>
         internal static T FromJson<T>(this string json, IRepository repository)
         {
@@ -151,7 +151,7 @@ namespace EntityWorker.Core.Helper
                             value = string.Empty;
                         if (prop.IsInternalType && value == LightDataTableShared.ValueByType(prop.PropertyType)) // Value is default
                         {
-                            var cmd = repository.GetSqlCommand($"SELECT [{prop.GetPropertyName()}] FROM [{type.TableName()}] WHERE [{item.GetPrimaryKey().GetPropertyName()}] = {Querys.GetValueByType(item.GetPrimaryKeyValue(), repository.DataBaseTypes)}");
+                            var cmd = repository.GetSqlCommand($"SELECT [{prop.GetPropertyName()}] FROM {type.TableName().GetName(repository.DataBaseTypes)} WHERE [{item.GetPrimaryKey().GetPropertyName()}] = {Querys.GetValueByType(item.GetPrimaryKeyValue(), repository.DataBaseTypes)}");
                             var data = repository.ExecuteScalar(cmd);
                             if (data == null)
                                 continue;
@@ -354,8 +354,8 @@ namespace EntityWorker.Core.Helper
         /// <summary>
         /// Try to insert 
         /// </summary>
-        /// <param name="str"></param>
-        /// <param name="text"></param>
+        /// <param name="str">Source</param>
+        /// <param name="text">string to insert</param>
         /// <param name="identifier"></param>
         /// <param name="insertLastIfNotFound"></param>
         /// <returns></returns>
@@ -383,7 +383,7 @@ namespace EntityWorker.Core.Helper
 
 
         /// <summary>
-        /// Generate an entityKey Primary Id cant be null or empty
+        /// Generate an entityKey. Primary Id cant be null or empty
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
@@ -393,6 +393,7 @@ namespace EntityWorker.Core.Helper
         /// Generate an entityKey Primary Id cant be null or empty
         /// </summary>
         /// <param name="type">entitytyp</param>
+        /// <param name="id"></param>
         /// <returns></returns>
         public static string EntityKey(this Type type, object id) => type.GetActualType().FullName + id.ToString();
 
@@ -551,7 +552,7 @@ namespace EntityWorker.Core.Helper
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static String TableName<T>()
+        public static Table TableName<T>()
         {
             return typeof(T).TableName();
         }
@@ -561,16 +562,17 @@ namespace EntityWorker.Core.Helper
         /// </summary>
         /// <typeparam name="type"></typeparam>
         /// <returns></returns>
-        public static String TableName(this Type type)
+        public static Table TableName(this Type type)
         {
             if (CachedTableNames.ContainsKey(type))
                 return CachedTableNames[type];
-            return CachedTableNames.GetOrAdd(type, (type.GetCustomAttribute<Table>()?.Name ?? type.Name).CleanName());
+            return CachedTableNames.GetOrAdd(type, (type.GetCustomAttribute<Table>() ?? new Table(type.Name)));
         }
 
         /// <summary>
         /// Get the Primary key from type
         /// </summary>
+        /// <param name="item"></param>
         /// <param name="type"></param>
         /// <returns></returns>
         public static IFastDeepClonerProperty GetPrimaryKey(this object item)
@@ -790,12 +792,11 @@ namespace EntityWorker.Core.Helper
         internal static IList DataReaderConverter(Transaction.Transaction repository, IDataReader reader, DbCommandExtended command, Type type)
         {
             var tType = type.GetActualType();
+            var attachable = tType.GetPrimaryKey() != null;
             var baseListType = typeof(List<>);
             var listType = baseListType.MakeGenericType(tType);
             var iList = DeepCloner.CreateInstance(listType) as IList;
-            //#if (NETSTANDARD2_0 || NETSTANDARD1_3 || NETSTANDARD1_5)
             var props = DeepCloner.GetFastDeepClonerProperties(tType);
-            //#endif
             try
             {
                 var colNames = new Custom_ValueType<int, string>();
@@ -804,10 +805,9 @@ namespace EntityWorker.Core.Helper
                 {
                     object item = null;
                     object clItem = null;
-                    //#if (NETSTANDARD2_0 || NETSTANDARD1_3 || NETSTANDARD1_5)
 
                     item = DeepCloner.CreateInstance(tType);
-                    clItem = DeepCloner.CreateInstance(tType);
+                    clItem = attachable ? DeepCloner.CreateInstance(tType) : null;
                     var col = 0;
 
                     while (col < reader.FieldCount)
@@ -839,9 +839,7 @@ namespace EntityWorker.Core.Helper
                                 value = new Guid(value as byte[]);
 
                             var dataEncode = prop.GetCustomAttribute<DataEncode>();
-                            var toBase64String = prop.GetCustomAttribute<ToBase64String>();
-
-                            if (toBase64String != null)
+                            if (prop.ContainAttribute<ToBase64String>())
                             {
                                 if (value.ConvertValue<string>().IsBase64String())
                                     value = MethodHelper.DecodeStringFromBase64(value.ConvertValue<string>());
@@ -856,7 +854,8 @@ namespace EntityWorker.Core.Helper
                             else value = MethodHelper.ConvertValue(value, prop.PropertyType);
 
                             prop.SetValue(item, value);
-                            prop.SetValue(clItem, value);
+                            if (attachable)
+                                prop.SetValue(clItem, value);
                         }
                         col++;
                     }

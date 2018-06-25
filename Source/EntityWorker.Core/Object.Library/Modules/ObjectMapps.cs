@@ -25,9 +25,9 @@ namespace EntityWorker.Core.Object.Library.Modules
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public IObjectMapps<T> TableName(string name)
+        public IObjectMapps<T> TableName(string name, string schema = null)
         {
-            Extension.CachedTableNames.GetOrAdd(typeof(T), name.CleanName(), true);
+            Extension.CachedTableNames.GetOrAdd(typeof(T), new Table(name.CleanName(), schema), true);
             return this;
         }
 

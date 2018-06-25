@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using EntityWorker.Core.Attributes;
 
 namespace LightData.CMS.Modules.Library
@@ -37,7 +38,7 @@ namespace LightData.CMS.Modules.Library
         public string Description { get; set; }
 
         [ForeignKey(typeof(User))]
-        public string CreatedBy { get; set; }
+        public Guid? CreatedBy { get; set; }
 
         public User CreatedByUser { get; set; }
     }

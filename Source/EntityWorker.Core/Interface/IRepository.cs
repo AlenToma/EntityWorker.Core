@@ -133,14 +133,14 @@ namespace EntityWorker.Core.InterFace
         /// </summary>
         /// <param name="entity"></param>
 
-        void Delete(object entity);
+        IRepository Delete(object entity);
         /// <summary>
         /// Delete entity.
         /// SaveChanges is needed after
         /// </summary>
         /// <param name="entity"></param>
         /// 
-        Task DeleteAsync(object entity);
+        Task<IRepository> DeleteAsync(object entity);
 
         /// <summary>
         /// Save entity.
@@ -148,7 +148,7 @@ namespace EntityWorker.Core.InterFace
         /// </summary>
         /// <param name="entity"></param>
 
-        void Save(object entity);
+        IRepository Save(object entity);
 
         /// <summary>
         /// Save entity.
@@ -156,7 +156,7 @@ namespace EntityWorker.Core.InterFace
         /// </summary>
         /// <param name="entity"></param>
 
-        Task SaveAsync(object entity);
+        Task<IRepository> SaveAsync(object entity);
 
         /// <summary>
         /// Get Entity 
@@ -303,7 +303,7 @@ namespace EntityWorker.Core.InterFace
         /// <typeparam name="T"></typeparam>
         /// <param name="force">force recreation if table eg if exist delete then create agen</param>
 
-        void CreateTable<T>(bool force = false);
+        IRepository CreateTable<T>(bool force = false);
 
 
         /// <summary>
@@ -314,7 +314,7 @@ namespace EntityWorker.Core.InterFace
         /// <param name="type"></param>
         /// <param name="force">force recreation if table eg if exist delete then create agen</param>
 
-        void CreateTable(Type type, bool force = false);
+        IRepository CreateTable(Type type, bool force = false);
 
         /// <summary>
         /// Remove Table
@@ -322,7 +322,7 @@ namespace EntityWorker.Core.InterFace
         /// </summary>
         /// <typeparam name="T"></typeparam>
 
-        void RemoveTable<T>();
+        IRepository RemoveTable<T>();
 
         /// <summary>
         /// Remove Table
@@ -330,7 +330,7 @@ namespace EntityWorker.Core.InterFace
         /// </summary>
         /// <typeparam name="T"></typeparam>
 
-        void RemoveTable(Type type);
+        IRepository RemoveTable(Type type);
 
         /// <summary>
         /// Convert DbCommandExtended to List of Type T

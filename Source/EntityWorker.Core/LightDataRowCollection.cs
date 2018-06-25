@@ -57,7 +57,7 @@ namespace EntityWorker.Core
             {
                 var tItem = item.ToObject(tType);
                 iList?.Add(tItem);
-                if (!repository?.IsAttached(tItem) ?? true)
+                if (tItem.GetPrimaryKey() != null && (!repository?.IsAttached(tItem) ?? true))
                     repository?.Attach(tItem);
             }
             return iList;
@@ -73,7 +73,7 @@ namespace EntityWorker.Core
             {
                 var tItem = item.ToObject(tType);
                 iList?.Add(tItem);
-                if (!repository?.IsAttached(tItem) ?? true)
+                if (tItem.GetPrimaryKey() != null && (!repository?.IsAttached(tItem) ?? true))
                     repository?.Attach(tItem);
             }
             return (List<T>)iList;

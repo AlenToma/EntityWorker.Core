@@ -421,6 +421,7 @@
             </summary>
             <typeparam name="T"></typeparam>
             <param name="json"></param>
+            <param name="repository"></param>
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Helper.Extension.FromJson(System.String,System.Type)">
@@ -14954,7 +14955,7 @@
         </member>
         <member name="M:EntityWorker.Core.Transaction.Transaction.GetCodeLatestChanges(System.Reflection.Assembly)">
             <summary>
-            Return the new added column, tables or modified prooerty
+            Return the new added column, tables or modified Properties
             Property Rename is not supported. renaming a property x will end up removing the column x and adding column y so there will be dataloss
             Adding a primary key is not supported either
             Abstract classes are ignored by default
@@ -14986,7 +14987,7 @@
         <member name="M:EntityWorker.Core.Transaction.Transaction.MigrationConfig``1(``0)">
             <summary>
             Specifies the migrationConfig which contain a list Migration to migrate
-            the migration is executed automatic as long as you have class that inherit from IMigrationConfig
+            the migration is executed automatic(InitializeMigration()) as long as you have class that inherit from IMigrationConfig
             or you could manually execute a migration
             </summary>
             <typeparam name="T"></typeparam>
@@ -14994,7 +14995,7 @@
         </member>
         <member name="M:EntityWorker.Core.Transaction.Transaction.ValidateConnection">
             <summary>
-            Validate Connection is Open or broken
+            Validate Connection is Open or broken then reopen it
             </summary>
         </member>
         <member name="M:EntityWorker.Core.Transaction.Transaction.CreateTransaction">

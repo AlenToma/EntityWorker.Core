@@ -66,7 +66,7 @@ namespace EntityWorker.Core.Object.Library.XML
                             value = string.Empty;
                         if (prop.IsInternalType && value == LightDataTableShared.ValueByType(prop.PropertyType)) // Value is default
                         {
-                            var cmd = transaction.GetSqlCommand($"SELECT [{prop.GetPropertyName()}] FROM [{type.TableName()}] WHERE [{item.GetPrimaryKey().GetPropertyName()}] = {Querys.GetValueByType(item.GetPrimaryKeyValue(), transaction.DataBaseTypes)}");
+                            var cmd = transaction.GetSqlCommand($"SELECT [{prop.GetPropertyName()}] FROM {type.TableName().GetName(transaction.DataBaseTypes)} WHERE [{item.GetPrimaryKey().GetPropertyName()}] = {Querys.GetValueByType(item.GetPrimaryKeyValue(), transaction.DataBaseTypes)}");
                             var data = transaction.ExecuteScalar(cmd);
                             if (data == null)
                                 continue;
@@ -124,7 +124,7 @@ namespace EntityWorker.Core.Object.Library.XML
                             value = string.Empty;
                         if (prop.IsInternalType && value == LightDataTableShared.ValueByType(prop.PropertyType)) // Value is default
                         {
-                            var cmd = transaction.GetSqlCommand($"SELECT [{prop.GetPropertyName()}] FROM [{type.TableName()}] WHERE [{item.GetPrimaryKey().GetPropertyName()}] = {Querys.GetValueByType(item.GetPrimaryKeyValue(), transaction.DataBaseTypes)}");
+                            var cmd = transaction.GetSqlCommand($"SELECT [{prop.GetPropertyName()}] FROM {type.TableName().GetName(transaction.DataBaseTypes)} WHERE [{item.GetPrimaryKey().GetPropertyName()}] = {Querys.GetValueByType(item.GetPrimaryKeyValue(), transaction.DataBaseTypes)}");
                             var data = transaction.ExecuteScalar(cmd);
                             if (data == null)
                                 continue;

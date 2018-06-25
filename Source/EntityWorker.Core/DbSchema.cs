@@ -257,7 +257,7 @@ namespace EntityWorker.Core
             GlobalConfiguration.Log?.Info("Delete", o);
             var type = o.GetType().GetActualType();
             var props = DeepCloner.GetFastDeepClonerProperties(type);
-            var table = "[" + (type.TableName()) + "]";
+            var table =  type.TableName().GetName(_repository.DataBaseTypes) ;
             var primaryKey = o.GetType().GetPrimaryKey();
             var primaryKeyValue = o.GetPrimaryKeyValue();
             if (primaryKeyValue.ObjectIsNew())
@@ -362,7 +362,7 @@ namespace EntityWorker.Core
                 var primaryKeyId = !Extension.ObjectIsNew(o.GetPrimaryKeyValue()) ? o.GetPrimaryKeyValue() : null;
                 var availableColumns = _repository.GetColumnSchema(o.GetType());
                 var objectRules = o.GetType().GetCustomAttribute<Rule>();
-                var tableName = o.GetType().TableName();
+                var tableName = o.GetType().TableName().GetName(_repository.DataBaseTypes);
                 var primaryKeySubstitut = !primaryKey.GetCustomAttribute<PrimaryKey>().AutoGenerate ? primaryKeyId : null;
 
                 object dbTrigger = null;
@@ -396,13 +396,13 @@ namespace EntityWorker.Core
                 if (!updateOnly)
                     dbTrigger?.GetType().GetMethod("BeforeSave").Invoke(dbTrigger, new List<object>() { _repository, o }.ToArray()); // Check the Rule before save
                 object tempPrimaryKey = null;
-                var sql = "UPDATE [" + (o.GetType().TableName()) + "] SET ";
+                var sql = "UPDATE " + (o.GetType().TableName().GetName(_repository.DataBaseTypes)) + " SET ";
                 var cols = props.FindAll(x => (availableColumns.ContainsKey(x.GetPropertyName()) || availableColumns.ContainsKey(x.GetPropertyName().ToLower())) && (x.IsInternalType || x.ContainAttribute<JsonDocument>() || x.ContainAttribute<XmlDocument>()) && !x.ContainAttribute<ExcludeFromAbstract>() && x.GetCustomAttribute<PrimaryKey>() == null);
                 if (primaryKeyId == null)
                 {
                     if (primaryKey.PropertyType.IsNumeric() && primaryKey.GetCustomAttribute<PrimaryKey>().AutoGenerate)
                     {
-                        sql = "INSERT INTO [" + tableName + "](" + string.Join(",", cols.Select(x => "[" + x.GetPropertyName() + "]")) + ") Values(";
+                        sql = "INSERT INTO " + tableName + "(" + string.Join(",", cols.Select(x => "[" + x.GetPropertyName() + "]")) + ") Values(";
                         sql += string.Join(",", cols.Select(x => "@" + x.GetPropertyName())) + ");";
                         sql += _repository.DataBaseTypes == DataBaseTypes.Sqllight ? " select last_insert_rowid();" : (_repository.DataBaseTypes != DataBaseTypes.PostgreSql ? " SELECT IDENT_CURRENT('" + tableName + "');" : " SELECT currval('" + string.Format("{0}_{1}_seq", tableName, primaryKey.GetPropertyName()) + "');");
                     }
@@ -411,12 +411,12 @@ namespace EntityWorker.Core
                         var colList = new List<IFastDeepClonerProperty>();
                         tempPrimaryKey = primaryKeySubstitut == null ? Guid.NewGuid() : primaryKeySubstitut;
                         if (primaryKeySubstitut == null && primaryKey.PropertyType.IsNumeric())
-                            tempPrimaryKey = _repository.ExecuteScalar(_repository.GetSqlCommand(String.Format("SELECT MAX([{0}]) FROM [{1}]", primaryKey.GetPropertyName(), tableName))).ConvertValue<long>() + 1;
+                            tempPrimaryKey = _repository.ExecuteScalar(_repository.GetSqlCommand(String.Format("SELECT MAX([{0}]) FROM {1}", primaryKey.GetPropertyName(), tableName))).ConvertValue<long>() + 1;
                         else if (primaryKey.PropertyType == typeof(string))
                             tempPrimaryKey = tempPrimaryKey.ToString();
                         colList.Insert(0, primaryKey);
                         colList.AddRange(cols);
-                        sql = "INSERT INTO [" + tableName + "](" + string.Join(",", colList.Select(x => "[" + x.GetPropertyName() + "]")) + ") Values(";
+                        sql = "INSERT INTO " + tableName + "(" + string.Join(",", colList.Select(x => "[" + x.GetPropertyName() + "]")) + ") Values(";
                         sql += string.Join(",", colList.Select(x => "@" + x.GetPropertyName())) + "); select '" + tempPrimaryKey + "'";
                     }
                 }
@@ -541,6 +541,7 @@ namespace EntityWorker.Core
         private List<Type> _alreadyControlled = new List<Type>();
         public CodeToDataBaseMergeCollection GetDatabase_Diff(Type tableType, CodeToDataBaseMergeCollection str = null, List<Type> createdTables = null)
         {
+            _repository.CreateSchema(tableType);
             str = str ?? new CodeToDataBaseMergeCollection(_repository);
             tableType = tableType.GetActualType();
             if (_alreadyControlled.Any(x => x == tableType))
@@ -559,13 +560,13 @@ namespace EntityWorker.Core
             var props = DeepCloner.GetFastDeepClonerProperties(tableType).Where(x => !x.ContainAttribute<ExcludeFromAbstract>());
             var codeToDataBaseMerge = new CodeToDataBaseMerge() { Object_Type = tableType };
             var isPrimaryKey = "";
-            if (!IsValidName(tableName))
-                throw new EntityException(tableName + " is not a valid Name for the current provider " + _repository.DataBaseTypes);
+            if (!IsValidName(tableName.Name))
+                throw new EntityException(tableName.Name + " is not a valid Name for the current provider " + _repository.DataBaseTypes);
 
 
             if (!table.Values.Any())
             {
-                codeToDataBaseMerge.Sql = new StringBuilder("CREATE TABLE " + (_repository.DataBaseTypes == DataBaseTypes.Mssql ? "[dbo]." : "") + _repository.DataBaseTypes.GetValidSqlName(tableName) + "(");
+                codeToDataBaseMerge.Sql = new StringBuilder($"CREATE TABLE {tableName.GetName(_repository.DataBaseTypes)} (");
                 foreach (var prop in props.Where(x => (x.GetDbTypeByType(_repository.DataBaseTypes) != null || !x.IsInternalType || x.ContainAttribute<JsonDocument>() || x.ContainAttribute<XmlDocument>()) && !x.ContainAttribute<ExcludeFromAbstract>()).GroupBy(x => x.Name).Select(x => x.First())
                         .OrderBy(x => x.ContainAttribute<PrimaryKey>() ? null : x.Name))
                 {
@@ -603,9 +604,9 @@ namespace EntityWorker.Core
 
                     if (foreignKey != null)
                     {
-                        var key = propName + "-" + tableName;
+                        var key = propName + "-" + tableName.GetName(_repository.DataBaseTypes);
                         if (!str.Keys.ContainsKey(key))
-                            str.Keys.Add(key, new Tuple<string, ForeignKey>(tableName, foreignKey));
+                            str.Keys.Add(key, new Tuple<string, ForeignKey>(tableName.GetName(_repository.DataBaseTypes), foreignKey));
                     }
 
                     codeToDataBaseMerge.Sql.Append((Nullable.GetUnderlyingType(prop.PropertyType) != null || prop.PropertyType == typeof(string)) && !prop.ContainAttribute<NotNullable>() ? " NULL," : " NOT NULL,");
@@ -613,14 +614,14 @@ namespace EntityWorker.Core
 
                 if (str.Keys.Any() && _repository.DataBaseTypes == DataBaseTypes.Sqllight)
                 {
-                    while (str.Keys.Any(x => x.Value.Item1 == tableName))
+                    while (str.Keys.Any(x => x.Value.Item1 == tableName.Name))
                     {
 
-                        var key = str.Keys.FirstOrDefault(x => x.Value.Item1 == tableName);
+                        var key = str.Keys.FirstOrDefault(x => x.Value.Item1 == tableName.Name);
                         var type = key.Value.Item2.Type.GetActualType();
                         var keyPrimary = type.GetPrimaryKey().GetPropertyName();
                         var tb = type.TableName();
-                        codeToDataBaseMerge.Sql.Append("FOREIGN KEY(" + key.Key.Split('-')[0] + ") REFERENCES " + tb + "(" + keyPrimary + "),");
+                        codeToDataBaseMerge.Sql.Append("FOREIGN KEY(" + key.Key.Split('-')[0] + ") REFERENCES " + tb.GetName(_repository.DataBaseTypes) + "(" + keyPrimary + "),");
                         str.Keys.Remove(key.Key);
                     }
 
@@ -628,7 +629,7 @@ namespace EntityWorker.Core
 
                 if (!string.IsNullOrEmpty(isPrimaryKey) && _repository.DataBaseTypes == DataBaseTypes.Mssql)
                 {
-                    codeToDataBaseMerge.Sql.Append(" CONSTRAINT [PK_" + tableName + "] PRIMARY KEY CLUSTERED");
+                    codeToDataBaseMerge.Sql.Append(" CONSTRAINT [PK_" + tableName.Name + "] PRIMARY KEY CLUSTERED");
                     codeToDataBaseMerge.Sql.Append(" ([" + isPrimaryKey + "] ASC");
                     codeToDataBaseMerge.Sql.Append(")");
                     codeToDataBaseMerge.Sql.Append("WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]");
@@ -664,14 +665,14 @@ namespace EntityWorker.Core
 
                         if (_repository.DataBaseTypes != DataBaseTypes.Sqllight && !(prop.GetDbTypeListByType(_repository.DataBaseTypes).Any(x => x.ToLower().Contains(modify.DataType.ToLower()))) && _repository.DataBaseTypes != DataBaseTypes.PostgreSql)
                         {
-                            var constraine = Properties.Resources.DropContraine.Replace("@tb", $"'{tableName}'").Replace("@col", $"'{prop.GetPropertyName()}'");
+                            var constraine = Properties.Resources.DropContraine.Replace("@tb", $"'{tableName.Name}'").Replace("@col", $"'{prop.GetPropertyName()}'").Replace("@schema", $"'{tableName.Schema ?? ""}'");
                             codeToDataBaseMerge.Sql.Append(constraine);
-                            codeToDataBaseMerge.Sql.Append($"\nALTER TABLE [{tableName}] ALTER COLUMN [{prop.GetPropertyName()}] {prop.GetDbTypeByType(_repository.DataBaseTypes)} {((Nullable.GetUnderlyingType(propType) != null || propType == typeof(string)) && !prop.ContainAttribute<NotNullable>() ? " NULL" : " NOT NULL")}");
+                            codeToDataBaseMerge.Sql.Append($"\nALTER TABLE {tableName.GetName(_repository.DataBaseTypes)} ALTER COLUMN [{prop.GetPropertyName()}] {prop.GetDbTypeByType(_repository.DataBaseTypes)} {((Nullable.GetUnderlyingType(propType) != null || propType == typeof(string)) && !prop.ContainAttribute<NotNullable>() ? " NULL" : " NOT NULL")}");
                         }
                         else
                         {
                             if (!(prop.GetDbTypeListByType(_repository.DataBaseTypes).Any(x => x.ToLower().Contains(modify.DataType.ToLower()))) && _repository.DataBaseTypes == DataBaseTypes.PostgreSql)
-                                codeToDataBaseMerge.Sql.Append($"\nALTER TABLE [{tableName}] ALTER COLUMN [{prop.GetPropertyName()}] TYPE {prop.GetDbTypeByType(_repository.DataBaseTypes)}, ALTER COLUMN [{prop.GetPropertyName()}] SET DEFAULT {Querys.GetValueByTypeSTRING(MethodHelper.ConvertValue(null, propType), _repository.DataBaseTypes)};");
+                                codeToDataBaseMerge.Sql.Append($"\nALTER TABLE {tableName.GetName(_repository.DataBaseTypes)} ALTER COLUMN [{prop.GetPropertyName()}] TYPE {prop.GetDbTypeByType(_repository.DataBaseTypes)}, ALTER COLUMN [{prop.GetPropertyName()}] SET DEFAULT {Querys.GetValueByTypeSTRING(MethodHelper.ConvertValue(null, propType), _repository.DataBaseTypes)};");
 
 
                         }
@@ -680,7 +681,7 @@ namespace EntityWorker.Core
                         GetDatabase_Diff(prop.PropertyType, str, createdTables);
                     else
                     {
-                        codeToDataBaseMerge.Sql.Append(string.Format("\nALTER TABLE [{0}] ADD " + (_repository.DataBaseTypes == DataBaseTypes.PostgreSql ? "COLUMN" : "") + " [{1}] {2} {3} DEFAULT {4};", tableName, prop.GetPropertyName(), prop.GetDbTypeByType(_repository.DataBaseTypes),
+                        codeToDataBaseMerge.Sql.Append(string.Format("\nALTER TABLE {0} ADD " + (_repository.DataBaseTypes == DataBaseTypes.PostgreSql ? "COLUMN" : "") + " [{1}] {2} {3} DEFAULT {4};", tableName.GetName(_repository.DataBaseTypes), prop.GetPropertyName(), prop.GetDbTypeByType(_repository.DataBaseTypes),
                               (Nullable.GetUnderlyingType(propType) != null || propType == typeof(string)) && !prop.ContainAttribute<NotNullable>() ? " NULL" : " NOT NULL", Querys.GetValueByTypeSTRING(MethodHelper.ConvertValue(null, propType), _repository.DataBaseTypes)));
                     }
                 }
@@ -697,22 +698,22 @@ namespace EntityWorker.Core
                 {
                     if (_repository.DataBaseTypes == DataBaseTypes.Mssql)
                     {
-                        var constraine = Properties.Resources.DropContraine.Replace("@tb", $"'{tableName}'").Replace("@col", $"'{col.ColumnName}'");
+                        var constraine = Properties.Resources.DropContraine.Replace("@tb", $"'{tableName.Name}'").Replace("@col", $"'{col.ColumnName}'").Replace("@schema", $"'{tableName.Schema?? ""}'");
                         colRemove.Sql.Append(constraine);
 
                     }
                     //colRemove.Sql.Append("IF EXISTS (SELECT name FROM sys.objects  WHERE name = 'datedflt' AND type = 'D') DROP DEFAULT datedflt;");
-                    colRemove.Sql.Append(string.Format("\nALTER TABLE [{0}] DROP COLUMN IF EXISTS [{1}];", tableName, col.ColumnName));
+                    colRemove.Sql.Append(string.Format("\nALTER TABLE {0} DROP COLUMN IF EXISTS [{1}];", tableName.GetName(_repository.DataBaseTypes), col.ColumnName));
 
                 }
                 else
                 {
-                    colRemove.Sql.Append(string.Format("DROP TABLE IF exists [{0}_temp];\nCREATE TABLE [{0}_temp] AS SELECT {1} FROM [{0}];", tableName, string.Join(",", table.Values.ToList().FindAll(x =>
+                    colRemove.Sql.Append(string.Format("DROP TABLE IF exists [{0}_temp];\nCREATE TABLE [{0}_temp] AS SELECT {1} FROM [{0}];", tableName.Name, string.Join(",", table.Values.ToList().FindAll(x =>
                     props.Any(a => string.Equals(x.ColumnName, a.GetPropertyName(), StringComparison.CurrentCultureIgnoreCase) &&
                     (a.GetDbTypeByType(_repository.DataBaseTypes) != null || !a.IsInternalType) &&
                     !a.ContainAttribute<ExcludeFromAbstract>())).Select(x => x.ColumnName))));
-                    colRemove.Sql.Append(string.Format("DROP TABLE [{0}];\n", tableName));
-                    colRemove.Sql.Append(string.Format("ALTER TABLE [{0}_temp] RENAME TO [{0}]; ", tableName));
+                    colRemove.Sql.Append(string.Format("DROP TABLE [{0}];\n", tableName.Name));
+                    colRemove.Sql.Append(string.Format("ALTER TABLE [{0}_temp] RENAME TO [{0}]; ", tableName.Name));
                 }
                 colRemove.DataLoss = true;
             }
@@ -783,8 +784,8 @@ namespace EntityWorker.Core
                         {
                             Database.CachedColumnSchema.Remove(tType.FullName + _repository.DataBaseTypes.ToString());
                             var tableName = tType.TableName();
-                            _repository.ExecuteNonQuery(_repository.GetSqlCommand("DELETE FROM [" + tableName + "];"));
-                            var cmd = _repository.GetSqlCommand("DROP TABLE [" + tableName + "];");
+                            _repository.ExecuteNonQuery(_repository.GetSqlCommand("DELETE FROM " + tableName.GetName(_repository.DataBaseTypes) + ";"));
+                            var cmd = _repository.GetSqlCommand("DROP TABLE " + tableName.GetName(_repository.DataBaseTypes) + ";");
                             _repository.ExecuteNonQuery(cmd);
                             Database.CachedColumnSchema.Remove(tType.FullName + _repository.DataBaseTypes.ToString());
                         }

@@ -19,7 +19,6 @@ using EntityWorker.Core.SqlQuerys;
 using EntityWorker.Core.Postgres;
 using EntityWorker.Core.Object.Library.Modules;
 using System.IO;
-using System.IO.Compression;
 using EntityWorker.Core.Object.Library.Gzip;
 using EntityWorker.Core.Object.Library.DataBase;
 
@@ -59,6 +58,7 @@ namespace EntityWorker.Core.Transaction
         /// <param name="dataBaseTypes">The type of the database Ms-sql or Sql-light</param>
         public Transaction(string connectionString, DataBaseTypes dataBaseTypes) : base()
         {
+
             base._transaction = this;
             _attachedObjects = new Custom_ValueType<string, object>();
             if (string.IsNullOrEmpty(connectionString))
@@ -116,7 +116,7 @@ namespace EntityWorker.Core.Transaction
 
 
         /// <summary>
-        /// Return the new added column, tables or modified prooerty
+        /// Return the new added column, tables or modified Properties
         /// Property Rename is not supported. renaming a property x will end up removing the column x and adding column y so there will be dataloss
         /// Adding a primary key is not supported either
         /// Abstract classes are ignored by default
@@ -245,7 +245,7 @@ namespace EntityWorker.Core.Transaction
 
         /// <summary>
         /// Specifies the migrationConfig which contain a list Migration to migrate
-        /// the migration is executed automatic as long as you have class that inherit from IMigrationConfig
+        /// the migration is executed automatic(InitializeMigration()) as long as you have class that inherit from IMigrationConfig
         /// or you could manually execute a migration
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -295,31 +295,39 @@ namespace EntityWorker.Core.Transaction
         }
 
         /// <summary>
-        /// Validate Connection is Open or broken
+        /// Validate Connection is Open or broken then reopen it
         /// </summary>
         protected void ValidateConnection()
         {
-            if (SqlConnection == null)
+            try
             {
-                if (DataBaseTypes == DataBaseTypes.Sqllight)
+                if (SqlConnection == null)
                 {
-                    if (SqlConnection == null)
-                        SqlConnection = new SQLiteConnection(ConnectionString);
+                    if (DataBaseTypes == DataBaseTypes.Sqllight)
+                    {
+                        if (SqlConnection == null)
+                            SqlConnection = new SQLiteConnection(ConnectionString);
+                    }
+                    else if (DataBaseTypes == DataBaseTypes.Mssql)
+                    {
+                        if (SqlConnection == null)
+                            SqlConnection = new SqlConnection(ConnectionString);
+                    }
+                    else
+                    {
+                        if (SqlConnection == null)
+                            SqlConnection = new NpgsqlConnection(ConnectionString);
+                    }
                 }
-                else if (DataBaseTypes == DataBaseTypes.Mssql)
-                {
-                    if (SqlConnection == null)
-                        SqlConnection = new SqlConnection(ConnectionString);
-                }
-                else
-                {
-                    if (SqlConnection == null)
-                        SqlConnection = new NpgsqlConnection(ConnectionString);
-                }
-            }
 
-            if (SqlConnection.State == ConnectionState.Broken || SqlConnection.State == ConnectionState.Closed)
-                SqlConnection.Open();
+                if (SqlConnection.State == ConnectionState.Broken || SqlConnection.State == ConnectionState.Closed)
+                    SqlConnection.Open();
+
+            }
+            catch (Exception e)
+            {
+                throw new EntityException(e.Message);
+            }
         }
 
 
@@ -681,7 +689,7 @@ namespace EntityWorker.Core.Transaction
             GlobalConfiguration.Log?.Info("Attaching", key);
             if (objcDbEntity == null)
                 throw new EntityException("DbEntity cant be null");
-            if (Extension.ObjectIsNew(objcDbEntity.GetPrimaryKeyValue()))
+            if (objcDbEntity.GetPrimaryKey() == null || Extension.ObjectIsNew(objcDbEntity.GetPrimaryKeyValue()))
                 return;
             if (_attachedObjects.ContainsKey(key))
             {
@@ -710,7 +718,8 @@ namespace EntityWorker.Core.Transaction
             {
                 var aValue = prop.GetValue(entity);
                 var bValue = prop.GetValue(originalObject);
-                if ((!prop.IsInternalType && !prop.ContainAttribute<JsonDocument>()) ||
+                if ((!prop.IsInternalType &&
+                    !prop.ContainAttribute<JsonDocument>()) ||
                     prop.ContainAttribute<ExcludeFromAbstract>() ||
                     prop.ContainAttribute<PrimaryKey>() ||
                     prop.ContainAttribute<XmlDocument>() ||
@@ -806,21 +815,23 @@ namespace EntityWorker.Core.Transaction
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public virtual async Task DeleteAsync(object entity)
+        public virtual async Task<IRepository> DeleteAsync(object entity)
         {
             await Task.Run(() =>
             {
                 _dbSchema.DeleteAbstract(entity);
             });
+            return await Task.FromResult<IRepository>(this);
         }
 
         /// <summary>
         /// Remove Row
         /// </summary>
         /// <param name="entity"></param>
-        public virtual void Delete(object entity)
+        public virtual IRepository Delete(object entity)
         {
             _dbSchema.DeleteAbstract(entity);
+            return this;
         }
 
         /// <summary>
@@ -828,21 +839,24 @@ namespace EntityWorker.Core.Transaction
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public virtual async Task SaveAsync(object entity)
+        public virtual async Task<IRepository> SaveAsync(object entity)
         {
+
             await Task.Run(() =>
             {
                 _dbSchema.Save(entity);
             });
+            return await Task.FromResult<IRepository>(this);
         }
 
         /// <summary>
         /// Save object
         /// </summary>
         /// <param name="entity"></param>
-        public virtual void Save(object entity)
+        public virtual IRepository Save(object entity)
         {
             _dbSchema.Save(entity);
+            return this;
         }
 
         /// <summary>
@@ -964,9 +978,11 @@ namespace EntityWorker.Core.Transaction
         /// <typeparam name="T"></typeparam>
         /// <param name="force"> remove and recreate all</param>
 
-        public void CreateTable<T>(bool force = false)
+        public IRepository CreateTable<T>(bool force = false)
         {
             _dbSchema.CreateTable(typeof(T), null, force);
+
+            return this;
         }
 
         /// <summary>
@@ -977,18 +993,21 @@ namespace EntityWorker.Core.Transaction
         /// <param name="type"></param>
         /// <param name="force"> remove and recreate all</param>
 
-        public void CreateTable(Type type, bool force = false)
+        public IRepository CreateTable(Type type, bool force = false)
         {
             _dbSchema.CreateTable(type, null, force);
+
+            return this;
         }
 
         /// <summary>
         /// This will remove the table and if it has a ForeignKey to other tables it will also remove those table to
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        public void RemoveTable<T>()
+        public IRepository RemoveTable<T>()
         {
             _dbSchema.RemoveTable(typeof(T));
+            return this;
         }
 
         /// <summary>
@@ -996,9 +1015,10 @@ namespace EntityWorker.Core.Transaction
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="type"></param>
-        public void RemoveTable(Type type)
+        public IRepository RemoveTable(Type type)
         {
             _dbSchema.RemoveTable(type);
+            return this;
         }
 
         /// <summary>
@@ -1128,17 +1148,14 @@ namespace EntityWorker.Core.Transaction
         /// <returns></returns>
         public byte[] CreatePackage<T>(T package) where T : PackageEntity
         {
-
             if (package == null)
                 throw new EntityException("Package cant be null");
             using (var mem = new MemoryStream())
             {
                 using (var db = new LiteDB.LiteDatabase(mem))
                 {
-
                     var packageCollection = db.GetCollection<T>("Packages");
                     packageCollection.Insert(package);
-
                     return GzipUtility.Compress(new ByteCipher(GlobalConfiguration.PackageDataEncode_Key, DataCipherKeySize.Key_128).Encrypt(mem.ToArray()));
                 }
             }

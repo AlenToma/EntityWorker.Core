@@ -24,7 +24,7 @@ namespace EntityWorker.Core.SqlQuerys
         private static Regex StringyFyExp = new Regex(@"<Stringify>\[.*?\]</Stringify>");
         private static string boolString = "<bool>[#]</bool>";
         private static Regex BoolExp = new Regex(@"<bool>\[.*?\]</bool>");
-        internal static Custom_ValueType<Type, List<string>> CachedColumns = new Custom_ValueType<Type, List<string>>();
+        internal static Custom_ValueType<string, List<string>> CachedColumns = new Custom_ValueType<string, List<string>>();
 
         private static string dataEncodeString = "<DataEncode>[#]</DataEncode>";
         private static Regex DataEncodeExp = new Regex(@"<DataEncode>\[.*?\]</DataEncode>");
@@ -50,10 +50,13 @@ namespace EntityWorker.Core.SqlQuerys
 
             _transaction = transaction;
             _obType = type.GetActualType();
-            if (!CachedColumns.ContainsKey(_obType))
-                _columns = CachedColumns.GetOrAdd(_obType, _transaction.GetColumnSchema(_obType).Select(x => $"[{_obType.TableName()}].[{x.Key}]").ToList());
+            DataBaseTypes = transaction.DataBaseTypes;
+            var key = _obType.FullName + DataBaseTypes;
+
+            if (!CachedColumns.ContainsKey(key))
+                _columns = CachedColumns.GetOrAdd(key, _transaction.GetColumnSchema(_obType).Select(x => $"{_obType.TableName().GetName(DataBaseTypes)}.[{x.Key}]").ToList());
             else
-                _columns = CachedColumns[_obType];
+                _columns = CachedColumns[key];
             _primaryId  = _obType.GetPrimaryKey()?.GetPropertyName();
 
         }
@@ -61,10 +64,11 @@ namespace EntityWorker.Core.SqlQuerys
         public LightDataLinqToNoSql(DataBaseTypes dataBaseTypes)
         {
             DataBaseTypes = dataBaseTypes;
-            if (!CachedColumns.ContainsKey(_obType))
-                _columns = CachedColumns.GetOrAdd(_obType, _transaction.GetColumnSchema(_obType).Select(x => $"[{_obType.TableName()}].[{x.Key}]").ToList());
+            var key = _obType.FullName + DataBaseTypes;
+            if (!CachedColumns.ContainsKey(key))
+                _columns = CachedColumns.GetOrAdd(key, _transaction.GetColumnSchema(_obType).Select(x => $"{_obType.TableName().GetName(DataBaseTypes)}.[{x.Key}]").ToList());
             else
-                _columns = CachedColumns[_obType];
+                _columns = CachedColumns[key];
         }
 
         public string Quary
@@ -72,8 +76,8 @@ namespace EntityWorker.Core.SqlQuerys
             get
             {
                 WhereClause.RemoveAll(x => string.IsNullOrEmpty(x));
-                var tableName = _obType.TableName();
-                var query = "SELECT " + string.Join(",", _columns) + " FROM " + DataBaseTypes.GetValidSqlName(tableName) + " " + System.Environment.NewLine +
+                var tableName = _obType.TableName().GetName(DataBaseTypes);
+                var query = "SELECT " + string.Join(",", _columns) + " FROM " + tableName + " " + System.Environment.NewLine +
                        string.Join(Environment.NewLine, JoinClauses.Values.Select(x => x.Item2)) +
                        Environment.NewLine + (WhereClause.Any() ? "WHERE " : string.Empty) + string.Join(" AND ", WhereClause.ToArray());
                 query = query.TrimEnd(" AND ").TrimEnd(" OR ");
@@ -114,8 +118,8 @@ namespace EntityWorker.Core.SqlQuerys
             get
             {
                 WhereClause.RemoveAll(x => string.IsNullOrEmpty(x));
-                var tableName = _obType.TableName();
-                var query = "SELECT count(distinct " + DataBaseTypes.GetValidSqlName(tableName) + "." + _primaryId + ") as items FROM " + DataBaseTypes.GetValidSqlName(tableName) + " " + Environment.NewLine +
+                var tableName = _obType.TableName().GetName(DataBaseTypes);
+                var query = "SELECT count(distinct " + tableName + "." + _primaryId + ") as items FROM " + tableName + " " + Environment.NewLine +
                        string.Join(Environment.NewLine, JoinClauses.Values.Select(x => x.Item2)) +
                        Environment.NewLine + (WhereClause.Any() ? "WHERE " : string.Empty) + string.Join(" AND ", WhereClause.ToArray());
                 query = query.TrimEnd(" AND ").TrimEnd(" OR ");
@@ -127,8 +131,8 @@ namespace EntityWorker.Core.SqlQuerys
         {
             get
             {
-                var tableName = _obType.TableName();
-                return " EXISTS (SELECT 1 FROM " + DataBaseTypes.GetValidSqlName(tableName) + " " + Environment.NewLine +
+                var tableName = _obType.TableName().GetName(DataBaseTypes);
+                return " EXISTS (SELECT 1 FROM " + tableName + " " + Environment.NewLine +
                        string.Join(Environment.NewLine, JoinClauses.Values.Select(x => x.Item2)) +
                        Environment.NewLine + "WHERE " + string.Join(" AND ", WhereClause.ToArray()) + ")";
             }
@@ -796,8 +800,8 @@ namespace EntityWorker.Core.SqlQuerys
                     var cl = hasValueAttr ? (m.Expression as MemberExpression).Expression.Type : m.Expression.Type;
                     var prop = DeepCloner.GetFastDeepClonerProperties(cl).First(x => x.Name == (hasValueAttr ? (m.Expression as MemberExpression).Member.Name : m.Member.Name));
                     var name = prop.GetPropertyName();
-                    var table = cl.TableName();
-                    var columnName = string.Format("[{0}].[{1}]", table, name).CleanValidSqlName(DataBaseTypes);
+                    var table = cl.TableName().GetName(DataBaseTypes);
+                    var columnName = string.Format("{0}.[{1}]", table, name).CleanValidSqlName(DataBaseTypes);
                     var dataEncode = prop.GetCustomAttribute<DataEncode>();
                     if (columnOnly)
                         return columnName;
@@ -859,13 +863,13 @@ namespace EntityWorker.Core.SqlQuerys
                     var v = "";
                     if (prop != null)
                     {
-                        v += string.Format("LEFT JOIN [{0}] {1} ON [{2}].[{3}] = [{4}].[{5}]", table, randomTableName, randomTableName, primaryId, parentTable, prop.GetPropertyName()).CleanValidSqlName(DataBaseTypes);
+                        v += string.Format("LEFT JOIN {0} {1} ON [{2}].[{3}] = {4}.[{5}]", table.GetName(DataBaseTypes), randomTableName, randomTableName, primaryId, parentTable.GetName(DataBaseTypes), prop.GetPropertyName()).CleanValidSqlName(DataBaseTypes);
                     }
                     else
                     {
                         prop = DeepCloner.GetFastDeepClonerProperties(cl).FirstOrDefault(x => x.ContainAttribute<ForeignKey>() && x.GetCustomAttribute<ForeignKey>().Type == parentType);
                         if (prop != null)
-                            v += string.Format("LEFT JOIN [{0}] {1} ON [{2}].[{3}] = [{4}].[{5}]", table, randomTableName, randomTableName, prop.GetPropertyName(), parentTable, primaryId).CleanValidSqlName(DataBaseTypes);
+                            v += string.Format("LEFT JOIN {0} {1} ON [{2}].[{3}] = {4}.[{5}]", table.GetName(DataBaseTypes), randomTableName, randomTableName, prop.GetPropertyName(), parentTable.GetName(DataBaseTypes), primaryId).CleanValidSqlName(DataBaseTypes);
                     }
 
                     if (string.IsNullOrEmpty(v))
@@ -906,7 +910,7 @@ namespace EntityWorker.Core.SqlQuerys
                     var v = "";
                     if (prop != null)
                     {
-                        v += string.Format("INNER JOIN [{0}] {1} ON [{2}].[{3}] = [{4}].[{5}]", parentTable, randomTableName, table, primaryId, randomTableName, prop.GetPropertyName()).CleanValidSqlName(DataBaseTypes);
+                        v += string.Format("INNER JOIN {0} {1} ON {2}.[{3}] = [{4}].[{5}]", parentTable.GetName(DataBaseTypes), randomTableName, table.GetName(DataBaseTypes), primaryId, randomTableName, prop.GetPropertyName()).CleanValidSqlName(DataBaseTypes);
                     }
                     else
                     {

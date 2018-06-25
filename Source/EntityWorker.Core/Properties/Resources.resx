@@ -926,8 +926,13 @@
 &lt;/DocumentElement&gt;</value>
   </data>
   <data name="dropConstraine" xml:space="preserve">
-    <value>Declare @TableName varchar(100) = @tb
-Declare @ColumnName varchar(100) = @col
+    <value>Declare @TableName varchar(100) = @tb;
+Declare @ColumnName varchar(100) = @col;
+declare @fullName varchar(100) = @tb;
+if (@schema  &lt;&gt; '')
+begin
+set @fullName = @schema +'.' + @tb
+end;
 DECLARE @FOREIGN_KEY_NAME VARCHAR(100)
 DECLARE FOREIGN_KEY_CURSOR CURSOR FOR
 select o.name from sysobjects o 
@@ -944,7 +949,7 @@ OPEN FOREIGN_KEY_CURSOR
 FETCH NEXT FROM FOREIGN_KEY_CURSOR INTO @FOREIGN_KEY_NAME
 WHILE @@FETCH_STATUS = 0
     BEGIN
-       DECLARE @DROP_COMMAND NVARCHAR(500) = 'ALTER TABLE ['+@TableName+'] DROP CONSTRAINT' + ' ' + @FOREIGN_KEY_NAME
+       DECLARE @DROP_COMMAND NVARCHAR(500) = 'ALTER TABLE '+@fullName+' DROP CONSTRAINT' + ' ' + @FOREIGN_KEY_NAME
 
        EXECUTE Sp_executesql @DROP_COMMAND
 

@@ -1,19 +1,23 @@
 ﻿using EntityWorker.Core.Attributes;
 using LightData.CMS.Modules.Interface;
+using System;
 
 namespace LightData.CMS.Modules.Library
 {
+    [Table("Users", "geto")]
     public class User
     {
         public User(string txt)
         {
 
         }
-        public string Id { get; set; }
+        public Guid? Id { get; set; }
 
         public string UserName { get; set; }
 
         public string Password { get; set; }
+
+        //public string test { get; set; }
 
         public System.Guid RoleId { get; set; }
 

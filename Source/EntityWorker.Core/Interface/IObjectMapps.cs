@@ -13,11 +13,14 @@ namespace EntityWorker.Core.Interface
     public interface IObjectMapps<T> where T : class
     {
         /// <summary>
-        /// Assign diffrent name for the object in the database
+        /// Assign diffrent name for the object in the database.
+        /// schema works only for MSSQl and postGreSql
+        /// Database should allow Create Schema for this to work or the Schema should already be created
         /// </summary>
         /// <param name="name"></param>
+        /// <param name="schema"></param>
         /// <returns></returns>
-        IObjectMapps<T> TableName(string name);
+        IObjectMapps<T> TableName(string name, string schema = null);
 
         /// <summary>
         /// Assign a rule to object
@@ -42,8 +45,6 @@ namespace EntityWorker.Core.Interface
         /// <returns></returns>
         IObjectMapps<T> HasXmlIgnore<TP>(Expression<Func<T, TP>> action);
 
-
-
         /// <summary>
         /// Use this when you have types that are unknown like interface wich it can takes more than one type 
         /// </summary>
@@ -61,7 +62,6 @@ namespace EntityWorker.Core.Interface
         /// <param name="dataBaseTypes">null for all providers</param>
         /// <returns></returns>
         IObjectMapps<T> HasColumnType<TP>(Expression<Func<T, TP>> action, string dataType, DataBaseTypes? dataBaseTypes = null);
-
 
         /// <summary>
         /// Add Primary Key to Property

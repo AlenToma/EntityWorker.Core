@@ -35,7 +35,7 @@ namespace LightData.CMS.Modules.Repository
         protected override void OnModuleConfiguration(IModuleBuilder moduleBuilder)
         {
             moduleBuilder.Entity<User>()
-                .TableName("Users")
+                .TableName("Users", "geto")
                 .HasKnownType(x=> x.Person, typeof(Person))
                 .HasPrimaryKey(x => x.Id, false)
                 .NotNullable(x => x.UserName)

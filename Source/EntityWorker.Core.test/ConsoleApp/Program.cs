@@ -67,7 +67,7 @@ namespace ConsoleApp1
                 var jsonUser = new UserTemp()
                 {
                     User = user,
-                    UserXml = user
+                    UserXml = user,
                 };
                 rep.Save(jsonUser);
 
@@ -87,7 +87,7 @@ namespace ConsoleApp1
                 var jsonUser = new UserTemp()
                 {
                     User = user,
-                    UserXml = user
+                    UserXml = user,
                 };
                 rep.Save(jsonUser);
 
@@ -107,7 +107,7 @@ namespace ConsoleApp1
                 var jsonUser = new UserTemp()
                 {
                     User = user,
-                    UserXml = user
+                    UserXml = user,
                 };
                 rep.Save(jsonUser);
 
@@ -311,7 +311,7 @@ namespace ConsoleApp1
                 execute(rep.Get<User>().LoadChildren(), "Get All");
                 execute(rep.Get<Person>().Where(x => x.FirstName.Contains("Admin") || !string.IsNullOrEmpty(x.FirstName) || string.IsNullOrEmpty(x.FirstName) == false && x.Id != id), "IsNullOrEmpty");
 
-                execute(rep.DataReaderConverter<User>(rep.GetSqlCommand("select * from Users")).LoadChildren(), "CustomSelect");
+                execute(rep.DataReaderConverter<User>(rep.GetSqlCommand("select * from geto.Users")).LoadChildren(), "CustomSelect");
 
                 execute(rep.Get<Person>().Where(x => x.Addresses.Any(a => a.Country.Name.Contains("US") && !string.IsNullOrEmpty(a.PostalCode))), "Any");
 
@@ -334,7 +334,7 @@ namespace ConsoleApp1
                 execute(rep.Get<Person>().Where(x => x.FirstName.Contains("Admin") || !string.IsNullOrEmpty(x.FirstName) || string.IsNullOrEmpty(x.FirstName) == false && x.Id != id), "IsNullOrEmpty");
 
 
-                execute(rep.DataReaderConverter<User>(rep.GetSqlCommand("select * from Users")).LoadChildren(), "CustomSelect");
+                execute(rep.DataReaderConverter<User>(rep.GetSqlCommand("select * from geto.Users")).LoadChildren(), "CustomSelect");
 
 
                 execute(rep.Get<Person>().Where(x => x.Addresses.Any(a => a.Country.Name.Contains("US") && !string.IsNullOrEmpty(a.PostalCode))), "Any");

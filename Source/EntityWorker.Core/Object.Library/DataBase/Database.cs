@@ -36,6 +36,34 @@ namespace EntityWorker.Core.Object.Library.DataBase
         }
 
         /// <summary>
+        /// create schema if not exist
+        /// </summary>
+        /// <param name="type"></param>
+        public void CreateSchema(Type type)
+        {
+            try
+            {
+                var schema = type.GetActualType().TableName().Schema;
+                if (string.IsNullOrEmpty(schema) || _transaction.DataBaseTypes == DataBaseTypes.Sqllight)
+                    return;
+                var sql = _transaction.GetSqlCommand(_transaction.DataBaseTypes == DataBaseTypes.Mssql ?
+                    $"SELECT 1 FROM sys.schemas WHERE name = String[{schema}]" :
+                    $"SELECT 1 FROM information_schema.schemata WHERE schema_name = String[{schema}]");
+                var res = _transaction.ExecuteScalar(sql);
+                if (res?.ToString() == "1")
+                    return;
+                else
+                {
+                    _transaction.ExecuteNonQuery(_transaction.GetSqlCommand("CREATE SCHEMA " + schema + ""));
+                }
+            }catch(Exception e)
+            {
+                throw new EntityException(e.Message);
+            }
+
+        }
+
+        /// <summary>
         /// Get the ColumnSchema  
         /// </summary>
         /// <param name="datatype"></param>
@@ -49,10 +77,9 @@ namespace EntityWorker.Core.Object.Library.DataBase
                     return CachedColumnSchema[key];
                 datatype = datatype.GetActualType();
                 var tableName = datatype.TableName();
-                var sql = $"SELECT COLUMN_NAME as columnname, data_type as datatype ,TABLE_CATALOG as db,TABLE_NAME as tb , IS_NULLABLE as isnullable FROM INFORMATION_SCHEMA.COLUMNS WHERE LOWER(TABLE_NAME) = LOWER(String[{tableName}])";
+                var sql = $"SELECT COLUMN_NAME as columnname, data_type as datatype ,TABLE_CATALOG as db,TABLE_NAME as tb , IS_NULLABLE as isnullable FROM INFORMATION_SCHEMA.COLUMNS WHERE LOWER(TABLE_NAME) = LOWER(String[{tableName.Name}])";
                 if (_transaction.DataBaseTypes == DataBaseTypes.Sqllight)
-                    sql = $"SELECT name  as columnname, type as datatype FROM pragma_table_info(String[{tableName}])";
-
+                    sql = $"SELECT name  as columnname, type as datatype FROM pragma_table_info(String[{tableName.Name}])";
                 var columns = (List<ColumnSchema>)_transaction.DataReaderConverter(_transaction.GetSqlCommand(sql), typeof(ColumnSchema));
                 var dic = new Custom_ValueType<string, ColumnSchema>();
                 if (columns != null)
