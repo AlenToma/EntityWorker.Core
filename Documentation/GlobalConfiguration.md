@@ -16,7 +16,7 @@ EntityWorker.Core.GlobalConfiguration.DataEncode_Key = "the key used to Encode t
 EntityWorker.Core.GlobalConfiguration.PackageDataEncode_Key = "packageSecurityKey";
 
 
-// Last set the culture for converting the data eg DateTime, decimal.
+// Set the culture for converting the data eg DateTime, decimal.
 EntityWorker.Core.GlobalConfiguration.CultureInfo = new CultureInfo("en");
 
 /// read logger section to know how to setup

@@ -10,7 +10,6 @@ lets see how EntityWorker gets the changed objects
                 var newValue = changes.First().NewValue;
                 var propertyName = changes.First().PropertyName;
                 rep.Save(user);
-                var changes2 = rep.GetObjectChanges(user);
                 rep.SaveChanges();
             }
 

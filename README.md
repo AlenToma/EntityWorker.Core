@@ -5,10 +5,11 @@ EntityWorker is an alternative to entityframwork. is more flexible and much fast
 ![screenshot](https://github.com/AlenToma/EntityWorker.Core/blob/master/EF_VS_EW.PNG?raw=true)
 
 ## CodeProject
-[EntityWorker-Core-An-Alternative-to-Entity-Framewo](https://www.codeproject.com/Tips/1222424/EntityWorker-Core-An-Alternative-to-Entity-Framewo)
+* [CodeProject](https://www.codeproject.com/Tips/1222424/EntityWorker-Core-An-Alternative-to-Entity-Framewo)
 
 ## EntityWorker.Core in Action
-[LightData.CMS](https://github.com/AlenToma/LightData.CMS)
+* [LightData.CMS](https://github.com/AlenToma/LightData.CMS)
+* [IProduct](https://github.com/AlenToma/IProduct)
 
 ## Support for Providers
 * Mssql
@@ -37,6 +38,7 @@ See Code Example for more info.
 * [Json](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Json.md)
 * [Xml](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Xml.md)
 * [Save](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Save.md)
+* [Delete](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Delete.md)
 * [LinqToSql](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/LinqToSql.md)
 * [Dynamic linq](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Dynamic.Linq.md)
 * [Custom ISqlQueryable](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/CustomQueries.md)
