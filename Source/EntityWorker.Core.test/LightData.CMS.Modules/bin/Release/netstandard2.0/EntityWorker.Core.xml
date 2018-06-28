@@ -991,9 +991,12 @@
         </member>
         <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.TableName(System.String,System.String)">
             <summary>
-            Assign diffrent name for the object in the database
+            Assign diffrent name for the object in the database.
+            schema works only for MSSQl and postGreSql
+            Database should allow Create Schema for this to work or the Schema should already be created
             </summary>
             <param name="name"></param>
+            <param name="schema"></param>
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Interface.IObjectMapps`1.HasRule``1">

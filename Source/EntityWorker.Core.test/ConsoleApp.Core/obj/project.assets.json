@@ -373,7 +373,7 @@
           }
         }
       },
-      "EntityWorker.Core/2.2.5": {
+      "EntityWorker.Core/2.2.6": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v2.0",
         "dependencies": {
@@ -390,7 +390,7 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v2.0",
         "dependencies": {
-          "EntityWorker.Core": "2.2.5"
+          "EntityWorker.Core": "2.2.6"
         },
         "compile": {
           "bin/placeholder/LightData.CMS.Modules.dll": {}
@@ -1245,7 +1245,7 @@
         "version.txt"
       ]
     },
-    "EntityWorker.Core/2.2.5": {
+    "EntityWorker.Core/2.2.6": {
       "type": "project",
       "path": "../../EntityWorker.Core/EntityWorker.Core.csproj",
       "msbuildProject": "../../EntityWorker.Core/EntityWorker.Core.csproj"
@@ -1258,7 +1258,7 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.0": [
-      "EntityWorker.Core >= 2.2.5",
+      "EntityWorker.Core >= 2.2.6",
       "LightData.CMS.Modules >= 1.0.0",
       "Microsoft.NETCore.App >= 2.0.0"
     ]

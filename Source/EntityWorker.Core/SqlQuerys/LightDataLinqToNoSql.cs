@@ -390,6 +390,16 @@ namespace EntityWorker.Core.SqlQuerys
             else if (m.Method.ReturnType.IsInternalType())
             {
                 CleanDecoder(ValuetoSql(Expression.Lambda(m).Compile().DynamicInvoke()));
+                return m;
+            }
+            else if ((m.Arguments?.Any() ?? false))
+            {
+                var expression = m.Arguments.First();
+                if ((expression?.ToString().Contains("DisplayClass") ?? false))
+                {
+                    CleanDecoder(ValuetoSql(Expression.Lambda(m).Compile().DynamicInvoke()));
+                    return m;
+                }else throw new EntityException(string.Format("The method '{0}' is not supported", m.Method.Name));
             }
 
             throw new EntityException(string.Format("The method '{0}' is not supported", m.Method.Name));

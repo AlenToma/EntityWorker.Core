@@ -257,7 +257,7 @@ namespace EntityWorker.Core
             GlobalConfiguration.Log?.Info("Delete", o);
             var type = o.GetType().GetActualType();
             var props = DeepCloner.GetFastDeepClonerProperties(type);
-            var table =  type.TableName().GetName(_repository.DataBaseTypes) ;
+            var table =  type.TableName().GetName(_repository.DataBaseTypes);
             var primaryKey = o.GetType().GetPrimaryKey();
             var primaryKeyValue = o.GetPrimaryKeyValue();
             if (primaryKeyValue.ObjectIsNew())
@@ -269,7 +269,7 @@ namespace EntityWorker.Core
                 Querys.Where(_repository.DataBaseTypes).Column(primaryKey.GetPropertyName()).Equal(primaryKeyValue).Execute()
             };
 
-            foreach (var prop in props.Where(x => !x.IsInternalType && x.GetCustomAttribute<IndependentData>() == null && !x.ContainAttribute<JsonDocument>() && x.GetCustomAttribute<ExcludeFromAbstract>() == null))
+            foreach (var prop in props.Where(x => !x.IsInternalType && x.GetCustomAttribute<IndependentData>() == null && !x.ContainAttribute<JsonDocument>() && !x.ContainAttribute<XmlDocument>() && x.GetCustomAttribute<ExcludeFromAbstract>() == null))
             {
                 var value = prop.GetValue(o);
 
@@ -702,7 +702,6 @@ namespace EntityWorker.Core
                         colRemove.Sql.Append(constraine);
 
                     }
-                    //colRemove.Sql.Append("IF EXISTS (SELECT name FROM sys.objects  WHERE name = 'datedflt' AND type = 'D') DROP DEFAULT datedflt;");
                     colRemove.Sql.Append(string.Format("\nALTER TABLE {0} DROP COLUMN IF EXISTS [{1}];", tableName.GetName(_repository.DataBaseTypes), col.ColumnName));
 
                 }

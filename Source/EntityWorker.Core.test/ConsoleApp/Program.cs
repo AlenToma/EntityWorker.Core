@@ -1,4 +1,4 @@
-﻿using LightData.CMS.Modules.Repository;
+﻿ using LightData.CMS.Modules.Repository;
 using LightData.CMS.Modules.Library;
 using System;
 using System.Linq;
@@ -19,6 +19,7 @@ namespace ConsoleApp1
             {
                 //Console.WriteLine((arg as Args).Data);
             });
+            //test();
             DynamicLinq();
             SaveJson();
             PackageTest();
@@ -35,7 +36,7 @@ namespace ConsoleApp1
             using (var rep = new Repository())
             {
                 var us = rep.Get<User>().LoadChildren().ExecuteFirstOrDefault();
-                var person = rep.Get<Person>().Where(x => x.Id == us.Person.Id).Execute();
+                var person = rep.Get<Person>().Where(x => x.Id == us.Person.Id.ConvertValue<Guid>()).Execute();
             }
         }
 
