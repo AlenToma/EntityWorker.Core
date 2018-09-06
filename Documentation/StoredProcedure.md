@@ -18,8 +18,8 @@ CREATE PROCEDURE [dbo].[GetPerson]
 // Code
   var cmd = rep.GetStoredProcedure("GetPerson");
       rep.AddInnerParameter(cmd, "FirstName", "Admin");
-      ISqlQueryable<Person><person> data = rep.DataReaderConverter<Person><person>(cmd).LoadChildren();
-      List<Person><person> persons = data.Execute();
+      ISqlQueryable<Person> data = rep.DataReaderConverter<Person>(cmd).LoadChildren();
+      List<Person> persons = data.Execute();
       // Or custom Class
       List<Person><person> persons = rep.DataReaderConverter(cmd, typeof(Person));
 
