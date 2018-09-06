@@ -1,4 +1,4 @@
-##Procedure
+## Procedure
 Here is how you could use store procedure in entityworker
 
 ```sql
