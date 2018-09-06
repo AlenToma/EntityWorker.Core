@@ -21,6 +21,6 @@ CREATE PROCEDURE [dbo].[GetPerson]
       ISqlQueryable<Person> data = rep.DataReaderConverter<Person>(cmd).LoadChildren();
       List<Person> persons = data.Execute();
       // Or custom Class
-      List<Person><person> persons = rep.DataReaderConverter(cmd, typeof(Person));
+      List<Person> persons = rep.DataReaderConverter(cmd, typeof(Person));
 
 ```
