@@ -16,11 +16,13 @@ CREATE PROCEDURE [dbo].[GetPerson]
 
 ```csharp
 // Code
+using (var rep = new Repository()) {
   var cmd = rep.GetStoredProcedure("GetPerson");
       rep.AddInnerParameter(cmd, "FirstName", "Admin");
       ISqlQueryable<Person> data = rep.DataReaderConverter<Person>(cmd).LoadChildren();
       List<Person> persons = data.Execute();
       // Or custom Class
-      List<Person> persons = rep.DataReaderConverter(cmd, typeof(Person));
+      List<Person> persons = (List<Person>)rep.DataReaderConverter(cmd, typeof(Person));
+      }
 
 ```
