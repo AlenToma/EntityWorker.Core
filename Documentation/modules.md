@@ -3,7 +3,7 @@
    // Migration will ignore creating abstract classes
    public abstract class Entity
    {
-        [PrimaryId]
+        [PrimaryKey]
         public Guid? Id { get; set; }
    }
 
