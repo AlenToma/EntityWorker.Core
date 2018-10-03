@@ -35,7 +35,7 @@
         protected override void OnModuleConfiguration(IModuleBuilder moduleBuilder)
         {
             moduleBuilder.Entity<User>()
-                .TableName("Users")
+                .TableName("Users", "dbo")
                 .HasPrimaryKey(x => x.Id, false)
                 .NotNullable(x => x.UserName)
                 .HasDataEncode(x => x.UserName)
@@ -49,6 +49,20 @@
                 
                  moduleBuilder.Entity<Person>()
                  .HasColumnType(x => x.FirstName, "varchar(100)");
+                 
+                 // OR
+            moduleBuilder.EntityType(typeof(User))
+                .TableName("Users", "geto")
+                .HasKnownType("Person", typeof(Person))
+                .HasPrimaryKey("Id", false)
+                .NotNullable("UserName")
+                .HasDataEncode("UserName")
+                .HasDataEncode("Password")
+                .HasForeignKey<Role>("RoleId")
+                .HasIndependentData("Role")
+                .HasForeignKey<Person>("PersonId")
+                .HasRule<UserRule>()
+                .HasJsonIgnore("Password");
          }
 
 

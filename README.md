@@ -40,6 +40,7 @@ See Code Example for more info.
 * [Save](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Save.md)
 * [Delete](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Delete.md)
 * [LinqToSql](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/LinqToSql.md)
+* [Store Procedure](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/StoredProcedure.md)
 * [Dynamic linq](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Dynamic.Linq.md)
 * [Custom ISqlQueryable](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/CustomQueries.md)
 * [Entity Mappings](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/EntityMappings.md)

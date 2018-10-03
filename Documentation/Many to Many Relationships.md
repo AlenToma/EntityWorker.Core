@@ -5,14 +5,14 @@ We will create two class Menus and Article
     public class Menus
     {
         [PrimaryKey]
-        public long? Id { get; set; }
+        public Guid? Id { get; set; }
 
         [NotNullable]
 
         public string DisplayName { get; set; }
 
         [ForeignKey(typeof(Menus))]
-        public long? ParentId { get; set; }
+        public Guid? ParentId { get; set; }
 
 
         /// <summary>
@@ -48,7 +48,7 @@ We will create two class Menus and Article
 
         // Its importend to set propertyName in Manytomany relations
         [ForeignKey(type: typeof(Menus), propertyName: "Menus")]
-        public long MenusId { get; set; }
+        public Guid MenusId { get; set; }
         
         // Referense to menus 
         [IndependentData]
