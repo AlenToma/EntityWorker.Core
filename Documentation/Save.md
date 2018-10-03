@@ -37,7 +37,7 @@ Depending on the primarykey it will either execute an update or insert.
    }
 
 ```
-so some time we would want to save some object but ignore some properties. 
+Some time we would want to save some object but ignore some properties. 
 this is usefull when we retrive some data from json that contain some old data, that we dont want them in the db
 ```csharp
         using (var rep = new Repository())
