@@ -37,3 +37,16 @@ Depending on the primarykey it will either execute an update or insert.
    }
 
 ```
+so some time we would want to save some object but ignore some properties. 
+this is usefull when we retrive some data from json that contain some old data, that we dont want them in the db
+```csharp
+        using (var rep = new Repository())
+            {
+                var us = rep.Get<User>().OrderBy(x=> x.Id).LoadChildren().ExecuteFirstOrDefault();
+                us.Role.Name = "Yedsfsdft";
+                rep.Save(us, x => x.Person.Addresses.Select(a=> a.Name));
+                var m = rep.Get<User>().OrderBy(x => x.Id).LoadChildren().ExecuteFirstOrDefault();
+                Console.WriteLine("New Value for RoleName is " + m.Role.Name);
+                rep.SaveChanges();
+            } 
+```
