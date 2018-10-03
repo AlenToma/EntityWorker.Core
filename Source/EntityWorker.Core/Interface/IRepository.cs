@@ -143,20 +143,24 @@ namespace EntityWorker.Core.InterFace
         Task<IRepository> DeleteAsync(object entity);
 
         /// <summary>
-        /// Save entity.
-        /// SaveChanges is needed after
+        /// Save Entity 
+        /// ignore/execlude updateing some properties to the database. 
         /// </summary>
+        /// <typeparam name="T"></typeparam>
         /// <param name="entity"></param>
-
-        IRepository Save(object entity);
+        /// <param name="ignoredProperties"></param>
+        /// <returns></returns>
+        IRepository Save<T>(T entity, params Expression<Func<T, object>>[] ignoredProperties);
 
         /// <summary>
-        /// Save entity.
-        /// SaveChanges is needed after
+        /// Save Entity 
+        /// ignore/execlude updateing some properties to the database. 
         /// </summary>
+        /// <typeparam name="T"></typeparam>
         /// <param name="entity"></param>
-
-        Task<IRepository> SaveAsync(object entity);
+        /// <param name="ignoredProperties"></param>
+        /// <returns></returns>
+        Task<IRepository> SaveAsync<T>(T entity, params Expression<Func<T, object>>[] ignoredProperties);
 
         /// <summary>
         /// Get Entity 

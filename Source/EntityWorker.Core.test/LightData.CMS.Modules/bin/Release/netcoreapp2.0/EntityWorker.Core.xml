@@ -981,6 +981,12 @@
             <typeparam name="T"></typeparam>
             <returns></returns>
         </member>
+        <member name="M:EntityWorker.Core.Interface.IModuleBuilder.EntityType(System.Type)">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:EntityWorker.Core.Interface.IObjectMapps`1">
             <summary>
             Entity Configration
@@ -1294,12 +1300,13 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.Save">
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.Save(System.Linq.Expressions.Expression{System.Func{`0,System.Object}}[])">
             <summary>
             Save All Changes. 
             You have to trigger SaveChanges() to commit
             https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Save.md
             </summary>
+            <param name="ignoredProperties">ignore/execlude updateing some properties to the database. </param>
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.SaveAll(System.Func{`0,System.Boolean})">
@@ -1373,6 +1380,171 @@
             Convert To XML
             https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Xml.md
             </summary>
+            <returns></returns>
+        </member>
+        <member name="T:EntityWorker.Core.Interface.ITypeMapps">
+            <summary>
+            Entity Configration
+            Here we could configrate and set all primary keys and Foreign keys for properties
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Repository.md
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ITypeMapps.TableName(System.String,System.String)">
+            <summary>
+            Assign diffrent name for the object in the database.
+            schema works only for MSSQl and postGreSql
+            Database should allow Create Schema for this to work or the Schema should already be created
+            </summary>
+            <param name="name"></param>
+            <param name="schema"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ITypeMapps.HasRule``1">
+            <summary>
+            Assign a rule to object
+            </summary>
+            <typeparam name="Source">Must implement interface IDbRuleTrigger</typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ITypeMapps.HasJsonIgnore(System.String)">
+            <summary>
+            EntityWorker will ignore serializing or derializing all properties that contain this attribute
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ITypeMapps.HasXmlIgnore(System.String)">
+            <summary>
+            EntityWorker will ignore serializing or derializing all properties that contain this attribute
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ITypeMapps.HasKnownType(System.String,System.Type)">
+            <summary>
+            Use this when you have types that are unknown like interface wich it can takes more than one type 
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ITypeMapps.HasColumnType(System.String,System.String,System.Nullable{EntityWorker.Core.Helper.DataBaseTypes})">
+            <summary>
+            Assign a diffrent database type for the property
+            Attibutes Stringify, DataEncode, JsonDocument , XmlDocument and ToBase64String will override this attribute.
+            </summary>
+            <param name="action"></param>
+            <param name="dataType">The database type ex nvarchar(4000)</param>
+            <param name="dataBaseTypes">null for all providers</param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ITypeMapps.HasPrimaryKey(System.String,System.Boolean)">
+            <summary>
+            Add Primary Key to Property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <param name="autoGenerate"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ITypeMapps.HasForeignKey``1(System.String,System.String)">
+            <summary>
+            Add Foreign Key to Property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <param name="Source"></param>
+            <param name="propertyName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ITypeMapps.HasDataEncode(System.String,System.String,EntityWorker.Core.Helper.DataCipherKeySize)">
+            <summary>
+            Add DataEncode for property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <param name="key"></param>
+            <param name="keySize"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ITypeMapps.HasIndependentData(System.String)">
+            <summary>
+            Add IndependentData for property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ITypeMapps.NotNullable(System.String)">
+            <summary>
+            Add NotNullable for property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ITypeMapps.HasPropertyName(System.String,System.String,System.String)">
+            <summary>
+            Add PropertyName for property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <param name="name"></param>
+            <param name="displayName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ITypeMapps.HasStringify(System.String)">
+            <summary>
+            Add Stringify for property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ITypeMapps.ExcludeFromAbstract(System.String)">
+            <summary>
+            Add ExcludeFromAbstract for property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ITypeMapps.HasDefaultOnEmpty(System.String,System.Object)">
+            <summary>
+            Add DefaultOnEmpty for property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <param name="value"> Fefault value when property is null</param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ITypeMapps.HasToBase64String(System.String)">
+            <summary>
+            Add ToBase64String for property
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ITypeMapps.HasJsonDocument(System.String)">
+            <summary>
+            Add JsonDocument for property
+            Save the property as Json object in the database 
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ITypeMapps.HasXmlDocument(System.String)">
+            <summary>
+            Add XmlDocument for property
+            Save the property as xml object in the database 
+            </summary>
+            <typeparam name="TP"></typeparam>
+            <param name="action"></param>
             <returns></returns>
         </member>
         <member name="T:EntityWorker.Core.InterFace.IRepository">
@@ -1497,19 +1669,25 @@
             <param name="entity"></param>
             
         </member>
-        <member name="M:EntityWorker.Core.InterFace.IRepository.Save(System.Object)">
+        <member name="M:EntityWorker.Core.InterFace.IRepository.Save``1(``0,System.Linq.Expressions.Expression{System.Func{``0,System.Object}}[])">
             <summary>
-            Save entity.
-            SaveChanges is needed after
+            Save Entity 
+            ignore/execlude updateing some properties to the database. 
             </summary>
+            <typeparam name="T"></typeparam>
             <param name="entity"></param>
+            <param name="ignoredProperties"></param>
+            <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.InterFace.IRepository.SaveAsync(System.Object)">
+        <member name="M:EntityWorker.Core.InterFace.IRepository.SaveAsync``1(``0,System.Linq.Expressions.Expression{System.Func{``0,System.Object}}[])">
             <summary>
-            Save entity.
-            SaveChanges is needed after
+            Save Entity 
+            ignore/execlude updateing some properties to the database. 
             </summary>
+            <typeparam name="T"></typeparam>
             <param name="entity"></param>
+            <param name="ignoredProperties"></param>
+            <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.InterFace.IRepository.Get``1">
             <summary>
@@ -6267,6 +6445,12 @@
             <typeparam name="T"></typeparam>
             <returns></returns>
         </member>
+        <member name="M:EntityWorker.Core.Object.Library.Modules.ModuleBuilder.EntityType(System.Type)">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:EntityWorker.Core.Object.Library.Modules.ObjectMapps`1">
             <summary>
             Entity Configration
@@ -6610,7 +6794,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.Save">
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.Save(System.Linq.Expressions.Expression{System.Func{`0,System.Object}}[])">
             <summary>
             Save All Changes. 
             You have to trigger SaveChanges() to commit
@@ -15183,18 +15367,25 @@
             </summary>
             <param name="entity"></param>
         </member>
-        <member name="M:EntityWorker.Core.Transaction.Transaction.SaveAsync(System.Object)">
+        <member name="M:EntityWorker.Core.Transaction.Transaction.Save``1(``0,System.Linq.Expressions.Expression{System.Func{``0,System.Object}}[])">
             <summary>
-            Save object
+            Save Entity 
+            ignore/execlude updateing some properties to the database. 
             </summary>
+            <typeparam name="T"></typeparam>
             <param name="entity"></param>
+            <param name="ignoredProperties"></param>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.Transaction.Transaction.Save(System.Object)">
+        <member name="M:EntityWorker.Core.Transaction.Transaction.SaveAsync``1(``0,System.Linq.Expressions.Expression{System.Func{``0,System.Object}}[])">
             <summary>
-            Save object
+            Save Entity 
+            ignore/execlude updateing some properties to the database. 
             </summary>
+            <typeparam name="T"></typeparam>
             <param name="entity"></param>
+            <param name="ignoredProperties"></param>
+            <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Transaction.Transaction.GetAllAsync``1">
             <summary>

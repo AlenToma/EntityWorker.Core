@@ -392,12 +392,13 @@ namespace EntityWorker.Core.Object.Library
         /// You have to trigger SaveChanges() to commit
         /// </summary>
         /// <returns></returns>
-        public ISqlQueryable<T> Save()
+        public ISqlQueryable<T> Save(params Expression<Func<T, object>>[] ignoredProperties)
         {
             foreach (var item in Execute())
-                _repository.Save(item);
+                _repository.Save(item, ignoredProperties);
             return this;
         }
+
 
         /// <summary>
         /// Save All Changes. 
@@ -515,5 +516,7 @@ namespace EntityWorker.Core.Object.Library
         {
             return await Task.FromResult<string>(Execute().ToXml());
         }
+
+     
     }
 }

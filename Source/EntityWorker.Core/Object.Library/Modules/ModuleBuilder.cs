@@ -1,5 +1,6 @@
 ﻿using EntityWorker.Core.Helper;
 using EntityWorker.Core.Interface;
+using System;
 
 namespace EntityWorker.Core.Object.Library.Modules
 {
@@ -27,6 +28,15 @@ namespace EntityWorker.Core.Object.Library.Modules
         public IObjectMapps<T> Entity<T>() where T : class
         {
             return new ObjectMapps<T>();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public ITypeMapps EntityType(Type objectType)
+        {
+            return new TypeMapps(objectType);
         }
     }
 }

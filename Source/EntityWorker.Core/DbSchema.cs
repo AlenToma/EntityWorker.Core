@@ -98,22 +98,18 @@ namespace EntityWorker.Core
         /// <returns></returns>
         public object GetById(object id, Type type)
         {
-            var entityKey = type.EntityKey(id);
-            if (_repository.IsAttached(entityKey))
-                return DeepCloner.Clone(_repository._attachedObjects[entityKey]);
-            else
+
+            var k = type.FullName + _repository.DataBaseTypes.ToString();
+            var primaryKey = type.GetActualType().GetPrimaryKey();
+            if (!CachedSql.ContainsKey(k))
             {
-                var k = type.FullName + _repository.DataBaseTypes.ToString();
-                var primaryKey = type.GetActualType().GetPrimaryKey();
-                if (!CachedSql.ContainsKey(k))
-                {
-                    var key = primaryKey.GetPropertyName();
-                    CachedSql.GetOrAdd(k, Querys.Select(type.GetActualType(), _repository.DataBaseTypes).Where.Column(key).Equal("@ID", true).Execute());
-                }
-                var cmd = _repository.GetSqlCommand(CachedSql[k]);
-                _repository.AddInnerParameter(cmd, "@ID", id.ConvertValue(primaryKey.PropertyType), _repository.GetSqlType(primaryKey.PropertyType));
-                return type.GetActualType() != type ? _repository.DataReaderConverter(cmd, type) : _repository.DataReaderConverter(cmd, type).Cast<object>().FirstOrDefault();
+                var key = primaryKey.GetPropertyName();
+                CachedSql.GetOrAdd(k, Querys.Select(type.GetActualType(), _repository.DataBaseTypes).Where.Column(key).Equal("@ID", true).Execute());
             }
+            var cmd = _repository.GetSqlCommand(CachedSql[k]);
+            _repository.AddInnerParameter(cmd, "@ID", id.ConvertValue(primaryKey.PropertyType), _repository.GetSqlType(primaryKey.PropertyType));
+            return type.GetActualType() != type ? _repository.DataReaderConverter(cmd, type) : _repository.DataReaderConverter(cmd, type).Cast<object>().FirstOrDefault();
+
         }
 
         /// <summary>
@@ -257,7 +253,7 @@ namespace EntityWorker.Core
             GlobalConfiguration.Log?.Info("Delete", o);
             var type = o.GetType().GetActualType();
             var props = DeepCloner.GetFastDeepClonerProperties(type);
-            var table =  type.TableName().GetName(_repository.DataBaseTypes);
+            var table = type.TableName().GetName(_repository.DataBaseTypes);
             var primaryKey = o.GetType().GetPrimaryKey();
             var primaryKeyValue = o.GetPrimaryKeyValue();
             if (primaryKeyValue.ObjectIsNew())
@@ -339,18 +335,23 @@ namespace EntityWorker.Core
             return sql;
         }
 
-        public void Save(object o)
+        public void Save(object o, List<string> ignoredProperties = null)
         {
             lock (ObjectLocker)
             {
-                Save(o, false);
+                Save(o, false, false, ignoredProperties);
             }
         }
 
-        private object Save(object o, bool isIndependentData, bool updateOnly = false)
+        private object Save(object o, bool isIndependentData, bool updateOnly = false, List<string> ignoredProperties = null, string lastProperty = null)
         {
             try
             {
+                if (ignoredProperties == null)
+                    ignoredProperties = new List<string>();
+                if (lastProperty == null)
+                    lastProperty = string.Empty; // not valid name
+
                 GlobalConfiguration.Log?.Info("Save", o);
                 _repository.CreateTransaction();
                 var props = DeepCloner.GetFastDeepClonerProperties(o.GetType());
@@ -389,6 +390,7 @@ namespace EntityWorker.Core
 
                         var changes = _repository.GetObjectChanges(o);
                         foreach (var item in props.Where(x => x.CanRead && !changes.Any(a => a.PropertyName == x.Name) && (x.IsInternalType || x.ContainAttribute<JsonDocument>())))
+                            //if (!ignoredProperties.Any(a => a == item.Name || a == (o.GetType().Name + "." + item.Name) || a == (lastProperty + "." + item.Name)))
                             item.SetValue(o, item.GetValue(data));
                     }
                 }
@@ -398,6 +400,11 @@ namespace EntityWorker.Core
                 object tempPrimaryKey = null;
                 var sql = "UPDATE " + (o.GetType().TableName().GetName(_repository.DataBaseTypes)) + " SET ";
                 var cols = props.FindAll(x => (availableColumns.ContainsKey(x.GetPropertyName()) || availableColumns.ContainsKey(x.GetPropertyName().ToLower())) && (x.IsInternalType || x.ContainAttribute<JsonDocument>() || x.ContainAttribute<XmlDocument>()) && !x.ContainAttribute<ExcludeFromAbstract>() && x.GetCustomAttribute<PrimaryKey>() == null);
+
+                // Clean out all unwanted properties
+                if (ignoredProperties.Any())
+                    cols = cols.FindAll(x => !ignoredProperties.Any(a => a == x.Name || a == (o.GetType().Name + "." + x.Name) || a == (lastProperty + "." + x.Name)));
+
                 if (primaryKeyId == null)
                 {
                     if (primaryKey.PropertyType.IsNumeric() && primaryKey.GetCustomAttribute<PrimaryKey>().AutoGenerate)
@@ -444,7 +451,7 @@ namespace EntityWorker.Core
                         if (obValue != null)
                         {
                             v = obValue.GetType().GetPrimaryKey().GetValue(obValue)?.ObjectIsNew() ?? true ?
-                                Save(obValue, independentData) :
+                                Save(obValue, independentData, false, ignoredProperties, ob.Name) :
                                 obValue.GetType().GetPrimaryKey().GetValue(obValue);
                             col.SetValue(o, v);
                         }
@@ -510,7 +517,7 @@ namespace EntityWorker.Core
                     {
                         var foreignKey = DeepCloner.GetFastDeepClonerProperties(item.GetType()).FirstOrDefault(x => x.GetCustomAttribute<ForeignKey>()?.Type == o.GetType() && string.IsNullOrEmpty(x.GetCustomAttribute<ForeignKey>().PropertyName));
                         foreignKey?.SetValue(item, primaryKeyId);
-                        var res = Save(item, independentData);
+                        var res = Save(item, independentData, false, ignoredProperties, prop.Name);
                         foreignKey = props.FirstOrDefault(x => x.GetCustomAttribute<ForeignKey>()?.Type == type && (x.GetCustomAttribute<ForeignKey>().PropertyName == prop.Name || string.IsNullOrEmpty(x.GetCustomAttribute<ForeignKey>().PropertyName)));
                         if (foreignKey == null || !foreignKey.GetValue(o).ObjectIsNew()) continue;
                         if (o.GetType() == foreignKey.GetCustomAttribute<ForeignKey>().Type) continue;
@@ -522,7 +529,7 @@ namespace EntityWorker.Core
                 if (oState != null && _repository.GetObjectChanges(o, oState).Count > 0) // a change has been made outside the function Save then resave          
                 {
                     o.SetPrimaryKeyValue(primaryKeyId);
-                    Save(o, false, true);
+                    Save(o, false, true, ignoredProperties);
                 }
                 o.SetPrimaryKeyValue(primaryKeyId);
                 _repository.Attach(o, true);
@@ -698,7 +705,7 @@ namespace EntityWorker.Core
                 {
                     if (_repository.DataBaseTypes == DataBaseTypes.Mssql)
                     {
-                        var constraine = Properties.Resources.DropContraine.Replace("@tb", $"'{tableName.Name}'").Replace("@col", $"'{col.ColumnName}'").Replace("@schema", $"'{tableName.Schema?? ""}'");
+                        var constraine = Properties.Resources.DropContraine.Replace("@tb", $"'{tableName.Name}'").Replace("@col", $"'{col.ColumnName}'").Replace("@schema", $"'{tableName.Schema ?? ""}'");
                         colRemove.Sql.Append(constraine);
 
                     }

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using EntityWorker.Core.Helper;
 using EntityWorker.Core;
 using LightData.CMS.Modules.Library.Internal;
+using EntityWorker.Core.Interface;
 
 namespace ConsoleApp1
 {
@@ -35,9 +36,14 @@ namespace ConsoleApp1
         {
             using (var rep = new Repository())
             {
-                var us = rep.Get<User>().LoadChildren().ExecuteFirstOrDefault();
-                var person = rep.Get<Person>().Where(x => x.Id == us.Person.Id.ConvertValue<Guid>()).Execute();
-            }
+                var us = rep.Get<User>().OrderBy(x=> x.Id).LoadChildren().ExecuteFirstOrDefault();
+                us.Role.Name = "Yedsfsdft";
+                rep.Save(us, x => x.Person.Addresses.Select(a=> a.Name));
+                var m = rep.Get<User>().OrderBy(x => x.Id).LoadChildren().ExecuteFirstOrDefault();
+                Console.WriteLine("New Value for RoleName is " + m.Role.Name);
+
+                rep.Rollback();
+            }         
         }
 
         public static void DynamicLinq()
@@ -192,11 +198,11 @@ namespace ConsoleApp1
 
                 user = rep.Get<User>().Where(x => x.Id == user.Id).ExecuteFirstOrDefault();
 
-                user.UserName = "alen";
+                user.UserName = "aalen";
                 Console.WriteLine("----------------UpdateTest Test------------------");
                 rep.Save(user);
                 rep.SaveChanges();
-                Console.WriteLine((rep.Get<User>().Where(x => x.Id == user.Id).ExecuteFirstOrDefault().UserName == "alen" ? "Success" : "Failed"));
+                Console.WriteLine((rep.Get<User>().Where(x => x.Id == user.Id).ExecuteFirstOrDefault().UserName == "aalen" ? "Success" : "Failed"));
                 Console.WriteLine(" ");
 
                 user = rep.Get<User>().Where(x => x.Id == user.Id).LoadChildren().ExecuteFirstOrDefault();

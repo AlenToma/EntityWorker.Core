@@ -724,7 +724,10 @@ namespace EntityWorker.Core.Helper
                         continue;
                     propTree += ("." + x);
                     if (propTree.Split('.').Length == 4)
-                        propTree = string.Join(".", propTree.Split('.').Skip(2));
+                    {
+                        propTree = string.Join(".", propTree.Split('.').ToList().Skip(2).Cast<string>().ToArray());
+
+                    }
                     tempList.Add(propTree.TrimStart('.'));
                 }
 

@@ -36,7 +36,7 @@ namespace LightData.CMS.Modules.Repository
         {
             moduleBuilder.Entity<User>()
                 .TableName("Users", "geto")
-                .HasKnownType(x=> x.Person, typeof(Person))
+                .HasKnownType(x => x.Person, typeof(Person))
                 .HasPrimaryKey(x => x.Id, false)
                 .NotNullable(x => x.UserName)
                 .HasDataEncode(x => x.UserName)
@@ -46,12 +46,25 @@ namespace LightData.CMS.Modules.Repository
                 .HasForeignKey<Person, Guid>(x => x.PersonId)
                 .HasRule<UserRule>()
                 .HasJsonIgnore(x => x.Password);
+
+            moduleBuilder.EntityType(typeof(User))
+                .TableName("Users", "geto")
+                .HasKnownType("Person", typeof(Person))
+                .HasPrimaryKey("Id", false)
+                .NotNullable("UserName")
+                .HasDataEncode("UserName")
+                .HasDataEncode("Password")
+                .HasForeignKey<Role>("RoleId")
+                .HasIndependentData("Role")
+                .HasForeignKey<Person>("PersonId")
+                .HasRule<UserRule>()
+                .HasJsonIgnore("Password");
         }
 
         // Get the full connection string from the web-config
         public static string GetConnectionString(DataBaseTypes dbType)
         {
-            return dbType == DataBaseTypes.Mssql ? @"Server=.\SQLEXPRESS; Database=CMStest; User Id=root; Password=root;" :
+            return dbType == DataBaseTypes.Mssql ? @"Server=DESKTOP-4BRMQVE\SQLEXPRESS;Trusted_Connection=True; Database=CMStest; User Id=root; Password=root;" :
                   (dbType == DataBaseTypes.Sqllight ? @"Data Source=D:\Projects\LightData.CMS\source\LightData.CMS\App_Data\LightDataTabletest.db" :
                   "Host=localhost;Username=postgres;Password=root;Database=mydatabase");
         }

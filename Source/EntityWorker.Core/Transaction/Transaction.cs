@@ -835,28 +835,38 @@ namespace EntityWorker.Core.Transaction
         }
 
         /// <summary>
-        /// Save object
+        /// Save Entity 
+        /// ignore/execlude updateing some properties to the database. 
         /// </summary>
+        /// <typeparam name="T"></typeparam>
         /// <param name="entity"></param>
+        /// <param name="ignoredProperties"></param>
         /// <returns></returns>
-        public virtual async Task<IRepository> SaveAsync(object entity)
+        public IRepository Save<T>(T entity, params Expression<Func<T, object>>[] ignoredProperties)
         {
+            var parames = new List<string>();
+            if (ignoredProperties != null)
+                parames = ignoredProperties.ConvertExpressionToIncludeList(true);
 
-            await Task.Run(() =>
-            {
-                _dbSchema.Save(entity);
-            });
-            return await Task.FromResult<IRepository>(this);
+            _dbSchema.Save(entity, parames);
+            return this;
         }
 
         /// <summary>
-        /// Save object
+        /// Save Entity 
+        /// ignore/execlude updateing some properties to the database. 
         /// </summary>
+        /// <typeparam name="T"></typeparam>
         /// <param name="entity"></param>
-        public virtual IRepository Save(object entity)
+        /// <param name="ignoredProperties"></param>
+        /// <returns></returns>
+        public virtual async Task<IRepository> SaveAsync<T>(T entity, params Expression<Func<T, object>>[] ignoredProperties)
         {
-            _dbSchema.Save(entity);
-            return this;
+            await Task.Run(() =>
+            {
+                this.Save(entity, ignoredProperties);
+            });
+            return await Task.FromResult<IRepository>(this);
         }
 
         /// <summary>
@@ -1188,6 +1198,8 @@ namespace EntityWorker.Core.Transaction
                 throw new EntityException($"Error the package structure is not valid.\n Orginal exception\n{exception.Message}");
             }
         }
+
+   
 
         #endregion
     }

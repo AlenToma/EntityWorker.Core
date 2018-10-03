@@ -161,8 +161,9 @@ namespace EntityWorker.Core.Interface
         /// You have to trigger SaveChanges() to commit
         /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Save.md
         /// </summary>
+        /// <param name="ignoredProperties">ignore/execlude updateing some properties to the database. </param>
         /// <returns></returns>
-        ISqlQueryable<T> Save();
+        ISqlQueryable<T> Save(params Expression<Func<T, object>>[] ignoredProperties);
 
         /// <summary>
         /// Save All Changes. 

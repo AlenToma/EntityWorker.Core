@@ -1,4 +1,5 @@
 ﻿using EntityWorker.Core.Helper;
+using System;
 
 namespace EntityWorker.Core.Interface
 {
@@ -18,5 +19,11 @@ namespace EntityWorker.Core.Interface
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         IObjectMapps<T> Entity<T>() where T : class;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        ITypeMapps EntityType(Type objectType);
     }
 }
