@@ -842,7 +842,7 @@ namespace EntityWorker.Core.Transaction
         /// <param name="entity"></param>
         /// <param name="ignoredProperties"></param>
         /// <returns></returns>
-        public IRepository Save<T>(T entity, params Expression<Func<T, object>>[] ignoredProperties)
+        public virtual IRepository Save<T>(T entity, params Expression<Func<T, object>>[] ignoredProperties)
         {
             var parames = new List<string>();
             if (ignoredProperties != null)
