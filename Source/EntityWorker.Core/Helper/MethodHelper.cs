@@ -11,6 +11,7 @@ using EntityWorker.Core.InterFace;
 using EntityWorker.Core.SQLite;
 using EntityWorker.Core.Object.Library;
 using EntityWorker.Core.Postgres;
+using EntityWorker.Core.Interface;
 
 namespace EntityWorker.Core.Helper
 {
@@ -21,7 +22,7 @@ namespace EntityWorker.Core.Helper
     {
 
         ///// <summary>
-        /////  Get All types that containe Property with PrimaryId Attribute
+        /////  Get All types that containe Property with PrimaryKey Attribute
         ///// </summary>
         ///// <param name="assembly"></param>
         ///// <returns></returns>
@@ -83,7 +84,7 @@ namespace EntityWorker.Core.Helper
         private static Regex stringExp = new Regex(@"String\[.*?\]|String\[.?\]");
         private static Regex dateExp = new Regex(@"Date\[.*?\]|Date\[.?\]");
         private static Regex guidExp = new Regex(@"Guid\[.*?\]|Guid\[.?\]");
-        internal static DbCommandExtended ProcessSql(this IRepository repository, IDbConnection connection, IDbTransaction tran, string sql)
+        internal static ISqlCommand ProcessSql(this IRepository repository, IDbConnection connection, IDbTransaction tran, string sql)
         {
             var i = 1;
             var dicCols = new Custom_ValueType<string, Tuple<object, SqlDbType>>();
@@ -130,7 +131,7 @@ namespace EntityWorker.Core.Helper
             else cmd = tran == null ? new NpgsqlCommand(sql, connection as NpgsqlConnection) : new NpgsqlCommand(sql, connection as NpgsqlConnection, tran as NpgsqlTransaction);
             var dbCommandExtended = new DbCommandExtended(cmd, repository);
             foreach (var dic in dicCols)
-                repository.AddInnerParameter(dbCommandExtended, dic.Key, dic.Value.Item1, dic.Value.Item2);
+                dbCommandExtended.AddInnerParameter(dic.Key, dic.Value.Item1, dic.Value.Item2);
             return dbCommandExtended;
         }
     }

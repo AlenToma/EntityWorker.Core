@@ -13,7 +13,6 @@ using EntityWorker.Core.Object.Library;
 using EntityWorker.Core.FastDeepCloner;
 using System.Text.RegularExpressions;
 using EntityWorker.Core.Object.Library.JSON;
-using System.Threading.Tasks;
 using EntityWorker.Core.InterFace;
 using EntityWorker.Core.SqlQuerys;
 using EntityWorker.Core.Object.Library.XML;
@@ -326,8 +325,8 @@ namespace EntityWorker.Core.Helper
         /// </summary>
         /// <param name="str">Source string</param>
         /// <param name="text"> string to insert</param>
-        /// <param name="identifier"></param>
-        /// <param name="insertLastIfNotFound">insert after a specific string, count is from last</param>
+        /// <param name="identifier">after last identified string </param>
+        /// <param name="insertLastIfNotFound">insert after a specific string, count is from last, even if the identifier text not found</param>
         /// <returns></returns>
         public static string InsertAfter(this string str, string text, string identifier, bool insertLastIfNotFound = true)
         {
@@ -628,13 +627,12 @@ namespace EntityWorker.Core.Helper
             return uninitializedObject ? FormatterServices.GetUninitializedObject(type) : DeepCloner.CreateInstance(type);
         }
 
-
         /// <summary>
         /// Get IList Actual Type
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        private static readonly Dictionary<Type, Type> CachedActualType = new Dictionary<Type, Type>();
+        private static readonly Custom_ValueType<Type, Type> CachedActualType = new Custom_ValueType<Type, Type>();
 
         /// <summary>
         /// Get Internal type of IList
@@ -645,23 +643,23 @@ namespace EntityWorker.Core.Helper
         {
             if (CachedActualType.ContainsKey(type))
                 return CachedActualType[type];
-            lock (CachedActualType)
-            {
-                if (type.GetTypeInfo().IsArray)
-                    CachedActualType.Add(type, type.GetElementType());
-                else if (type.GenericTypeArguments.Any())
-                    CachedActualType.Add(type, type.GenericTypeArguments.First());
-                else if (type.FullName?.Contains("List`1") ?? false)
-                    CachedActualType.Add(type, type.GetRuntimeProperty("Item").PropertyType);
-                else
-                    CachedActualType.Add(type, type);
-            }
 
-            return CachedActualType[type];
+            if (type.GetTypeInfo().IsArray)
+                CachedActualType.TryAdd(type, type.GetElementType());
+            else if (type.GenericTypeArguments.Any())
+                CachedActualType.TryAdd(type, type.GenericTypeArguments.First());
+            else if (type.FullName?.Contains("List`1") ?? false)
+                CachedActualType.TryAdd(type, type.GetRuntimeProperty("Item").PropertyType);
+            else
+                CachedActualType.TryAdd(type, type);
+
+            return CachedActualType.Get(type);
         }
 
         /// <summary>
         /// Check if string is base64
+        /// this is only a simple validation by an regxp 
+        /// @"^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)$"
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
@@ -787,12 +785,12 @@ namespace EntityWorker.Core.Helper
         }
 
 
-        internal static List<T> DataReaderConverter<T>(Transaction.Transaction repository, IDataReader reader, DbCommandExtended command)
+        internal static List<T> DataReaderConverter<T>(Transaction.Transaction repository, IDataReader reader, ISqlCommand command)
         {
             return ((List<T>)DataReaderConverter(repository, reader, command, typeof(T)));
         }
 
-        internal static IList DataReaderConverter(Transaction.Transaction repository, IDataReader reader, DbCommandExtended command, Type type)
+        internal static IList DataReaderConverter(Transaction.Transaction repository, IDataReader reader, ISqlCommand command, Type type)
         {
             var tType = type.GetActualType();
             var attachable = tType.GetPrimaryKey() != null;
@@ -803,7 +801,7 @@ namespace EntityWorker.Core.Helper
             try
             {
                 var colNames = new Custom_ValueType<int, string>();
-                var pp = new Custom_ValueType<int, FastDeepCloner.IFastDeepClonerProperty>();
+                var pp = new Custom_ValueType<int, IFastDeepClonerProperty>();
                 while (reader.Read())
                 {
                     object item = null;
@@ -871,7 +869,7 @@ namespace EntityWorker.Core.Helper
             }
             catch (Exception e)
             {
-                throw e;
+                throw new EntityException(e.Message);
             }
             finally
             {
@@ -886,7 +884,7 @@ namespace EntityWorker.Core.Helper
 
         private static readonly Dictionary<string, Exception> CachedSqlException = new Dictionary<string, Exception>();
         private static readonly Dictionary<string, LightDataTable> CachedGetSchemaTable = new Dictionary<string, LightDataTable>();
-        internal static ILightDataTable ReadData(this ILightDataTable data, DataBaseTypes dbType, IDataReader reader, DbCommandExtended command, string primaryKey = null, bool closeReader = true)
+        internal static ILightDataTable ReadData(this ILightDataTable data, DataBaseTypes dbType, IDataReader reader, ISqlCommand command, string primaryKey = null, bool closeReader = true)
         {
             var i = 0;
             data.TablePrimaryKey = primaryKey;

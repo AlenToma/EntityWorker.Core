@@ -522,8 +522,8 @@
             </summary>
             <param name="str">Source string</param>
             <param name="text"> string to insert</param>
-            <param name="identifier"></param>
-            <param name="insertLastIfNotFound">insert after a specific string, count is from last</param>
+            <param name="identifier">after last identified string </param>
+            <param name="insertLastIfNotFound">insert after a specific string, count is from last, even if the identifier text not found</param>
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Helper.Extension.InsertBefore(System.String,System.String,System.String,System.Boolean)">
@@ -684,6 +684,8 @@
         <member name="M:EntityWorker.Core.Helper.Extension.IsBase64String(System.String)">
             <summary>
             Check if string is base64
+            this is only a simple validation by an regxp 
+            @"^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)$"
             </summary>
             <param name="str"></param>
             <returns></returns>
@@ -1152,6 +1154,60 @@
             <param name="action"></param>
             <returns></returns>
         </member>
+        <member name="P:EntityWorker.Core.Interface.ISqlCommand.Command">
+            <summary>
+            DbCommand
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlCommand.AddInnerParameter(System.String,System.Object,System.Data.SqlDbType)">
+            <summary>
+            Add Parameter to sqlCommand
+            </summary>
+            <param name="attrName"></param>
+            <param name="value"></param>
+            <param name="dbType"></param>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlCommand.AddInnerParameter(System.String,System.Object,System.Data.DbType)">
+            <summary>
+            Add parameters to SqlCommand
+            </summary>
+            <param name="attrName"></param>
+            <param name="value"></param>
+            <param name="dbType"></param>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlCommand.DataReaderConverter``1">
+            <summary>
+            Convert SqlCommand to List of Type T
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlCommand.DataReaderConverter(System.Type)">
+            <summary>
+            Convert SqlCommand to list of System.Type
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlCommand.GetLightDataTable(System.String)">
+            <summary>
+            Get LightDataTable by SqlCommand
+            </summary>
+            <param name="primaryKey"> set the primary key for faster browsing the datatable </param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlCommand.ExecuteScalar">
+            <summary>
+            ExecuteScale with return value
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.ISqlCommand.ExecuteNonQuery">
+            <summary>
+            Execute Quary
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:EntityWorker.Core.Interface.ISqlQueryable`1">
             <summary>
             quaryProvider for EntityWorker.Core
@@ -1568,12 +1624,12 @@
             Database type
             </summary>
         </member>
-        <member name="M:EntityWorker.Core.InterFace.IRepository.GetLightDataTable(EntityWorker.Core.Object.Library.DbCommandExtended,System.String)">
+        <member name="M:EntityWorker.Core.InterFace.IRepository.GetLightDataTable(EntityWorker.Core.Interface.ISqlCommand,System.String)">
             <summary>
             Get LightDataTable by SqlCommand
             </summary>
             <param name="cmd"></param>
-            <param name="primaryKey"></param>
+            <param name="primaryKey"> set the primary key for faster browsing the datatable </param>
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.InterFace.IRepository.GetSqlCommand(System.String)">
@@ -1592,7 +1648,7 @@
             <param name="type">Set for faster Converting of dbreader to object</param>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.InterFace.IRepository.AddInnerParameter(EntityWorker.Core.Object.Library.DbCommandExtended,System.String,System.Object,System.Data.SqlDbType)">
+        <member name="M:EntityWorker.Core.InterFace.IRepository.AddInnerParameter(EntityWorker.Core.Interface.ISqlCommand,System.String,System.Object,System.Data.SqlDbType)">
             <summary>
             Add Parameter to sqlCommand
             </summary>
@@ -1601,7 +1657,7 @@
             <param name="value"></param>
             <param name="dbType"></param>
         </member>
-        <member name="M:EntityWorker.Core.InterFace.IRepository.AddInnerParameter(EntityWorker.Core.Object.Library.DbCommandExtended,System.String,System.Object,System.Data.DbType)">
+        <member name="M:EntityWorker.Core.InterFace.IRepository.AddInnerParameter(EntityWorker.Core.Interface.ISqlCommand,System.String,System.Object,System.Data.DbType)">
             <summary>
             Add parameters to SqlCommand
             </summary>
@@ -1619,19 +1675,19 @@
         </member>
         <member name="M:EntityWorker.Core.InterFace.IRepository.GetDbType(System.Type)">
             <summary>
-            DbType By System.Type
+            Get DbType By System.Type
             </summary>
             <param name="type"></param>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.InterFace.IRepository.ExecuteScalar(EntityWorker.Core.Object.Library.DbCommandExtended)">
+        <member name="M:EntityWorker.Core.InterFace.IRepository.ExecuteScalar(EntityWorker.Core.Interface.ISqlCommand)">
             <summary>
             ExecuteScale with return value
             </summary>
             <param name="cmd"></param>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.InterFace.IRepository.ExecuteNonQuery(EntityWorker.Core.Object.Library.DbCommandExtended)">
+        <member name="M:EntityWorker.Core.InterFace.IRepository.ExecuteNonQuery(EntityWorker.Core.Interface.ISqlCommand)">
             <summary>
             Execute Quary
             </summary>
@@ -1667,7 +1723,6 @@
             SaveChanges is needed after
             </summary>
             <param name="entity"></param>
-            
         </member>
         <member name="M:EntityWorker.Core.InterFace.IRepository.Save``1(``0,System.Linq.Expressions.Expression{System.Func{``0,System.Object}}[])">
             <summary>
@@ -1854,7 +1909,7 @@
             </summary>
             <typeparam name="T"></typeparam>
         </member>
-        <member name="M:EntityWorker.Core.InterFace.IRepository.DataReaderConverter``1(EntityWorker.Core.Object.Library.DbCommandExtended)">
+        <member name="M:EntityWorker.Core.InterFace.IRepository.DataReaderConverter``1(EntityWorker.Core.Interface.ISqlCommand)">
             <summary>
             Convert DbCommandExtended to List of Type T
             </summary>
@@ -1862,7 +1917,7 @@
             <param name="command"></param>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.InterFace.IRepository.DataReaderConverter(EntityWorker.Core.Object.Library.DbCommandExtended,System.Type)">
+        <member name="M:EntityWorker.Core.InterFace.IRepository.DataReaderConverter(EntityWorker.Core.Interface.ISqlCommand,System.Type)">
             <summary>
             Convert DbCommandExtended to list of System.Type
             </summary>
@@ -6129,6 +6184,12 @@
             <typeparam name="T"> datatype ed Users</typeparam>
             <returns></returns>
         </member>
+        <member name="T:EntityWorker.Core.Object.Library.DbCommandExtended">
+            <summary>
+            EntityWorker.Core SqlCommand
+            https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Repository.md
+            </summary>
+        </member>
         <member name="M:EntityWorker.Core.Object.Library.DbCommandExtended.#ctor(System.Data.Common.DbCommand,EntityWorker.Core.InterFace.IRepository)">
             <summary>
             
@@ -6136,6 +6197,66 @@
             <param name="cmd"></param>
             <param name="provider"></param>
             <param name="tableType"></param>
+        </member>
+        <member name="P:EntityWorker.Core.Object.Library.DbCommandExtended.Command">
+            <summary>
+            DbCommand
+            </summary>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.DbCommandExtended.AddInnerParameter(System.String,System.Object,System.Data.SqlDbType)">
+            <summary>
+            Add Parameter to sqlCommand
+            </summary>
+            <param name="attrName"></param>
+            <param name="value"></param>
+            <param name="dbType"></param>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.DbCommandExtended.AddInnerParameter(System.String,System.Object,System.Data.DbType)">
+            <summary>
+            Add parameters to SqlCommand
+            </summary>
+            <param name="attrName"></param>
+            <param name="value"></param>
+            <param name="dbType"></param>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.DbCommandExtended.DataReaderConverter``1">
+            <summary>
+            Convert SqlCommand to List of Type T
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.DbCommandExtended.DataReaderConverter(System.Type)">
+            <summary>
+            Convert SqlCommand to list of System.Type
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.DbCommandExtended.GetLightDataTable(System.String)">
+            <summary>
+            Get LightDataTable by SqlCommand
+            </summary>
+            <param name="primaryKey"> set the primary key for faster browsing the datatable </param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.DbCommandExtended.ExecuteScalar">
+            <summary>
+            ExecuteScale with return value
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.DbCommandExtended.ExecuteNonQuery">
+            <summary>
+            Execute Quary
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.DbCommandExtended.ToString">
+            <summary>
+            get the sql command
+            </summary>
+            <returns></returns>
         </member>
         <member name="T:EntityWorker.Core.Object.Library.EntityChanges">
             <summary>
@@ -15160,7 +15281,7 @@
         </member>
         <member name="M:EntityWorker.Core.Transaction.Transaction.InitializeMigration(System.Reflection.Assembly)">
             <summary>
-             Initialize the migration
+            Initialize the migration
             </summary>
             <param name="assembly">null for the current Assembly</param>
         </member>
@@ -15216,7 +15337,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.Transaction.Transaction.DataReaderConverter``1(EntityWorker.Core.Object.Library.DbCommandExtended)">
+        <member name="M:EntityWorker.Core.Transaction.Transaction.DataReaderConverter``1(EntityWorker.Core.Interface.ISqlCommand)">
             <summary>
             Convert to known object
             </summary>
@@ -15224,7 +15345,7 @@
             <param name="command"></param>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.Transaction.Transaction.DataReaderConverter(EntityWorker.Core.Object.Library.DbCommandExtended,System.Type)">
+        <member name="M:EntityWorker.Core.Transaction.Transaction.DataReaderConverter(EntityWorker.Core.Interface.ISqlCommand,System.Type)">
             <summary>
             Convert to unknown type
             </summary>
@@ -15232,14 +15353,14 @@
             <param name="type"></param>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.Transaction.Transaction.ExecuteScalar(EntityWorker.Core.Object.Library.DbCommandExtended)">
+        <member name="M:EntityWorker.Core.Transaction.Transaction.ExecuteScalar(EntityWorker.Core.Interface.ISqlCommand)">
             <summary>
             
             </summary>
             <param name="cmd"></param>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.Transaction.Transaction.ExecuteNonQuery(EntityWorker.Core.Object.Library.DbCommandExtended)">
+        <member name="M:EntityWorker.Core.Transaction.Transaction.ExecuteNonQuery(EntityWorker.Core.Interface.ISqlCommand)">
             <inheritdoc />
         </member>
         <member name="M:EntityWorker.Core.Transaction.Transaction.Rollback">
@@ -15271,7 +15392,7 @@
             <param name="type"></param>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.Transaction.Transaction.AddInnerParameter(EntityWorker.Core.Object.Library.DbCommandExtended,System.String,System.Object,System.Data.SqlDbType)">
+        <member name="M:EntityWorker.Core.Transaction.Transaction.AddInnerParameter(EntityWorker.Core.Interface.ISqlCommand,System.String,System.Object,System.Data.SqlDbType)">
             <summary>
             Add parameters to SqlCommand
             </summary>
@@ -15280,7 +15401,7 @@
             <param name="value"></param>
             <param name="dbType"></param>
         </member>
-        <member name="M:EntityWorker.Core.Transaction.Transaction.AddInnerParameter(EntityWorker.Core.Object.Library.DbCommandExtended,System.String,System.Object,System.Data.DbType)">
+        <member name="M:EntityWorker.Core.Transaction.Transaction.AddInnerParameter(EntityWorker.Core.Interface.ISqlCommand,System.String,System.Object,System.Data.DbType)">
             <summary>
             Add parameters to SqlCommand
             </summary>
@@ -15303,7 +15424,7 @@
             <param name="storedProcedure">Name</param>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.Transaction.Transaction.GetLightDataTableList(EntityWorker.Core.Object.Library.DbCommandExtended,System.String)">
+        <member name="M:EntityWorker.Core.Transaction.Transaction.GetLightDataTableList(EntityWorker.Core.Interface.ISqlCommand,System.String)">
             <summary>
             return a list of LightDataTable e.g. DataSet
             </summary>
@@ -15354,7 +15475,7 @@
             <param name="entity"></param>
             <returns> primaryId >0 is mandatory </returns>
         </member>
-        <member name="M:EntityWorker.Core.Transaction.Transaction.GetLightDataTable(EntityWorker.Core.Object.Library.DbCommandExtended,System.String)">
+        <member name="M:EntityWorker.Core.Transaction.Transaction.GetLightDataTable(EntityWorker.Core.Interface.ISqlCommand,System.String)">
             <summary>
             return LightDataTable e.g. DataTable
             </summary>

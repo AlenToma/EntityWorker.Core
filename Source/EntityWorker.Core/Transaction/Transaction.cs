@@ -50,7 +50,6 @@ namespace EntityWorker.Core.Transaction
         /// </summary>
         protected DbConnection SqlConnection { get; private set; }
 
-
         /// <summary>
         /// Constructor
         /// </summary>
@@ -58,7 +57,6 @@ namespace EntityWorker.Core.Transaction
         /// <param name="dataBaseTypes">The type of the database Ms-sql or Sql-light</param>
         public Transaction(string connectionString, DataBaseTypes dataBaseTypes) : base()
         {
-
             base._transaction = this;
             _attachedObjects = new Custom_ValueType<string, object>();
             if (string.IsNullOrEmpty(connectionString))
@@ -96,7 +94,7 @@ namespace EntityWorker.Core.Transaction
         protected abstract void OnModuleConfiguration(IModuleBuilder moduleBuilder);
 
         /// <summary>
-        ///  Initialize the migration
+        /// Initialize the migration
         /// </summary>
         /// <param name="assembly">null for the current Assembly</param>
         protected void InitializeMigration(Assembly assembly = null)
@@ -152,16 +150,16 @@ namespace EntityWorker.Core.Transaction
             if (DataBaseTypes == DataBaseTypes.Mssql)
             {
                 sqlBuild.InitialCatalog = "master";
-                var tr = new DbRepository(sqlBuild.ToString(), DataBaseTypes);
-                var cmd = tr.GetSqlCommand($"SELECT  CAST(CASE WHEN db_id(String[{dbName}]) is not null THEN 1 ELSE 0 END AS BIT)");
-                return tr.ExecuteScalar(cmd).ConvertValue<bool>();
+                using (var rep = new DbRepository(sqlBuild.ToString(), DataBaseTypes))
+                    return rep.GetSqlCommand($"SELECT  CAST(CASE WHEN db_id(String[{dbName}]) is not null THEN 1 ELSE 0 END AS BIT)").ExecuteScalar().ConvertValue<bool>();
+
             }
             else if (DataBaseTypes == DataBaseTypes.Sqllight)
             {
                 try
                 {
-                    var tr = new DbRepository(sqlBuild.ToString(), DataBaseTypes);
-                    tr.ValidateConnection();
+                    using (var rep = new DbRepository(sqlBuild.ToString(), DataBaseTypes))
+                        rep.ValidateConnection();
                     return true;
 
                 }
@@ -174,9 +172,8 @@ namespace EntityWorker.Core.Transaction
             {
                 dbName = npSqlBuilder.Database;
                 npSqlBuilder.Database = "";
-                var tr = new DbRepository(npSqlBuilder.ToString(), DataBaseTypes);
-                var cmd = tr.GetSqlCommand($"SELECT CAST(CASE WHEN datname is not null THEN 1 ELSE 0 END AS BIT) from pg_database WHERE lower(datname) = lower(String[{dbName}])");
-                return tr.ExecuteScalar(cmd).ConvertValue<bool>();
+                using (var rep = new DbRepository(npSqlBuilder.ToString(), DataBaseTypes))
+                    return rep.GetSqlCommand($"SELECT CAST(CASE WHEN datname is not null THEN 1 ELSE 0 END AS BIT) from pg_database WHERE lower(datname) = lower(String[{dbName}])").ExecuteScalar().ConvertValue<bool>();
             }
         }
 
@@ -202,10 +199,8 @@ namespace EntityWorker.Core.Transaction
                 if (DataBaseTypes == DataBaseTypes.Mssql)
                 {
                     sqlBuild.InitialCatalog = "master";
-                    var tr = new DbRepository(sqlBuild.ToString(), DataBaseTypes);
-                    var cmd = tr.GetSqlCommand($"Create DataBase [{dbName.Trim()}]");
-                    tr.ExecuteNonQuery(cmd);
-
+                    using (var rep = new DbRepository(sqlBuild.ToString(), DataBaseTypes))
+                        rep.GetSqlCommand($"Create DataBase [{dbName.Trim()}]").ExecuteNonQuery();
                 }
                 else if (DataBaseTypes == DataBaseTypes.Sqllight)
                     SQLiteConnection.CreateFile(dbName.Trim());
@@ -213,9 +208,8 @@ namespace EntityWorker.Core.Transaction
                 {
                     dbName = npSqlBuilder.Database;
                     npSqlBuilder.Database = "";
-                    var tr = new DbRepository(npSqlBuilder.ToString(), DataBaseTypes);
-                    var cmd = tr.GetSqlCommand($"Create DataBase {dbName}");
-                    tr.ExecuteNonQuery(cmd);
+                    using (var rep = new DbRepository(npSqlBuilder.ToString(), DataBaseTypes))
+                        rep.GetSqlCommand($"Create DataBase {dbName}").ExecuteNonQuery();
                 }
 
                 var latestChanges = GetCodeLatestChanges();
@@ -366,7 +360,7 @@ namespace EntityWorker.Core.Transaction
         /// <typeparam name="T"></typeparam>
         /// <param name="command"></param>
         /// <returns></returns>
-        public ISqlQueryable<T> DataReaderConverter<T>(DbCommandExtended command)
+        public ISqlQueryable<T> DataReaderConverter<T>(ISqlCommand command)
         {
             GlobalConfiguration.Log?.Info("Execute", command);
             return new SqlQueryable<T>(this, ((List<T>)DataReaderConverter(command, typeof(T))));
@@ -378,7 +372,7 @@ namespace EntityWorker.Core.Transaction
         /// <param name="command"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public IList DataReaderConverter(DbCommandExtended command, Type type)
+        public IList DataReaderConverter(ISqlCommand command, Type type)
         {
             IList result;
             ValidateConnection();
@@ -406,7 +400,7 @@ namespace EntityWorker.Core.Transaction
         /// </summary>
         /// <param name="cmd"></param>
         /// <returns></returns>
-        public object ExecuteScalar(DbCommandExtended cmd)
+        public object ExecuteScalar(ISqlCommand cmd)
         {
             ValidateConnection();
             var o = cmd.Command.ExecuteScalar();
@@ -415,7 +409,7 @@ namespace EntityWorker.Core.Transaction
         }
 
         /// <inheritdoc />
-        public int ExecuteNonQuery(DbCommandExtended cmd)
+        public int ExecuteNonQuery(ISqlCommand cmd)
         {
 
             ValidateConnection();
@@ -529,7 +523,7 @@ namespace EntityWorker.Core.Transaction
         /// <param name="attrName"></param>
         /// <param name="value"></param>
         /// <param name="dbType"></param>
-        public IRepository AddInnerParameter(DbCommandExtended cmd, string attrName, object value, SqlDbType dbType = SqlDbType.NVarChar)
+        public IRepository AddInnerParameter(ISqlCommand cmd, string attrName, object value, SqlDbType dbType = SqlDbType.NVarChar)
         {
             if (attrName != null && attrName[0] != '@')
                 attrName = "@" + attrName;
@@ -568,7 +562,7 @@ namespace EntityWorker.Core.Transaction
         /// <param name="attrName"></param>
         /// <param name="value"></param>
         /// <param name="dbType"></param>
-        public IRepository AddInnerParameter(DbCommandExtended cmd, string attrName, object value, DbType dbType)
+        public IRepository AddInnerParameter(ISqlCommand cmd, string attrName, object value, DbType dbType)
         {
             if (attrName != null && attrName[0] != '@')
                 attrName = "@" + attrName;
@@ -615,7 +609,7 @@ namespace EntityWorker.Core.Transaction
         /// </summary>
         /// <param name="sql"></param>
         /// <returns></returns>
-        public DbCommandExtended GetSqlCommand(string sql)
+        public ISqlCommand GetSqlCommand(string sql)
         {
             ValidateConnection();
             return this.ProcessSql(SqlConnection, Trans, sql);
@@ -626,7 +620,7 @@ namespace EntityWorker.Core.Transaction
         /// </summary>
         /// <param name="storedProcedure">Name</param>
         /// <returns></returns>
-        public DbCommandExtended GetStoredProcedure(string storedProcedure)
+        public ISqlCommand GetStoredProcedure(string storedProcedure)
         {
             ValidateConnection();
             var cmd = this.ProcessSql(SqlConnection, Trans, storedProcedure);
@@ -640,7 +634,7 @@ namespace EntityWorker.Core.Transaction
         /// <param name="cmd">sqlCommand that are create from GetSqlCommand</param>
         /// <param name="primaryKeyId"> Table primaryKeyId, so LightDataTable.FindByPrimaryKey could be used </param>
         /// <returns></returns>
-        protected List<ILightDataTable> GetLightDataTableList(DbCommandExtended cmd, string primaryKeyId = null)
+        protected List<ILightDataTable> GetLightDataTableList(ISqlCommand cmd, string primaryKeyId = null)
         {
             GlobalConfiguration.Log?.Info("Execute", cmd);
             var returnList = new List<ILightDataTable>();
@@ -800,7 +794,7 @@ namespace EntityWorker.Core.Transaction
         /// <param name="cmd">sqlCommand that are create from GetSqlCommand</param>
         /// <param name="primaryKey">Table primaryKeyId, so LightDataTable.FindByPrimaryKey could be used </param>
         /// <returns></returns>
-        public ILightDataTable GetLightDataTable(DbCommandExtended cmd, string primaryKey = null)
+        public ILightDataTable GetLightDataTable(ISqlCommand cmd, string primaryKey = null)
         {
             GlobalConfiguration.Log?.Info("Execute", cmd);
             ValidateConnection();
@@ -1199,7 +1193,7 @@ namespace EntityWorker.Core.Transaction
             }
         }
 
-   
+
 
         #endregion
     }

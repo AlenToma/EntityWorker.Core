@@ -37,10 +37,10 @@ namespace EntityWorker.Core.InterFace
         /// Get LightDataTable by SqlCommand
         /// </summary>
         /// <param name="cmd"></param>
-        /// <param name="primaryKey"></param>
+        /// <param name="primaryKey"> set the primary key for faster browsing the datatable </param>
         /// <returns></returns>
 
-        ILightDataTable GetLightDataTable(DbCommandExtended cmd, string primaryKey = null);
+        ILightDataTable GetLightDataTable(ISqlCommand cmd, string primaryKey = null);
 
         /// <summary>
         /// Return SqlCommand that already contain SQLConnection
@@ -48,7 +48,7 @@ namespace EntityWorker.Core.InterFace
         /// <param name="sql"></param>
         /// <param name="type">Set for faster Converting of dbreader to object</param>
         /// <returns></returns>
-        DbCommandExtended GetSqlCommand(string sql);
+        ISqlCommand GetSqlCommand(string sql);
 
         /// <summary>
         /// Return SqlCommand that already contain SQLConnection
@@ -56,7 +56,7 @@ namespace EntityWorker.Core.InterFace
         /// <param name="storedProcedure"></param>
         /// <param name="type">Set for faster Converting of dbreader to object</param>
         /// <returns></returns>
-        DbCommandExtended GetStoredProcedure(string storedProcedure);
+        ISqlCommand GetStoredProcedure(string storedProcedure);
 
         /// <summary>
         /// Add Parameter to sqlCommand
@@ -66,7 +66,7 @@ namespace EntityWorker.Core.InterFace
         /// <param name="value"></param>
         /// <param name="dbType"></param>
 
-        IRepository AddInnerParameter(DbCommandExtended cmd, string attrName, object value, SqlDbType dbType = SqlDbType.NVarChar);
+        IRepository AddInnerParameter(ISqlCommand cmd, string attrName, object value, SqlDbType dbType = SqlDbType.NVarChar);
 
         /// <summary>
         /// Add parameters to SqlCommand
@@ -75,7 +75,7 @@ namespace EntityWorker.Core.InterFace
         /// <param name="attrName"></param>
         /// <param name="value"></param>
         /// <param name="dbType"></param>
-        IRepository AddInnerParameter(DbCommandExtended cmd, string attrName, object value, DbType dbType);
+        IRepository AddInnerParameter(ISqlCommand cmd, string attrName, object value, DbType dbType);
 
         /// <summary>
         /// Get SqlDbType By system Type
@@ -86,7 +86,7 @@ namespace EntityWorker.Core.InterFace
 
 
         /// <summary>
-        /// DbType By System.Type
+        /// Get DbType By System.Type
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
@@ -98,7 +98,7 @@ namespace EntityWorker.Core.InterFace
         /// <param name="cmd"></param>
         /// <returns></returns>
 
-        object ExecuteScalar(DbCommandExtended cmd);
+        object ExecuteScalar(ISqlCommand cmd);
 
         /// <summary>
         /// Execute Quary
@@ -106,7 +106,7 @@ namespace EntityWorker.Core.InterFace
         /// <param name="cmd"></param>
         /// <returns></returns>
 
-        int ExecuteNonQuery(DbCommandExtended cmd);
+        int ExecuteNonQuery(ISqlCommand cmd);
 
         /// <summary>
         /// Create Transaction
@@ -139,7 +139,7 @@ namespace EntityWorker.Core.InterFace
         /// SaveChanges is needed after
         /// </summary>
         /// <param name="entity"></param>
-        /// 
+       
         Task<IRepository> DeleteAsync(object entity);
 
         /// <summary>
@@ -342,7 +342,7 @@ namespace EntityWorker.Core.InterFace
         /// <typeparam name="T"></typeparam>
         /// <param name="command"></param>
         /// <returns></returns>
-        ISqlQueryable<T> DataReaderConverter<T>(DbCommandExtended command);
+        ISqlQueryable<T> DataReaderConverter<T>(ISqlCommand command);
 
         /// <summary>
         /// Convert DbCommandExtended to list of System.Type
@@ -350,7 +350,7 @@ namespace EntityWorker.Core.InterFace
         /// <param name="command"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        IList DataReaderConverter(DbCommandExtended command, Type type);
+        IList DataReaderConverter(ISqlCommand command, Type type);
 
         /// <summary>
         /// Create Protected package that contain files or data for backup purpose or moving data from one location to another.
