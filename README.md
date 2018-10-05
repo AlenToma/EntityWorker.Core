@@ -29,6 +29,7 @@ See Code Example for more info.
 ## Code Example
 
 * [GlobalConfiguration](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/GlobalConfiguration.md)
+* [Extension](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Extension.md)
 * [Logger](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/logger.md)
 * [Repository](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Repository.md)
 * [Allowed System type](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/System.Type.md)
