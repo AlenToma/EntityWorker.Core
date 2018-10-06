@@ -1,4 +1,4 @@
-﻿ using LightData.CMS.Modules.Repository;
+﻿using LightData.CMS.Modules.Repository;
 using LightData.CMS.Modules.Library;
 using System;
 using System.Linq;
@@ -36,14 +36,11 @@ namespace ConsoleApp1
         {
             using (var rep = new Repository())
             {
-                var us = rep.Get<User>().OrderBy(x=> x.Id).LoadChildren().ExecuteFirstOrDefault();
-                us.Role.Name = "Yedsfsdft";
-                rep.Save(us, x => x.Person.Addresses.Select(a=> a.Name));
-                var m = rep.Get<User>().OrderBy(x => x.Id).LoadChildren().ExecuteFirstOrDefault();
-                Console.WriteLine("New Value for RoleName is " + m.Role.Name);
-
-                rep.Rollback();
-            }         
+                var strList = new List<string>() { "Alen", "Toma" };
+                var data =rep.Get<Person>().Where(x => strList.Contains(x.FirstName) || !strList.Contains(x.FirstName));
+                var users = data.ExecuteFirstOrDefault();
+                var sql = data.ParsedLinqToSql;
+            }
         }
 
         public static void DynamicLinq()

@@ -1118,7 +1118,7 @@ namespace EntityWorker.Core.Transaction
         /// <returns></returns>
         public object Execute(Expression expression)
         {
-            var _expression = new LightDataLinqToNoSql(expression.Type.GetActualType(), this);
+            var _expression = new LinqToSql(expression.Type.GetActualType(), this);
             _expression.Translate(expression);
             return _dbSchema.Select(expression.Type, _expression.Quary);
 
@@ -1133,7 +1133,7 @@ namespace EntityWorker.Core.Transaction
         public TResult Execute<TResult>(Expression expression)
         {
             var isEnumerable = (typeof(TResult).Name == "IEnumerable`1");
-            var _expression = new LightDataLinqToNoSql(typeof(TResult).GetActualType(), this);
+            var _expression = new LinqToSql(typeof(TResult).GetActualType(), this);
             _expression.Translate(expression);
             if (!isEnumerable)
                 return Select<TResult>(_expression.Quary).First();

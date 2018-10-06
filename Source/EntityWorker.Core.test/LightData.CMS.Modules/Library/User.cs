@@ -27,5 +27,7 @@ namespace LightData.CMS.Modules.Library
 
         public IPerson Person { get; set; }
 
+        public bool? IsActive { get; set; }
+
     }
 }

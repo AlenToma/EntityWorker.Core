@@ -15233,7 +15233,7 @@
             be part of an evaluated sub-tree.
             </summary>
         </member>
-        <member name="M:EntityWorker.Core.SqlQuerys.LightDataLinqToNoSql.VisitBinary(System.Linq.Expressions.BinaryExpression)">
+        <member name="M:EntityWorker.Core.SqlQuerys.LinqToSql.VisitBinary(System.Linq.Expressions.BinaryExpression)">
             <summary>
             
             </summary>
