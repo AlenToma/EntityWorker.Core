@@ -726,7 +726,7 @@ namespace EntityWorker.Core.SqlQuerys
                 switch (Type.GetTypeCode(c.Value.GetType()))
                 {
                     case TypeCode.Boolean:
-                        sb.Append(((bool)c.Value) ? (DataBaseTypes == DataBaseTypes.PostgreSql ? "true" : "1") : (DataBaseTypes == DataBaseTypes.PostgreSql ? "true" : "1"));
+                        sb.Append(((bool)c.Value) ? (DataBaseTypes == DataBaseTypes.PostgreSql ? "true" : "1") : (DataBaseTypes == DataBaseTypes.PostgreSql ? "false" : "0"));
                         break;
 
                     case TypeCode.String:
@@ -837,6 +837,7 @@ namespace EntityWorker.Core.SqlQuerys
                     }
                     if (isNot)
                     {
+                        var invert = GetInvert();
                         if (!hasValueAttr)
                             columnName = $"(CASE WHEN {columnName} = {boolString.Replace("#", "0T")} THEN {boolString.Replace("#", "1T")} ELSE {boolString.Replace("#", "0T")} END) {boolString.Replace("#", "0")}";
                         else columnName = $"(CASE WHEN {columnName} IS NULL THEN {boolString.Replace("#", "1T")} ELSE {boolString.Replace("#", "0T")} END) {boolString.Replace("#", "0")}";
