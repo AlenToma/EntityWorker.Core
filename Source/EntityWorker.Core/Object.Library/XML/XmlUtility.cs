@@ -31,8 +31,7 @@ namespace EntityWorker.Core.Object.Library.XML
         }
 
         /// <summary>
-        /// DeSerilize Xml to IAnimal, this is supposed to handle all unknow object types but there has not been to many tests.
-        /// Only IAnimal test been done here.
+        /// DeSerilize Xml to object, this is supposed to handle all unknow object types but there has not been to many tests.
         /// </summary>
         /// <param name="xml"></param>
         /// <param name="transaction"></param>
@@ -89,8 +88,7 @@ namespace EntityWorker.Core.Object.Library.XML
         }
 
         /// <summary>
-        /// DeSerilize Xml to IAnimal, this is supposed to handle all unknow object types but there has not been to many tests.
-        /// Only IAnimal test been done here.
+        /// DeSerilize Xml to object, this is supposed to handle all unknow object types but there has not been to many tests.
         /// </summary>
         /// <param name="xml"></param>
         /// <param name="transaction"></param>

@@ -7000,8 +7000,7 @@
         </member>
         <member name="M:EntityWorker.Core.Object.Library.XML.XmlUtility.FromXml(System.String,EntityWorker.Core.InterFace.IRepository)">
             <summary>
-            DeSerilize Xml to IAnimal, this is supposed to handle all unknow object types but there has not been to many tests.
-            Only IAnimal test been done here.
+            DeSerilize Xml to object, this is supposed to handle all unknow object types but there has not been to many tests.
             </summary>
             <param name="xml"></param>
             <param name="transaction"></param>
@@ -7009,8 +7008,7 @@
         </member>
         <member name="M:EntityWorker.Core.Object.Library.XML.XmlUtility.FromXml``1(System.String,EntityWorker.Core.InterFace.IRepository)">
             <summary>
-            DeSerilize Xml to IAnimal, this is supposed to handle all unknow object types but there has not been to many tests.
-            Only IAnimal test been done here.
+            DeSerilize Xml to object, this is supposed to handle all unknow object types but there has not been to many tests.
             </summary>
             <param name="xml"></param>
             <param name="transaction"></param>

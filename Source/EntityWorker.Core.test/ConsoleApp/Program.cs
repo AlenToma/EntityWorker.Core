@@ -37,7 +37,7 @@ namespace ConsoleApp1
             using (var rep = new Repository())
             {
                 var strList = new List<string>() { "Alen", "Toma" };
-                var data =rep.Get<User>().Where(x =>  !x.IsActive || x.IsActive);
+                var data =rep.Get<User>().Where(x =>  !x.IsActive2.HasValue && x.IsActive2.HasValue == true);
                 var users = data.ExecuteFirstOrDefault();
                 var sql = data.ParsedLinqToSql;
             }

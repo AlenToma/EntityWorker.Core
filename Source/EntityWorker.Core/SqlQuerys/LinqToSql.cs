@@ -169,7 +169,8 @@ namespace EntityWorker.Core.SqlQuerys
         {
             if (ex.NodeType == ExpressionType.MemberAccess)
             {
-
+                if (ex.ToString().Contains("DisplayClass"))
+                    return Expression.Lambda(ex).Compile().DynamicInvoke();
                 var member = (ex as MemberExpression).Expression as ConstantExpression;
                 if (member?.Value.GetType().GetFields(_bindingFlags).Length > 0)
                     return member?.Value.GetType().GetFields(_bindingFlags).First().GetValue(member.Value);
@@ -303,8 +304,7 @@ namespace EntityWorker.Core.SqlQuerys
                     sb.Append("(CASE WHEN ");
                     this.Visit(m.Object);
                     InsertBeforeDecoder(" LIKE ");
-                    var v = string.Format("String[{0}%]", value);
-                    CleanDecoder(v);
+                    CleanDecoder(string.Format("String[{0}%]", value));
                     sb.Append(" THEN " + boolString.Replace("#", "1T") + " ELSE " + boolString.Replace("#", "0T") + " END) ");
                     sb.Append(boolString.Replace("#", !string.IsNullOrEmpty(invert) ? "0" : "1"));
 
@@ -317,8 +317,7 @@ namespace EntityWorker.Core.SqlQuerys
                     this.Visit(m.Arguments[0]);
                     InsertBeforeDecoder(" LIKE ");
                     var value = (((MemberExpression)m.Object).Member as FieldInfo) != null ? (((MemberExpression)m.Object).Member as FieldInfo)?.GetValue(ex.Value) : (((MemberExpression)m.Object).Member as PropertyInfo)?.GetValue(ex.Value);
-                    var v = string.Format("String[{0}%]", value);
-                    CleanDecoder(v);
+                    CleanDecoder(string.Format("String[{0}%]", value));
                     sb.Append(" THEN " + boolString.Replace("#", "1T") + " ELSE " + boolString.Replace("#", "0T") + " END) ");
                     sb.Append(boolString.Replace("#", !string.IsNullOrEmpty(invert) ? "0" : "1"));
 
@@ -336,8 +335,7 @@ namespace EntityWorker.Core.SqlQuerys
                     sb.Append("(CASE WHEN ");
                     this.Visit(m.Object);
                     InsertBeforeDecoder(" LIKE ");
-                    var v = string.Format("String[%{0}]", value);
-                    CleanDecoder(v);
+                    CleanDecoder(string.Format("String[%{0}]", value));
                     sb.Append(" THEN " + boolString.Replace("#", "1T") + " ELSE " + boolString.Replace("#", "0T") + " END) ");
                     sb.Append(boolString.Replace("#", !string.IsNullOrEmpty(invert) ? "0" : "1"));
 
@@ -350,8 +348,7 @@ namespace EntityWorker.Core.SqlQuerys
                     this.Visit(m.Arguments[0]);
                     InsertBeforeDecoder(" LIKE ");
                     var value = (((MemberExpression)m.Object).Member as FieldInfo) != null ? (((MemberExpression)m.Object).Member as FieldInfo)?.GetValue(ex.Value) : (((MemberExpression)m.Object).Member as PropertyInfo)?.GetValue(ex.Value);
-                    var v = string.Format("String[%{0}]", value);
-                    CleanDecoder(v);
+                    CleanDecoder(string.Format("String[%{0}]", value));
                     sb.Append(" THEN " + boolString.Replace("#", "1T") + " ELSE " + boolString.Replace("#", "0T") + " END) ");
                     sb.Append(boolString.Replace("#", !string.IsNullOrEmpty(invert) ? "0" : "1"));
 
@@ -648,8 +645,7 @@ namespace EntityWorker.Core.SqlQuerys
 
             this.Visit(b.Right);
             var reg = new Regex(@"\b(IsNullOrEmpty|Contains|StartsWith|EndsWith)\b", RegexOptions.IgnoreCase | RegexOptions.Multiline);
-            if ((b.Right.Type == typeof(bool) || b.Right.Type == typeof(bool?))
-                && !reg.Match(b.Right.ToString()).Success)
+            if ((b.Right.Type == typeof(bool) || b.Right.Type == typeof(bool?)) && !reg.Match(b.Right.ToString()).Success)
                 validateBinaryExpression(b, null);
             validateBinaryExpression(b, b.Right);
 
@@ -666,7 +662,7 @@ namespace EntityWorker.Core.SqlQuerys
             var type = value.GetType();
 
             if (type == typeof(bool) || type == typeof(bool?))
-                return value.ConvertValue<bool>() ? ( DataBaseTypes == DataBaseTypes.PostgreSql ? "true" : "1") : (DataBaseTypes == DataBaseTypes.PostgreSql ? "false" : "0");
+                return value.ConvertValue<bool>() ? (DataBaseTypes == DataBaseTypes.PostgreSql ? "true" : "1") : (DataBaseTypes == DataBaseTypes.PostgreSql ? "false" : "0");
 
             if (type == typeof(string))
                 return string.Format("String[{0}]", value);
@@ -840,7 +836,7 @@ namespace EntityWorker.Core.SqlQuerys
                         var invert = GetInvert();
                         if (!hasValueAttr)
                             columnName = $"(CASE WHEN {columnName} = {boolString.Replace("#", "0T")} THEN {boolString.Replace("#", "1T")} ELSE {boolString.Replace("#", "0T")} END) {boolString.Replace("#", "0")}";
-                        else columnName = $"(CASE WHEN {columnName} IS NULL THEN {boolString.Replace("#", "1T")} ELSE {boolString.Replace("#", "0T")} END) {boolString.Replace("#", "0")}";
+                        else columnName = $"(CASE WHEN {columnName} IS NULL THEN {boolString.Replace("#", "0T")} ELSE {boolString.Replace("#", "1T")} END) {boolString.Replace("#", "0")}";
                     }
                     else if (hasValueAttr)
                     {

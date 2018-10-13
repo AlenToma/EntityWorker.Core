@@ -29,5 +29,7 @@ namespace LightData.CMS.Modules.Library
 
         public bool IsActive { get; set; }
 
+        public bool? IsActive2 { get; set; }
+
     }
 }

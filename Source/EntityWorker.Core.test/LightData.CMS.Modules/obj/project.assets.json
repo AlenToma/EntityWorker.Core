@@ -373,7 +373,7 @@
           }
         }
       },
-      "EntityWorker.Core/2.3.1": {
+      "EntityWorker.Core/2.3.4": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v2.0",
         "dependencies": {
@@ -412,7 +412,7 @@
           }
         }
       },
-      "EntityWorker.Core/2.3.1": {
+      "EntityWorker.Core/2.3.4": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5.1",
         "dependencies": {
@@ -748,7 +748,7 @@
           "ref/netstandard1.3/System.Threading.Tasks.dll": {}
         }
       },
-      "EntityWorker.Core/2.3.1": {
+      "EntityWorker.Core/2.3.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -2337,7 +2337,7 @@
         "system.threading.tasks.nuspec"
       ]
     },
-    "EntityWorker.Core/2.3.1": {
+    "EntityWorker.Core/2.3.4": {
       "type": "project",
       "path": "../../EntityWorker.Core/EntityWorker.Core.csproj",
       "msbuildProject": "../../EntityWorker.Core/EntityWorker.Core.csproj"
@@ -2345,14 +2345,14 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.0": [
-      "EntityWorker.Core >= 2.3.1",
+      "EntityWorker.Core >= 2.3.4",
       "Microsoft.NETCore.App >= 2.0.0"
     ],
     ".NETFramework,Version=v4.6.1": [
-      "EntityWorker.Core >= 2.3.1"
+      "EntityWorker.Core >= 2.3.4"
     ],
     ".NETStandard,Version=v2.0": [
-      "EntityWorker.Core >= 2.3.1",
+      "EntityWorker.Core >= 2.3.4",
       "NETStandard.Library >= 2.0.3"
     ]
   },
@@ -2384,6 +2384,7 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "D:\\Projects\\EntityWorker.Core\\Source\\EntityWorker.Core\\bin\\Release": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
