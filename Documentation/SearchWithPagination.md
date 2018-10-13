@@ -36,6 +36,7 @@ here is a simple example on how you could implement a simple generic method with
                     data = data.OrderBy(settings.SortColumn);
                 else data = data.OrderByDescending(settings.SortColumn);
             }
+            // we get the total rows before we add Skip and Take
             settings.TotalPages = Math.Ceiling(data.ExecuteCount().ConvertValue<decimal>() / settings.PageSize).ConvertValue<int>();
             data = data.Skip(settings.SelectedPage / settings.PageSize).Take(settings.PageSize);
             settings.Result = data.Execute();
