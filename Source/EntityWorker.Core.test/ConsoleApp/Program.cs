@@ -32,14 +32,22 @@ namespace ConsoleApp1
 
         }
 
+        private static string T = "Admin";
+
+        public string m = "";
+
+        private static List<string> k = new List<string>() { "Admin", "Alen" , "sdsd" };
+
+
+
         public static void test()
         {
             using (var rep = new Repository())
             {
-                var strList = new List<string>() { "Alen", "Toma" };
-                var data =rep.Get<User>().Where(x =>  !x.IsActive2.HasValue && x.IsActive2.HasValue == true);
-                var users = data.ExecuteFirstOrDefault();
-                var sql = data.ParsedLinqToSql;
+                var s = "Admin";
+                var user = new User("") { UserName = "sd" };
+                var t = new List<string>() { "Admin", "Alen" , "sdsad"};
+                var users = rep.Get<User>().Where(x=> x.UserName == s || x.UserName == T || x.UserName == user.UserName).LoadChildren().ExecuteFirstOrDefault();
             }
         }
 

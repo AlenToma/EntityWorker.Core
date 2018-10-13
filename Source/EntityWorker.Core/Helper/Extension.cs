@@ -99,10 +99,22 @@ namespace EntityWorker.Core.Helper
         /// Convert To Json
         /// </summary>
         /// <param name="o"></param>
+        /// <param name="param">The Default is GlobalConfigration.JSONParameters</param>
         /// <returns></returns>
-        public static string ToJson(this object o)
+        public static string ToJson(this object o, JSONParameters param = null)
         {
-            return JSON.ToNiceJSON(o);
+            return JSON.ToNiceJSON(o, param ?? GlobalConfiguration.JSONParameters);
+        }
+
+
+        /// <summary>
+        /// Convert Json to dynamic object
+        /// </summary>
+        /// <param name=""></param>
+        /// <returns></returns>
+        public static dynamic FromJsonToDynamic(this string json)
+        {
+            return JSON.ToDynamic(json);
         }
 
         /// <summary>
@@ -110,10 +122,11 @@ namespace EntityWorker.Core.Helper
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="json"></param>
+        /// <param name="param">The Default is GlobalConfigration.JSONParameters</param>
         /// <returns></returns>
-        public static T FromJson<T>(this string json)
+        public static T FromJson<T>(this string json, JSONParameters param = null)
         {
-            return JSON.ToObject<T>(json);
+            return JSON.ToObject<T>(json, param ?? GlobalConfiguration.JSONParameters);
         }
 
         /// <summary>
@@ -123,10 +136,10 @@ namespace EntityWorker.Core.Helper
         /// <param name="json"></param>
         /// <param name="repository"></param>
         /// <returns></returns>
-        internal static T FromJson<T>(this string json, IRepository repository)
+        internal static T FromJson<T>(this string json, IRepository repository, JSONParameters param = null)
         {
-            var o = JSON.ToObject<T>(json);
 
+            var o = JSON.ToObject<T>(json, param ?? GlobalConfiguration.JSONParameters);
 
             void LoadJsonIgnoreProperties(object item)
             {
@@ -143,7 +156,7 @@ namespace EntityWorker.Core.Helper
                 if (!(item?.GetPrimaryKeyValue().ObjectIsNew() ?? true))
                 {
                     var primaryId = item.GetPrimaryKeyValue();
-                    foreach (var prop in DeepCloner.GetFastDeepClonerProperties(item.GetType()).Where(x => (x.ContainAttribute<JsonIgnore>() || !x.IsInternalType) && !x.ContainAttribute<ExcludeFromAbstract>() && x.CanRead))
+                    foreach (var prop in DeepCloner.GetFastDeepClonerProperties(item.GetType()).Where(x => (x.ContainAttribute<JsonIgnore>() || !x.IsInternalType) && !x.ContainAttribute<ExcludeFromAbstract>() && x.CanReadWrite))
                     {
                         var value = prop.GetValue(item);
                         if (prop.PropertyType == typeof(string) && string.IsNullOrEmpty(value?.ToString()))
@@ -180,10 +193,11 @@ namespace EntityWorker.Core.Helper
         /// <typeparam name="T"></typeparam>
         /// <param name="json"></param>
         /// <param name="type"></param>
+        /// <param name="param">The Default is GlobalConfigration.JSONParameters</param>
         /// <returns></returns>
-        public static object FromJson(this string json, Type type)
+        public static object FromJson(this string json, Type type, JSONParameters param = null)
         {
-            return JSON.ToObject(json, type);
+            return JSON.ToObject(json, type, param ?? GlobalConfiguration.JSONParameters);
         }
 
         /// <summary>
@@ -192,10 +206,11 @@ namespace EntityWorker.Core.Helper
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="json"></param>
+        /// <param name="param">The Default is GlobalConfigration.JSONParameters</param>
         /// <returns></returns>
-        public static object FromJson(this string json)
+        public static object FromJson(this string json, JSONParameters param)
         {
-            return JSON.ToObject(json);
+            return JSON.ToObject(json, param ?? GlobalConfiguration.JSONParameters);
         }
 
         /// <summary>
@@ -834,7 +849,7 @@ namespace EntityWorker.Core.Helper
                             pp.TryAdd(col, prop);
                         }
                         else prop = pp[col];
-                        if (prop != null && value != DBNull.Value && value != null && prop.CanRead)
+                        if (prop != null && value != DBNull.Value && value != null && prop.CanReadWrite)
                         {
                             if (value as byte[] != null && prop.PropertyType.FullName.Contains("Guid"))
                                 value = new Guid(value as byte[]);

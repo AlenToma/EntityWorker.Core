@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using EntityWorker.Core.Helper;
 using EntityWorker.Core.Interface;
 using EntityWorker.Core.Object.Library;
+using EntityWorker.Core.Object.Library.JSON;
 
 namespace EntityWorker.Core.InterFace
 {
@@ -174,16 +175,18 @@ namespace EntityWorker.Core.InterFace
         /// All JsonIgnore Values will be loaded from the database if a primary key exist and the value is default()  eg null or empty or even 0 for int and decimal
         /// </summary>
         /// <typeparam name="T"></typeparam>
+        /// <param name="param">The Default is GlobalConfigration.JSONParameters</param>
         /// <returns></returns>
-        ISqlQueryable<T> FromJson<T>(string json) where T : class;
+        ISqlQueryable<T> FromJson<T>(string json, JSONParameters param = null) where T : class;
 
         /// <summary>
         /// Get ISqlQueryable from Json.
         /// All JsonIgnore Values will be loaded from the database if a primary key exist and the value is default()  eg null or empty or even 0 for int and decimal
         /// </summary>
         /// <typeparam name="T"></typeparam>
+        /// <param name="param">The Default is GlobalConfigration.JSONParameters</param>
         /// <returns></returns>
-        Task<ISqlQueryable<T>> FromJsonAsync<T>(string json) where T : class;
+        Task<ISqlQueryable<T>> FromJsonAsync<T>(string json, JSONParameters param = null) where T : class;
 
         /// <summary>
         /// Get ISqlQueryable from Xml.

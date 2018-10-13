@@ -1,4 +1,4 @@
-﻿#if net4
+﻿
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,7 +14,7 @@ namespace EntityWorker.Core.Object.Library.JSON
 
         public DynamicJson(string json)
         {
-            var parse = EntityWorker.Core.Object.Library.JSON.JSON.Parse(json);
+            var parse = JSON.Parse(json);
 
             if (parse is IDictionary<string, object>)
                 _dictionary = (IDictionary<string, object>)parse;
@@ -33,17 +33,17 @@ namespace EntityWorker.Core.Object.Library.JSON
             return _dictionary.Keys.ToList();
         }
 
-        public override bool TryGetIndex(GetIndexBinder binder, Object[] indexes, out Object result)
+        public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object result)
         {
             var index = indexes[0];
             if (index is int)
             {
-                result = _list[(int) index];
+                result = _list[(int)index];
             }
             else
             {
-                result = _dictionary[(string) index];
-            } 
+                result = _dictionary[(string)index];
+            }
             if (result is IDictionary<string, object>)
                 result = new DynamicJson(result as IDictionary<string, object>);
             return true;
@@ -52,7 +52,7 @@ namespace EntityWorker.Core.Object.Library.JSON
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
             if (_dictionary.TryGetValue(binder.Name, out result) == false)
-                if (_dictionary.TryGetValue(binder.Name.ToLower(), out result) == false)
+                if (_dictionary.TryGetValue(binder.Name.ToLowerInvariant(), out result) == false)
                     return false;// throw new Exception("property not found " + binder.Name);
 
             if (result is IDictionary<string, object>)
@@ -77,11 +77,10 @@ namespace EntityWorker.Core.Object.Library.JSON
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            foreach(var o in _list)
+            foreach (var o in _list)
             {
                 yield return new DynamicJson(o as IDictionary<string, object>);
             }
         }
     }
 }
-#endif

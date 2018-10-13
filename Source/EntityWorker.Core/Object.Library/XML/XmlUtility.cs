@@ -58,7 +58,7 @@ namespace EntityWorker.Core.Object.Library.XML
                 if (!(item?.GetPrimaryKeyValue().ObjectIsNew() ?? true))
                 {
                     var primaryId = item.GetPrimaryKeyValue();
-                    foreach (var prop in DeepCloner.GetFastDeepClonerProperties(item.GetType()).Where(x => (x.ContainAttribute<XmlIgnore>() || !x.IsInternalType) && !x.ContainAttribute<ExcludeFromAbstract>() && x.CanRead))
+                    foreach (var prop in DeepCloner.GetFastDeepClonerProperties(item.GetType()).Where(x => (x.ContainAttribute<XmlIgnore>() || !x.IsInternalType) && !x.ContainAttribute<ExcludeFromAbstract>() && x.CanReadWrite))
                     {
                         var value = prop.GetValue(item);
                         if (prop.PropertyType == typeof(string) && string.IsNullOrEmpty(value?.ToString()))
@@ -115,7 +115,7 @@ namespace EntityWorker.Core.Object.Library.XML
                 if (!(item?.GetPrimaryKeyValue().ObjectIsNew() ?? true))
                 {
                     var primaryId = item.GetPrimaryKeyValue();
-                    foreach (var prop in DeepCloner.GetFastDeepClonerProperties(item.GetType()).Where(x => (x.ContainAttribute<XmlIgnore>() || !x.IsInternalType) && !x.ContainAttribute<ExcludeFromAbstract>() && x.CanRead))
+                    foreach (var prop in DeepCloner.GetFastDeepClonerProperties(item.GetType()).Where(x => (x.ContainAttribute<XmlIgnore>() || !x.IsInternalType) && !x.ContainAttribute<ExcludeFromAbstract>() && x.CanReadWrite))
                     {
                         var value = prop.GetValue(item);
                         if (prop.PropertyType == typeof(string) && string.IsNullOrEmpty(value?.ToString()))

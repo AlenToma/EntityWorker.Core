@@ -7,14 +7,16 @@ using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Collections.Specialized;
+using EntityWorker.Core.Helper;
+using EntityWorker.Core.Attributes;
 
 namespace EntityWorker.Core.Object.Library.JSON
 {
-    public delegate string Serialize(object data);
-    public delegate object Deserialize(string data);
 
     public sealed class JSONParameters
     {
+        public JsonFormatting JsonFormatting = JsonFormatting.Auto;
+
         /// <summary>
         /// Use the optimized fast Dataset Schema format (default = True)
         /// </summary>
@@ -32,10 +34,6 @@ namespace EntityWorker.Core.Object.Library.JSON
         /// </summary>
         public bool UseUTCDateTime = true;
         /// <summary>
-        /// Show the readonly properties of types in the output (default = False)
-        /// </summary>
-        public bool ShowReadOnlyProperties = false;
-        /// <summary>
         /// Use the $types extension to optimise the output json (default = True)
         /// </summary>
         public bool UsingGlobalTypes = true;
@@ -44,10 +42,6 @@ namespace EntityWorker.Core.Object.Library.JSON
         /// </summary>
         [Obsolete("Not needed anymore and will always match")]
         public bool IgnoreCaseOnDeserialize = false;
-        /// <summary>
-        /// Anonymous types have read only properties 
-        /// </summary>
-        public bool EnableAnonymousTypes = false;
         /// <summary>
         /// Enable fastJSON extensions $types, $type, $map (default = True)
         /// </summary>
@@ -65,8 +59,11 @@ namespace EntityWorker.Core.Object.Library.JSON
         /// </summary>
         public bool UseValuesOfEnums = false;
         /// <summary>
+        /// Ignore attributes to check for (default : XmlIgnoreAttribute, NonSerialized)
+        /// </summary>
+        public List<Type> IgnoreAttributes = new List<Type> { typeof(System.Xml.Serialization.XmlIgnoreAttribute), typeof(NonSerializedAttribute), typeof(JsonIgnore) };
+        /// <summary>
         /// If you have parametric and no default constructor for you classes (default = False)
-        /// 
         /// IMPORTANT NOTE : If True then all initial values within the class will be ignored and will be not set
         /// </summary>
         public bool ParametricConstructorOverride = false;
@@ -79,17 +76,17 @@ namespace EntityWorker.Core.Object.Library.JSON
         /// </summary>
         public byte SerializerMaxDepth = 20;
         /// <summary>
-        /// Inline circular or already seen objects instead of replacement with $i (default = False) 
+        /// Inline circular or already seen objects instead of replacement with $i (default = false) 
         /// </summary>
         public bool InlineCircularReferences = false;
-        /// <summary>
-        /// Save property/field names as lowercase (default = false)
-        /// </summary>
-        public bool SerializeToLowerCaseNames = false;
         /// <summary>
         /// Formatter indent spaces (default = 3)
         /// </summary>
         public byte FormatterIndentSpaces = 3;
+        /// <summary>
+        /// TESTING - allow non quoted keys in the json like javascript (default = false)
+        /// </summary>
+        public bool AllowNonQuotedKeys = false;
 
         public void FixValues()
         {
@@ -98,12 +95,34 @@ namespace EntityWorker.Core.Object.Library.JSON
                 UsingGlobalTypes = false;
                 InlineCircularReferences = true;
             }
-            if (EnableAnonymousTypes)
-                ShowReadOnlyProperties = true;
+        }
+
+        internal JSONParameters MakeCopy()
+        {
+            return new JSONParameters
+            {
+                AllowNonQuotedKeys = AllowNonQuotedKeys,
+                DateTimeMilliseconds = DateTimeMilliseconds,
+                FormatterIndentSpaces = FormatterIndentSpaces,
+                IgnoreAttributes = new List<Type>(IgnoreAttributes),
+                InlineCircularReferences = InlineCircularReferences,
+                KVStyleStringDictionary = KVStyleStringDictionary,
+                ParametricConstructorOverride = ParametricConstructorOverride,
+                SerializeNullValues = SerializeNullValues,
+                SerializerMaxDepth = SerializerMaxDepth,
+                UseEscapedUnicode = UseEscapedUnicode,
+                UseExtensions = UseExtensions,
+                UseFastGuid = UseFastGuid,
+                UseOptimizedDatasetSchema = UseOptimizedDatasetSchema,
+                UseUTCDateTime = UseUTCDateTime,
+                UseValuesOfEnums = UseValuesOfEnums,
+                UsingGlobalTypes = UsingGlobalTypes,
+                JsonFormatting = JsonFormatting
+            };
         }
     }
 
-    internal static class JSON
+    public static class JSON
     {
         /// <summary>
         /// Globally set-able parameters for controlling the serializer
@@ -116,9 +135,7 @@ namespace EntityWorker.Core.Object.Library.JSON
         /// <returns></returns>
         public static string ToNiceJSON(object obj)
         {
-            string s = ToJSON(obj, Parameters); // use default params
-
-            return Beautify(s);
+            return Beautify(ToJSON(obj, Parameters));
         }
         /// <summary>
         /// Create a formatted json string (beautified) from an object
@@ -128,9 +145,7 @@ namespace EntityWorker.Core.Object.Library.JSON
         /// <returns></returns>
         public static string ToNiceJSON(object obj, JSONParameters param)
         {
-            string s = ToJSON(obj, param);
-
-            return Beautify(s, param.FormatterIndentSpaces);
+            return Beautify(ToJSON(obj, param), param.FormatterIndentSpaces);
         }
         /// <summary>
         /// Create a json representation for an object
@@ -150,6 +165,7 @@ namespace EntityWorker.Core.Object.Library.JSON
         public static string ToJSON(object obj, JSONParameters param)
         {
             param.FixValues();
+            param = param.MakeCopy();
             Type t = null;
 
             if (obj == null)
@@ -160,9 +176,21 @@ namespace EntityWorker.Core.Object.Library.JSON
             if (t == typeof(Dictionary<,>) || t == typeof(List<>))
                 param.UsingGlobalTypes = false;
 
+            var useExtensions = param.UseExtensions;
+            var usingGlobalTypes = param.UsingGlobalTypes;
             // FEATURE : enable extensions when you can deserialize anon types
-            if (param.EnableAnonymousTypes) { param.UseExtensions = false; param.UsingGlobalTypes = false; }
-            return new JSONSerializer(param).ConvertToJSON(obj);
+            if (Reflection.IsAnonymousType(t?? obj.GetType()))
+            {
+                param.UseExtensions = false;
+                param.UsingGlobalTypes = false;
+            }
+
+            var o = new JSONSerializer(param).ConvertToJSON(obj);
+            // reset parameter
+            param.UseExtensions = useExtensions;
+            param.UsingGlobalTypes = usingGlobalTypes;
+
+            return o;
         }
         /// <summary>
         /// Parse a json string and generate a Dictionary&lt;string,object&gt; or List&lt;object&gt; structure
@@ -171,9 +199,9 @@ namespace EntityWorker.Core.Object.Library.JSON
         /// <returns></returns>
         public static object Parse(string json)
         {
-            return new JsonParser(json).Decode();
+            return new JsonParser(json, Parameters.AllowNonQuotedKeys).Decode();
         }
-#if net4
+
         /// <summary>
         /// Create a .net4 dynamic object from the json string
         /// </summary>
@@ -183,7 +211,7 @@ namespace EntityWorker.Core.Object.Library.JSON
         {
             return new DynamicJson(json);
         }
-#endif
+
         /// <summary>
         /// Create a typed generic object from the json
         /// </summary>
@@ -253,7 +281,7 @@ namespace EntityWorker.Core.Object.Library.JSON
         /// <returns></returns>
         public static object FillObject(object input, string json)
         {
-            Dictionary<string, object> ht = new JsonParser(json).Decode() as Dictionary<string, object>;
+            Dictionary<string, object> ht = new JsonParser(json, Parameters.AllowNonQuotedKeys).Decode() as Dictionary<string, object>;
             if (ht == null) return null;
             return new deserializer(Parameters).ParseDictionary(ht, null, input.GetType(), input);
         }
@@ -304,7 +332,7 @@ namespace EntityWorker.Core.Object.Library.JSON
         /// <param name="type"></param>
         /// <param name="serializer"></param>
         /// <param name="deserializer"></param>
-        public static void RegisterCustomType(Type type, Serialize serializer, Deserialize deserializer)
+        public static void RegisterCustomType(Type type, Reflection.Serialize serializer, Reflection.Deserialize deserializer)
         {
             Reflection.Instance.RegisterCustomType(type, serializer, deserializer);
         }
@@ -315,36 +343,14 @@ namespace EntityWorker.Core.Object.Library.JSON
         {
             Reflection.Instance.ClearReflectionCache();
         }
-
-        internal static long CreateLong(string s, int index, int count)
-        {
-            long num = 0;
-            bool neg = false;
-            for (int x = 0; x < count; x++, index++)
-            {
-                char cc = s[index];
-
-                if (cc == '-')
-                    neg = true;
-                else if (cc == '+')
-                    neg = false;
-                else
-                {
-                    num *= 10;
-                    num += (int)(cc - '0');
-                }
-            }
-            if (neg) num = -num;
-
-            return num;
-        }
     }
 
     internal class deserializer
     {
         public deserializer(JSONParameters param)
         {
-            _params = param;
+            param.FixValues();
+            _params = param.MakeCopy();
         }
 
         private JSONParameters _params;
@@ -379,23 +385,25 @@ namespace EntityWorker.Core.Object.Library.JSON
 
         public object ToObject(string json, Type type)
         {
-            //_params = Parameters;
-            _params.FixValues();
+            //_params.FixValues();
             Type t = null;
             if (type != null && type.IsGenericType)
                 t = Reflection.Instance.GetGenericTypeDefinition(type);
-            if (t == typeof(Dictionary<,>) || t == typeof(List<>))
-                _params.UsingGlobalTypes = false;
             _usingglobals = _params.UsingGlobalTypes;
+            if (t == typeof(Dictionary<,>) || t == typeof(List<>))
+                _usingglobals = false;
 
-            object o = new JsonParser(json).Decode();
+            object o = new JsonParser(json, _params.AllowNonQuotedKeys).Decode();
             if (o == null)
                 return null;
 #if !SILVERLIGHT
-            if (type != null && type == typeof(DataSet))
-                return CreateDataset(o as Dictionary<string, object>, null);
-            else if (type != null && type == typeof(DataTable))
-                return CreateDataTable(o as Dictionary<string, object>, null);
+            if (type != null)
+            {
+                if (type == typeof(DataSet))
+                    return CreateDataset(o as Dictionary<string, object>, null);
+                else if (type == typeof(DataTable))
+                    return CreateDataTable(o as Dictionary<string, object>, null);
+            }
 #endif
             if (o is IDictionary)
             {
@@ -406,15 +414,18 @@ namespace EntityWorker.Core.Object.Library.JSON
             }
             else if (o is List<object>)
             {
-                if (type != null && t == typeof(Dictionary<,>)) // kv format
-                    return RootDictionary(o, type);
-                else if (type != null && t == typeof(List<>)) // deserialize to generic list
-                    return RootList(o, type);
-                else if (type != null && type.IsArray)
-                    return RootArray(o, type);
-                else if (type == typeof(Hashtable))
-                    return RootHashTable((List<object>)o);
-                else if (type == null)
+                if (type != null)
+                {
+                    if (t == typeof(Dictionary<,>)) // kv format
+                        return RootDictionary(o, type);
+                    else if (t == typeof(List<>)) // deserialize to generic list
+                        return RootList(o, type);
+                    else if (type.IsArray)
+                        return RootArray(o, type);
+                    else if (type == typeof(Hashtable))
+                        return RootHashTable((List<object>)o);
+                }
+                else //if (type == null)
                 {
                     List<object> l = (List<object>)o;
                     if (l.Count > 0 && l[0].GetType() == typeof(Dictionary<string, object>))
@@ -464,7 +475,7 @@ namespace EntityWorker.Core.Object.Library.JSON
                 if (s == null)
                     return (int)((long)value);
                 else
-                    return CreateInteger(s, 0, s.Length);
+                    return JsonHelper.CreateInteger(s, 0, s.Length);
             }
             else if (conversionType == typeof(long))
             {
@@ -472,34 +483,34 @@ namespace EntityWorker.Core.Object.Library.JSON
                 if (s == null)
                     return (long)value;
                 else
-                    return JSON.CreateLong(s, 0, s.Length);
+                    return JsonHelper.CreateLong(s, 0, s.Length);
             }
             else if (conversionType == typeof(string))
                 return (string)value;
 
             else if (conversionType.IsEnum)
-                return CreateEnum(conversionType, value);
+                return JsonHelper.CreateEnum(conversionType, value);
 
             else if (conversionType == typeof(DateTime))
-                return CreateDateTime((string)value);
+                return JsonHelper.CreateDateTime((string)value, _params.UseUTCDateTime);
 
             else if (conversionType == typeof(DateTimeOffset))
-                return CreateDateTimeOffset((string)value);
+                return JsonHelper.CreateDateTimeOffset((string)value);
 
             else if (Reflection.Instance.IsTypeRegistered(conversionType))
                 return Reflection.Instance.CreateCustom((string)value, conversionType);
 
             // 8-30-2014 - James Brooks - Added code for nullable types.
-            if (IsNullable(conversionType))
+            if (JsonHelper.IsNullable(conversionType))
             {
                 if (value == null)
                     return value;
-                conversionType = UnderlyingTypeOf(conversionType);
+                conversionType = JsonHelper.UnderlyingTypeOf(conversionType);
             }
 
             // 8-30-2014 - James Brooks - Nullable Guid is a special case so it was moved after the "IsNullable" check.
             if (conversionType == typeof(Guid))
-                return CreateGuid((string)value);
+                return JsonHelper.CreateGuid((string)value);
 
             // 2016-04-02 - Enrico Padovani - proper conversion of byte[] back from string
             if (conversionType == typeof(byte[]))
@@ -511,105 +522,25 @@ namespace EntityWorker.Core.Object.Library.JSON
             return Convert.ChangeType(value, conversionType, CultureInfo.InvariantCulture);
         }
 
-        private object CreateDateTimeOffset(string value)
-        {
-            //                   0123456789012345678 9012 9/3 0/4  1/5
-            // datetime format = yyyy-MM-ddTHH:mm:ss .nnn  _   +   00:00
-
-            // ISO8601 roundtrip formats have 7 digits for ticks, and no space before the '+'
-            // datetime format = yyyy-MM-ddTHH:mm:ss .nnnnnnn  +   00:00  
-            // datetime format = yyyy-MM-ddTHH:mm:ss .nnnnnnn  Z  
-
-            int year;
-            int month;
-            int day;
-            int hour;
-            int min;
-            int sec;
-            int ms = 0;
-            int usTicks = 0; // ticks for xxx.x microseconds
-            int th = 0;
-            int tm = 0;
-
-            year = CreateInteger(value, 0, 4);
-            month = CreateInteger(value, 5, 2);
-            day = CreateInteger(value, 8, 2);
-            hour = CreateInteger(value, 11, 2);
-            min = CreateInteger(value, 14, 2);
-            sec = CreateInteger(value, 17, 2);
-
-            int p = 20;
-
-            if (value.Length > 21 && value[19] == '.')
-            {
-                ms = CreateInteger(value, p, 3);
-                p = 23;
-
-                // handle 7 digit case
-                if (value.Length > 25 && char.IsDigit(value[p]))
-                {
-                    usTicks = CreateInteger(value, p, 4);
-                    p = 27;
-                }
-            }
-
-            if (value[p] == 'Z')
-                // UTC
-                return CreateDateTimeOffset(year, month, day, hour, min, sec, ms, usTicks, TimeSpan.Zero);
-
-            if (value[p] == ' ')
-                ++p;
-
-            // +00:00
-            th = CreateInteger(value, p + 1, 2);
-            tm = CreateInteger(value, p + 1 + 2 + 1, 2);
-
-            if (value[p] == '-')
-                th = -th;
-
-            return CreateDateTimeOffset(year, month, day, hour, min, sec, ms, usTicks, new TimeSpan(th, tm, 0));
-        }
-
-        private static DateTimeOffset CreateDateTimeOffset(
-            int year, int month, int day, int hour, int min, int sec, int milli, int extraTicks, TimeSpan offset)
-        {
-            var dt = new DateTimeOffset(year, month, day, hour, min, sec, milli, offset);
-
-            if (extraTicks > 0)
-                dt += TimeSpan.FromTicks(extraTicks);
-
-            return dt;
-        }
-
-        private bool IsNullable(Type t)
-        {
-            if (!t.IsGenericType) return false;
-            Type g = t.GetGenericTypeDefinition();
-            return (g.Equals(typeof(Nullable<>)));
-        }
-
-        private Type UnderlyingTypeOf(Type t)
-        {
-            return t.GetGenericArguments()[0];
-        }
-
         private object RootList(object parse, Type type)
         {
             Type[] gtypes = Reflection.Instance.GetGenericArguments(type);
-            IList o = (IList)Reflection.Instance.FastCreateInstance(type);
-            DoParseList(parse, gtypes[0], o);
+            var o = (IList)FastDeepCloner.DeepCloner.CreateInstance(type);
+            DoParseList((IList)parse, gtypes[0], o);
             return o;
         }
 
-        private void DoParseList(object parse, Type it, IList o)
+        private void DoParseList(IList parse, Type it, IList o)
         {
             Dictionary<string, object> globals = new Dictionary<string, object>();
-            foreach (var k in (IList)parse)
+
+            foreach (var k in parse)
             {
                 _usingglobals = false;
                 object v = k;
-                if (k is Dictionary<string, object>)
-                    v = ParseDictionary(k as Dictionary<string, object>, globals, it, null);
+                var a = k as Dictionary<string, object>;
+                if (a != null)
+                    v = ParseDictionary(a, globals, it, null);
                 else
                     v = ChangeType(k, it);
 
@@ -619,9 +550,9 @@ namespace EntityWorker.Core.Object.Library.JSON
 
         private object RootArray(object parse, Type type)
         {
-            Type it = type.GetElementType();
-            IList o = (IList)Reflection.Instance.FastCreateInstance(typeof(List<>).MakeGenericType(it));
-            DoParseList(parse, it, o);
+            Type it = type.GetActualType();
+            var o = (IList)FastDeepCloner.DeepCloner.CreateInstance(typeof(List<>).MakeGenericType(it));
+            DoParseList((IList)parse, it, o);
             var array = Array.CreateInstance(it, o.Count);
             o.CopyTo(array, 0);
 
@@ -638,17 +569,21 @@ namespace EntityWorker.Core.Object.Library.JSON
                 t1 = gtypes[0];
                 t2 = gtypes[1];
             }
-            var arraytype = t2.GetElementType();
+
+            var arraytype = t2.GetActualType();
             if (parse is Dictionary<string, object>)
             {
-                IDictionary o = (IDictionary)Reflection.Instance.FastCreateInstance(type);
+                IDictionary o = (IDictionary)FastDeepCloner.DeepCloner.CreateInstance(type);
 
                 foreach (var kv in (Dictionary<string, object>)parse)
                 {
                     object v;
                     object k = ChangeType(kv.Key, t1);
 
-                    if (kv.Value is Dictionary<string, object>)
+                    if (t2.Name.StartsWith("Dictionary")) // deserialize a dictionary
+                        v = RootDictionary(kv.Value, t2);
+
+                    else if (kv.Value is Dictionary<string, object>)
                         v = ParseDictionary(kv.Value as Dictionary<string, object>, null, t2, null);
 
                     else if (t2.IsArray && t2 != typeof(byte[]))
@@ -675,9 +610,9 @@ namespace EntityWorker.Core.Object.Library.JSON
         {
             object tn = "";
             if (type == typeof(NameValueCollection))
-                return CreateNV(d);
+                return JsonHelper.CreateNV(d);
             if (type == typeof(StringDictionary))
-                return CreateSD(d);
+                return JsonHelper.CreateSD(d);
 
             if (d.TryGetValue("$i", out tn))
             {
@@ -727,7 +662,7 @@ namespace EntityWorker.Core.Object.Library.JSON
                 if (_params.ParametricConstructorOverride)
                     o = System.Runtime.Serialization.FormatterServices.GetUninitializedObject(type);
                 else
-                    o = Reflection.Instance.FastCreateInstance(type);
+                    o = FastDeepCloner.DeepCloner.CreateInstance(type);
             }
             int circount = 0;
             if (_circobj.TryGetValue(o, out circount) == false)
@@ -737,7 +672,7 @@ namespace EntityWorker.Core.Object.Library.JSON
                 _cirrev.Add(circount, o);
             }
 
-            Dictionary<string, myPropInfo> props = Reflection.Instance.Getproperties(type, typename);
+            var props = Reflection.Instance.Getproperties(type, typename);
             foreach (var kv in d)
             {
                 var n = kv.Key;
@@ -750,101 +685,70 @@ namespace EntityWorker.Core.Object.Library.JSON
                     continue;
                 }
                 myPropInfo pi;
-                if (props.TryGetValue(name.ToLower(), out pi) == false)
-                    if (props.TryGetValue(name, out pi) == false)
+                if (props.TryGetValue(name, out pi) == false)
+                    if (props.TryGetValue(name.ToLowerInvariant(), out pi) == false)
                         continue;
 
-                if (v != null)
+                if (pi.CanWrite)
                 {
-                    object oset = null;
-
-                    switch (pi.Type)
+                    if (v != null)
                     {
-                        case myPropInfoType.Int: oset = (int)AutoConv(v); break;
-                        case myPropInfoType.Long: oset = AutoConv(v); break;
-                        case myPropInfoType.String: oset = (string)v; break;
-                        case myPropInfoType.Bool: oset = (bool)v; break;
-                        case myPropInfoType.DateTime: oset = CreateDateTime((string)v); break;
-                        case myPropInfoType.Enum: oset = CreateEnum(pi.pt, v); break;
-                        case myPropInfoType.Guid: oset = CreateGuid((string)v); break;
+                        object oset = null;
 
-                        case myPropInfoType.Array:
-                            if (!pi.IsValueType)
-                                oset = CreateArray((List<object>)v, pi.pt, pi.bt, globaltypes);
-                            // what about 'else'?
-                            break;
-                        case myPropInfoType.ByteArray: oset = Convert.FromBase64String((string)v); break;
+                        switch (pi.Type)
+                        {
+                            case myPropInfoType.Int: oset = (int)JsonHelper.AutoConv(v); break;
+                            case myPropInfoType.Long: oset = JsonHelper.AutoConv(v); break;
+                            case myPropInfoType.String: oset = v.ToString(); break;
+                            case myPropInfoType.Bool: oset = JsonHelper.BoolConv(v); break;
+                            case myPropInfoType.DateTime: oset = JsonHelper.CreateDateTime((string)v, _params.UseUTCDateTime); break;
+                            case myPropInfoType.Enum: oset = JsonHelper.CreateEnum(pi.pt, v); break;
+                            case myPropInfoType.Guid: oset = JsonHelper.CreateGuid((string)v); break;
+
+                            case myPropInfoType.Array:
+                                if (!pi.IsValueType)
+                                    oset = CreateArray((List<object>)v, pi.pt, pi.bt, globaltypes);
+                                // what about 'else'?
+                                break;
+                            case myPropInfoType.ByteArray: oset = Convert.FromBase64String((string)v); break;
 #if !SILVERLIGHT
-                        case myPropInfoType.DataSet: oset = CreateDataset((Dictionary<string, object>)v, globaltypes); break;
-                        case myPropInfoType.DataTable: oset = CreateDataTable((Dictionary<string, object>)v, globaltypes); break;
-                        case myPropInfoType.Hashtable: // same case as Dictionary
+                            case myPropInfoType.DataSet: oset = CreateDataset((Dictionary<string, object>)v, globaltypes); break;
+                            case myPropInfoType.DataTable: oset = CreateDataTable((Dictionary<string, object>)v, globaltypes); break;
+                            case myPropInfoType.Hashtable: // same case as Dictionary
 #endif
-                        case myPropInfoType.Dictionary: oset = CreateDictionary((List<object>)v, pi.pt, pi.GenericTypes, globaltypes); break;
-                        case myPropInfoType.StringKeyDictionary: oset = CreateStringKeyDictionary((Dictionary<string, object>)v, pi.pt, pi.GenericTypes, globaltypes); break;
-                        case myPropInfoType.NameValue: oset = CreateNV((Dictionary<string, object>)v); break;
-                        case myPropInfoType.StringDictionary: oset = CreateSD((Dictionary<string, object>)v); break;
-                        case myPropInfoType.Custom: oset = Reflection.Instance.CreateCustom((string)v, pi.pt); break;
-                        default:
-                            {
-                                if (pi.IsGenericType && pi.IsValueType == false && v is List<object>)
-                                    oset = CreateGenericList((List<object>)v, pi.pt, pi.bt, globaltypes);
+                            case myPropInfoType.Dictionary: oset = CreateDictionary((List<object>)v, pi.pt, pi.GenericTypes, globaltypes); break;
+                            case myPropInfoType.StringKeyDictionary: oset = CreateStringKeyDictionary((Dictionary<string, object>)v, pi.pt, pi.GenericTypes, globaltypes); break;
+                            case myPropInfoType.NameValue: oset = JsonHelper.CreateNV((Dictionary<string, object>)v); break;
+                            case myPropInfoType.StringDictionary: oset = JsonHelper.CreateSD((Dictionary<string, object>)v); break;
+                            case myPropInfoType.Custom: oset = Reflection.Instance.CreateCustom((string)v, pi.pt); break;
+                            default:
+                                {
+                                    if (pi.IsGenericType && pi.IsValueType == false && v is List<object>)
+                                        oset = CreateGenericList((List<object>)v, pi.pt, pi.bt, globaltypes);
 
-                                else if ((pi.IsClass || pi.IsStruct || pi.IsInterface) && v is Dictionary<string, object>)
-                                    oset = ParseDictionary((Dictionary<string, object>)v, globaltypes, pi.pt, pi.Property.GetValue(o));
+                                    else if ((pi.IsClass || pi.IsStruct || pi.IsInterface) && v is Dictionary<string, object>)
+                                        oset = ParseDictionary((Dictionary<string, object>)v, globaltypes, pi.pt, null);// pi.getter(o));
 
-                                else if (v is List<object>)
-                                    oset = CreateArray((List<object>)v, pi.pt, typeof(object), globaltypes);
+                                    else if (v is List<object>)
+                                        oset = CreateArray((List<object>)v, pi.pt, typeof(object), globaltypes);
 
-                                else if (pi.IsValueType)
-                                    oset = ChangeType(v, pi.changeType);
+                                    else if (pi.IsValueType)
+                                        oset = ChangeType(v, pi.changeType);
 
-                                else
-                                    oset = v;
-                            }
-                            break;
+                                    else
+                                        oset = v;
+                                }
+                                break;
+                        }
+
+                        pi.Property.SetValue(o, oset);
                     }
-
-                    pi.Property.SetValue(o, oset);
                 }
-
             }
             return o;
         }
 
-        private long AutoConv(object value)
-        {
-            if (value is string)
-            {
-                string s = (string)value;
-                return CreateLong(s, 0, s.Length);
-            }
-            else if (value is long)
-                return (long)value;
-            else
-                return Convert.ToInt64(value);
-        }
-
-        private StringDictionary CreateSD(Dictionary<string, object> d)
-        {
-            StringDictionary nv = new StringDictionary();
-
-            foreach (var o in d)
-                nv.Add(o.Key, (string)o.Value);
-
-            return nv;
-        }
-
-        private NameValueCollection CreateNV(Dictionary<string, object> d)
-        {
-            NameValueCollection nv = new NameValueCollection();
-
-            foreach (var o in d)
-                nv.Add(o.Key, (string)o.Value);
-
-            return nv;
-        }
-
-        private void ProcessMap(object obj, Dictionary<string, myPropInfo> props, Dictionary<string, object> dic)
+        private static void ProcessMap(object obj, Dictionary<string, myPropInfo> props, Dictionary<string, object> dic)
         {
             foreach (KeyValuePair<string, object> kv in dic)
             {
@@ -852,106 +756,8 @@ namespace EntityWorker.Core.Object.Library.JSON
                 object o = p.Property.GetValue(obj);
                 Type t = Type.GetType((string)kv.Value);
                 if (t == typeof(Guid))
-                    p.Property.SetValue(obj, CreateGuid((string)o));
+                    p.Property.SetValue(obj, JsonHelper.CreateGuid((string)o));
             }
-        }
-
-        private long CreateLong(string s, int index, int count)
-        {
-            long num = 0;
-            bool neg = false;
-            for (int x = 0; x < count; x++, index++)
-            {
-                char cc = s[index];
-
-                if (cc == '-')
-                    neg = true;
-                else if (cc == '+')
-                    neg = false;
-                else
-                {
-                    num *= 10;
-                    num += (int)(cc - '0');
-                }
-            }
-            if (neg) num = -num;
-
-            return num;
-        }
-
-        private int CreateInteger(string s, int index, int count)
-        {
-            int num = 0;
-            bool neg = false;
-            for (int x = 0; x < count; x++, index++)
-            {
-                char cc = s[index];
-
-                if (cc == '-')
-                    neg = true;
-                else if (cc == '+')
-                    neg = false;
-                else
-                {
-                    num *= 10;
-                    num += (int)(cc - '0');
-                }
-            }
-            if (neg) num = -num;
-
-            return num;
-        }
-
-        private object CreateEnum(Type pt, object v)
-        {
-            // FEATURE : optimize create enum
-#if !SILVERLIGHT
-            return Enum.Parse(pt, v.ToString());
-#else
-            return Enum.Parse(pt, v, true);
-#endif
-        }
-
-        private Guid CreateGuid(string s)
-        {
-            if (s.Length > 30)
-                return new Guid(s);
-            else
-                return new Guid(Convert.FromBase64String(s));
-        }
-
-        private DateTime CreateDateTime(string value)
-        {
-            if (value.Length < 19)
-                return DateTime.MinValue;
-
-            bool utc = false;
-            //                   0123456789012345678 9012 9/3
-            // datetime format = yyyy-MM-ddTHH:mm:ss .nnn  Z
-            int year;
-            int month;
-            int day;
-            int hour;
-            int min;
-            int sec;
-            int ms = 0;
-
-            year = CreateInteger(value, 0, 4);
-            month = CreateInteger(value, 5, 2);
-            day = CreateInteger(value, 8, 2);
-            hour = CreateInteger(value, 11, 2);
-            min = CreateInteger(value, 14, 2);
-            sec = CreateInteger(value, 17, 2);
-            if (value.Length > 21 && value[19] == '.')
-                ms = CreateInteger(value, 20, 3);
-
-            if (value[value.Length - 1] == 'Z')
-                utc = true;
-
-            if (_params.UseUTCDateTime == false && utc == false)
-                return new DateTime(year, month, day, hour, min, sec, ms);
-            else
-                return new DateTime(year, month, day, hour, min, sec, ms, DateTimeKind.Utc).ToLocalTime();
         }
 
         private object CreateArray(List<object> data, Type pt, Type bt, Dictionary<string, object> globalTypes)
@@ -984,8 +790,8 @@ namespace EntityWorker.Core.Object.Library.JSON
         {
             if (pt != typeof(object))
             {
-                IList col = (IList)Reflection.Instance.FastCreateInstance(pt);
-                var it = pt.GetGenericArguments()[0];
+                IList col = (IList)FastDeepCloner.DeepCloner.CreateInstance(pt);
+                var it = Reflection.Instance.GetGenericArguments(pt)[0];// pt.GetGenericArguments()[0];
                 // create an array of objects
                 foreach (object ob in data)
                 {
@@ -1009,14 +815,14 @@ namespace EntityWorker.Core.Object.Library.JSON
 
         private object CreateStringKeyDictionary(Dictionary<string, object> reader, Type pt, Type[] types, Dictionary<string, object> globalTypes)
         {
-            var col = (IDictionary)Reflection.Instance.FastCreateInstance(pt);
+            var col = (IDictionary)FastDeepCloner.DeepCloner.CreateInstance(pt);
             Type arraytype = null;
             Type t2 = null;
             if (types != null)
                 t2 = types[1];
 
             Type generictype = null;
-            var ga = t2.GetGenericArguments();
+            var ga = Reflection.Instance.GetGenericArguments(t2);// t2.GetGenericArguments();
             if (ga.Length > 0)
                 generictype = ga[0];
             arraytype = t2.GetElementType();
@@ -1050,7 +856,7 @@ namespace EntityWorker.Core.Object.Library.JSON
 
         private object CreateDictionary(List<object> reader, Type pt, Type[] types, Dictionary<string, object> globalTypes)
         {
-            IDictionary col = (IDictionary)Reflection.Instance.FastCreateInstance(pt);
+            IDictionary col = (IDictionary)FastDeepCloner.DeepCloner.CreateInstance(pt);
             Type t1 = null;
             Type t2 = null;
             if (types != null)
@@ -1165,7 +971,7 @@ namespace EntityWorker.Core.Object.Library.JSON
                     {
                         string s = (string)v[i];
                         if (s != null)
-                            v[i] = CreateDateTime(s);
+                            v[i] = JsonHelper.CreateDateTime(s, _params.UseUTCDateTime);
                     }
                 }
                 dt.Rows.Add(v);
@@ -1189,7 +995,7 @@ namespace EntityWorker.Core.Object.Library.JSON
             }
             else
             {
-                var ms = (DatasetSchema)this.ParseDictionary((Dictionary<string, object>)schema, globalTypes, typeof(DatasetSchema), null);
+                var ms = (DatasetSchema)ParseDictionary((Dictionary<string, object>)schema, globalTypes, typeof(DatasetSchema), null);
                 dt.TableName = ms.Info[0];
                 for (int i = 0; i < ms.Info.Count; i += 3)
                 {

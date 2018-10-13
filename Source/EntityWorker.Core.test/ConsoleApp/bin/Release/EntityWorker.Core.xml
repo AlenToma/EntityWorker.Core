@@ -408,22 +408,31 @@
             UseFull Extension, that work with EntityWorker.Core
             </summary>
         </member>
-        <member name="M:EntityWorker.Core.Helper.Extension.ToJson(System.Object)">
+        <member name="M:EntityWorker.Core.Helper.Extension.ToJson(System.Object,EntityWorker.Core.Object.Library.JSON.JSONParameters)">
             <summary>
             Convert To Json
             </summary>
             <param name="o"></param>
+            <param name="param">The Default is GlobalConfigration.JSONParameters</param>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.Helper.Extension.FromJson``1(System.String)">
+        <member name="M:EntityWorker.Core.Helper.Extension.FromJsonToDynamic(System.String)">
+            <summary>
+            Convert Json to dynamic object
+            </summary>
+            <param name=""></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Helper.Extension.FromJson``1(System.String,EntityWorker.Core.Object.Library.JSON.JSONParameters)">
             <summary>
             generic Json to object
             </summary>
             <typeparam name="T"></typeparam>
             <param name="json"></param>
+            <param name="param">The Default is GlobalConfigration.JSONParameters</param>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.Helper.Extension.FromJson``1(System.String,EntityWorker.Core.InterFace.IRepository)">
+        <member name="M:EntityWorker.Core.Helper.Extension.FromJson``1(System.String,EntityWorker.Core.InterFace.IRepository,EntityWorker.Core.Object.Library.JSON.JSONParameters)">
             <summary>
             generic Json to object
             </summary>
@@ -432,22 +441,24 @@
             <param name="repository"></param>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.Helper.Extension.FromJson(System.String,System.Type)">
+        <member name="M:EntityWorker.Core.Helper.Extension.FromJson(System.String,System.Type,EntityWorker.Core.Object.Library.JSON.JSONParameters)">
             <summary>
             Json to object
             </summary>
             <typeparam name="T"></typeparam>
             <param name="json"></param>
             <param name="type"></param>
+            <param name="param">The Default is GlobalConfigration.JSONParameters</param>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.Helper.Extension.FromJson(System.String)">
+        <member name="M:EntityWorker.Core.Helper.Extension.FromJson(System.String,EntityWorker.Core.Object.Library.JSON.JSONParameters)">
             <summary>
             Json to object
             json must containe the $type
             </summary>
             <typeparam name="T"></typeparam>
             <param name="json"></param>
+            <param name="param">The Default is GlobalConfigration.JSONParameters</param>
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Helper.Extension.FromXml``1(System.String,EntityWorker.Core.InterFace.IRepository)">
@@ -1410,18 +1421,20 @@
             <typeparam name="TSource"></typeparam>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.Json">
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.Json(EntityWorker.Core.Object.Library.JSON.JSONParameters)">
             <summary>
             Convert To JSON
             https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Json.md
             </summary>
+            <param name="param">The Default is GlobalConfigration.JSONParameters</param>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.JsonAsync">
+        <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.JsonAsync(EntityWorker.Core.Object.Library.JSON.JSONParameters)">
             <summary>
             Convert To JSON
             https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Json.md
             </summary>
+            <param name="param">The Default is GlobalConfigration.JSONParameters</param>
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Interface.ISqlQueryable`1.Xml">
@@ -1751,20 +1764,22 @@
             <typeparam name="T"></typeparam>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.InterFace.IRepository.FromJson``1(System.String)">
+        <member name="M:EntityWorker.Core.InterFace.IRepository.FromJson``1(System.String,EntityWorker.Core.Object.Library.JSON.JSONParameters)">
             <summary>
             Get ISqlQueryable from Json.
             All JsonIgnore Values will be loaded from the database if a primary key exist and the value is default()  eg null or empty or even 0 for int and decimal
             </summary>
             <typeparam name="T"></typeparam>
+            <param name="param">The Default is GlobalConfigration.JSONParameters</param>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.InterFace.IRepository.FromJsonAsync``1(System.String)">
+        <member name="M:EntityWorker.Core.InterFace.IRepository.FromJsonAsync``1(System.String,EntityWorker.Core.Object.Library.JSON.JSONParameters)">
             <summary>
             Get ISqlQueryable from Json.
             All JsonIgnore Values will be loaded from the database if a primary key exist and the value is default()  eg null or empty or even 0 for int and decimal
             </summary>
             <typeparam name="T"></typeparam>
+            <param name="param">The Default is GlobalConfigration.JSONParameters</param>
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.InterFace.IRepository.FromXml``1(System.String)">
@@ -6308,11 +6323,6 @@
             Use the UTC date format (default = True)
             </summary>
         </member>
-        <member name="F:EntityWorker.Core.Object.Library.JSON.JSONParameters.ShowReadOnlyProperties">
-            <summary>
-            Show the readonly properties of types in the output (default = False)
-            </summary>
-        </member>
         <member name="F:EntityWorker.Core.Object.Library.JSON.JSONParameters.UsingGlobalTypes">
             <summary>
             Use the $types extension to optimise the output json (default = True)
@@ -6321,11 +6331,6 @@
         <member name="F:EntityWorker.Core.Object.Library.JSON.JSONParameters.IgnoreCaseOnDeserialize">
             <summary>
             Ignore case when processing json and deserializing 
-            </summary>
-        </member>
-        <member name="F:EntityWorker.Core.Object.Library.JSON.JSONParameters.EnableAnonymousTypes">
-            <summary>
-            Anonymous types have read only properties 
             </summary>
         </member>
         <member name="F:EntityWorker.Core.Object.Library.JSON.JSONParameters.UseExtensions">
@@ -6348,10 +6353,14 @@
             Output Enum values instead of names (default = False)
             </summary>
         </member>
+        <member name="F:EntityWorker.Core.Object.Library.JSON.JSONParameters.IgnoreAttributes">
+            <summary>
+            Ignore attributes to check for (default : XmlIgnoreAttribute, NonSerialized)
+            </summary>
+        </member>
         <member name="F:EntityWorker.Core.Object.Library.JSON.JSONParameters.ParametricConstructorOverride">
             <summary>
             If you have parametric and no default constructor for you classes (default = False)
-            
             IMPORTANT NOTE : If True then all initial values within the class will be ignored and will be not set
             </summary>
         </member>
@@ -6367,17 +6376,17 @@
         </member>
         <member name="F:EntityWorker.Core.Object.Library.JSON.JSONParameters.InlineCircularReferences">
             <summary>
-            Inline circular or already seen objects instead of replacement with $i (default = False) 
-            </summary>
-        </member>
-        <member name="F:EntityWorker.Core.Object.Library.JSON.JSONParameters.SerializeToLowerCaseNames">
-            <summary>
-            Save property/field names as lowercase (default = false)
+            Inline circular or already seen objects instead of replacement with $i (default = false) 
             </summary>
         </member>
         <member name="F:EntityWorker.Core.Object.Library.JSON.JSONParameters.FormatterIndentSpaces">
             <summary>
             Formatter indent spaces (default = 3)
+            </summary>
+        </member>
+        <member name="F:EntityWorker.Core.Object.Library.JSON.JSONParameters.AllowNonQuotedKeys">
+            <summary>
+            TESTING - allow non quoted keys in the json like javascript (default = false)
             </summary>
         </member>
         <member name="F:EntityWorker.Core.Object.Library.JSON.JSON.Parameters">
@@ -6418,6 +6427,13 @@
         <member name="M:EntityWorker.Core.Object.Library.JSON.JSON.Parse(System.String)">
             <summary>
             Parse a json string and generate a Dictionary&lt;string,object&gt; or List&lt;object&gt; structure
+            </summary>
+            <param name="json"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityWorker.Core.Object.Library.JSON.JSON.ToDynamic(System.String)">
+            <summary>
+            Create a .net4 dynamic object from the json string
             </summary>
             <param name="json"></param>
             <returns></returns>
@@ -6509,7 +6525,7 @@
             <param name="spaces"></param>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.Object.Library.JSON.JSON.RegisterCustomType(System.Type,EntityWorker.Core.Object.Library.JSON.Serialize,EntityWorker.Core.Object.Library.JSON.Deserialize)">
+        <member name="M:EntityWorker.Core.Object.Library.JSON.JSON.RegisterCustomType(System.Type,EntityWorker.Core.Object.Library.JSON.Reflection.Serialize,EntityWorker.Core.Object.Library.JSON.Reflection.Deserialize)">
             <summary>
             Register custom type handlers for your own types not natively handled by fastJSON
             </summary>
@@ -6967,16 +6983,18 @@
             Dispose the repository
             </summary>
         </member>
-        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.Json">
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.Json(EntityWorker.Core.Object.Library.JSON.JSONParameters)">
             <summary>
             Convert To JSON
             </summary>
+            <param name="param">The Default is GlobalConfigration.JSONParameters</param>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.JsonAsync">
+        <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.JsonAsync(EntityWorker.Core.Object.Library.JSON.JSONParameters)">
             <summary>
             Convert To JSON
             </summary>
+            <param name="param">The Default is GlobalConfigration.JSONParameters</param>
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Object.Library.SqlQueryable`1.Xml">
@@ -15625,20 +15643,22 @@
             <typeparam name="T"></typeparam>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.Transaction.Transaction.FromJson``1(System.String)">
+        <member name="M:EntityWorker.Core.Transaction.Transaction.FromJson``1(System.String,EntityWorker.Core.Object.Library.JSON.JSONParameters)">
             <summary>
             Get ISqlQueryable from Json.
             All JsonIgnore Values will be loaded from the database if a primary key exist and the value is default()  eg null or empty or even 0 for int and decimal
             </summary>
             <typeparam name="T"></typeparam>
+            <param name="param">The Default is GlobalConfigration.JSONParameters</param>
             <returns></returns>
         </member>
-        <member name="M:EntityWorker.Core.Transaction.Transaction.FromJsonAsync``1(System.String)">
+        <member name="M:EntityWorker.Core.Transaction.Transaction.FromJsonAsync``1(System.String,EntityWorker.Core.Object.Library.JSON.JSONParameters)">
             <summary>
             Get ISqlQueryable from Json.
             All JsonIgnore Values will be loaded from the database if a primary key exist
             </summary>
             <typeparam name="T"></typeparam>
+            <param name="param">The Default is GlobalConfigration.JSONParameters</param>
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Transaction.Transaction.FromXml``1(System.String)">

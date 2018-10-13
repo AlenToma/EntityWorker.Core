@@ -28,7 +28,7 @@ namespace EntityWorker.Core.FastDeepCloner
             var fullPath = primaryType.Name;
             foreach (var property in properties.Values)
             {
-                if (!property.CanRead || property.FastDeepClonerIgnore)
+                if (!property.CanReadWrite || property.FastDeepClonerIgnore)
                     continue;
                 var value = property.GetValue(objectToBeCloned);
                 if (value == null)
@@ -92,7 +92,7 @@ namespace EntityWorker.Core.FastDeepCloner
                 foreach (var prop in primaryType.GetFastDeepClonerProperties().Where(x => !typeof(List<string>).GetFastDeepClonerProperties().Any(a => a.Key == x.Key)))
                 {
                     var property = prop.Value;
-                    if (!property.CanRead || property.FastDeepClonerIgnore)
+                    if (!property.CanReadWrite || property.FastDeepClonerIgnore)
                         continue;
                     var value = property.GetValue(objectToBeCloned);
                     if (value == null)

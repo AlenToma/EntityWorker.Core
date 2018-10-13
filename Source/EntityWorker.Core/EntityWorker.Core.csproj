@@ -3,9 +3,9 @@
     <TargetFrameworks>netcoreapp2.0;netstandard2.0;net451</TargetFrameworks>
     <PackageId>EntityWorker.Core</PackageId>
     <AssemblyName>EntityWorker.Core</AssemblyName>
-    <AssemblyVersion>2.0.3.4</AssemblyVersion>
-    <FileVersion>2.0.3.4</FileVersion>
-    <Version>2.3.4</Version>
+    <AssemblyVersion>2.0.3.5</AssemblyVersion>
+    <FileVersion>2.0.3.5</FileVersion>
+    <Version>2.3.5</Version>
     <Authors>Alen Toma</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageProjectUrl>https://github.com/AlenToma/EntityWorker.Core</PackageProjectUrl>
@@ -20,7 +20,9 @@ And it have support to multiple providers like mssql, sqlite and postgressql
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <!--<TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeP2POutput;</TargetsForTfmSpecificBuildOutput>-->
     <!--<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);CustomContentTarget</TargetsForTfmSpecificContentInPackage>-->
-    <PackageReleaseNotes>Expression improvement Include HasValue</PackageReleaseNotes>
+    <PackageReleaseNotes>Expression improvement, and i think is in its finel form now.
+Implement Camelcase and other formatting, for Jsonparse.
+JsonParer is able now to serialize and deserialize dynamic objects(AnonymousType).</PackageReleaseNotes>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>7.2</LangVersion>
   </PropertyGroup>

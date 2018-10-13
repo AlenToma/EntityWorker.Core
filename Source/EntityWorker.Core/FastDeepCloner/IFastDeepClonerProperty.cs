@@ -17,6 +17,11 @@ namespace EntityWorker.Core.FastDeepCloner
         // able to process or clone
         bool CanRead { get; }
 
+
+        bool CanReadWrite { get; }
+
+        bool CanWrite { get; }
+
         // Have attr FastDeepClonerIgnore
         bool FastDeepClonerIgnore { get; }
 

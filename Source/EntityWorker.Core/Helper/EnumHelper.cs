@@ -1,9 +1,11 @@
 ﻿namespace EntityWorker.Core.Helper
 {
-    public enum ItemState
+
+    public enum JsonFormatting
     {
-        Added, // is the default
-        Changed // this is mostly used in IDbRuleTrigger AfterSave in-case we want to re-update the record
+        Auto, // Default the name wont change eg as PropertyName
+        LowerCase, // The name will be lowerCase
+        CamelCase // CamelCase firstchar is LowerCase
     }
 
     public enum DataBaseTypes

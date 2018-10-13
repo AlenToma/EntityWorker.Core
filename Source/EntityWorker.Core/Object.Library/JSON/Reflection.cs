@@ -5,6 +5,10 @@ using System.Collections;
 using System.Text;
 using EntityWorker.Core.FastDeepCloner;
 using EntityWorker.Core.Attributes;
+using System.Reflection.Emit;
+using System.Runtime.Serialization;
+using System.Linq;
+using System.Runtime.CompilerServices;
 #if !SILVERLIGHT
 using System.Data;
 #endif
@@ -12,15 +16,15 @@ using System.Collections.Specialized;
 
 namespace EntityWorker.Core.Object.Library.JSON
 {
-    internal struct Getters
+    public struct Getters
     {
         public string Name;
         public string lcName;
         public string memberName;
-        public Func<object, object> Getter;
+        public FastDeepCloner.IFastDeepClonerProperty Property;
     }
 
-    internal enum myPropInfoType
+    public enum myPropInfoType
     {
         Int,
         Long,
@@ -45,18 +49,18 @@ namespace EntityWorker.Core.Object.Library.JSON
         Unknown,
     }
 
-    internal struct myPropInfo
+    internal class myPropInfo
     {
         public Type pt;
         public Type bt;
         public Type changeType;
-        public IFastDeepClonerProperty Property;
+        public FastDeepCloner.IFastDeepClonerProperty Property;
         public Type[] GenericTypes;
         public string Name;
-#if net4
         public string memberName;
-#endif
         public myPropInfoType Type;
+        public bool CanWrite;
+
         public bool IsClass;
         public bool IsValueType;
         public bool IsGenericType;
@@ -64,9 +68,9 @@ namespace EntityWorker.Core.Object.Library.JSON
         public bool IsInterface;
     }
 
-    internal sealed class Reflection
+    public sealed class Reflection
     {
-        // Sinlgeton pattern 4 from : http://csharpindepth.com/articles/general/singleton.aspx
+        // Singleton pattern 4 from : http://csharpindepth.com/articles/general/singleton.aspx
         private static readonly Reflection instance = new Reflection();
         // Explicit static constructor to tell C# compiler
         // not to mark type as beforefieldinit
@@ -78,19 +82,77 @@ namespace EntityWorker.Core.Object.Library.JSON
         }
         public static Reflection Instance { get { return instance; } }
 
-        private delegate object CreateObject();
+        public static bool RDBMode = false;
 
-        private SafeDictionary<Type, string> _tyname = new SafeDictionary<Type, string>();
-        private SafeDictionary<string, Type> _typecache = new SafeDictionary<string, Type>();
-        private SafeDictionary<Type, CreateObject> _constrcache = new SafeDictionary<Type, CreateObject>();
-        private SafeDictionary<Type, Getters[]> _getterscache = new SafeDictionary<Type, Getters[]>();
+        public delegate string Serialize(object data);
+        public delegate object Deserialize(string data);
+
+
+        private SafeDictionary<Type, string> _tyname = new SafeDictionary<Type, string>(10);
+        private SafeDictionary<string, Type> _typecache = new SafeDictionary<string, Type>(10);
+        private SafeDictionary<Type, Getters[]> _getterscache = new SafeDictionary<Type, Getters[]>(10);
         private SafeDictionary<string, Dictionary<string, myPropInfo>> _propertycache = new SafeDictionary<string, Dictionary<string, myPropInfo>>();
-        private SafeDictionary<Type, Type[]> _genericTypes = new SafeDictionary<Type, Type[]>();
-        private SafeDictionary<Type, Type> _genericTypeDef = new SafeDictionary<Type, Type>();
+        private SafeDictionary<Type, Type[]> _genericTypes = new SafeDictionary<Type, Type[]>(10);
+        private SafeDictionary<Type, Type> _genericTypeDef = new SafeDictionary<Type, Type>(10);
+        private static SafeDictionary<short, OpCode> _opCodes;
+
+        private static bool TryGetOpCode(short code, out OpCode opCode)
+        {
+            if (_opCodes != null)
+                return _opCodes.TryGetValue(code, out opCode);
+            var dict = new SafeDictionary<short, OpCode>();
+            foreach (var fi in typeof(OpCodes).GetFields(BindingFlags.Public | BindingFlags.Static))
+            {
+                if (!typeof(OpCode).IsAssignableFrom(fi.FieldType)) continue;
+                var innerOpCode = (OpCode)fi.GetValue(null);
+                if (innerOpCode.OpCodeType != OpCodeType.Nternal)
+                    dict.Add(innerOpCode.Value, innerOpCode);
+            }
+            _opCodes = dict;
+            return _opCodes.TryGetValue(code, out opCode);
+        }
 
         #region bjson custom types
-        internal UnicodeEncoding unicode = new UnicodeEncoding();
-        internal UTF8Encoding utf8 = new UTF8Encoding();
+        //internal UnicodeEncoding unicode = new UnicodeEncoding();
+        private static UTF8Encoding utf8 = new UTF8Encoding();
+
+        // TODO : optimize utf8 
+        public static byte[] UTF8GetBytes(string str)
+        {
+            return utf8.GetBytes(str);
+        }
+
+        public static string UTF8GetString(byte[] bytes, int offset, int len)
+        {
+            return utf8.GetString(bytes, offset, len);
+        }
+
+        public unsafe static byte[] UnicodeGetBytes(string str)
+        {
+            int len = str.Length * 2;
+            byte[] b = new byte[len];
+            fixed (void* ptr = str)
+            {
+                System.Runtime.InteropServices.Marshal.Copy(new IntPtr(ptr), b, 0, len);
+            }
+            return b;
+        }
+
+        public static string UnicodeGetString(byte[] b)
+        {
+            return UnicodeGetString(b, 0, b.Length);
+        }
+
+        public unsafe static string UnicodeGetString(byte[] bytes, int offset, int buflen)
+        {
+            string str = "";
+            fixed (byte* bptr = bytes)
+            {
+                char* cptr = (char*)(bptr + offset);
+                str = new string(cptr, 0, buflen / 2);
+            }
+            return str;
+        }
         #endregion
 
         #region json custom types
@@ -151,7 +213,7 @@ namespace EntityWorker.Core.Object.Library.JSON
             }
         }
 
-        public Dictionary<string, myPropInfo> Getproperties(Type type, string typename)
+        internal Dictionary<string, myPropInfo> Getproperties(Type type, string typename)
         {
             Dictionary<string, myPropInfo> sd = null;
             if (_propertycache.TryGetValue(typename, out sd))
@@ -160,10 +222,8 @@ namespace EntityWorker.Core.Object.Library.JSON
             }
             else
             {
-                sd = new Dictionary<string, myPropInfo>();
-                var bf = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static;
-                var pr = FastDeepCloner.DeepCloner.GetFastDeepClonerProperties(type);
-                //type.GetProperties(bf);
+                sd = new Custom_ValueType<string, myPropInfo>();
+                var pr = DeepCloner.GetFastDeepClonerProperties(type);
                 foreach (var p in pr)
                 {
                     if (!p.CanRead)// Property is an indexer
@@ -171,30 +231,27 @@ namespace EntityWorker.Core.Object.Library.JSON
 
                     myPropInfo d = CreateMyProp(p.PropertyType, p.Name);
                     d.Property = p;
+                    d.CanWrite = p.CanWrite;
 
-                    sd.Add(p.Name.ToLower(), d);
-                }
-                var fi = FastDeepCloner.DeepCloner.GetFastDeepClonerFields(type);
-                //FieldInfo[] fi = type.GetFields(bf);
-                foreach (var f in fi)
-                {
-                    if (!f.CanRead)// Property is an indexer
-                        continue;
-
-                    myPropInfo d = CreateMyProp(f.PropertyType, f.Name);
-
-                    d.Property = f;
-
-                    sd.Add(f.Name.ToLower(), d);
-
-
-
-                    _propertycache.Add(typename, sd);
-
+                    foreach (var at in p.Attributes)
+                    {
+                        if (at is DataMemberAttribute)
+                        {
+                            var dm = (DataMemberAttribute)at;
+                            if (dm.Name != "")
+                                d.memberName = dm.Name;
+                        }
+                    }
+                    if (d.memberName != null)
+                        sd.Add(d.memberName, d);
+                    else
+                        sd.Add(p.Name.ToLowerInvariant(), d);
                 }
 
-                return sd;
+                _propertycache.Add(typename, sd);
+
             }
+            return sd;
         }
 
         private myPropInfo CreateMyProp(Type t, string name)
@@ -244,7 +301,7 @@ namespace EntityWorker.Core.Object.Library.JSON
             if (t.IsGenericType)
             {
                 d.IsGenericType = true;
-                d.bt = t.GetGenericArguments()[0];
+                d.bt = Reflection.Instance.GetGenericArguments(t)[0];
             }
 
             d.pt = t;
@@ -265,7 +322,7 @@ namespace EntityWorker.Core.Object.Library.JSON
 
         #region [   PROPERTY GET SET   ]
 
-        internal string GetTypeAssemblyName(Type t)
+        public string GetTypeAssemblyName(Type t)
         {
             string val = "";
             if (_tyname.TryGetValue(t, out val))
@@ -286,57 +343,137 @@ namespace EntityWorker.Core.Object.Library.JSON
             else
             {
                 Type t = Type.GetType(typename);
+
+                if (RDBMode)
+                {
+                    if (t == null) // RaptorDB : loading runtime assemblies
+                    {
+                        t = Type.GetType(typename, (name) =>
+                        {
+                            return AppDomain.CurrentDomain.GetAssemblies().Where(z => z.FullName == name.FullName).FirstOrDefault();
+                        }, null, true);
+                    }
+                }
+
                 _typecache.Add(typename, t);
                 return t;
             }
         }
 
-        internal object FastCreateInstance(Type objtype)
+
+        internal static FieldInfo GetGetterBackingField(PropertyInfo autoProperty)
         {
-            return objtype.Creator();
+            var getMethod = autoProperty.GetGetMethod();
+            // Restrict operation to auto properties to avoid risking errors if a getter does not contain exactly one field read instruction (such as with calculated properties).
+            if (!getMethod.IsDefined(typeof(System.Runtime.CompilerServices.CompilerGeneratedAttribute), false)) return null;
+
+            var byteCode = getMethod.GetMethodBody()?.GetILAsByteArray() ?? new byte[0];
+            //var byteCode = getMethod.GetMethodBody().GetILAsByteArray();
+            int pos = 0;
+            // Find the first LdFld instruction and parse its operand to a FieldInfo object.
+            while (pos < byteCode.Length)
+            {
+                // Read and parse the OpCode (it can be 1 or 2 bytes in size).
+                byte code = byteCode[pos++];
+                if (!(TryGetOpCode(code, out var opCode) || pos < byteCode.Length && TryGetOpCode((short)(code * 0x100 + byteCode[pos++]), out opCode)))
+                    throw new NotSupportedException("Unknown IL code detected.");
+                // If it is a LdFld, read its operand, parse it to a FieldInfo and return it.
+                if (opCode == OpCodes.Ldfld && opCode.OperandType == OperandType.InlineField && pos + sizeof(int) <= byteCode.Length)
+                {
+                    return getMethod.Module.ResolveMember(BitConverter.ToInt32(byteCode, pos), getMethod.DeclaringType?.GetGenericArguments(), null) as FieldInfo;
+                }
+                // Otherwise, set the current position to the start of the next instruction, if any (we need to know how much bytes are used by operands).
+                pos += opCode.OperandType == OperandType.InlineNone
+                            ? 0
+                            : opCode.OperandType == OperandType.ShortInlineBrTarget ||
+                              opCode.OperandType == OperandType.ShortInlineI ||
+                              opCode.OperandType == OperandType.ShortInlineVar
+                                ? 1
+                                : opCode.OperandType == OperandType.InlineVar
+                                    ? 2
+                                    : opCode.OperandType == OperandType.InlineI8 ||
+                                      opCode.OperandType == OperandType.InlineR
+                                        ? 8
+                                        : opCode.OperandType == OperandType.InlineSwitch
+                                            ? 4 * (BitConverter.ToInt32(byteCode, pos) + 1)
+                                            : 4;
+            }
+            return null;
         }
 
-        internal Getters[] GetGetters(Type type, bool ShowReadOnlyProperties)
+
+
+
+
+
+        public Getters[] GetGetters(Type type, List<Type> IgnoreAttributes)
         {
             Getters[] val = null;
             if (_getterscache.TryGetValue(type, out val))
                 return val;
-            //bool isAnonymous = IsAnonymousType(type);
 
-            var bf = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static;
-            //if (ShowReadOnlyProperties)
-            //    bf |= BindingFlags.NonPublic;
             var props = DeepCloner.GetFastDeepClonerProperties(type);
             List<Getters> getters = new List<Getters>();
-            foreach (FastDeepClonerProperty p in props)
+            foreach (var p in props)
             {
-                if (!p.CanRead || p.ContainAttribute<JsonIgnore>())
-                {// Property is an indexer
+                if (!p.CanRead)//|| isAnonymous == false))
                     continue;
+
+                if (IgnoreAttributes != null)
+                {
+                    bool found = false;
+                    foreach (var ignoreAttr in IgnoreAttributes)
+                    {
+                        if (p.ContainAttribute(ignoreAttr))
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found)
+                        continue;
+                }
+                string mName = null;
+
+                foreach (var at in p.Attributes)
+                {
+                    if (at is DataMemberAttribute)
+                    {
+                        var dm = (DataMemberAttribute)at;
+                        if (dm.Name != "")
+                        {
+                            mName = dm.Name;
+                        }
+                    }
                 }
 
-                string mName = null;
-                getters.Add(new Getters { Getter = p._propertyGet, Name = p.Name, lcName = p.Name.ToLower(), memberName = mName });
+                getters.Add(new Getters { Property = p, Name = p.Name, lcName = p.Name.ToLowerInvariant(), memberName = mName });
             }
 
-            ////FieldInfo[] fi = type.GetFields(bf);
-            //var fi = DeepCloner.GetFastDeepClonerFields(type);
-            //foreach (FastDeepClonerProperty f in fi)
-            //{
-            //    if (!f.CanRead || f.ContainAttribute<JsonIgnore>())
-            //    {// Property is an indexer
-            //        continue;
-            //    }
-            //    string mName = null;
-
-            //    getters.Add(new Getters { Getter = f._propertyGet, Name = f.Name, lcName = f.Name.ToLower(), memberName = mName });
-
-            //}
             val = getters.ToArray();
             _getterscache.Add(type, val);
             return val;
         }
 
+        internal static bool IsAnonymousType(Type type)
+        {
+            // may break in the future if compiler defined names change...
+            const string CS_ANONYMOUS_PREFIX = "<>f__AnonymousType";
+            const string VB_ANONYMOUS_PREFIX = "VB$AnonymousType";
+            const string Auto_ANONYMOUS_PREFIX = "AnonymousType";
+
+            if (type == null)
+                throw new ArgumentNullException("type");
+
+            if (type.Namespace == null && (type.Name.StartsWith(CS_ANONYMOUS_PREFIX, StringComparison.Ordinal)
+                || type.Name.StartsWith(VB_ANONYMOUS_PREFIX, StringComparison.Ordinal) ||
+                type.Name.StartsWith(Auto_ANONYMOUS_PREFIX, StringComparison.Ordinal)))
+            {
+                return type.IsDefined(typeof(CompilerGeneratedAttribute), false);
+            }
+
+            return false;
+        }
         #endregion
 
         internal void ResetPropertyCache()
@@ -346,13 +483,12 @@ namespace EntityWorker.Core.Object.Library.JSON
 
         internal void ClearReflectionCache()
         {
-            _tyname = new SafeDictionary<Type, string>();
-            _typecache = new SafeDictionary<string, Type>();
-            _constrcache = new SafeDictionary<Type, CreateObject>();
-            _getterscache = new SafeDictionary<Type, Getters[]>();
-            _propertycache = new SafeDictionary<string, Dictionary<string, myPropInfo>>();
-            _genericTypes = new SafeDictionary<Type, Type[]>();
-            _genericTypeDef = new SafeDictionary<Type, Type>();
+            _tyname = new SafeDictionary<Type, string>(10);
+            _typecache = new SafeDictionary<string, Type>(10);
+            _getterscache = new SafeDictionary<Type, Getters[]>(10);
+            _propertycache = new SafeDictionary<string, Dictionary<string, myPropInfo>>(10);
+            _genericTypes = new SafeDictionary<Type, Type[]>(10);
+            _genericTypeDef = new SafeDictionary<Type, Type>(10);
         }
     }
 }

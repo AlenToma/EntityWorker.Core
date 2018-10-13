@@ -116,15 +116,14 @@ namespace EntityWorker.Core.Object.Library.JSON
             else if (obj is TimeSpan)
                 _output.Append(((TimeSpan)obj).Ticks);
 
-#if net4
             else if (_params.KVStyleStringDictionary == false &&
                 obj is IEnumerable<KeyValuePair<string, object>>)
 
                 WriteStringDictionary((IEnumerable<KeyValuePair<string, object>>)obj);
-#endif
+
 
             else if (_params.KVStyleStringDictionary == false && obj is IDictionary &&
-                obj.GetType().IsGenericType && obj.GetType().GetGenericArguments()[0] == typeof(string))
+                obj.GetType().IsGenericType && Reflection.Instance.GetGenericArguments(obj.GetType())[0] == typeof(string))
 
                 WriteStringDictionary((IDictionary)obj);
             else if (obj is IDictionary)
@@ -161,7 +160,7 @@ namespace EntityWorker.Core.Object.Library.JSON
         private void WriteDateTimeOffset(DateTimeOffset d)
         {
             DateTime dt = _params.UseUTCDateTime ? d.UtcDateTime : d.DateTime;
-            
+
             write_date_value(dt);
 
             var ticks = dt.Ticks % TimeSpan.TicksPerSecond;
@@ -198,10 +197,8 @@ namespace EntityWorker.Core.Object.Library.JSON
                 else
                 {
                     if (pendingSeparator) _output.Append(',');
-                    if (_params.SerializeToLowerCaseNames)
-                        WritePair(key.ToLower(), nameValueCollection[key]);
-                    else
-                        WritePair(key, nameValueCollection[key]);
+                    var name = JsonHelper.SerializaName(_params.JsonFormatting, key);
+                    WritePair(name, nameValueCollection[key]);
                     pendingSeparator = true;
                 }
             }
@@ -224,10 +221,8 @@ namespace EntityWorker.Core.Object.Library.JSON
                     if (pendingSeparator) _output.Append(',');
 
                     string k = (string)entry.Key;
-                    if (_params.SerializeToLowerCaseNames)
-                        WritePair(k.ToLower(), entry.Value);
-                    else
-                        WritePair(k, entry.Value);
+                    var name = JsonHelper.SerializaName(_params.JsonFormatting, k);
+                    WritePair(k, entry.Value);
                     pendingSeparator = true;
                 }
             }
@@ -236,7 +231,7 @@ namespace EntityWorker.Core.Object.Library.JSON
 
         private void WriteCustom(object obj)
         {
-            Serialize s;
+            Reflection.Serialize s;
             Reflection.Instance._customSerializer.TryGetValue(obj.GetType(), out s);
             WriteStringFast(s(obj));
         }
@@ -473,12 +468,12 @@ namespace EntityWorker.Core.Object.Library.JSON
                 append = true;
             }
 
-            Getters[] g = Reflection.Instance.GetGetters(t, _params.ShowReadOnlyProperties);
+            Getters[] g = Reflection.Instance.GetGetters(t, _params.IgnoreAttributes);
             int c = g.Length;
             for (int ii = 0; ii < c; ii++)
             {
                 var p = g[ii];
-                object o = p.Getter(obj);
+                object o = p.Property.GetValue(obj);
                 if (_params.SerializeNullValues == false && (o == null || o is DBNull))
                 {
                     //append = false;
@@ -489,10 +484,11 @@ namespace EntityWorker.Core.Object.Library.JSON
                         _output.Append(',');
                     if (p.memberName != null)
                         WritePair(p.memberName, o);
-                    else if (_params.SerializeToLowerCaseNames)
-                        WritePair(p.lcName, o);
                     else
-                        WritePair(p.Name, o);
+                    {
+                        WritePair(JsonHelper.SerializaName(_params.JsonFormatting, p.Name), o);
+                    }
+
                     if (o != null && _params.UseExtensions)
                     {
                         Type tt = o.GetType();
@@ -562,10 +558,7 @@ namespace EntityWorker.Core.Object.Library.JSON
                     if (pendingSeparator) _output.Append(',');
 
                     string k = (string)entry.Key;
-                    if (_params.SerializeToLowerCaseNames)
-                        WritePair(k.ToLower(), entry.Value);
-                    else
-                        WritePair(k, entry.Value);
+                    WritePair(JsonHelper.SerializaName(_params.JsonFormatting, k), entry.Value);
                     pendingSeparator = true;
                 }
             }
@@ -585,11 +578,7 @@ namespace EntityWorker.Core.Object.Library.JSON
                 {
                     if (pendingSeparator) _output.Append(',');
                     string k = entry.Key;
-
-                    if (_params.SerializeToLowerCaseNames)
-                        WritePair(k.ToLower(), entry.Value);
-                    else
-                        WritePair(k, entry.Value);
+                    WritePair(JsonHelper.SerializaName(_params.JsonFormatting, k), entry.Value);
                     pendingSeparator = true;
                 }
             }
@@ -645,7 +634,7 @@ namespace EntityWorker.Core.Object.Library.JSON
                 }
                 else
                 {
-                    if (c != '\t' && c != '\n' && c != '\r' && c != '\"' && c != '\\' && c!='\0')// && c != ':' && c!=',')
+                    if (c != '\t' && c != '\n' && c != '\r' && c != '\"' && c != '\\' && c != '\0')// && c != ':' && c!=',')
                     {
                         if (runIndex == -1)
                             runIndex = index;

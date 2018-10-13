@@ -21,6 +21,7 @@ using EntityWorker.Core.Object.Library.Modules;
 using System.IO;
 using EntityWorker.Core.Object.Library.Gzip;
 using EntityWorker.Core.Object.Library.DataBase;
+using EntityWorker.Core.Object.Library.JSON;
 
 namespace EntityWorker.Core.Transaction
 {
@@ -1042,12 +1043,13 @@ namespace EntityWorker.Core.Transaction
         /// All JsonIgnore Values will be loaded from the database if a primary key exist and the value is default()  eg null or empty or even 0 for int and decimal
         /// </summary>
         /// <typeparam name="T"></typeparam>
+        /// <param name="param">The Default is GlobalConfigration.JSONParameters</param>
         /// <returns></returns>
-        public ISqlQueryable<T> FromJson<T>(string json) where T : class
+        public ISqlQueryable<T> FromJson<T>(string json, JSONParameters param = null) where T : class
         {
             if (typeof(T).GetPrimaryKey() == null)
                 throw new EntityException("Primary Id not found for object " + typeof(T).FullName);
-            return new SqlQueryable<T>(this, json.FromJson<List<T>>(this));
+            return new SqlQueryable<T>(this, json.FromJson<List<T>>(this, param));
         }
 
         /// <summary>
@@ -1055,12 +1057,13 @@ namespace EntityWorker.Core.Transaction
         /// All JsonIgnore Values will be loaded from the database if a primary key exist
         /// </summary>
         /// <typeparam name="T"></typeparam>
+        /// <param name="param">The Default is GlobalConfigration.JSONParameters</param>
         /// <returns></returns>
-        public async Task<ISqlQueryable<T>> FromJsonAsync<T>(string json) where T : class
+        public async Task<ISqlQueryable<T>> FromJsonAsync<T>(string json, JSONParameters param = null) where T : class
         {
             if (typeof(T).GetPrimaryKey() == null)
                 throw new EntityException("Primary Id not found for object " + typeof(T).FullName);
-            return await Task.FromResult<ISqlQueryable<T>>(new SqlQueryable<T>(this, json.FromJson<List<T>>(this)));
+            return await Task.FromResult<ISqlQueryable<T>>(new SqlQueryable<T>(this, json.FromJson<List<T>>(this, param)));
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EntityWorker.Core.Object.Library.JSON;
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -214,15 +215,17 @@ namespace EntityWorker.Core.Interface
         /// Convert To JSON
         /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Json.md
         /// </summary>
+        /// <param name="param">The Default is GlobalConfigration.JSONParameters</param>
         /// <returns></returns>
-        string Json();
+        string Json(JSONParameters param = null);
 
         /// <summary>
         /// Convert To JSON
         /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Json.md
         /// </summary>
+        /// <param name="param">The Default is GlobalConfigration.JSONParameters</param>
         /// <returns></returns>
-        Task<string> JsonAsync();
+        Task<string> JsonAsync(JSONParameters param = null);
 
         /// <summary>
         /// Convert To XML

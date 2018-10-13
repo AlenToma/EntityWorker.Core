@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using EntityWorker.Core.Interface;
 using EntityWorker.Core.SqlQuerys;
 using EntityWorker.Core.Helper;
+using EntityWorker.Core.Object.Library.JSON;
 
 namespace EntityWorker.Core.Object.Library
 {
@@ -484,19 +485,21 @@ namespace EntityWorker.Core.Object.Library
         /// <summary>
         /// Convert To JSON
         /// </summary>
+        /// <param name="param">The Default is GlobalConfigration.JSONParameters</param>
         /// <returns></returns>
-        public string Json()
+        public string Json(JSONParameters param = null)
         {
-            return Execute().ToJson();
+            return Execute().ToJson(param);
         }
 
         /// <summary>
         /// Convert To JSON
         /// </summary>
+        /// <param name="param">The Default is GlobalConfigration.JSONParameters</param>
         /// <returns></returns>
-        public async Task<string> JsonAsync()
+        public async Task<string> JsonAsync(JSONParameters param = null)
         {
-            return await Task.FromResult<string>(Execute().ToJson());
+            return await Task.FromResult<string>(Execute().ToJson(param));
         }
 
         /// <summary>

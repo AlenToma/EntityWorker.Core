@@ -169,7 +169,7 @@ namespace EntityWorker.Core.SqlQuerys
         {
             if (ex.NodeType == ExpressionType.MemberAccess)
             {
-                if (ex.ToString().Contains("DisplayClass"))
+                if (ex.ToString().Contains("DisplayClass") || (ex as MemberExpression).Expression == null)
                     return Expression.Lambda(ex).Compile().DynamicInvoke();
                 var member = (ex as MemberExpression).Expression as ConstantExpression;
                 if (member?.Value.GetType().GetFields(_bindingFlags).Length > 0)
@@ -249,7 +249,7 @@ namespace EntityWorker.Core.SqlQuerys
             {
                 var ex = (((MemberExpression)m.Object).Expression as ConstantExpression);
 
-                if (ex == null)
+                if (ex == null && ((MemberExpression)m.Object).Expression != null)
                 {
                     var invert = GetInvert();
                     var value = GetSingleValue(m.Arguments[0]);
@@ -269,7 +269,7 @@ namespace EntityWorker.Core.SqlQuerys
                     try
                     {
                         var Stringify = (m.Arguments[0] as MemberExpression).Member as PropertyInfo != null ? ((m.Arguments[0] as MemberExpression).Member as PropertyInfo).GetCustomAttributes<Stringify>() != null : false;
-                        var value = (((MemberExpression)m.Object).Member as FieldInfo) != null ? (((MemberExpression)m.Object).Member as FieldInfo)?.GetValue(ex.Value) : (((MemberExpression)m.Object).Member as PropertyInfo)?.GetValue(ex.Value);
+                        var value = GetSingleValue((MemberExpression)m.Object);
                         if (value == null)
                             this.Visit(ex);
                         else
@@ -297,7 +297,7 @@ namespace EntityWorker.Core.SqlQuerys
             else if (m.Method.Name == "StartsWith")
             {
                 var ex = (((MemberExpression)m.Object).Expression as ConstantExpression);
-                if (ex == null)
+                if (ex == null && ((MemberExpression)m.Object).Expression != null)
                 {
                     var invert = GetInvert();
                     var value = GetSingleValue(m.Arguments[0]);
@@ -316,7 +316,7 @@ namespace EntityWorker.Core.SqlQuerys
                     sb.Append("(CASE WHEN ");
                     this.Visit(m.Arguments[0]);
                     InsertBeforeDecoder(" LIKE ");
-                    var value = (((MemberExpression)m.Object).Member as FieldInfo) != null ? (((MemberExpression)m.Object).Member as FieldInfo)?.GetValue(ex.Value) : (((MemberExpression)m.Object).Member as PropertyInfo)?.GetValue(ex.Value);
+                    var value = GetSingleValue((MemberExpression)m.Object); 
                     CleanDecoder(string.Format("String[{0}%]", value));
                     sb.Append(" THEN " + boolString.Replace("#", "1T") + " ELSE " + boolString.Replace("#", "0T") + " END) ");
                     sb.Append(boolString.Replace("#", !string.IsNullOrEmpty(invert) ? "0" : "1"));
@@ -328,7 +328,7 @@ namespace EntityWorker.Core.SqlQuerys
             if (m.Method.Name == "EndsWith")
             {
                 var ex = (((MemberExpression)m.Object).Expression as ConstantExpression);
-                if (ex == null)
+                if (ex == null && ((MemberExpression)m.Object).Expression != null)
                 {
                     var invert = GetInvert();
                     var value = GetSingleValue(m.Arguments[0]);
@@ -347,7 +347,7 @@ namespace EntityWorker.Core.SqlQuerys
                     sb.Append("(CASE WHEN ");
                     this.Visit(m.Arguments[0]);
                     InsertBeforeDecoder(" LIKE ");
-                    var value = (((MemberExpression)m.Object).Member as FieldInfo) != null ? (((MemberExpression)m.Object).Member as FieldInfo)?.GetValue(ex.Value) : (((MemberExpression)m.Object).Member as PropertyInfo)?.GetValue(ex.Value);
+                    var value = GetSingleValue((MemberExpression)m.Object);
                     CleanDecoder(string.Format("String[%{0}]", value));
                     sb.Append(" THEN " + boolString.Replace("#", "1T") + " ELSE " + boolString.Replace("#", "0T") + " END) ");
                     sb.Append(boolString.Replace("#", !string.IsNullOrEmpty(invert) ? "0" : "1"));
@@ -464,9 +464,11 @@ namespace EntityWorker.Core.SqlQuerys
                     if (replaceWith.Contains("String["))
                     {
                         var spt = replaceWith.Split(new string[] { "]," }, StringSplitOptions.None).Where(x => !string.IsNullOrEmpty(x));
-                        var isFirst = true;
+                        var i = 0;
+                        var value = "";
                         foreach (var str in spt)
                         {
+                            i++;
                             var xValue = str.Trim().Replace("String[", "").TrimEnd("]");
                             var rValue = xValue.TrimStart('%').TrimEnd("%");
                             var codedValue = new DataCipher(result.First(), result.Last().ConvertValue<int>().ConvertValue<DataCipherKeySize>()).Encrypt(rValue);
@@ -474,16 +476,18 @@ namespace EntityWorker.Core.SqlQuerys
                                 codedValue = "%" + codedValue;
                             if (xValue.EndsWith("%"))
                                 codedValue += "%";
-                            sb.Insert(m.Index, (!isFirst ? "," : "") + "String[" + codedValue + "]");
-                            isFirst = false;
+                            value += $"String[{codedValue}]{(i == spt.Count() ? "" : ",")}";
                         }
+                        sb.Insert(m.Index, value);
                     }
                     else if (replaceWith.Contains("Date["))
                     {
                         var spt = replaceWith.Split(new string[] { "]," }, StringSplitOptions.None).Where(x => !string.IsNullOrEmpty(x));
-                        var isFirst = true;
+                        var i = 0;
+                        var value = "";
                         foreach (var str in spt)
                         {
+                            i++;
                             var xValue = str.Trim().Replace("Date[", "").TrimEnd("]");
                             var rValue = xValue.TrimStart('%').TrimEnd("%");
                             var codedValue = new DataCipher(result.First(), result.Last().ConvertValue<int>().ConvertValue<DataCipherKeySize>()).Encrypt(rValue);
@@ -491,9 +495,9 @@ namespace EntityWorker.Core.SqlQuerys
                                 codedValue = "%" + codedValue;
                             if (xValue.EndsWith("%"))
                                 codedValue += "%";
-                            sb.Insert(m.Index, (!isFirst ? "," : "") + "Date[" + codedValue + "]");
-                            isFirst = false;
+                            value += $"Date[{codedValue}]{(i == spt.Count() ? "" : ",")}";
                         }
+                        sb.Insert(m.Index, value);
                     }
                     else
                         sb = sb.Insert(m.Index, new DataCipher(result.First(), result.Last().ConvertValue<int>().ConvertValue<DataCipherKeySize>()).Encrypt(replaceWith));
@@ -806,7 +810,7 @@ namespace EntityWorker.Core.SqlQuerys
                     VisitConstantFixed(m.Expression as ConstantExpression, m.Member?.Name);
                     return m;
                 }
-                else if (m.Expression?.ToString().Contains("DisplayClass") ?? false)
+                else if (m.Expression?.ToString().Contains("DisplayClass") ?? false || m.Expression == null)
                 {
                     CleanDecoder(ValuetoSql(Expression.Lambda(m).Compile().DynamicInvoke()));
                     return m;
