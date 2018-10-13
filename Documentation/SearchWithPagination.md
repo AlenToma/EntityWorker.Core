@@ -41,7 +41,7 @@ here is a simple example on how you could implement a simple generic method with
             settings.TotalPages = Math.Ceiling(data.ExecuteCount().ConvertValue<decimal>() / settings.PageSize).ConvertValue<int>();
             data = data.Skip(settings.SelectedPage / settings.PageSize).Take(settings.PageSize);
             settings.Result = data.Execute();
-            return settings; // here after you could use the data to post it back as json or use any other way
+            return settings; // here after you could use the data to post it back as json or use it any other way
         }
         
         // we could call this method like 
