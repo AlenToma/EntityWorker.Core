@@ -10,6 +10,9 @@ There are many attributes you could use to improve the code
 /// </summary>
 [KnownType]
 
+// For Specify different name for json serialize
+[System.Runtime.Serialization.DataMemberAttribute]
+
 /// <summary>
 /// Save the property as xml object in the database
 /// For the moment those values cant be searched by linq.
