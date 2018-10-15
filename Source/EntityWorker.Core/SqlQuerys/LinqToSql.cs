@@ -648,8 +648,9 @@ namespace EntityWorker.Core.SqlQuerys
             }
 
             this.Visit(b.Right);
+            var exp = (b.Right as BinaryExpression)?.Left;
             var reg = new Regex(@"\b(IsNullOrEmpty|Contains|StartsWith|EndsWith)\b", RegexOptions.IgnoreCase | RegexOptions.Multiline);
-            if ((b.Right.Type == typeof(bool) || b.Right.Type == typeof(bool?)) && !reg.Match(b.Right.ToString()).Success)
+            if ((exp == null || exp.Type == typeof(bool) || exp.Type == typeof(bool?)) && (b.Right.Type == typeof(bool) || b.Right.Type == typeof(bool?)) && !reg.Match(b.Right.ToString()).Success)
                 validateBinaryExpression(b, null);
             validateBinaryExpression(b, b.Right);
 

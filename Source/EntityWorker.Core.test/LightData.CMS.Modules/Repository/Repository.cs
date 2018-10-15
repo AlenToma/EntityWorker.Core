@@ -64,7 +64,7 @@ namespace LightData.CMS.Modules.Repository
         // Get the full connection string from the web-config
         public static string GetConnectionString(DataBaseTypes dbType)
         {
-            return dbType == DataBaseTypes.Mssql ? @"Server=DESKTOP-4BRMQVE\SQLEXPRESS;Trusted_Connection=True; Database=CMStest; User Id=root; Password=root;" :
+            return dbType == DataBaseTypes.Mssql ? @"Server=DESKTOP-4BRMQVE\mssql;Trusted_Connection=false; Database=CMStest; User Id=root; Password=root;" :
                   (dbType == DataBaseTypes.Sqllight ? @"Data Source=D:\Projects\LightData.CMS\source\LightData.CMS\App_Data\LightDataTabletest.db" :
                   "Host=localhost;Username=postgres;Password=root;Database=mydatabase");
         }

@@ -8,7 +8,7 @@
     ".NETCoreApp,Version=v2.0": {
       "LightData.CMS.Modules/1.0.0": {
         "dependencies": {
-          "EntityWorker.Core": "2.3.5"
+          "EntityWorker.Core": "2.3.6"
         },
         "runtime": {
           "LightData.CMS.Modules.dll": {}
@@ -192,7 +192,7 @@
           }
         }
       },
-      "EntityWorker.Core/2.3.5": {
+      "EntityWorker.Core/2.3.6": {
         "dependencies": {
           "System.Data.SqlClient": "4.5.0"
         },
@@ -292,7 +292,7 @@
       "path": "system.text.encoding.codepages/4.5.0",
       "hashPath": "system.text.encoding.codepages.4.5.0.nupkg.sha512"
     },
-    "EntityWorker.Core/2.3.5": {
+    "EntityWorker.Core/2.3.6": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

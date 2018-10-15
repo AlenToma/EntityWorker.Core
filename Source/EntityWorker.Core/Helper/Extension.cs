@@ -110,6 +110,7 @@ namespace EntityWorker.Core.Helper
         /// <summary>
         /// Convert Json to dynamic object
         /// </summary>
+        /// <param name="json"></param>
         /// <param name=""></param>
         /// <returns></returns>
         public static dynamic FromJsonToDynamic(this string json)
@@ -135,6 +136,7 @@ namespace EntityWorker.Core.Helper
         /// <typeparam name="T"></typeparam>
         /// <param name="json"></param>
         /// <param name="repository"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
         internal static T FromJson<T>(this string json, IRepository repository, JSONParameters param = null)
         {

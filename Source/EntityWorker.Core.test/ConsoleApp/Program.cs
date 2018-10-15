@@ -47,7 +47,7 @@ namespace ConsoleApp1
                 var s = "Admin";
                 var user = new User("") { UserName = "sd" };
                 var t = new List<string>() { "Admin", "Alen" , "sdsad"};
-                var users = rep.Get<User>().Where(x=> x.UserName == s || x.UserName == T || x.UserName == user.UserName).LoadChildren().ExecuteFirstOrDefault();
+                var users = rep.Get<User>().Where(x=> !x.IsActive || x.IsActive2 == false).LoadChildren().ExecuteFirstOrDefault();
             }
         }
 
