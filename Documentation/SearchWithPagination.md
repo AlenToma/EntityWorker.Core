@@ -39,7 +39,7 @@ here is a simple example on how you could implement a simple generic method with
             // we get the total rows before we add Skip and Take. 
             // ExecuteCount only execute select count(*) for the selected search or match rows
             settings.TotalPages = (data.ExecuteCount() / settings.PageSize).ConvertValue<int>();
-            data = data.Skip(settings.SelectedPage * settings.PageSize).Take(settings.PageSize);
+            data = data.Skip((settings.SelectedPage - 1) * settings.PageSize).Take(settings.PageSize);
             settings.Result = data.Execute();
             return settings; // here after you could use the data to post it back as json or use it any other way
         }
