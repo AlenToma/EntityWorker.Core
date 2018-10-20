@@ -9,7 +9,7 @@
     ".NETStandard,Version=v2.0/": {
       "LightData.CMS.Modules/1.0.0": {
         "dependencies": {
-          "EntityWorker.Core": "2.3.5",
+          "EntityWorker.Core": "2.3.7",
           "NETStandard.Library": "2.0.3",
           "System.Configuration": "4.0.0.0"
         },
@@ -213,7 +213,7 @@
           "System.Runtime": "4.3.0"
         }
       },
-      "EntityWorker.Core/2.3.5": {
+      "EntityWorker.Core/2.3.7": {
         "dependencies": {
           "System.Data.SqlClient": "4.5.0",
           "System.Reflection.Emit": "4.3.0"
@@ -326,7 +326,7 @@
     "System.IO/4.3.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-3qjaHvxQPDpSOYICjUoTsmoq5u6QJAFRUITgeT/4gqkF1bajbSmb1kwSxEA8AHlofqgcKJcM8udgieRNhaJ5Cg==",
+      "sha512": "sha512-Ep3xyKDltu0EsCk1BvoWBC7NltwFqRlYCjwKTV7+d4sAH0lVk5P3Q2XydNm6dYxUJZdUgmBLf52F3pAwzKIJBg==",
       "path": "system.io/4.3.0",
       "hashPath": "system.io.4.3.0.nupkg.sha512"
     },
@@ -375,7 +375,7 @@
     "System.Runtime/4.3.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-JufQi0vPQ0xGnAczR13AUFglDyVYt4Kqnz1AZaiKZ5+GICq0/1MH/mO/eAJHt/mHW1zjKBJd7kV26SrxddAhiw==",
+      "sha512": "sha512-wLlTiM4b/Un90BM6s3voqYybZEGra4WiIaXfTeB9kVPZr6QDP97xjG+rZYzdP2jiuQnij1bA8q4PzmrY6l5QTw==",
       "path": "system.runtime/4.3.0",
       "hashPath": "system.runtime.4.3.0.nupkg.sha512"
     },
@@ -421,7 +421,7 @@
       "path": "system.threading.tasks/4.3.0",
       "hashPath": "system.threading.tasks.4.3.0.nupkg.sha512"
     },
-    "EntityWorker.Core/2.3.5": {
+    "EntityWorker.Core/2.3.7": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

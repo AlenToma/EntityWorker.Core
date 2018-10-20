@@ -9,7 +9,7 @@
     ".NETStandard,Version=v2.0/": {
       "LightData.CMS.Modules/1.0.0": {
         "dependencies": {
-          "EntityWorker.Core": "2.3.6",
+          "EntityWorker.Core": "2.3.7",
           "NETStandard.Library": "2.0.3",
           "System.Configuration": "4.0.0.0"
         },
@@ -213,7 +213,7 @@
           "System.Runtime": "4.3.0"
         }
       },
-      "EntityWorker.Core/2.3.6": {
+      "EntityWorker.Core/2.3.7": {
         "dependencies": {
           "System.Data.SqlClient": "4.5.0",
           "System.Reflection.Emit": "4.3.0"
@@ -421,7 +421,7 @@
       "path": "system.threading.tasks/4.3.0",
       "hashPath": "system.threading.tasks.4.3.0.nupkg.sha512"
     },
-    "EntityWorker.Core/2.3.6": {
+    "EntityWorker.Core/2.3.7": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

@@ -86,11 +86,13 @@ namespace EntityWorker.Core.SqlQuerys
 
                 if (!string.IsNullOrEmpty(OrderBy))
                     query += Environment.NewLine + "ORDER BY " + OrderBy;
-                else query += Environment.NewLine + "ORDER BY " + _obType.GetPrimaryKey().GetPropertyName() + " ASC";
+                else
+                    query += Environment.NewLine + "ORDER BY " + _obType.GetPrimaryKey().GetPropertyName() + " ASC";
 
                 if (DataBaseTypes == DataBaseTypes.Mssql || DataBaseTypes == DataBaseTypes.PostgreSql)
                     query += Environment.NewLine + "OFFSET " + Skip + Environment.NewLine + "ROWS FETCH NEXT " + Take + " ROWS ONLY;";
-                else query += Environment.NewLine + "LIMIT  " + Skip + Environment.NewLine + "," + Take + ";";
+                else
+                    query += Environment.NewLine + "LIMIT  " + Skip + Environment.NewLine + "," + Take + ";";
 
                 return query;
             }
@@ -108,7 +110,8 @@ namespace EntityWorker.Core.SqlQuerys
                 {
                     if (DataBaseTypes == DataBaseTypes.Sqllight)
                         return Quary.Substring(0, Quary.LastIndexOf("LIMIT")) + "LIMIT 1";
-                    else return Quary.Substring(0, Quary.LastIndexOf("OFFSET")) + "LIMIT 1";
+                    else
+                        return Quary.Substring(0, Quary.LastIndexOf("OFFSET")) + "LIMIT 1";
                 }
             }
         }
@@ -176,7 +179,8 @@ namespace EntityWorker.Core.SqlQuerys
                     return member?.Value.GetType().GetFields(_bindingFlags).First().GetValue(member.Value);
                 else if (member?.Value.GetType().GetProperties().Length > 0)
                     return member?.Value.GetType().GetProperties().First().GetValue(member.Value);
-                else return null;
+                else
+                    return null;
             }
             else
             {
@@ -279,7 +283,8 @@ namespace EntityWorker.Core.SqlQuerys
                             {
                                 if (Stringify)
                                     v = ValuetoSql(string.Format("DefaultValueForEmptyArray({0})", Guid.NewGuid().ToString()), Stringify);
-                                else v = ValuetoSql(-1, Stringify);
+                                else
+                                    v = ValuetoSql(-1, Stringify);
                             }
 
                             CleanDecoder(v);
@@ -316,7 +321,7 @@ namespace EntityWorker.Core.SqlQuerys
                     sb.Append("(CASE WHEN ");
                     this.Visit(m.Arguments[0]);
                     InsertBeforeDecoder(" LIKE ");
-                    var value = GetSingleValue((MemberExpression)m.Object); 
+                    var value = GetSingleValue((MemberExpression)m.Object);
                     CleanDecoder(string.Format("String[{0}%]", value));
                     sb.Append(" THEN " + boolString.Replace("#", "1T") + " ELSE " + boolString.Replace("#", "0T") + " END) ");
                     sb.Append(boolString.Replace("#", !string.IsNullOrEmpty(invert) ? "0" : "1"));
@@ -396,7 +401,8 @@ namespace EntityWorker.Core.SqlQuerys
                     CleanDecoder(ValuetoSql(Expression.Lambda(m).Compile().DynamicInvoke()));
                     return m;
                 }
-                else throw new EntityException(string.Format("The method '{0}' is not supported", m.Method.Name));
+                else
+                    throw new EntityException(string.Format("The method '{0}' is not supported", m.Method.Name));
             }
 
             throw new EntityException(string.Format("The method '{0}' is not supported", m.Method.Name));
@@ -445,7 +451,8 @@ namespace EntityWorker.Core.SqlQuerys
         {
             if (EndWithDecoder())
                 sb = sb.InsertBefore(text, "<DataEncode>");
-            else sb.Append(text);
+            else
+                sb.Append(text);
         }
 
         internal void CleanDecoder(string replaceWith)
@@ -519,7 +526,8 @@ namespace EntityWorker.Core.SqlQuerys
                 {
                     if (exp.NodeType != ExpressionType.Not)
                         sb.Append(" = " + (DataBaseTypes == DataBaseTypes.PostgreSql ? "true" : "1"));
-                    else sb.Append(" = " + (DataBaseTypes == DataBaseTypes.PostgreSql ? "false" : "0"));
+                    else
+                        sb.Append(" = " + (DataBaseTypes == DataBaseTypes.PostgreSql ? "false" : "0"));
                 }
             }
             else
@@ -659,11 +667,19 @@ namespace EntityWorker.Core.SqlQuerys
         }
 
 
-        private string ValuetoSql(object value, bool singleValueToString = false)
+        private string ValuetoSql(object value, bool singleValueToString = false, Type externalType = null)
         {
             CleanText();
             if (value == null)
-                return "String[]";
+            {
+                if (externalType == typeof(Guid) || externalType == typeof(Guid?))
+                    return "Guid[NULL]";
+                else if (externalType == typeof(DateTime) || externalType == typeof(DateTime?) || externalType == typeof(TimeSpan) || externalType == typeof(TimeSpan?))
+                    return "Date[NULL]";
+                else
+                    return "String[NULL]";
+            }
+
             var type = value.GetType();
 
             if (type == typeof(bool) || type == typeof(bool?))
@@ -672,14 +688,15 @@ namespace EntityWorker.Core.SqlQuerys
             if (type == typeof(string))
                 return string.Format("String[{0}]", value);
 
-            if (type == typeof(Guid) || type == typeof(Guid))
+            if (type == typeof(Guid) || type == typeof(Guid?))
                 return string.Format("Guid[{0}]", value);
 
             if (type == typeof(DateTime) || type == typeof(DateTime?) || type == typeof(TimeSpan) || type == typeof(TimeSpan?))
             {
                 if (!singleValueToString)
                     return string.Format("Date[{0}]", value);
-                else return string.Format("String[{0}]", value);
+                else
+                    return string.Format("String[{0}]", value);
             }
 
             if (value is IEnumerable && !value.GetType().IsInternalType())
@@ -703,9 +720,11 @@ namespace EntityWorker.Core.SqlQuerys
 
                     if (value.GetType().IsNumeric())
                         return string.Format("{0}", value);
-                    else return string.Format("String[{0}]", value);
+                    else
+                        return string.Format("String[{0}]", value);
                 }
-                else return string.Format("String[{0}]", value);
+                else
+                    return string.Format("String[{0}]", value);
             }
 
         }
@@ -741,12 +760,13 @@ namespace EntityWorker.Core.SqlQuerys
                     case TypeCode.Object:
 
                         object value = null;
+                        Type fieldType = null;
                         if (c.Value.GetType().GetFields(_bindingFlags).Length > 0 && (string.IsNullOrEmpty(memName) || c.Value.GetType().GetFields(_bindingFlags).Any(x => x.Name == memName)))
                         {
                             var field = string.IsNullOrEmpty(memName)
                                  ? c.Value.GetType().GetFields(_bindingFlags).FirstOrDefault()
                                  : c.Value.GetType().GetFields(_bindingFlags).FirstOrDefault(x => x.Name == memName);
-
+                            fieldType = field?.FieldType;
                             value = field?.GetValue(c.Value) ?? c.Value.GetType().GetFields(_bindingFlags).FirstOrDefault()?.GetValue(c.Value);
                         }
                         else
@@ -754,14 +774,15 @@ namespace EntityWorker.Core.SqlQuerys
                             var field = string.IsNullOrEmpty(memName)
                             ? c.Value.GetType().GetProperties().FirstOrDefault()
                             : c.Value.GetType().GetProperties().FirstOrDefault(x => x.Name == memName);
+                            fieldType = field?.PropertyType;
                             value = field?.GetValue(c.Value) ?? c.Value.GetType().GetProperties().FirstOrDefault()?.GetValue(c.Value);
                         }
 
 
 
-                        if (value == null)
+                        if (value == null && fieldType == null)
                             break;
-                        CleanDecoder(ValuetoSql(value, isEnum));
+                        CleanDecoder(ValuetoSql(value, isEnum, fieldType));
                         break;
                     default:
                         if (isEnum && SavedTypes.ContainsKey(type))
@@ -841,7 +862,8 @@ namespace EntityWorker.Core.SqlQuerys
                         var invert = GetInvert();
                         if (!hasValueAttr)
                             columnName = $"(CASE WHEN {columnName} = {boolString.Replace("#", "0T")} THEN {boolString.Replace("#", "1T")} ELSE {boolString.Replace("#", "0T")} END) {boolString.Replace("#", "0")}";
-                        else columnName = $"(CASE WHEN {columnName} IS NULL THEN {boolString.Replace("#", "0T")} ELSE {boolString.Replace("#", "1T")} END) {boolString.Replace("#", "0")}";
+                        else
+                            columnName = $"(CASE WHEN {columnName} IS NULL THEN {boolString.Replace("#", "0T")} ELSE {boolString.Replace("#", "1T")} END) {boolString.Replace("#", "0")}";
                     }
                     else if (hasValueAttr)
                     {
@@ -981,7 +1003,8 @@ namespace EntityWorker.Core.SqlQuerys
             lambdaExpression = (LambdaExpression)Evaluator.Eval(lambdaExpression ?? (expression.Arguments[1]) as LambdaExpression);
 
             var body = lambdaExpression.Body as MemberExpression;
-            if (body == null) return false;
+            if (body == null)
+                return false;
             var col = VisitMember(body, true)?.ToString();
             if (string.IsNullOrEmpty(OrderBy))
             {
@@ -999,7 +1022,8 @@ namespace EntityWorker.Core.SqlQuerys
         {
             var sizeExpression = (ConstantExpression)expression.Arguments[1];
 
-            if (!int.TryParse(sizeExpression.Value.ToString(), out var size)) return false;
+            if (!int.TryParse(sizeExpression.Value.ToString(), out var size))
+                return false;
             Take = size;
             return true;
         }
@@ -1008,7 +1032,8 @@ namespace EntityWorker.Core.SqlQuerys
         {
             var sizeExpression = (ConstantExpression)expression.Arguments[1];
 
-            if (!int.TryParse(sizeExpression.Value.ToString(), out var size)) return false;
+            if (!int.TryParse(sizeExpression.Value.ToString(), out var size))
+                return false;
             Skip = size;
             return true;
         }

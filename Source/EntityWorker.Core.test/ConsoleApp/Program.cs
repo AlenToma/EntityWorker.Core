@@ -36,18 +36,17 @@ namespace ConsoleApp1
 
         public string m = "";
 
-        private static List<string> k = new List<string>() { "Admin", "Alen" , "sdsd" };
+        private static List<string> k = new List<string>() { "Admin", "Alen", "sdsd" };
 
 
 
         public static void test()
         {
-            using (var rep = new Repository())
+            using (var rep = new Repository( DataBaseTypes.Sqllight))
             {
-                var s = "Admin";
-                var user = new User("") { UserName = "sd" };
-                var t = new List<string>() { "Admin", "Alen" , "sdsad"};
-                var users = rep.Get<User>().Where(x=> !x.IsActive || x.IsActive2 == false).LoadChildren().ExecuteFirstOrDefault();
+                Guid? c = null;
+                var data = rep.Get<User>().Where(x => x.PersonId == c);
+                var users = data.Execute();
             }
         }
 

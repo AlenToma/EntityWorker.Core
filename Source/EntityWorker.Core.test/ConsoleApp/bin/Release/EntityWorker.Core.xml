@@ -420,6 +420,7 @@
             <summary>
             Convert Json to dynamic object
             </summary>
+            <param name="json"></param>
             <param name=""></param>
             <returns></returns>
         </member>
@@ -439,6 +440,7 @@
             <typeparam name="T"></typeparam>
             <param name="json"></param>
             <param name="repository"></param>
+            <param name="param"></param>
             <returns></returns>
         </member>
         <member name="M:EntityWorker.Core.Helper.Extension.FromJson(System.String,System.Type,EntityWorker.Core.Object.Library.JSON.JSONParameters)">
