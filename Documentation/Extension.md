@@ -1,5 +1,5 @@
 ## EntityWorker.Core Extension
-EntityWorker Containes many usefull methods that will help you in your developing
+EntityWorker Containes many usefull methods that will help you in your development
 ```csharp
 using EntityWorker.Core.Helper; 
 class name (Extension)
