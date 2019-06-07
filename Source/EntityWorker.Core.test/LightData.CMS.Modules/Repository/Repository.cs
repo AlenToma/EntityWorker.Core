@@ -35,36 +35,51 @@ namespace LightData.CMS.Modules.Repository
         protected override void OnModuleConfiguration(IModuleBuilder moduleBuilder)
         {
             moduleBuilder.Entity<User>()
-                .TableName("Users", "geto")
-                .HasKnownType(x => x.Person, typeof(Person))
-                .HasPrimaryKey(x => x.Id, false)
-                .NotNullable(x => x.UserName)
-                .HasDataEncode(x => x.UserName)
-                .HasDataEncode(x => x.Password)
-                .HasForeignKey<Role, Guid>(x => x.RoleId)
-                .HasIndependentData(x => x.Role)
-                .HasForeignKey<Person, Guid>(x => x.PersonId)
                 .HasRule<UserRule>()
-                .HasJsonIgnore(x => x.Password);
+                .TableName("Users", "geto")
+                .Property(x => x.Person)
+                .HasKnownType(typeof(Person))
+                .Property(x => x.Id)
+                .HasPrimaryKey(false)
+                .Property(x => x.UserName)
+                .NotNullable()
+                .HasDataEncode()
+                .Property(x => x.Password)
+                .HasJsonIgnore()
+                .HasDataEncode()
+                .Property(x => x.RoleId)
+                .HasForeignKey<Role>()
+                .Property(x => x.Role)
+                .HasIndependentData()
+                .Property(x => x.PersonId)
+                .HasForeignKey<Person>();
 
             moduleBuilder.EntityType(typeof(User))
+                .HasRule(typeof(UserRule))
                 .TableName("Users", "geto")
-                .HasKnownType("Person", typeof(Person))
-                .HasPrimaryKey("Id", false)
-                .NotNullable("UserName")
-                .HasDataEncode("UserName")
-                .HasDataEncode("Password")
-                .HasForeignKey<Role>("RoleId")
-                .HasIndependentData("Role")
-                .HasForeignKey<Person>("PersonId")
-                .HasRule<UserRule>()
-                .HasJsonIgnore("Password");
+                .Property("Person")
+                .HasKnownType(typeof(Person))
+                .Property("Id")
+                .HasPrimaryKey(false)
+                .Property("UserName")
+                .NotNullable()
+                .HasDataEncode()
+                .Property("Password")
+                .HasJsonIgnore()
+                .HasDataEncode()
+                .Property("RoleId")
+                .HasForeignKey<Role>("Role_Id")
+                .Property("Role")
+                .HasIndependentData()
+                .Property("PersonId")
+                .HasForeignKey<Person>("Person_Id");
         }
 
         // Get the full connection string from the web-config
         public static string GetConnectionString(DataBaseTypes dbType)
         {
-            return dbType == DataBaseTypes.Mssql ? @"Server=DESKTOP-4BRMQVE\mssql;Trusted_Connection=false; Database=CMStest; User Id=root; Password=root;" :
+            return dbType == DataBaseTypes.Mssql ?
+                @"Server=DESKTOP-4BRMQVE\mssql;Trusted_Connection=false; Database=CMStest; User Id=root; Password=root;" :
                   (dbType == DataBaseTypes.Sqllight ? @"Data Source=D:\Projects\LightData.CMS\source\LightData.CMS\App_Data\LightDataTabletest.db" :
                   "Host=localhost;Username=postgres;Password=root;Database=mydatabase");
         }

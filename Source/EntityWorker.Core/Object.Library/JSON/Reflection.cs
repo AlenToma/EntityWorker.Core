@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Collections;
 using System.Text;
-using EntityWorker.Core.FastDeepCloner;
-using EntityWorker.Core.Attributes;
+using FastDeepCloner;
 using System.Reflection.Emit;
 using System.Runtime.Serialization;
 using System.Linq;
@@ -231,7 +230,7 @@ namespace EntityWorker.Core.Object.Library.JSON
 
                     myPropInfo d = CreateMyProp(p.PropertyType, p.Name);
                     d.Property = p;
-                    d.CanWrite = p.CanWrite;
+                    d.CanWrite = p.CanRead;
 
                     foreach (var at in p.Attributes)
                     {

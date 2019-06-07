@@ -14,3 +14,9 @@
 /Solution/packages/System.Data.SqlClient.4.4.2/lib
 /Solution/packages/System.Data.SqlClient.4.4.2/ref
 /Source/EntityWorkerTest/.vs/EntityWorkerTest/v15/Server/sqlite3
+/Solution/.vs/EntityWorker.Core/v16/Server/sqlite3/db.lock
+/Solution/.vs/EntityWorker.Core/v16
+/Source/EntityWorker.Core.test/ConsoleApp/bin/Debug
+/Source/EntityWorker.Core.test/LightData.CMS.Modules/bin/Debug/net461
+/Source/EntityWorker.Core.test/LightData.CMS.Modules/obj
+/Source/EntityWorker.Core.test/.vs/ConsoleApp/v16

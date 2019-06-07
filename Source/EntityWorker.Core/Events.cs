@@ -1,4 +1,4 @@
-﻿using EntityWorker.Core.FastDeepCloner;
+﻿using FastDeepCloner;
 using System.Data;
 
 namespace EntityWorker.Core

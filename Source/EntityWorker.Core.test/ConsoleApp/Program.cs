@@ -20,7 +20,7 @@ namespace ConsoleApp1
             {
                 //Console.WriteLine((arg as Args).Data);
             });
-            //test();
+            //Code();
             DynamicLinq();
             SaveJson();
             PackageTest();
@@ -40,12 +40,14 @@ namespace ConsoleApp1
 
 
 
-        public static void test()
+        public static void Code()
         {
             using (var rep = new Repository( DataBaseTypes.Sqllight))
             {
                 Guid? c = null;
-                var data = rep.Get<User>().Where(x => x.PersonId == c);
+
+                var k = c.ConvertValue<DateTime>();
+                var data = rep.Get<User>().Where(x => string.Equals(T, x.UserName, StringComparison.CurrentCultureIgnoreCase));
                 var users = data.Execute();
             }
         }

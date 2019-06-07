@@ -9,7 +9,7 @@ using EntityWorker.Core.Helper;
 using EntityWorker.Core.Interface;
 using EntityWorker.Core.Object.Library;
 using EntityWorker.Core.SqlQuerys;
-using EntityWorker.Core.FastDeepCloner;
+using FastDeepCloner;
 using EntityWorker.Core.Postgres;
 using Rule = EntityWorker.Core.Attributes.Rule;
 using EntityWorker.Core.Object.Library.DataBase;
@@ -176,7 +176,7 @@ namespace EntityWorker.Core
                     var props = DeepCloner.GetFastDeepClonerProperties(item.GetType());
 
                     id = item.GetPrimaryKeyValue().ToString();
-                    foreach (var prop in props.Where(x => x.CanReadWrite && !x.IsInternalType && !x.ContainAttribute<ExcludeFromAbstract>() && !x.ContainAttribute<JsonDocument>() && !x.ContainAttribute<XmlDocument>()))
+                    foreach (var prop in props.Where(x => x.CanRead && !x.IsInternalType && !x.ContainAttribute<ExcludeFromAbstract>() && !x.ContainAttribute<JsonDocument>() && !x.ContainAttribute<XmlDocument>()))
                     {
                         var path = string.Format("{0}.{1}", parentProb ?? "", prop.Name).TrimEnd('.').TrimStart('.');
                         var propCorrectPathName = path?.Split('.').Length >= 2 ? string.Join(".", path.Split('.').Reverse().Take(2).Reverse()) : path;
@@ -265,7 +265,7 @@ namespace EntityWorker.Core
                 Querys.Where(_repository.DataBaseTypes).Column(primaryKey.GetPropertyName()).Equal(primaryKeyValue).Execute()
             };
 
-            foreach (var prop in props.Where(x => x.CanReadWrite && !x.IsInternalType && x.GetCustomAttribute<IndependentData>() == null && !x.ContainAttribute<JsonDocument>() && !x.ContainAttribute<XmlDocument>() && x.GetCustomAttribute<ExcludeFromAbstract>() == null))
+            foreach (var prop in props.Where(x => x.CanRead && !x.IsInternalType && x.GetCustomAttribute<IndependentData>() == null && !x.ContainAttribute<JsonDocument>() && !x.ContainAttribute<XmlDocument>() && x.GetCustomAttribute<ExcludeFromAbstract>() == null))
             {
                 var value = prop.GetValue(o);
 
@@ -389,7 +389,7 @@ namespace EntityWorker.Core
                             _repository.Attach(data);
 
                         var changes = _repository.GetObjectChanges(o);
-                        foreach (var item in props.Where(x => x.CanReadWrite && !changes.Any(a => a.PropertyName == x.Name) && (x.IsInternalType || x.ContainAttribute<JsonDocument>())))
+                        foreach (var item in props.Where(x => x.CanRead && !changes.Any(a => a.PropertyName == x.Name) && (x.IsInternalType || x.ContainAttribute<JsonDocument>())))
                             //if (!ignoredProperties.Any(a => a == item.Name || a == (o.GetType().Name + "." + item.Name) || a == (lastProperty + "." + item.Name)))
                             item.SetValue(o, item.GetValue(data));
                     }
@@ -399,7 +399,7 @@ namespace EntityWorker.Core
                     dbTrigger?.GetType().GetMethod("BeforeSave").Invoke(dbTrigger, new List<object>() { _repository, o }.ToArray()); // Check the Rule before save
                 object tempPrimaryKey = null;
                 var sql = "UPDATE " + (o.GetType().TableName().GetName(_repository.DataBaseTypes)) + " SET ";
-                var cols = props.FindAll(x => x.CanReadWrite && (availableColumns.ContainsKey(x.GetPropertyName()) || availableColumns.ContainsKey(x.GetPropertyName().ToLower())) && (x.IsInternalType || x.ContainAttribute<JsonDocument>() || x.ContainAttribute<XmlDocument>()) && !x.ContainAttribute<ExcludeFromAbstract>() && x.GetCustomAttribute<PrimaryKey>() == null);
+                var cols = props.FindAll(x => x.CanRead && (availableColumns.ContainsKey(x.GetPropertyName()) || availableColumns.ContainsKey(x.GetPropertyName().ToLower())) && (x.IsInternalType || x.ContainAttribute<JsonDocument>() || x.ContainAttribute<XmlDocument>()) && !x.ContainAttribute<ExcludeFromAbstract>() && x.GetCustomAttribute<PrimaryKey>() == null);
 
                 // Clean out all unwanted properties
                 if (ignoredProperties.Any())
@@ -564,7 +564,7 @@ namespace EntityWorker.Core
             createdTables.Add(tableType);
             var table = _repository.GetColumnSchema(tableType);
             var tableName = tableType.TableName();
-            var props = DeepCloner.GetFastDeepClonerProperties(tableType).Where(x => x.CanReadWrite && !x.ContainAttribute<ExcludeFromAbstract>());
+            var props = DeepCloner.GetFastDeepClonerProperties(tableType).Where(x => x.CanRead && !x.ContainAttribute<ExcludeFromAbstract>());
             var codeToDataBaseMerge = new CodeToDataBaseMerge() { Object_Type = tableType };
             var isPrimaryKey = "";
             if (!IsValidName(tableName.Name))

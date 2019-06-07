@@ -10,12 +10,12 @@ using System.Text;
 using EntityWorker.Core.Attributes;
 using EntityWorker.Core.Interface;
 using EntityWorker.Core.Object.Library;
-using EntityWorker.Core.FastDeepCloner;
 using System.Text.RegularExpressions;
 using EntityWorker.Core.Object.Library.JSON;
 using EntityWorker.Core.InterFace;
 using EntityWorker.Core.SqlQuerys;
 using EntityWorker.Core.Object.Library.XML;
+using FastDeepCloner;
 
 namespace EntityWorker.Core.Helper
 {
@@ -158,7 +158,7 @@ namespace EntityWorker.Core.Helper
                 if (!(item?.GetPrimaryKeyValue().ObjectIsNew() ?? true))
                 {
                     var primaryId = item.GetPrimaryKeyValue();
-                    foreach (var prop in DeepCloner.GetFastDeepClonerProperties(item.GetType()).Where(x => (x.ContainAttribute<JsonIgnore>() || !x.IsInternalType) && !x.ContainAttribute<ExcludeFromAbstract>() && x.CanReadWrite))
+                    foreach (var prop in DeepCloner.GetFastDeepClonerProperties(item.GetType()).Where(x => (x.ContainAttribute<JsonIgnore>() || !x.IsInternalType) && !x.ContainAttribute<ExcludeFromAbstract>() && x.CanRead))
                     {
                         var value = prop.GetValue(item);
                         if (prop.PropertyType == typeof(string) && string.IsNullOrEmpty(value?.ToString()))
@@ -851,7 +851,7 @@ namespace EntityWorker.Core.Helper
                             pp.TryAdd(col, prop);
                         }
                         else prop = pp[col];
-                        if (prop != null && value != DBNull.Value && value != null && prop.CanReadWrite)
+                        if (prop != null && value != DBNull.Value && value != null && prop.CanRead)
                         {
                             if (value as byte[] != null && prop.PropertyType.FullName.Contains("Guid"))
                                 value = new Guid(value as byte[]);

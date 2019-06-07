@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 using EntityWorker.Core.Attributes;
 using EntityWorker.Core.Helper;
 using EntityWorker.Core.Object.Library;
-using EntityWorker.Core.FastDeepCloner;
+using FastDeepCloner;
 
 namespace EntityWorker.Core.SqlQuerys
 {
@@ -547,7 +547,7 @@ namespace EntityWorker.Core.SqlQuerys
                     {
                         var value = result.Replace("T", "");
                         var add = result.Contains("T");
-                        if ((b == null || i < length))
+                        if ((b == null || i < length || m.Index + m.Value.Length < sb.ToString().Length - 1))
                             sb = sb.Insert(m.Index, (!add ? " = " : "") + (value.ConvertValue<int>() == 0 ? DataBaseTypes == DataBaseTypes.PostgreSql ? "false" : "0" : DataBaseTypes == DataBaseTypes.PostgreSql ? "true" : "1"));
                     }
                     i++;
@@ -676,8 +676,9 @@ namespace EntityWorker.Core.SqlQuerys
                     return "Guid[NULL]";
                 else if (externalType == typeof(DateTime) || externalType == typeof(DateTime?) || externalType == typeof(TimeSpan) || externalType == typeof(TimeSpan?))
                     return "Date[NULL]";
-                else
+                else if (externalType == typeof(string))
                     return "String[NULL]";
+                else return "NULL";
             }
 
             var type = value.GetType();
@@ -767,7 +768,9 @@ namespace EntityWorker.Core.SqlQuerys
                                  ? c.Value.GetType().GetFields(_bindingFlags).FirstOrDefault()
                                  : c.Value.GetType().GetFields(_bindingFlags).FirstOrDefault(x => x.Name == memName);
                             fieldType = field?.FieldType;
-                            value = field?.GetValue(c.Value) ?? c.Value.GetType().GetFields(_bindingFlags).FirstOrDefault()?.GetValue(c.Value);
+
+                            value = field?.GetValue(c.Value);
+
                         }
                         else
                         {
@@ -775,7 +778,7 @@ namespace EntityWorker.Core.SqlQuerys
                             ? c.Value.GetType().GetProperties().FirstOrDefault()
                             : c.Value.GetType().GetProperties().FirstOrDefault(x => x.Name == memName);
                             fieldType = field?.PropertyType;
-                            value = field?.GetValue(c.Value) ?? c.Value.GetType().GetProperties().FirstOrDefault()?.GetValue(c.Value);
+                            value = field?.GetValue(c.Value);
                         }
 
 
@@ -834,7 +837,22 @@ namespace EntityWorker.Core.SqlQuerys
                 }
                 else if (m.Expression?.ToString().Contains("DisplayClass") ?? false || m.Expression == null)
                 {
-                    CleanDecoder(ValuetoSql(Expression.Lambda(m).Compile().DynamicInvoke()));
+                    var hasValueAttr = m.ToString().EndsWith(".HasValue");
+                    bool isNot = sb.ToString().EndsWith("NOT ");
+                    var value = ValuetoSql(Expression.Lambda(m).Compile().DynamicInvoke());
+                    var column = value;
+                    if (isNot)
+                    {
+                        var invert = GetInvert();
+                        column = $"(CASE WHEN {value} = {boolString.Replace("#", "0T")} THEN {boolString.Replace("#", "0T")} ELSE {boolString.Replace("#", "1T")} END) {boolString.Replace("#", "0")}";
+                    }
+                    else if (hasValueAttr)
+                    {
+                        column = $"(CASE WHEN {value} = {boolString.Replace("#", "0T")} THEN {boolString.Replace("#", "0T")} ELSE {boolString.Replace("#", "1T")} END) {boolString.Replace("#", "1")}";
+                    }
+
+
+                    CleanDecoder(column);
                     return m;
                 }
                 else if (m.Expression != null && (m.Expression.NodeType == ExpressionType.Parameter || (m.ToString().EndsWith(".HasValue") && m.Expression.NodeType == ExpressionType.MemberAccess)) && (_overridedNodeType == null))

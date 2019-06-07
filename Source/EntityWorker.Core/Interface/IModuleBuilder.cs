@@ -1,4 +1,5 @@
 ﻿using EntityWorker.Core.Helper;
+using EntityWorker.Core.Object.Library.Modules;
 using System;
 
 namespace EntityWorker.Core.Interface
@@ -18,12 +19,12 @@ namespace EntityWorker.Core.Interface
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        IObjectMapps<T> Entity<T>() where T : class;
+        ObjectMapps<T> Entity<T>() where T : class;
 
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        ITypeMapps EntityType(Type objectType);
+        TypeMapps EntityType(Type objectType);
     }
 }

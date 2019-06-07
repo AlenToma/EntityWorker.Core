@@ -25,7 +25,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public IObjectMapps<T> Entity<T>() where T : class
+        public ObjectMapps<T> Entity<T>() where T : class
         {
             return new ObjectMapps<T>();
         }
@@ -34,7 +34,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         /// 
         /// </summary>
         /// <returns></returns>
-        public ITypeMapps EntityType(Type objectType)
+        public TypeMapps EntityType(Type objectType)
         {
             return new TypeMapps(objectType);
         }

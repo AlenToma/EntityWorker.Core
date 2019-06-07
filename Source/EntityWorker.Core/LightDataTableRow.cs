@@ -431,7 +431,7 @@ namespace EntityWorker.Core
             foreach (var prop in FastDeepCloner.DeepCloner.GetFastDeepClonerProperties(selectedObject.GetType()))
             {
                 var name = Columns.ContainsKey(prop.Name) ? prop.Name : prop.GetPropertyName();
-                if (!Columns.ContainsKey(name) || !prop.CanReadWrite) continue;
+                if (!Columns.ContainsKey(name) || !prop.CanRead) continue;
                 try
                 {
                     var v = this[name];
@@ -473,7 +473,7 @@ namespace EntityWorker.Core
             foreach (var pr in FastDeepCloner.DeepCloner.GetFastDeepClonerProperties(obj.GetType()))
             {
                 var name = pr.GetPropertyName();
-                if (!Columns.ContainsKey(name) || !pr.CanReadWrite)
+                if (!Columns.ContainsKey(name) || !pr.CanRead)
                     continue;
                 var value = this[name, true];
                 if (!(value is LightDataTable))
@@ -540,7 +540,7 @@ namespace EntityWorker.Core
             foreach (var pr in FastDeepCloner.DeepCloner.GetFastDeepClonerProperties(obj?.GetType()))
             {
                 var name = pr.GetPropertyName();
-                if (!Columns.ContainsKey(name) || !pr.CanReadWrite)
+                if (!Columns.ContainsKey(name) || !pr.CanRead)
                     continue;
                 var value = this[name, true];
                 if (!(value is LightDataTable))

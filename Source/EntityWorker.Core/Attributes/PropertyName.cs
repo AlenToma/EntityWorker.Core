@@ -6,7 +6,7 @@ namespace EntityWorker.Core.Attributes
     /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
     /// Have diffrent Name for the property in the database
     /// </summary>
-    [AttributeUsage(AttributeTargets.Property, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Property, Inherited = false, AllowMultiple = false)]
     public sealed class PropertyName : Attribute
     {
         public string Name { get; private set; }

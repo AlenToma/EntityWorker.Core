@@ -12,7 +12,7 @@ using EntityWorker.Core.Helper;
 using EntityWorker.Core.Interface;
 using EntityWorker.Core.InterFace;
 using EntityWorker.Core.Object.Library;
-using EntityWorker.Core.FastDeepCloner;
+using FastDeepCloner;
 using EntityWorker.Core.SQLite;
 using System.Collections;
 using EntityWorker.Core.SqlQuerys;
