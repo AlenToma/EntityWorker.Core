@@ -11,7 +11,6 @@
     ISqlQueryable<User> users = rep.FromJson<User>(usersJsonString).LoadChildren();
     List<User> userList = users.Execute();
     /// Or
-    users.Save();
-    user.SaveChanges()
+    users.Save().SaveChanges();
    }
    ```
