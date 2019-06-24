@@ -35,6 +35,7 @@
         
         // We could configrate our modules here instead of adding attributes in the class,
         // offcource its upp to you too choose.
+        // note: this will override the attributes that exist in the class
         protected override void OnModuleConfiguration(IModuleBuilder moduleBuilder)
         {
            moduleBuilder.Entity<User>()
