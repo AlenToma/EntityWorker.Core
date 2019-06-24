@@ -8,9 +8,14 @@
         CamelCase // CamelCase firstchar is LowerCase
     }
 
+    /// <summary>
+    /// Mssql for "System.Data.SqlClient"
+    /// Sqllight for "System.Data.SQLite"
+    /// PostgreSql for "Npgsql"
+    /// </summary>
     public enum DataBaseTypes
     {
-        Mssql,
+        Mssql, 
         Sqllight,
         PostgreSql,
     }

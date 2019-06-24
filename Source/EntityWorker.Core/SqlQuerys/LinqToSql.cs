@@ -20,18 +20,18 @@ namespace EntityWorker.Core.SqlQuerys
         private StringBuilder sb;
         private ExpressionType? _overridedNodeType;
         private readonly List<string> _columns;
-        private static string stringyFy = "<Stringify>[#]</Stringify>";
+        private const string stringyFy = "<Stringify>[#]</Stringify>";
         private static Regex StringyFyExp = new Regex(@"<Stringify>\[.*?\]</Stringify>");
-        private static string boolString = "<bool>[#]</bool>";
+        private const string boolString = "<bool>[#]</bool>";
         private static Regex BoolExp = new Regex(@"<bool>\[.*?\]</bool>");
-        internal static Custom_ValueType<string, List<string>> CachedColumns = new Custom_ValueType<string, List<string>>();
+        internal static SafeValueType<string, List<string>> CachedColumns = new SafeValueType<string, List<string>>();
 
         private static string dataEncodeString = "<DataEncode>[#]</DataEncode>";
         private static Regex DataEncodeExp = new Regex(@"<DataEncode>\[.*?\]</DataEncode>");
         private string _primaryId;
 
-        private static Custom_ValueType<string, Type> SavedTypes = new Custom_ValueType<string, Type>();
-        public Custom_ValueType<string, Tuple<string, string>> JoinClauses { get; private set; } = new Custom_ValueType<string, Tuple<string, string>>();
+        private static SafeValueType<string, Type> SavedTypes = new SafeValueType<string, Type>();
+        public SafeValueType<string, Tuple<string, string>> JoinClauses { get; private set; } = new SafeValueType<string, Tuple<string, string>>();
 
         public int Skip { get; set; }
 

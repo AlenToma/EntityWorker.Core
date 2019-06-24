@@ -4,7 +4,7 @@ using EntityWorker.Core.Helper;
 namespace EntityWorker.Core.Attributes
 {
     /// <summary>
-    /// Use this when you have types that are unknown like interface wich it can takes more than one type
+    /// Use this when you have types that are unknown like interface which it can takes more than one type
     /// https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
     /// </summary>
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
@@ -17,7 +17,7 @@ namespace EntityWorker.Core.Attributes
             try
             {
                 if (objectType == null)
-                    throw new Exception("KnownType must have objectType, object type cant be null");
+                    throw new Exception("KnownType must have objectType, object type, it cannot be null");
                 ObjectType = objectType.GetActualType();
             }
             catch (Exception e)

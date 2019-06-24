@@ -3,18 +3,4 @@
   <PropertyGroup>
     <ShowAllFiles>true</ShowAllFiles>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Update="SQLite\SQLiteCommand.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Update="SQLite\SQLiteCommandBuilder.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Update="SQLite\SQLiteConnection.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Update="SQLite\SQLiteDataAdapter.cs">
-      <SubType>Component</SubType>
-    </Compile>
-  </ItemGroup>
 </Project>

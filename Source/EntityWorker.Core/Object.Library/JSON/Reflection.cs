@@ -20,7 +20,7 @@ namespace EntityWorker.Core.Object.Library.JSON
         public string Name;
         public string lcName;
         public string memberName;
-        public FastDeepCloner.IFastDeepClonerProperty Property;
+        public IFastDeepClonerProperty Property;
     }
 
     public enum myPropInfoType
@@ -53,7 +53,7 @@ namespace EntityWorker.Core.Object.Library.JSON
         public Type pt;
         public Type bt;
         public Type changeType;
-        public FastDeepCloner.IFastDeepClonerProperty Property;
+        public IFastDeepClonerProperty Property;
         public Type[] GenericTypes;
         public string Name;
         public string memberName;
@@ -221,16 +221,16 @@ namespace EntityWorker.Core.Object.Library.JSON
             }
             else
             {
-                sd = new Custom_ValueType<string, myPropInfo>();
+                sd = new SafeValueType<string, myPropInfo>();
                 var pr = DeepCloner.GetFastDeepClonerProperties(type);
                 foreach (var p in pr)
                 {
-                    if (!p.CanRead)// Property is an indexer
+                    if (p.PropertyGetValue == null)// Property is an indexer
                         continue;
 
                     myPropInfo d = CreateMyProp(p.PropertyType, p.Name);
                     d.Property = p;
-                    d.CanWrite = p.CanRead;
+                    d.CanWrite = p.CanWrite;
 
                     foreach (var at in p.Attributes)
                     {
@@ -415,7 +415,7 @@ namespace EntityWorker.Core.Object.Library.JSON
             List<Getters> getters = new List<Getters>();
             foreach (var p in props)
             {
-                if (!p.CanRead)//|| isAnonymous == false))
+                if (p.PropertySetValue == null)//|| isAnonymous == false))
                     continue;
 
                 if (IgnoreAttributes != null)

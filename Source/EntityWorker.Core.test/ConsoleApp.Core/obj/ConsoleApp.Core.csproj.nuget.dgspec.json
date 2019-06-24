@@ -157,7 +157,7 @@
       }
     },
     "E:\\Projects\\EntityWorker.Core\\Source\\EntityWorker.Core\\EntityWorker.Core.csproj": {
-      "version": "3.0.0",
+      "version": "3.0.1",
       "restore": {
         "projectUniqueName": "E:\\Projects\\EntityWorker.Core\\Source\\EntityWorker.Core\\EntityWorker.Core.csproj",
         "projectName": "EntityWorker.Core",
@@ -206,17 +206,13 @@
           "dependencies": {
             "FastDeepCloner": {
               "target": "Package",
-              "version": "[1.1.5, )"
+              "version": "[1.1.9, )"
             },
             "Microsoft.NETCore.App": {
               "suppressParent": "All",
               "target": "Package",
               "version": "[2.0.0, )",
               "autoReferenced": true
-            },
-            "System.Data.SqlClient": {
-              "target": "Package",
-              "version": "[4.5.0, )"
             }
           },
           "imports": [
@@ -229,7 +225,7 @@
           "dependencies": {
             "FastDeepCloner": {
               "target": "Package",
-              "version": "[1.1.5, )"
+              "version": "[1.1.9, )"
             }
           }
         },
@@ -237,17 +233,13 @@
           "dependencies": {
             "FastDeepCloner": {
               "target": "Package",
-              "version": "[1.1.5, )"
+              "version": "[1.1.9, )"
             },
             "NETStandard.Library": {
               "suppressParent": "All",
               "target": "Package",
               "version": "[2.0.3, )",
               "autoReferenced": true
-            },
-            "System.Data.SqlClient": {
-              "target": "Package",
-              "version": "[4.5.0, )"
             },
             "System.Reflection.Emit": {
               "target": "Package",

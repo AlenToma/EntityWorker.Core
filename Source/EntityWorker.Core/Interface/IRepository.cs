@@ -60,38 +60,13 @@ namespace EntityWorker.Core.InterFace
         ISqlCommand GetStoredProcedure(string storedProcedure);
 
         /// <summary>
-        /// Add Parameter to sqlCommand
-        /// </summary>
-        /// <param name="cmd"></param>
-        /// <param name="attrName"></param>
-        /// <param name="value"></param>
-        /// <param name="dbType"></param>
-
-        IRepository AddInnerParameter(ISqlCommand cmd, string attrName, object value, SqlDbType dbType = SqlDbType.NVarChar);
-
-        /// <summary>
         /// Add parameters to SqlCommand
         /// </summary>
         /// <param name="cmd"></param>
         /// <param name="attrName"></param>
         /// <param name="value"></param>
         /// <param name="dbType"></param>
-        IRepository AddInnerParameter(ISqlCommand cmd, string attrName, object value, DbType dbType);
-
-        /// <summary>
-        /// Get SqlDbType By system Type
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        SqlDbType GetSqlType(Type type);
-
-
-        /// <summary>
-        /// Get DbType By System.Type
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        DbType GetDbType(Type type);
+        IRepository AddInnerParameter(ISqlCommand cmd, string attrName, object value, DbType? dbType = null);
 
         /// <summary>
         /// ExecuteScale with return value
@@ -114,7 +89,7 @@ namespace EntityWorker.Core.InterFace
         /// </summary>
         /// <returns></returns>
 
-        DbTransaction CreateTransaction();
+        IDbTransaction CreateTransaction();
 
         /// <summary>
         /// RoleBack trnsaction

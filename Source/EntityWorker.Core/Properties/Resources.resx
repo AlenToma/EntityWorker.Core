@@ -1745,11 +1745,4 @@ DEALLOCATE FOREIGN_KEY_CURSOR;</value>
 &lt;/DataTypes&gt;
 &lt;/DocumentElement&gt;</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="SQLite_Interop_64" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>../External_DLL\x64\SQLite.Interop.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="SQLite_Interop_86" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>../External_DLL\x86\SQLite.Interop.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
 </root>

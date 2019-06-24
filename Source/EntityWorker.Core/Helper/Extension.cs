@@ -24,11 +24,11 @@ namespace EntityWorker.Core.Helper
     /// </summary>
     public static class Extension
     {
-        private static readonly Custom_ValueType<IFastDeepClonerProperty, string> CachedPropertyNames = new Custom_ValueType<IFastDeepClonerProperty, string>();
-        private static readonly Custom_ValueType<Type, IFastDeepClonerProperty> CachedPrimaryKeys = new Custom_ValueType<Type, IFastDeepClonerProperty>();
-        internal static readonly Custom_ValueType<Type, Table> CachedTableNames = new Custom_ValueType<Type, Table>();
+        private static readonly SafeValueType<IFastDeepClonerProperty, string> CachedPropertyNames = new SafeValueType<IFastDeepClonerProperty, string>();
+        private static readonly SafeValueType<Type, IFastDeepClonerProperty> CachedPrimaryKeys = new SafeValueType<Type, IFastDeepClonerProperty>();
+        internal static readonly SafeValueType<Type, Table> CachedTableNames = new SafeValueType<Type, Table>();
 
-        private static readonly Custom_ValueType<Type, List<string>> DbMsSqlMapper = new Custom_ValueType<Type, List<string>>()
+        private static readonly SafeValueType<Type, List<string>> DbMsSqlMapper = new SafeValueType<Type, List<string>>()
         {
             {typeof(int), new List<string>(){ "BIGINT" , "int", "single", "smallint", "tinyint" } },
             {typeof(long), new List<string>(){ "BIGINT" } },
@@ -44,7 +44,7 @@ namespace EntityWorker.Core.Helper
             {typeof(double), new List<string>(){ "DECIMAL(18,5)", "money" , "numeric", "smallmoney" } },
         };
 
-        private static readonly Custom_ValueType<Type, List<string>> DbSQLiteMapper = new Custom_ValueType<Type, List<string>>()
+        private static readonly SafeValueType<Type, List<string>> DbSQLiteMapper = new SafeValueType<Type, List<string>>()
         {
             {typeof(int), new List<string>(){ "BIGINT" , "SMALLINT", "TINYINT", "MEDIUMINT", "UNSIGNED BIG INT", "INT2", "INT8" } },
             {typeof(long), new List<string>(){ "BIGINT", "INT", "INTEGER"}},
@@ -60,7 +60,7 @@ namespace EntityWorker.Core.Helper
             {typeof(double), new List<string>(){ "DECIMAL(18,5)", "real" , "NUMERIC", "DOUBLE PRECISION"}},
         };
 
-        private static readonly Custom_ValueType<Type, List<string>> DbPostGresqlMapper = new Custom_ValueType<Type, List<string>>()
+        private static readonly SafeValueType<Type, List<string>> DbPostGresqlMapper = new SafeValueType<Type, List<string>>()
         {
             {typeof(int), new List<string>(){ "BIGINT", "smallint", "integer", "smallserial", "serial"}},
             {typeof(long), new List<string>(){ "BIGINT", "bigserial" } },
@@ -75,7 +75,6 @@ namespace EntityWorker.Core.Helper
             {typeof(char), new List<string>(){ "VARCHAR(10)", "char"} },
             {typeof(double), new List<string>(){ "DECIMAL(18,5)", "numeric" , "real" , "money"  } },
         };
-
 
 
         internal static string GetValidSqlName(this DataBaseTypes dbtype, string col)
@@ -634,22 +633,11 @@ namespace EntityWorker.Core.Helper
         }
 
         /// <summary>
-        /// Create Instance
-        /// </summary>
-        /// <param name="type"></param>
-        /// <param name="uninitializedObject"> true for FormatterServices.GetUninitializedObject and false for Activator.CreateInstance </param>
-        /// <returns></returns>
-        public static object CreateInstance(this Type type, bool uninitializedObject = false)
-        {
-            return uninitializedObject ? FormatterServices.GetUninitializedObject(type) : DeepCloner.CreateInstance(type);
-        }
-
-        /// <summary>
         /// Get IList Actual Type
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        private static readonly Custom_ValueType<Type, Type> CachedActualType = new Custom_ValueType<Type, Type>();
+        private static readonly SafeValueType<Type, Type> CachedActualType = new SafeValueType<Type, Type>();
 
         /// <summary>
         /// Get Internal type of IList
@@ -817,8 +805,8 @@ namespace EntityWorker.Core.Helper
             var props = DeepCloner.GetFastDeepClonerProperties(tType);
             try
             {
-                var colNames = new Custom_ValueType<int, string>();
-                var pp = new Custom_ValueType<int, IFastDeepClonerProperty>();
+                var colNames = new SafeValueType<int, string>();
+                var pp = new SafeValueType<int, IFastDeepClonerProperty>();
                 while (reader.Read())
                 {
                     object item = null;

@@ -10,7 +10,6 @@ using EntityWorker.Core.Interface;
 using EntityWorker.Core.Object.Library;
 using EntityWorker.Core.SqlQuerys;
 using FastDeepCloner;
-using EntityWorker.Core.Postgres;
 using Rule = EntityWorker.Core.Attributes.Rule;
 using EntityWorker.Core.Object.Library.DataBase;
 
@@ -18,9 +17,9 @@ namespace EntityWorker.Core
 {
     internal class DbSchema
     {
-        internal static readonly Custom_ValueType<Type, object> CachedIDbRuleTrigger = new Custom_ValueType<Type, object>();
+        internal static readonly SafeValueType<Type, object> CachedIDbRuleTrigger = new SafeValueType<Type, object>();
 
-        internal static readonly Custom_ValueType<string, string> CachedSql = new Custom_ValueType<string, string>();
+        internal static readonly SafeValueType<string, string> CachedSql = new SafeValueType<string, string>();
 
         public static object ObjectLocker = new object();
 
@@ -107,7 +106,7 @@ namespace EntityWorker.Core
                 CachedSql.GetOrAdd(k, Querys.Select(type.GetActualType(), _repository.DataBaseTypes).Where.Column(key).Equal("@ID", true).Execute());
             }
             var cmd = _repository.GetSqlCommand(CachedSql[k]);
-            _repository.AddInnerParameter(cmd, "@ID", id.ConvertValue(primaryKey.PropertyType), _repository.GetSqlType(primaryKey.PropertyType));
+            _repository.AddInnerParameter(cmd, "@ID", id.ConvertValue(primaryKey.PropertyType));
             return type.GetActualType() != type ? _repository.DataReaderConverter(cmd, type) : _repository.DataReaderConverter(cmd, type).Cast<object>().FirstOrDefault();
 
         }
@@ -147,7 +146,7 @@ namespace EntityWorker.Core
                 CachedSql.GetOrAdd(k, Querys.Select(type, _repository.DataBaseTypes).Where.Column(column).Equal("@ID", true).Execute());
 
             var cmd = _repository.GetSqlCommand(CachedSql[k]);
-            _repository.AddInnerParameter(cmd, "@ID", id, _repository.GetSqlType(id.GetType()));
+            _repository.AddInnerParameter(cmd, "@ID", id);
             return type.GetActualType() != type ? _repository.DataReaderConverter(cmd, type) : _repository.DataReaderConverter(cmd, type).Cast<object>().FirstOrDefault();
         }
 
@@ -369,7 +368,7 @@ namespace EntityWorker.Core
                 object dbTrigger = null;
                 if (objectRules != null && !CachedIDbRuleTrigger.ContainsKey(o.GetType()))
                 {
-                    dbTrigger = objectRules.RuleType.CreateInstance(true);
+                    dbTrigger = objectRules.RuleType.CreateInstance();
                     CachedIDbRuleTrigger.Add(o.GetType(), dbTrigger);
                 }
                 else if (objectRules != null || CachedIDbRuleTrigger.ContainsKey(o.GetType()))
@@ -436,7 +435,7 @@ namespace EntityWorker.Core
 
                 var cmd = _repository.GetSqlCommand(sql);
                 if ((!primaryKey.PropertyType.IsNumeric() || !primaryKey.GetCustomAttribute<PrimaryKey>().AutoGenerate) && primaryKeyId == null)
-                    _repository.AddInnerParameter(cmd, primaryKey.GetPropertyName(), tempPrimaryKey, _repository.GetSqlType(primaryKey.PropertyType));
+                    _repository.AddInnerParameter(cmd, primaryKey.GetPropertyName(), tempPrimaryKey);
 
 
                 foreach (var col in cols)
@@ -445,7 +444,7 @@ namespace EntityWorker.Core
                     var defaultOnEmpty = col.GetCustomAttribute<DefaultOnEmpty>();
                     if (col.ContainAttribute<ForeignKey>() && (v?.ObjectIsNew() ?? true))
                     {
-                        var ob = props.FirstOrDefault(x => x.PropertyType == col.GetCustomAttribute<ForeignKey>().Type && (string.IsNullOrEmpty(col.GetCustomAttribute<ForeignKey>().PropertyName) || col.GetCustomAttribute<ForeignKey>().PropertyName == x.Name));
+                        var ob = props.FirstOrDefault(x => (x.PropertyType == col.GetCustomAttribute<ForeignKey>().Type) && (string.IsNullOrEmpty(col.GetCustomAttribute<ForeignKey>().PropertyName) || col.GetCustomAttribute<ForeignKey>().PropertyName == x.Name));
                         var obValue = ob?.GetValue(o);
                         var independentData = ob?.GetCustomAttribute<IndependentData>() != null;
                         if (obValue != null)
@@ -493,7 +492,7 @@ namespace EntityWorker.Core
                     if (v == null && defaultOnEmpty != null)
                         v = defaultOnEmpty.Value.ConvertValue(col.PropertyType);
 
-                    _repository.AddInnerParameter(cmd, col.GetPropertyName(), v, (col.ContainAttribute<Stringify>() || col.ContainAttribute<DataEncode>() || col.ContainAttribute<ToBase64String>() || col.ContainAttribute<JsonDocument>() || col.ContainAttribute<XmlDocument>() ? _repository.GetSqlType(typeof(string)) : _repository.GetSqlType(col.PropertyType)));
+                    _repository.AddInnerParameter(cmd, col.GetPropertyName(), v);
                 }
 
                 if (primaryKeyId == null)
@@ -799,13 +798,12 @@ namespace EntityWorker.Core
 
                         c--;
                     }
-                    catch (NpgsqlException ex)
+                    catch (Exception e)
                     {
-                        _repository.Renew();
-                    }
-                    catch
-                    {
-                        // Ignore
+                        if (_repository.DataBaseTypes == DataBaseTypes.PostgreSql)
+                        {
+                            _repository.Renew();
+                        }
                     }
                 }
             }

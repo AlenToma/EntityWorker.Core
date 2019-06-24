@@ -1,4 +1,5 @@
 ﻿using EntityWorker.Core.Helper;
+using FastDeepCloner;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -15,7 +16,7 @@ namespace EntityWorker.Core.Object.Library.JSON
             return (g.Equals(typeof(Nullable<>)));
         }
 
-        private static Custom_ValueType<string, string> _chachedNames = new Custom_ValueType<string, string>();
+        private static SafeValueType<string, string> _chachedNames = new SafeValueType<string, string>();
         public static string SerializaName(JsonFormatting jsonFormatting, string name)
         {
             var key = jsonFormatting.ToString() + name;

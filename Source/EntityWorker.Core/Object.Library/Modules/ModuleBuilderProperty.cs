@@ -68,8 +68,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         /// <returns></returns>
         public ModuleBuilderProperty<T> HasJsonIgnore()
         {
-            if (!_property.ContainAttribute<JsonIgnore>())
-                _property.Attributes.Add(new JsonIgnore());
+            _property.Add(new JsonIgnore());
             return this;
         }
 
@@ -85,8 +84,7 @@ namespace EntityWorker.Core.Object.Library.Modules
             //var prop = FastDeepCloner.DeepCloner.GetProperty(typeof(T), Extension.GetMemberName(action));
             //if (prop == null)
             //    throw new EntityException($"Could not find Property{Extension.GetMemberName(action)}");
-            if (!_property.ContainAttribute<JsonDocument>())
-                _property.Attributes.Add(new JsonDocument());
+            _property.Add(new JsonDocument());
             return this;
         }
 
@@ -100,8 +98,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         /// <returns></returns>
         public ModuleBuilderProperty<T> HasXmlDocument()
         {
-            if (!_property.ContainAttribute<XmlDocument>())
-                _property.Attributes.Add(new XmlDocument());
+            _property.Add(new XmlDocument());
             return this;
         }
 
@@ -115,8 +112,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         /// <returns></returns>
         public ModuleBuilderProperty<T> HasXmlIgnore()
         {
-            if (!_property.ContainAttribute<XmlIgnore>())
-                _property.Attributes.Add(new XmlIgnore());
+            _property.Add(new XmlIgnore());
             return this;
         }
 
@@ -128,8 +124,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         /// <returns></returns>
         public ModuleBuilderProperty<T> HasKnownType(Type objectType)
         {
-            if (!_property.ContainAttribute<KnownType>())
-                _property.Attributes.Add(new KnownType(objectType));
+            _property.Add(new KnownType(objectType));
             return this;
         }
 
@@ -143,8 +138,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         /// <returns></returns>
         public ModuleBuilderProperty<T> HasPrimaryKey(bool autoGenerate = true)
         {
-            if (!_property.ContainAttribute<PrimaryKey>())
-                _property.Attributes.Add(new PrimaryKey(autoGenerate));
+            _property.Add(new PrimaryKey(autoGenerate));
             return this;
         }
 
@@ -161,8 +155,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         {
             if (!_property.IsInternalType || (_property.PropertyType != typeof(string) && !_property.PropertyType.IsNumeric() && _property.PropertyType != typeof(Guid) && _property.PropertyType != typeof(Guid?)))
                 throw new EntityException($"ForeignKey for Property { _property.Name } kan only be of type string or numeric or Guid");
-            if (!_property.ContainAttribute<ForeignKey>())
-                _property.Attributes.Add(new ForeignKey(typeof(Source), propertyName));
+            _property.Add(new ForeignKey(typeof(Source), propertyName));
             return this;
         }
 
@@ -177,7 +170,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         public ModuleBuilderProperty<T> HasColumnType(string dataType, DataBaseTypes? dataBaseTypes = null)
         {
             if (!_property.Attributes.Any(x => x is ColumnType && ((ColumnType)x).DataBaseTypes == dataBaseTypes))
-                _property.Attributes.Add(new ColumnType(dataType, dataBaseTypes));
+                _property.Add(new ColumnType(dataType, dataBaseTypes));
             return this;
         }
 
@@ -191,8 +184,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         /// <returns></returns>
         public ModuleBuilderProperty<T> HasDataEncode(string key = null, DataCipherKeySize keySize = DataCipherKeySize.Default)
         {
-            if (!_property.ContainAttribute<DataEncode>())
-                _property.Attributes.Add(new DataEncode(key, keySize));
+            _property.Add(new DataEncode(key, keySize));
             return this;
         }
 
@@ -204,9 +196,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         /// <returns></returns>
         public ModuleBuilderProperty<T> HasIndependentData()
         {
-
-            if (!_property.ContainAttribute<IndependentData>())
-                _property.Attributes.Add(new IndependentData());
+            _property.Add(new IndependentData());
             return this;
         }
 
@@ -218,8 +208,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         /// <returns></returns>
         public ModuleBuilderProperty<T> NotNullable()
         {
-            if (!_property.ContainAttribute<NotNullable>())
-                _property.Attributes.Add(new NotNullable());
+            _property.Add(new NotNullable());
             return this;
         }
 
@@ -233,8 +222,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         /// <returns></returns>
         public ModuleBuilderProperty<T> HasPropertyName(string name, string displayName = null)
         {
-            if (!_property.ContainAttribute<PropertyName>())
-                _property.Attributes.Add(new PropertyName(name, displayName));
+            _property.Add(new PropertyName(name, displayName));
             return this;
         }
 
@@ -246,8 +234,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         /// <returns></returns>
         public ModuleBuilderProperty<T> HasStringify()
         {
-            if (!_property.ContainAttribute<Stringify>())
-                _property.Attributes.Add(new Stringify());
+            _property.Add(new Stringify());
             return this;
         }
 
@@ -259,8 +246,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         /// <returns></returns>
         public ModuleBuilderProperty<T> ExcludeFromAbstract()
         {
-            if (!_property.ContainAttribute<ExcludeFromAbstract>())
-                _property.Attributes.Add(new ExcludeFromAbstract());
+            _property.Add(new ExcludeFromAbstract());
             return this;
         }
 
@@ -273,8 +259,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         /// <returns></returns>
         public ModuleBuilderProperty<T> HasDefaultOnEmpty(object value)
         {
-            if (!_property.ContainAttribute<DefaultOnEmpty>())
-                _property.Attributes.Add(new DefaultOnEmpty(value));
+            _property.Add(new DefaultOnEmpty(value));
             return this;
         }
 
@@ -287,8 +272,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         /// <returns></returns>
         public ModuleBuilderProperty<T> HasToBase64String()
         {
-            if (!_property.ContainAttribute<ToBase64String>())
-                _property.Attributes.Add(new ToBase64String());
+            _property.Attributes.Add(new ToBase64String());
             return this;
         }
 

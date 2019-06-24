@@ -1,4 +1,5 @@
 ﻿using EntityWorker.Core.Helper;
+using FastDeepCloner;
 using System;
 using System.Collections;
 using System.Collections.Generic;

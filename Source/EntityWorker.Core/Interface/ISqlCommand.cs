@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EntityWorker.Core.Helper;
+using System;
 using System.Collections;
 using System.Data;
 using System.Data.Common;
@@ -7,19 +8,12 @@ namespace EntityWorker.Core.Interface
 {
     public interface ISqlCommand
     {
+        DataBaseTypes DataBaseTypes { get; }
+
         /// <summary>
         /// DbCommand
         /// </summary>
         DbCommand Command { get; }
-
-        /// <summary>
-        /// Add Parameter to sqlCommand
-        /// </summary>
-        /// <param name="attrName"></param>
-        /// <param name="value"></param>
-        /// <param name="dbType"></param>
-
-        ISqlCommand AddInnerParameter(string attrName, object value, SqlDbType dbType = SqlDbType.NVarChar);
 
         /// <summary>
         /// Add parameters to SqlCommand
@@ -27,7 +21,7 @@ namespace EntityWorker.Core.Interface
         /// <param name="attrName"></param>
         /// <param name="value"></param>
         /// <param name="dbType"></param>
-        ISqlCommand AddInnerParameter(string attrName, object value, DbType dbType);
+        ISqlCommand AddInnerParameter(string attrName, object value, DbType? dbType = null);
 
         /// <summary>
         /// Convert SqlCommand to List of Type T

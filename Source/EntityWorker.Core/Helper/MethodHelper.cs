@@ -2,16 +2,15 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using EntityWorker.Core.InterFace;
-using EntityWorker.Core.SQLite;
 using EntityWorker.Core.Object.Library;
-using EntityWorker.Core.Postgres;
 using EntityWorker.Core.Interface;
+using EntityWorker.Core.Object.Library.DbWrapper;
+using FastDeepCloner;
 
 namespace EntityWorker.Core.Helper
 {
@@ -84,10 +83,10 @@ namespace EntityWorker.Core.Helper
         private static Regex stringExp = new Regex(@"String\[.*?\]|String\[.?\]");
         private static Regex dateExp = new Regex(@"Date\[.*?\]|Date\[.?\]");
         private static Regex guidExp = new Regex(@"Guid\[.*?\]|Guid\[.?\]");
-        internal static ISqlCommand ProcessSql(this IRepository repository, IDbConnection connection, IDbTransaction tran, string sql)
+        internal static ISqlCommand ProcessSql(this IRepository repository, TransactionSqlConnection connection, IDbTransaction tran, string sql)
         {
             var i = 1;
-            var dicCols = new Custom_ValueType<string, Tuple<object, SqlDbType>>();
+            var dicCols = new SafeValueType<string, Tuple<object, SqlDbType>>();
             MatchCollection matches = null;
             while ((matches = stringExp.Matches(sql)).Count > 0)
             {
@@ -107,7 +106,7 @@ namespace EntityWorker.Core.Helper
                 object str = exp.Value.TrimEnd(']').Substring(@"Date\[".Length - 1);
                 sql = sql.Remove(exp.Index, exp.Value.Length);
                 sql = sql.Insert(exp.Index, col);
-                dicCols.TryAdd(col, new Tuple<object, SqlDbType>(str.ConvertValue<DateTime>(), SqlDbType.DateTime));
+                dicCols.TryAdd(col, new Tuple<object, SqlDbType>(str.ConvertValue<DateTime?>(), SqlDbType.DateTime));
                 i++;
             }
 
@@ -124,14 +123,48 @@ namespace EntityWorker.Core.Helper
 
             sql = sql.CleanValidSqlName(repository.DataBaseTypes);
             DbCommand cmd = null;
-            if (repository.DataBaseTypes == DataBaseTypes.Mssql)
-                cmd = tran != null ? new SqlCommand(sql, connection as SqlConnection, tran as SqlTransaction) : new SqlCommand(sql, connection as SqlConnection);
-            else if (repository.DataBaseTypes == DataBaseTypes.Sqllight)
-                cmd = tran == null ? new SQLiteCommand(sql, connection as SQLiteConnection) : new SQLiteCommand(sql, connection as SQLiteConnection, tran as SQLiteTransaction);
-            else cmd = tran == null ? new NpgsqlCommand(sql, connection as NpgsqlConnection) : new NpgsqlCommand(sql, connection as NpgsqlConnection, tran as NpgsqlTransaction);
+
+            try
+            {
+                switch (repository.DataBaseTypes)
+                {
+                    case DataBaseTypes.Mssql:
+                        cmd = tran != null ?
+                            "System.Data.SqlClient.SqlCommand".GetObjectType("System.Data.SqlClient").CreateInstance(new object[] { sql, connection.DBConnection, tran }) as DbCommand :
+                                  "System.Data.SqlClient.SqlCommand".GetObjectType("System.Data.SqlClient").CreateInstance(new object[] { sql, connection.DBConnection }) as DbCommand;
+                        break;
+
+                    case DataBaseTypes.PostgreSql:
+                        cmd = tran != null ?
+                           "Npgsql.NpgsqlCommand".GetObjectType("Npgsql").CreateInstance(new object[] { sql, connection.DBConnection, tran }) as DbCommand :
+                                 "Npgsql.NpgsqlCommand".GetObjectType("Npgsql").CreateInstance(new object[] { sql, connection.DBConnection }) as DbCommand;
+                        break;
+
+                    case DataBaseTypes.Sqllight:
+                        cmd = tran != null ?
+                             "System.Data.SQLite.SQLiteCommand".GetObjectType("System.Data.SQLite").CreateInstance(new object[] { sql, connection.DBConnection, tran }) as DbCommand :
+                                   "System.Data.SQLite.SQLiteCommand".GetObjectType("System.Data.SQLite").CreateInstance(new object[] { sql, connection.DBConnection }) as DbCommand;
+                        break;
+                }
+            }
+            catch (Exception e)
+            {
+                switch (repository.DataBaseTypes)
+                {
+                    case DataBaseTypes.Mssql:
+                        throw new EntityException($"Please make sure that nuget 'System.Data.SqlClient' is installed \n orginal exception: \n {e.Message}");
+
+                    case DataBaseTypes.PostgreSql:
+                        throw new EntityException($"Please make sure that nuget 'Npgsql' is installed \n orginal exception: \n {e.Message}");
+
+                    case DataBaseTypes.Sqllight:
+                        throw new EntityException($"Please make sure that nuget 'System.Data.SQLite' is installed \n orginal exception: \n {e.Message}");
+                }
+            }
+
             var dbCommandExtended = new DbCommandExtended(cmd, repository);
             foreach (var dic in dicCols)
-                dbCommandExtended.AddInnerParameter(dic.Key, dic.Value.Item1, dic.Value.Item2);
+                dbCommandExtended.AddInnerParameter(dic.Key, dic.Value.Item1);
             return dbCommandExtended;
         }
     }

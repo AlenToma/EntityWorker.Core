@@ -1,7 +1,7 @@
 ﻿using EntityWorker.Core.Attributes;
 using EntityWorker.Core.Helper;
-using EntityWorker.Core.Postgres;
 using EntityWorker.Core.SqlQuerys;
+using FastDeepCloner;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +13,7 @@ namespace EntityWorker.Core.Object.Library
     {
         private readonly Transaction.Transaction _provider;
 
-        internal static Custom_ValueType<string, CodeToDataBaseMerge> ExecutedData { get; private set; } = new Custom_ValueType<string, CodeToDataBaseMerge>();
+        internal static SafeValueType<string, CodeToDataBaseMerge> ExecutedData { get; private set; } = new SafeValueType<string, CodeToDataBaseMerge>();
         public CodeToDataBaseMergeCollection(Transaction.Transaction provider)
         {
             _provider = provider;
@@ -60,28 +60,31 @@ namespace EntityWorker.Core.Object.Library
                                 key.Exception = null;
                                 ExecutedData.TryAdd(key.Object_Type.FullName + _provider.DataBaseTypes.ToString(), key);
                             }
-                            catch (NpgsqlException ex)
-                            {
-                                data[i].Counter += 1;
-                                if (ex.ToString().Contains("already exists"))
-                                    items[i].Executed = true;
-                                items[i].Exception = ex;
-                                _provider.Renew();
-                                exp = ex;
-
-                                if (data[i].Counter >= 50)
-                                    throw ex;
-                            }
                             catch (Exception ex)
                             {
-                                data[i].Counter += 1;
-                                data[i].Exception = ex;
-                                if (ex.ToString().Contains("already exists"))
-                                    items[i].Executed = true;
-                                exp = ex;
+                                if (ex.GetType().FullName.Contains("NpgsqlException"))
+                                {
+                                    data[i].Counter += 1;
+                                    if (ex.ToString().Contains("already exists"))
+                                        items[i].Executed = true;
+                                    items[i].Exception = ex;
+                                    _provider.Renew();
+                                    exp = ex;
 
-                                if (data[i].Counter >= 50)
-                                    throw ex;
+                                    if (data[i].Counter >= 50)
+                                        throw ex;
+                                }
+                                else
+                                {
+                                    data[i].Counter += 1;
+                                    data[i].Exception = ex;
+                                    if (ex.ToString().Contains("already exists"))
+                                        items[i].Executed = true;
+                                    exp = ex;
+
+                                    if (data[i].Counter >= 50)
+                                        throw ex;
+                                }
                             }
                         }
                     }

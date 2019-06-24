@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using EntityWorker.Core.Helper;
 using EntityWorker.Core;
 using LightData.CMS.Modules.Library.Internal;
-using EntityWorker.Core.Interface;
 
 namespace ConsoleApp1
 {
@@ -16,10 +15,10 @@ namespace ConsoleApp1
         private static Stopwatch sw = new Stopwatch();
         static void Main(string[] args)
         {
-            GlobalConfiguration.Log = new Logger((object sender, EventArgs arg) =>
-            {
-                //Console.WriteLine((arg as Args).Data);
-            });
+            //GlobalConfiguration.Log = new Logger((object sender, EventArgs arg) =>
+            //{
+            //    //Console.WriteLine((arg as Args).Data);
+            //});
             //Code();
             DynamicLinq();
             SaveJson();
@@ -140,7 +139,7 @@ namespace ConsoleApp1
         {
             sw.Stop();
             Console.WriteLine("Time taken: {0}ms", sw.Elapsed.TotalMilliseconds);
-            sw = new Stopwatch();
+         
         }
         private static List<object> usResult = null;
         public static void execute(dynamic q, string identifier)

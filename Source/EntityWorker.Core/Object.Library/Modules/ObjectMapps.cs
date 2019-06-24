@@ -1,5 +1,6 @@
 ﻿using EntityWorker.Core.Attributes;
 using EntityWorker.Core.Helper;
+using FastDeepCloner;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
@@ -52,7 +53,7 @@ namespace EntityWorker.Core.Object.Library.Modules
         /// <returns></returns>
         public ObjectMapps<T> HasRule<Source>()
         {
-            if (typeof(Source).GetInterfaces().Length <= 0 || !typeof(Source).GetInterfaces().Any(x => x.ToString().Contains("IDbRuleTrigger") && x.ToString().Contains(typeof(T).FullName)))
+            if (typeof(Source).GetInterfaces().Length <= 0 || !typeof(Source).GetInterfaces().Any(x => x.ToString().Contains("IDbRuleTrigger") && x.FullName.Contains(typeof(T).FullName)))
                 throw new EntityException($"Source dose not implement interface IDbRuleTrigger<{typeof(T).Name }>");
             var rule = typeof(Source).CreateInstance();
             DbSchema.CachedIDbRuleTrigger.GetOrAdd(typeof(T), rule);

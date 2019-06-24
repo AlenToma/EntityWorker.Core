@@ -1,13 +1,13 @@
 ﻿using EntityWorker.Core.Helper;
+using FastDeepCloner;
 using System;
 using System.Collections.Generic;
-using EntityWorker.Core.Postgres;
 
 namespace EntityWorker.Core.Object.Library.DataBase
 {
     public abstract class Database
     {
-        internal static readonly Custom_ValueType<string, Custom_ValueType<string, ColumnSchema>> CachedColumnSchema = new Custom_ValueType<string, Custom_ValueType<string, ColumnSchema>>();
+        internal static readonly SafeValueType<string, SafeValueType<string, ColumnSchema>> CachedColumnSchema = new SafeValueType<string, SafeValueType<string, ColumnSchema>>();
 
         protected Transaction.Transaction _transaction { get; set; }
 
@@ -56,7 +56,8 @@ namespace EntityWorker.Core.Object.Library.DataBase
                 {
                     _transaction.ExecuteNonQuery(_transaction.GetSqlCommand("CREATE SCHEMA " + schema + ""));
                 }
-            }catch(Exception e)
+            }
+            catch (Exception e)
             {
                 throw new EntityException(e.Message);
             }
@@ -68,10 +69,11 @@ namespace EntityWorker.Core.Object.Library.DataBase
         /// </summary>
         /// <param name="datatype"></param>
         /// <returns></returns>
-        public Custom_ValueType<string, ColumnSchema> GetColumnSchema(Type datatype)
+        public SafeValueType<string, ColumnSchema> GetColumnSchema(Type datatype)
         {
             try
             {
+                
                 var key = datatype.FullName + _transaction.DataBaseTypes.ToString();
                 if (CachedColumnSchema.ContainsKey(key))
                     return CachedColumnSchema[key];
@@ -81,15 +83,21 @@ namespace EntityWorker.Core.Object.Library.DataBase
                 if (_transaction.DataBaseTypes == DataBaseTypes.Sqllight)
                     sql = $"SELECT name  as columnname, type as datatype FROM pragma_table_info(String[{tableName.Name}])";
                 var columns = (List<ColumnSchema>)_transaction.DataReaderConverter(_transaction.GetSqlCommand(sql), typeof(ColumnSchema));
-                var dic = new Custom_ValueType<string, ColumnSchema>();
+                var dic = new SafeValueType<string, ColumnSchema>();
                 if (columns != null)
                     columns.ForEach(x => dic.Add(x.ColumnName, x));
+                _transaction.CounterException = 0;
                 return CachedColumnSchema.GetOrAdd(key, dic);
             }
-            catch (NpgsqlException)
+            catch (Exception e)
             {
-                _transaction.Renew();
-                return GetColumnSchema(datatype);
+                if (_transaction.DataBaseTypes == DataBaseTypes.PostgreSql && _transaction.CounterException <= 3)
+                {
+                    _transaction.CounterException++;
+                    _transaction.Renew();
+                    return GetColumnSchema(datatype);
+                }
+                else throw new EntityException(e.Message);
             }
         }
 
@@ -98,7 +106,7 @@ namespace EntityWorker.Core.Object.Library.DataBase
         /// </summary>
         /// <typeparam name="T"> datatype ed Users</typeparam>
         /// <returns></returns>
-        public Custom_ValueType<string, ColumnSchema> GetColumnSchema<T>()
+        public SafeValueType<string, ColumnSchema> GetColumnSchema<T>()
         {
             return GetColumnSchema(typeof(T));
         }

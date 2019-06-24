@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -13,15 +12,14 @@ using EntityWorker.Core.Interface;
 using EntityWorker.Core.InterFace;
 using EntityWorker.Core.Object.Library;
 using FastDeepCloner;
-using EntityWorker.Core.SQLite;
 using System.Collections;
 using EntityWorker.Core.SqlQuerys;
-using EntityWorker.Core.Postgres;
 using EntityWorker.Core.Object.Library.Modules;
 using System.IO;
 using EntityWorker.Core.Object.Library.Gzip;
 using EntityWorker.Core.Object.Library.DataBase;
 using EntityWorker.Core.Object.Library.JSON;
+using EntityWorker.Core.Object.Library.DbWrapper;
 
 namespace EntityWorker.Core.Transaction
 {
@@ -31,38 +29,61 @@ namespace EntityWorker.Core.Transaction
     /// </summary>
     public abstract class Transaction : Database, IRepository
     {
-        internal Custom_ValueType<IDataReader, bool> OpenedDataReaders = new Custom_ValueType<IDataReader, bool>();
+        internal SafeValueType<IDataReader, bool> OpenedDataReaders = new SafeValueType<IDataReader, bool>();
+
+        private static bool FirstRun;
 
         private static object MigrationLocker = new object();
 
         internal readonly DbSchema _dbSchema;
 
-        internal readonly Custom_ValueType<string, object> _attachedObjects;
+        internal readonly SafeValueType<string, object> _attachedObjects;
+
+        internal int CounterException { get; set; }
 
         /// <summary>
         /// DataBase Type
         /// </summary>
         public DataBaseTypes DataBaseTypes { get; private set; }
 
-        internal DbTransaction Trans { get; private set; }
+        internal IDbTransaction Trans { get; private set; }
 
         /// <summary>
         /// DataBase Connection
         /// </summary>
-        protected DbConnection SqlConnection { get; private set; }
+        protected TransactionSqlConnection SqlConnection { get; private set; }
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="connectionString">Full connection string</param>
-        /// <param name="dataBaseTypes">The type of the database Ms-sql or Sql-light</param>
+        /// <param name="dataBaseTypes">The type of the database Ms-sql, Sql-light or PostgreSql
+        /// Not the nuget package specific for the enum needs to be installed.
+        /// Mssql for "System.Data.SqlClient"
+        /// Sqllight for "System.Data.SQLite"
+        /// PostgreSql for "Npgsql"
+        /// </param>
         public Transaction(string connectionString, DataBaseTypes dataBaseTypes) : base()
         {
             base._transaction = this;
-            _attachedObjects = new Custom_ValueType<string, object>();
+            _attachedObjects = new SafeValueType<string, object>();
             if (string.IsNullOrEmpty(connectionString))
                 if (string.IsNullOrEmpty(connectionString))
                     throw new EntityException("ConnectionString can not be empty");
+
+            if (!FirstRun)
+            {
+                FirstRun = true;
+                ConfigrationManager.OnAttributeCollectionChanged = new Action<IFastDeepClonerProperty>((property) =>
+                {
+                    if (property.ContainAttribute<KnownType>())
+                    {
+                        if (property.PropertyType != property.PropertyType.GetActualType())
+                            property.PropertyType = typeof(List<>).MakeGenericType(property.GetCustomAttribute<KnownType>().ObjectType);
+                        else property.PropertyType = property.GetCustomAttribute<KnownType>().ObjectType;
+                    }
+                });
+            }
 
             ConnectionString = connectionString;
             DataBaseTypes = dataBaseTypes;
@@ -139,18 +160,15 @@ namespace EntityWorker.Core.Transaction
         /// <returns></returns>
         protected bool DataBaseExist()
         {
-            var sqlBuild = DataBaseTypes != DataBaseTypes.PostgreSql ? new SqlConnectionStringBuilder(ConnectionString) : null;
-            var npSqlBuilder = DataBaseTypes == DataBaseTypes.PostgreSql ? new NpgsqlConnectionStringBuilder(ConnectionString) : null;
-            var dbName = DataBaseTypes == DataBaseTypes.Mssql ? sqlBuild.InitialCatalog : sqlBuild?.DataSource;
-            if (string.IsNullOrEmpty(dbName) && DataBaseTypes != DataBaseTypes.PostgreSql)
-                throw new EntityException("InitialCatalog can not be null or empty");
 
-            if (DataBaseTypes == DataBaseTypes.PostgreSql && string.IsNullOrEmpty(npSqlBuilder.Database))
-                throw new EntityException("Database can not be null or empty");
+            var sqlBuild = new TransactionConnectionString(DataBaseTypes, ConnectionString);
+            if (string.IsNullOrEmpty(sqlBuild.InitialCatalog))
+                throw new EntityException("InitialCatalog, Database or DataSource  can not be null or empty");
 
+            var dbName = sqlBuild.InitialCatalog;
             if (DataBaseTypes == DataBaseTypes.Mssql)
             {
-                sqlBuild.InitialCatalog = "master";
+                sqlBuild.InitialCatalog = "";
                 using (var rep = new DbRepository(sqlBuild.ToString(), DataBaseTypes))
                     return rep.GetSqlCommand($"SELECT  CAST(CASE WHEN db_id(String[{dbName}]) is not null THEN 1 ELSE 0 END AS BIT)").ExecuteScalar().ConvertValue<bool>();
 
@@ -171,9 +189,8 @@ namespace EntityWorker.Core.Transaction
             }
             else
             {
-                dbName = npSqlBuilder.Database;
-                npSqlBuilder.Database = "";
-                using (var rep = new DbRepository(npSqlBuilder.ToString(), DataBaseTypes))
+                sqlBuild.InitialCatalog = "";
+                using (var rep = new DbRepository(sqlBuild.ToString(), DataBaseTypes))
                     return rep.GetSqlCommand($"SELECT CAST(CASE WHEN datname is not null THEN 1 ELSE 0 END AS BIT) from pg_database WHERE lower(datname) = lower(String[{dbName}])").ExecuteScalar().ConvertValue<bool>();
             }
         }
@@ -188,28 +205,22 @@ namespace EntityWorker.Core.Transaction
                 if (DataBaseExist())
                     return;
 
-                var sqlBuild = DataBaseTypes != DataBaseTypes.PostgreSql ? new SqlConnectionStringBuilder(ConnectionString) : null;
-                var npSqlBuilder = DataBaseTypes == DataBaseTypes.PostgreSql ? new NpgsqlConnectionStringBuilder(ConnectionString) : null;
-                var dbName = DataBaseTypes == DataBaseTypes.Mssql ? sqlBuild?.InitialCatalog : sqlBuild?.DataSource;
-                if (string.IsNullOrEmpty(dbName) && DataBaseTypes != DataBaseTypes.PostgreSql)
-                    throw new EntityException("InitialCatalog can not be null or empty");
-
-                if (DataBaseTypes == DataBaseTypes.PostgreSql && string.IsNullOrEmpty(npSqlBuilder.Database))
-                    throw new EntityException("Database can not be null or empty");
-
+                var sqlBuild = new TransactionConnectionString(DataBaseTypes, ConnectionString);
+                if (string.IsNullOrEmpty(sqlBuild.InitialCatalog))
+                    throw new EntityException("InitialCatalog, Database or DataSource  can not be null or empty");
+                var dbName = sqlBuild.InitialCatalog;
                 if (DataBaseTypes == DataBaseTypes.Mssql)
                 {
-                    sqlBuild.InitialCatalog = "master";
+                    sqlBuild.InitialCatalog = "";
                     using (var rep = new DbRepository(sqlBuild.ToString(), DataBaseTypes))
                         rep.GetSqlCommand($"Create DataBase [{dbName.Trim()}]").ExecuteNonQuery();
                 }
                 else if (DataBaseTypes == DataBaseTypes.Sqllight)
-                    SQLiteConnection.CreateFile(dbName.Trim());
+                    File.Create(sqlBuild.ToString().Trim()).Close();
                 else
                 {
-                    dbName = npSqlBuilder.Database;
-                    npSqlBuilder.Database = "";
-                    using (var rep = new DbRepository(npSqlBuilder.ToString(), DataBaseTypes))
+                    sqlBuild.InitialCatalog = "";
+                    using (var rep = new DbRepository(sqlBuild.ToString(), DataBaseTypes))
                         rep.GetSqlCommand($"Create DataBase {dbName}").ExecuteNonQuery();
                 }
 
@@ -298,21 +309,7 @@ namespace EntityWorker.Core.Transaction
             {
                 if (SqlConnection == null)
                 {
-                    if (DataBaseTypes == DataBaseTypes.Sqllight)
-                    {
-                        if (SqlConnection == null)
-                            SqlConnection = new SQLiteConnection(ConnectionString);
-                    }
-                    else if (DataBaseTypes == DataBaseTypes.Mssql)
-                    {
-                        if (SqlConnection == null)
-                            SqlConnection = new SqlConnection(ConnectionString);
-                    }
-                    else
-                    {
-                        if (SqlConnection == null)
-                            SqlConnection = new NpgsqlConnection(ConnectionString);
-                    }
+                    SqlConnection = new TransactionSqlConnection(DataBaseTypes, ConnectionString);
                 }
 
                 if (SqlConnection.State == ConnectionState.Broken || SqlConnection.State == ConnectionState.Closed)
@@ -346,7 +343,7 @@ namespace EntityWorker.Core.Transaction
         /// Only one Transaction will be created until it get disposed
         /// </summary>
         /// <returns></returns>
-        public DbTransaction CreateTransaction()
+        public IDbTransaction CreateTransaction()
         {
             ValidateConnection();
             if (Trans?.Connection == null)
@@ -466,65 +463,13 @@ namespace EntityWorker.Core.Transaction
         }
 
         /// <summary>
-        /// SqlDbType by system.Type
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        public SqlDbType GetSqlType(Type type)
-        {
-            if (type == typeof(string))
-                return SqlDbType.NVarChar;
-
-            if (type.GetTypeInfo().IsGenericType && type.GetTypeInfo().GetGenericTypeDefinition() == typeof(Nullable<>))
-                type = Nullable.GetUnderlyingType(type);
-            if (type.GetTypeInfo().IsEnum)
-                type = typeof(long);
-            try
-            {
-                var param = new SqlParameter("", type == typeof(byte[]) ? new byte[0] : type.CreateInstance(true));
-                return param.SqlDbType;
-            }
-            catch
-            {
-                var param = new SqlParameter("", new object());
-                return param.SqlDbType;
-            }
-        }
-
-        /// <summary>
-        /// DbType By System.Type
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        public DbType GetDbType(Type type)
-        {
-            if (type == typeof(string))
-                return DbType.String;
-
-            if (type.GetTypeInfo().IsGenericType && type.GetTypeInfo().GetGenericTypeDefinition() == typeof(Nullable<>))
-                type = Nullable.GetUnderlyingType(type);
-            if (type.GetTypeInfo().IsEnum)
-                type = typeof(long);
-            try
-            {
-                var param = new SqlParameter("", type == typeof(byte[]) ? new byte[0] : type.CreateInstance(true));
-                return param.DbType;
-            }
-            catch
-            {
-                var param = new SqlParameter("", new object());
-                return param.DbType;
-            }
-        }
-
-        /// <summary>
         /// Add parameters to SqlCommand
         /// </summary>
         /// <param name="cmd"></param>
         /// <param name="attrName"></param>
         /// <param name="value"></param>
         /// <param name="dbType"></param>
-        public IRepository AddInnerParameter(ISqlCommand cmd, string attrName, object value, SqlDbType dbType = SqlDbType.NVarChar)
+        public IRepository AddInnerParameter(ISqlCommand cmd, string attrName, object value, DbType? dbType = null)
         {
             if (attrName != null && attrName[0] != '@')
                 attrName = "@" + attrName;
@@ -534,74 +479,8 @@ namespace EntityWorker.Core.Transaction
 
             var sqlDbTypeValue = value ?? DBNull.Value;
 
-            if (DataBaseTypes == DataBaseTypes.Mssql)
-            {
-                var param = new SqlParameter
-                {
-                    SqlDbType = dbType,
-                    Value = sqlDbTypeValue,
-                    ParameterName = attrName
-                };
-                cmd.Command.Parameters.Add(param);
-            }
-            else if (DataBaseTypes == DataBaseTypes.Sqllight)
-            {
-                (cmd.Command as SQLiteCommand).Parameters.AddWithValue(attrName, value ?? DBNull.Value);
-            }
-            else
-            {
-                (cmd.Command as NpgsqlCommand).Parameters.AddWithValue(attrName, value ?? DBNull.Value);
-            }
-
-            return this;
-        }
-
-        /// <summary>
-        /// Add parameters to SqlCommand
-        /// </summary>
-        /// <param name="cmd"></param>
-        /// <param name="attrName"></param>
-        /// <param name="value"></param>
-        /// <param name="dbType"></param>
-        public IRepository AddInnerParameter(ISqlCommand cmd, string attrName, object value, DbType dbType)
-        {
-            if (attrName != null && attrName[0] != '@')
-                attrName = "@" + attrName;
-
-            if (value?.GetType().GetTypeInfo().IsEnum ?? false)
-                value = value.ConvertValue<long>();
-
-            var sqlDbTypeValue = value ?? DBNull.Value;
-
-            if (DataBaseTypes == DataBaseTypes.Mssql)
-            {
-                var param = new SqlParameter
-                {
-                    DbType = dbType,
-                    Value = sqlDbTypeValue,
-                    ParameterName = attrName
-                };
-                cmd.Command.Parameters.Add(param);
-            }
-            else if (DataBaseTypes == DataBaseTypes.Sqllight)
-            {
-                (cmd.Command as SQLiteCommand).Parameters.Add(new SQLiteParameter()
-                {
-                    DbType = dbType,
-                    Value = value ?? DBNull.Value,
-                    ParameterName = attrName
-                });
-            }
-            else
-            {
-                (cmd.Command as NpgsqlCommand).Parameters.Add(new NpgsqlParameter()
-                {
-                    DbType = dbType,
-                    Value = value ?? DBNull.Value,
-                    ParameterName = attrName
-                });
-            }
-
+            var param = new TransactionParameter(DataBaseTypes, attrName, sqlDbTypeValue, dbType);
+            cmd.Command.Parameters.Add(param.Parameter);
             return this;
         }
 

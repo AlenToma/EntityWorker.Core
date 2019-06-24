@@ -74,7 +74,13 @@ namespace LightData.CMS.Modules.Migrations
                 i++;
             }
 
-            users.ForEach(x => repository.Save(x));
+            users.ForEach(x =>
+            {
+
+                repository.Save(x);
+
+
+            });
 
             var menus = new List<Menus>()
             {

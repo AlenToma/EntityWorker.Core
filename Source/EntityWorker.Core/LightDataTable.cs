@@ -8,6 +8,7 @@ using System.Runtime.Serialization;
 using EntityWorker.Core.Attributes;
 using EntityWorker.Core.Helper;
 using EntityWorker.Core.Interface;
+using FastDeepCloner;
 
 namespace EntityWorker.Core
 {

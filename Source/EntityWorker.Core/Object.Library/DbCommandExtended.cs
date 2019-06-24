@@ -3,7 +3,6 @@ using EntityWorker.Core.Interface;
 using EntityWorker.Core.InterFace;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 
@@ -36,18 +35,7 @@ namespace EntityWorker.Core.Object.Library
         /// </summary>
         public DbCommand Command { get => _cmd; }
 
-        /// <summary>
-        /// Add Parameter to sqlCommand
-        /// </summary>
-        /// <param name="attrName"></param>
-        /// <param name="value"></param>
-        /// <param name="dbType"></param>
-
-        public ISqlCommand AddInnerParameter(string attrName, object value, SqlDbType dbType = SqlDbType.NVarChar)
-        {
-            _provider.AddInnerParameter(this, attrName, value, dbType);
-            return this;
-        }
+        public DataBaseTypes DataBaseTypes => throw new NotImplementedException();
 
         /// <summary>
         /// Add parameters to SqlCommand
@@ -55,7 +43,7 @@ namespace EntityWorker.Core.Object.Library
         /// <param name="attrName"></param>
         /// <param name="value"></param>
         /// <param name="dbType"></param>
-        public ISqlCommand AddInnerParameter(string attrName, object value, DbType dbType)
+        public ISqlCommand AddInnerParameter(string attrName, object value, DbType? dbType = null)
         {
             _provider.AddInnerParameter(this, attrName, value, dbType);
             return this;
