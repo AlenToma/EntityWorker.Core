@@ -11,6 +11,9 @@ EntityWorker is an alternative to entityframwork. is more flexible and much fast
 * [IProduct](https://github.com/AlenToma/IProduct)
 
 ## Support for Providers
+ You will have to install the correct provider package.
+ Depending on which provider you use, you will have to install [System.Data.SqlClient](https://www.nuget.org/packages/System.Data.SqlClient/4.7.0-preview6.19303.8) for mssql , [Npgsql](https://www.nuget.org/packages/Npgsql/) for pgsql and
+[System.Data.SQLite](https://www.nuget.org/packages/System.Data.SQLite/) for SQLite. You will be noticed when the providers package is missing
 * Mssql
 * Sqlite
 * Postgresql
