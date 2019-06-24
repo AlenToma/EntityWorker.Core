@@ -37,35 +37,25 @@
         // offcource its upp to you too choose.
         protected override void OnModuleConfiguration(IModuleBuilder moduleBuilder)
         {
-            moduleBuilder.Entity<User>()
-                .TableName("Users", "dbo")
-                .HasPrimaryKey(x => x.Id, false)
-                .NotNullable(x => x.UserName)
-                .HasDataEncode(x => x.UserName)
-                .HasDataEncode(x => x.Password)
-                .HasForeignKey<Role, Guid>(x => x.RoleId)
-                .HasIndependentData(x => x.Role)
-                .HasForeignKey<Person, Guid>(x => x.PersonId)
+           moduleBuilder.Entity<User>()
                 .HasRule<UserRule>()
-                .HasJsonIgnore(x=> x.Password)
-                .HasXmlIgnore(x=> x.Password);
-                
-                 moduleBuilder.Entity<Person>()
-                 .HasColumnType(x => x.FirstName, "varchar(100)");
-                 
-                 // OR
-            moduleBuilder.EntityType(typeof(User))
                 .TableName("Users", "geto")
-                .HasKnownType("Person", typeof(Person))
-                .HasPrimaryKey("Id", false)
-                .NotNullable("UserName")
-                .HasDataEncode("UserName")
-                .HasDataEncode("Password")
-                .HasForeignKey<Role>("RoleId")
-                .HasIndependentData("Role")
-                .HasForeignKey<Person>("PersonId")
-                .HasRule<UserRule>()
-                .HasJsonIgnore("Password");
+                .Property(x => x.Person)
+                .HasKnownType(typeof(Person))
+                .Property(x => x.Id)
+                .HasPrimaryKey(true)
+                .Property(x => x.UserName)
+                .NotNullable()
+                .HasDataEncode()
+                .Property(x => x.Password)
+                .HasJsonIgnore()
+                .HasDataEncode()
+                .Property(x => x.RoleId)
+                .HasForeignKey<Role>()
+                .Property(x => x.Role)
+                .HasIndependentData()
+                .Property(x => x.PersonId)
+                .HasForeignKey<Person>();
          }
 
 
