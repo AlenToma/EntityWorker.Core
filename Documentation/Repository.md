@@ -2,6 +2,9 @@
 ```csharp
     // Here we inherit from Transaction which contains the database logic for handling the transaction.
     // Thats all we need right now.
+    // You will have to install the correct provider package.
+    // Depending on which provider you use, you will have to install System.Data.SqlClient for mssql , Npgsql for pgsql and
+    //System.Data.SQLite for SQLite. You will be noticed when the providers package is missing
     public class Repository : Transaction
     {
         // there are three databases types mssql, Sqlite and PostgreSql
