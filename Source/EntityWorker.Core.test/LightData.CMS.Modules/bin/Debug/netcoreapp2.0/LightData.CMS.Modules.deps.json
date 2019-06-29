@@ -1,30 +1,30 @@
 {
   "runtimeTarget": {
     "name": ".NETCoreApp,Version=v2.0",
-    "signature": "f61998a7b1561de1d407aa5e97f9340cdf6a659c"
+    "signature": "533e1a07ccd18d44adfd69a8e5aa06cfeec62f87"
   },
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v2.0": {
       "LightData.CMS.Modules/1.0.0": {
         "dependencies": {
-          "EntityWorker.Core": "3.0.1"
+          "EntityWorker.Core": "3.0.2"
         },
         "runtime": {
           "LightData.CMS.Modules.dll": {}
         }
       },
-      "FastDeepCloner/1.1.9": {
+      "FastDeepCloner/1.2.0": {
         "runtime": {
           "lib/netcoreapp2.0/FastDeepCloner.dll": {
-            "assemblyVersion": "1.0.1.9",
-            "fileVersion": "1.0.1.9"
+            "assemblyVersion": "1.0.2.0",
+            "fileVersion": "1.0.2.0"
           }
         }
       },
-      "EntityWorker.Core/3.0.1": {
+      "EntityWorker.Core/3.0.2": {
         "dependencies": {
-          "FastDeepCloner": "1.1.9"
+          "FastDeepCloner": "1.2.0"
         },
         "runtime": {
           "EntityWorker.Core.dll": {}
@@ -38,14 +38,14 @@
       "serviceable": false,
       "sha512": ""
     },
-    "FastDeepCloner/1.1.9": {
+    "FastDeepCloner/1.2.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-kRYaYgiQKBI/S68mN/MWxKA9lZO5meab4e57jxLckCTqjs8CXZYng9x2pmAC8kw4rwkdod/edMHvg+a9HFPDdg==",
-      "path": "fastdeepcloner/1.1.9",
-      "hashPath": "fastdeepcloner.1.1.9.nupkg.sha512"
+      "sha512": "sha512-CQGUKwu4gN2/QXAollyfx8IlW2FcBSm7rmUvHVPHL9nbqacPGorOT5G4dyKnH1NnVfh6+jHkvIyp7njjWbWbdA==",
+      "path": "fastdeepcloner/1.2.0",
+      "hashPath": "fastdeepcloner.1.2.0.nupkg.sha512"
     },
-    "EntityWorker.Core/3.0.1": {
+    "EntityWorker.Core/3.0.2": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

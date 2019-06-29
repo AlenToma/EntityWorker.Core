@@ -2,7 +2,7 @@
   "version": 3,
   "targets": {
     ".NETCoreApp,Version=v2.0": {
-      "FastDeepCloner/1.1.9": {
+      "FastDeepCloner/1.2.0": {
         "type": "package",
         "compile": {
           "lib/netcoreapp2.0/FastDeepCloner.dll": {}
@@ -206,11 +206,11 @@
           "build/netstandard2.0/NETStandard.Library.targets": {}
         }
       },
-      "EntityWorker.Core/3.0.1": {
+      "EntityWorker.Core/3.0.3": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v2.0",
         "dependencies": {
-          "FastDeepCloner": "1.1.9"
+          "FastDeepCloner": "1.2.0"
         },
         "compile": {
           "bin/placeholder/EntityWorker.Core.dll": {}
@@ -221,7 +221,7 @@
       }
     },
     ".NETFramework,Version=v4.6.1": {
-      "FastDeepCloner/1.1.9": {
+      "FastDeepCloner/1.2.0": {
         "type": "package",
         "compile": {
           "lib/net451/FastDeepCloner.dll": {}
@@ -230,11 +230,11 @@
           "lib/net451/FastDeepCloner.dll": {}
         }
       },
-      "EntityWorker.Core/3.0.1": {
+      "EntityWorker.Core/3.0.3": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5.1",
         "dependencies": {
-          "FastDeepCloner": "1.1.9"
+          "FastDeepCloner": "1.2.0"
         },
         "compile": {
           "bin/placeholder/EntityWorker.Core.dll": {}
@@ -245,7 +245,7 @@
       }
     },
     ".NETStandard,Version=v2.0": {
-      "FastDeepCloner/1.1.9": {
+      "FastDeepCloner/1.2.0": {
         "type": "package",
         "dependencies": {
           "System.Reflection.Emit": "4.3.0"
@@ -389,11 +389,11 @@
           "ref/netstandard1.3/System.Threading.Tasks.dll": {}
         }
       },
-      "EntityWorker.Core/3.0.1": {
+      "EntityWorker.Core/3.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
-          "FastDeepCloner": "1.1.9",
+          "FastDeepCloner": "1.2.0",
           "System.Reflection.Emit": "4.3.0"
         },
         "compile": {
@@ -406,14 +406,14 @@
     }
   },
   "libraries": {
-    "FastDeepCloner/1.1.9": {
-      "sha512": "kRYaYgiQKBI/S68mN/MWxKA9lZO5meab4e57jxLckCTqjs8CXZYng9x2pmAC8kw4rwkdod/edMHvg+a9HFPDdg==",
+    "FastDeepCloner/1.2.0": {
+      "sha512": "CQGUKwu4gN2/QXAollyfx8IlW2FcBSm7rmUvHVPHL9nbqacPGorOT5G4dyKnH1NnVfh6+jHkvIyp7njjWbWbdA==",
       "type": "package",
-      "path": "fastdeepcloner/1.1.9",
+      "path": "fastdeepcloner/1.2.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "fastdeepcloner.1.1.9.nupkg.sha512",
+        "fastdeepcloner.1.2.0.nupkg.sha512",
         "fastdeepcloner.nuspec",
         "lib/net451/FastDeepCloner.dll",
         "lib/net451/FastDeepCloner.xml",
@@ -780,6 +780,8 @@
       "type": "package",
       "path": "microsoft.netcore.targets/1.1.0",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/netstandard1.0/_._",
@@ -1131,6 +1133,8 @@
       "type": "package",
       "path": "system.reflection/4.3.0",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/MonoAndroid10/_._",
@@ -1210,6 +1214,8 @@
       "type": "package",
       "path": "system.reflection.emit/4.3.0",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/MonoAndroid10/_._",
@@ -1244,6 +1250,8 @@
       "type": "package",
       "path": "system.reflection.emit.ilgeneration/4.3.0",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/MonoAndroid10/_._",
@@ -1287,6 +1295,8 @@
       "type": "package",
       "path": "system.reflection.primitives/4.3.0",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/MonoAndroid10/_._",
@@ -1434,6 +1444,8 @@
       "type": "package",
       "path": "system.text.encoding/4.3.0",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/MonoAndroid10/_._",
@@ -1500,6 +1512,8 @@
       "type": "package",
       "path": "system.threading.tasks/4.3.0",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/MonoAndroid10/_._",
@@ -1561,7 +1575,7 @@
         "system.threading.tasks.nuspec"
       ]
     },
-    "EntityWorker.Core/3.0.1": {
+    "EntityWorker.Core/3.0.3": {
       "type": "project",
       "path": "../../EntityWorker.Core/EntityWorker.Core.csproj",
       "msbuildProject": "../../EntityWorker.Core/EntityWorker.Core.csproj"
@@ -1569,14 +1583,14 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.0": [
-      "EntityWorker.Core >= 3.0.1",
+      "EntityWorker.Core >= 3.0.3",
       "Microsoft.NETCore.App >= 2.0.0"
     ],
     ".NETFramework,Version=v4.6.1": [
-      "EntityWorker.Core >= 3.0.1"
+      "EntityWorker.Core >= 3.0.3"
     ],
     ".NETStandard,Version=v2.0": [
-      "EntityWorker.Core >= 3.0.1",
+      "EntityWorker.Core >= 3.0.3",
       "NETStandard.Library >= 2.0.3"
     ]
   },

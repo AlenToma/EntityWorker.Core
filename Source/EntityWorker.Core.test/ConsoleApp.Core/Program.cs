@@ -21,12 +21,12 @@ namespace ConsoleApp.Core
 
         private static void ExpressionTest()
         {
-            using(var rep = new Repository())
+            using (var rep = new Repository(DataBaseTypes.Sqllight))
             {
                 ////execute(rep.Get<User>().Where(x => string.IsNullOrEmpty(x.UserName)), "IsNullOrEmpty");
                 //execute(rep.Get<User>().Where(x => string.IsNullOrEmpty(x.Person.FirstName)), "IsNullOrEmpty");
                 var id = Guid.NewGuid();
-                execute(rep.Get<Person>().Where(x => x.FirstName.Contains("Admin") || string.IsNullOrEmpty(x.FirstName) || string.IsNullOrEmpty(x.FirstName) == false && x.Id != id) , "!IsNullOrEmpty");
+                execute(rep.Get<Person>().Where(x => x.FirstName.Contains("Admin") || string.IsNullOrEmpty(x.FirstName) || string.IsNullOrEmpty(x.FirstName) == false && x.Id != id), "!IsNullOrEmpty");
             }
 
         }

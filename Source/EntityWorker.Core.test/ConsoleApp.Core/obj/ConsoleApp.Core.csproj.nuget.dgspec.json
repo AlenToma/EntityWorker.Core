@@ -55,6 +55,18 @@
               "target": "Package",
               "version": "[2.0.0, )",
               "autoReferenced": true
+            },
+            "Npgsql": {
+              "target": "Package",
+              "version": "[4.0.7, )"
+            },
+            "System.Data.SQLite": {
+              "target": "Package",
+              "version": "[1.0.111, )"
+            },
+            "System.Data.SqlClient": {
+              "target": "Package",
+              "version": "[4.6.1, )"
             }
           },
           "imports": [
@@ -157,7 +169,7 @@
       }
     },
     "E:\\Projects\\EntityWorker.Core\\Source\\EntityWorker.Core\\EntityWorker.Core.csproj": {
-      "version": "3.0.1",
+      "version": "3.0.3",
       "restore": {
         "projectUniqueName": "E:\\Projects\\EntityWorker.Core\\Source\\EntityWorker.Core\\EntityWorker.Core.csproj",
         "projectName": "EntityWorker.Core",
@@ -206,7 +218,7 @@
           "dependencies": {
             "FastDeepCloner": {
               "target": "Package",
-              "version": "[1.1.9, )"
+              "version": "[1.2.0, )"
             },
             "Microsoft.NETCore.App": {
               "suppressParent": "All",
@@ -225,7 +237,7 @@
           "dependencies": {
             "FastDeepCloner": {
               "target": "Package",
-              "version": "[1.1.9, )"
+              "version": "[1.2.0, )"
             }
           }
         },
@@ -233,7 +245,7 @@
           "dependencies": {
             "FastDeepCloner": {
               "target": "Package",
-              "version": "[1.1.9, )"
+              "version": "[1.2.0, )"
             },
             "NETStandard.Library": {
               "suppressParent": "All",
