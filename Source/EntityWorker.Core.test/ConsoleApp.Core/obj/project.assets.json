@@ -2,7 +2,7 @@
   "version": 3,
   "targets": {
     ".NETCoreApp,Version=v2.0": {
-      "FastDeepCloner/1.2.0": {
+      "FastDeepCloner/1.2.5": {
         "type": "package",
         "compile": {
           "lib/netcoreapp2.0/FastDeepCloner.dll": {}
@@ -451,11 +451,11 @@
           "lib/netcoreapp2.0/_._": {}
         }
       },
-      "EntityWorker.Core/3.0.3": {
+      "EntityWorker.Core/3.0.7": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v2.0",
         "dependencies": {
-          "FastDeepCloner": "1.2.0"
+          "FastDeepCloner": "1.2.5"
         },
         "compile": {
           "bin/placeholder/EntityWorker.Core.dll": {}
@@ -468,7 +468,7 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v2.0",
         "dependencies": {
-          "EntityWorker.Core": "3.0.3"
+          "EntityWorker.Core": "3.0.7"
         },
         "compile": {
           "bin/placeholder/LightData.CMS.Modules.dll": {}
@@ -480,14 +480,14 @@
     }
   },
   "libraries": {
-    "FastDeepCloner/1.2.0": {
-      "sha512": "CQGUKwu4gN2/QXAollyfx8IlW2FcBSm7rmUvHVPHL9nbqacPGorOT5G4dyKnH1NnVfh6+jHkvIyp7njjWbWbdA==",
+    "FastDeepCloner/1.2.5": {
+      "sha512": "HtR/jyfcR/UqQAWnteeyr4bdibHoTliPhRE1CuBK4Q+CnYwrSy9sadcnM4oZkhC4xgb7ffEmNH8aM3/RDNrWcw==",
       "type": "package",
-      "path": "fastdeepcloner/1.2.0",
+      "path": "fastdeepcloner/1.2.5",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "fastdeepcloner.1.2.0.nupkg.sha512",
+        "fastdeepcloner.1.2.5.nupkg.sha512",
         "fastdeepcloner.nuspec",
         "lib/net451/FastDeepCloner.dll",
         "lib/net451/FastDeepCloner.xml",
@@ -1502,7 +1502,7 @@
         "version.txt"
       ]
     },
-    "EntityWorker.Core/3.0.3": {
+    "EntityWorker.Core/3.0.7": {
       "type": "project",
       "path": "../../EntityWorker.Core/EntityWorker.Core.csproj",
       "msbuildProject": "../../EntityWorker.Core/EntityWorker.Core.csproj"
@@ -1515,7 +1515,7 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.0": [
-      "EntityWorker.Core >= 3.0.3",
+      "EntityWorker.Core >= 3.0.7",
       "LightData.CMS.Modules >= 1.0.0",
       "Microsoft.NETCore.App >= 2.0.0",
       "Npgsql >= 4.0.7",

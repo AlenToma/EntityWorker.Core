@@ -53,7 +53,7 @@
         <member name="T:EntityWorker.Core.Attributes.ExcludeFromAbstract">
             <summary>
             https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/Attributes.md
-            This indicates that the prop will not be saved to the database.
+            This indicates that the prop or class will not be saved/created to the database.
             </summary>
         </member>
         <member name="T:EntityWorker.Core.Attributes.ForeignKey">
@@ -680,18 +680,28 @@
         </member>
         <member name="M:EntityWorker.Core.Interface.IDbRuleTrigger`1.BeforeSave(EntityWorker.Core.InterFace.IRepository,`0)">
             <summary>
-            Event triggered before save an item
+            Event triggered before saving an item
+            No need to commit your changes here as there is already a transaction create and a commit operation will be triggered 
             </summary>
             <param name="repository"></param>
             <param name="itemDbEntity"></param>
         </member>
         <member name="M:EntityWorker.Core.Interface.IDbRuleTrigger`1.AfterSave(EntityWorker.Core.InterFace.IRepository,`0,System.Object)">
             <summary>
-            triggered after saveing an item
+            triggered after saving an item
+            No need to commit your changes here as there is already a transaction create and a commit operation will be triggered 
             </summary>
             <param name="repository"></param>
             <param name="itemDbEntity"></param>
             <param name="objectId"></param>
+        </member>
+        <member name="M:EntityWorker.Core.Interface.IDbRuleTrigger`1.Delete(EntityWorker.Core.InterFace.IRepository,`0)">
+            <summary>
+            trigger before deleting an item
+            No need to commit your changes here as there is already a transaction create and a commit operation will be triggered 
+            </summary>
+            <param name="repository"></param>
+            <param name="itemDbEntity"></param>
         </member>
         <member name="P:EntityWorker.Core.Interface.ILightDataTable.TablePrimaryKey">
             <summary>

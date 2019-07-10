@@ -141,7 +141,7 @@ namespace ConsoleApp1
             Console.WriteLine("Time taken: {0}ms", sw.Elapsed.TotalMilliseconds);
          
         }
-        private static List<object> usResult = null;
+
         public static void execute(dynamic q, string identifier)
         {
             try
@@ -149,10 +149,11 @@ namespace ConsoleApp1
                 Console.WriteLine("----------------" + identifier + "------------------");
                 start();
                 var r = q.Execute();
+                stop();
                 Console.WriteLine("Success Count:" + r.Count);
                 Console.WriteLine(" ");
                 var sql = q.ParsedLinqToSql;
-                stop();
+              
             }
             catch (Exception ex)
             {

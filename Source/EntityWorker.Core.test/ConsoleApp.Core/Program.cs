@@ -23,9 +23,12 @@ namespace ConsoleApp.Core
         {
             using (var rep = new Repository(DataBaseTypes.Sqllight))
             {
+
                 ////execute(rep.Get<User>().Where(x => string.IsNullOrEmpty(x.UserName)), "IsNullOrEmpty");
                 //execute(rep.Get<User>().Where(x => string.IsNullOrEmpty(x.Person.FirstName)), "IsNullOrEmpty");
-                var id = Guid.NewGuid();
+                Guid? id = Guid.NewGuid();
+
+                //execute(rep.Get<Person>().Where(x => id == null || id == x.Id), "test");
                 execute(rep.Get<Person>().Where(x => x.FirstName.Contains("Admin") || string.IsNullOrEmpty(x.FirstName) || string.IsNullOrEmpty(x.FirstName) == false && x.Id != id), "!IsNullOrEmpty");
             }
 
@@ -40,7 +43,7 @@ namespace ConsoleApp.Core
         public static void stop()
         {
             sw.Stop();
-            Console.WriteLine("Time taken: {0}ms", sw.Elapsed.TotalMilliseconds);
+            Console.WriteLine("Time taken: {0}s", sw.Elapsed.TotalSeconds);
             sw = new Stopwatch();
         }
         private static List<object> usResult = null;

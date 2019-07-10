@@ -169,7 +169,7 @@
       }
     },
     "E:\\Projects\\EntityWorker.Core\\Source\\EntityWorker.Core\\EntityWorker.Core.csproj": {
-      "version": "3.0.3",
+      "version": "3.0.7",
       "restore": {
         "projectUniqueName": "E:\\Projects\\EntityWorker.Core\\Source\\EntityWorker.Core\\EntityWorker.Core.csproj",
         "projectName": "EntityWorker.Core",
@@ -218,7 +218,7 @@
           "dependencies": {
             "FastDeepCloner": {
               "target": "Package",
-              "version": "[1.2.0, )"
+              "version": "[1.2.5, )"
             },
             "Microsoft.NETCore.App": {
               "suppressParent": "All",
@@ -237,7 +237,7 @@
           "dependencies": {
             "FastDeepCloner": {
               "target": "Package",
-              "version": "[1.2.0, )"
+              "version": "[1.2.5, )"
             }
           }
         },
@@ -245,7 +245,7 @@
           "dependencies": {
             "FastDeepCloner": {
               "target": "Package",
-              "version": "[1.2.0, )"
+              "version": "[1.2.5, )"
             },
             "NETStandard.Library": {
               "suppressParent": "All",

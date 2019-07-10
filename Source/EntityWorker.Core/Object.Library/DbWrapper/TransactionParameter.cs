@@ -7,7 +7,6 @@ namespace EntityWorker.Core.Object.Library.DbWrapper
 {
     public sealed class TransactionParameter
     {
-
         private static SafeValueType<DataBaseTypes, IFastDeepClonerProperty> dbTypeProperty = new SafeValueType<DataBaseTypes, IFastDeepClonerProperty>();
 
         public DbType DbType { get => (DbType)dbTypeProperty[DataBaseTypes].GetValue(Parameter); set => dbTypeProperty[DataBaseTypes].SetValue(Parameter, value); }

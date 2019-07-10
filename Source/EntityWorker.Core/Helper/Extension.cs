@@ -818,7 +818,6 @@ namespace EntityWorker.Core.Helper
 
                     while (col < reader.FieldCount)
                     {
-
                         string columnName;
                         if (colNames.ContainsKey(col))
                             columnName = colNames[col];

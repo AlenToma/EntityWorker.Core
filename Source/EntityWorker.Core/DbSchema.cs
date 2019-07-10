@@ -249,12 +249,16 @@ namespace EntityWorker.Core
 
         private List<string> DeleteAbstract(object o, bool save)
         {
+
+
+            object dbTrigger = null;
             GlobalConfiguration.Log?.Info("Delete", o);
             var type = o.GetType().GetActualType();
             var props = DeepCloner.GetFastDeepClonerProperties(type);
             var table = type.TableName().GetName(_repository.DataBaseTypes);
             var primaryKey = o.GetType().GetPrimaryKey();
             var primaryKeyValue = o.GetPrimaryKeyValue();
+            var objectRules = type.GetCustomAttribute<Rule>();
             if (primaryKeyValue.ObjectIsNew())
                 return new List<string>();
             var sql = new List<string>() {
@@ -263,6 +267,29 @@ namespace EntityWorker.Core
                 table +
                 Querys.Where(_repository.DataBaseTypes).Column(primaryKey.GetPropertyName()).Equal(primaryKeyValue).Execute()
             };
+
+            if (objectRules != null && !CachedIDbRuleTrigger.ContainsKey(type))
+            {
+                dbTrigger = objectRules.RuleType.CreateInstance();
+                CachedIDbRuleTrigger.Add(o.GetType(), dbTrigger);
+            }
+            else if (objectRules != null || CachedIDbRuleTrigger.ContainsKey(type))
+                dbTrigger = CachedIDbRuleTrigger[type];
+
+            try
+            {
+                _repository.CreateTransaction();
+                if (objectRules != null)
+                    dbTrigger?.GetType().GetMethod("Delete").Invoke(dbTrigger, new List<object>() { _repository, o }.ToArray()); // Check the Rule before save
+            }
+            catch
+            {
+                _repository.Rollback();
+                throw;
+            }
+
+
+
 
             foreach (var prop in props.Where(x => x.CanRead && !x.IsInternalType && x.GetCustomAttribute<IndependentData>() == null && !x.ContainAttribute<JsonDocument>() && !x.ContainAttribute<XmlDocument>() && x.GetCustomAttribute<ExcludeFromAbstract>() == null))
             {
@@ -389,7 +416,6 @@ namespace EntityWorker.Core
 
                         var changes = _repository.GetObjectChanges(o);
                         foreach (var item in props.Where(x => x.CanRead && !changes.Any(a => a.PropertyName == x.Name) && (x.IsInternalType || x.ContainAttribute<JsonDocument>())))
-                            //if (!ignoredProperties.Any(a => a == item.Name || a == (o.GetType().Name + "." + item.Name) || a == (lastProperty + "." + item.Name)))
                             item.SetValue(o, item.GetValue(data));
                     }
                 }
@@ -545,14 +571,16 @@ namespace EntityWorker.Core
         #endregion
         #region DataBase Creation Logic
         private List<Type> _alreadyControlled = new List<Type>();
+        private long counter;
         public CodeToDataBaseMergeCollection GetDatabase_Diff(Type tableType, CodeToDataBaseMergeCollection str = null, List<Type> createdTables = null)
         {
-            _repository.CreateSchema(tableType);
+
             str = str ?? new CodeToDataBaseMergeCollection(_repository);
-            tableType = tableType.GetActualType();
-            if (_alreadyControlled.Any(x => x == tableType))
+            if (tableType.GetCustomAttribute<ExcludeFromAbstract>() != null || _alreadyControlled.Any(x => x == tableType))
                 return str;
-            else _alreadyControlled.Add(tableType);
+            _repository.CreateSchema(tableType);
+            tableType = tableType.GetActualType();
+            _alreadyControlled.Add(tableType);
             createdTables = createdTables ?? new List<Type>();
             if (createdTables.Any(x => x == tableType) || tableType.GetPrimaryKey() == null)
                 return str;
@@ -573,7 +601,9 @@ namespace EntityWorker.Core
             if (!table.Values.Any())
             {
                 codeToDataBaseMerge.Sql = new StringBuilder($"CREATE TABLE {tableName.GetName(_repository.DataBaseTypes)} (");
-                foreach (var prop in props.Where(x => (x.GetDbTypeByType(_repository.DataBaseTypes) != null || !x.IsInternalType || x.ContainAttribute<JsonDocument>() || x.ContainAttribute<XmlDocument>()) && !x.ContainAttribute<ExcludeFromAbstract>()).GroupBy(x => x.Name).Select(x => x.First())
+                foreach (var prop in props.Where(x => (x.GetDbTypeByType(_repository.DataBaseTypes) != null || !x.IsInternalType ||
+                x.ContainAttribute<JsonDocument>() || x.ContainAttribute<XmlDocument>()) &&
+                !x.ContainAttribute<ExcludeFromAbstract>()).GroupBy(x => x.Name).Select(x => x.First())
                         .OrderBy(x => x.ContainAttribute<PrimaryKey>() ? null : x.Name))
                 {
                     if (!prop.IsInternalType && !prop.ContainAttribute<JsonDocument>() && !prop.ContainAttribute<XmlDocument>())
@@ -655,6 +685,7 @@ namespace EntityWorker.Core
                 foreach (var prop in props.Where(x => (x.GetDbTypeByType(_repository.DataBaseTypes) != null || !x.IsInternalType) && !x.ContainAttribute<ExcludeFromAbstract>()).GroupBy(x => x.Name).Select(x => x.First())
                 .OrderBy(x => x.ContainAttribute<PrimaryKey>() ? null : x.Name))
                 {
+
                     if (prop.ContainAttribute<ForeignKey>())
                         GetDatabase_Diff(prop.GetCustomAttribute<ForeignKey>().Type, str, createdTables);
                     var propType = prop.PropertyType;
@@ -671,7 +702,14 @@ namespace EntityWorker.Core
 
                         if (_repository.DataBaseTypes != DataBaseTypes.Sqllight && !(prop.GetDbTypeListByType(_repository.DataBaseTypes).Any(x => x.ToLower().Contains(modify.DataType.ToLower()))) && _repository.DataBaseTypes != DataBaseTypes.PostgreSql)
                         {
-                            var constraine = Properties.Resources.DropContraine.Replace("@tb", $"'{tableName.Name}'").Replace("@col", $"'{prop.GetPropertyName()}'").Replace("@schema", $"'{tableName.Schema ?? ""}'");
+                            var constraine = Properties.Resources.DropContraine
+                                .Replace("@tb", $"'{tableName.Name}'").Replace("@col", $"'{prop.GetPropertyName()}'")
+                                .Replace("@schema", $"'{tableName.Schema ?? ""}'")
+                                .Replace("@TableName", "@" + counter++)
+                                .Replace("@ColumnName", "@" + counter++)
+                                .Replace("@fullName", "@" + counter++)
+                                .Replace("@DROP_COMMAND", "@" + counter++)
+                                .Replace("@FOREIGN_KEY_NAME", "@" + counter++);
                             codeToDataBaseMerge.Sql.Append(constraine);
                             codeToDataBaseMerge.Sql.Append($"\nALTER TABLE {tableName.GetName(_repository.DataBaseTypes)} ALTER COLUMN [{prop.GetPropertyName()}] {prop.GetDbTypeByType(_repository.DataBaseTypes)} {((Nullable.GetUnderlyingType(propType) != null || propType == typeof(string)) && !prop.ContainAttribute<NotNullable>() ? " NULL" : " NOT NULL")}");
                         }
@@ -704,7 +742,16 @@ namespace EntityWorker.Core
                 {
                     if (_repository.DataBaseTypes == DataBaseTypes.Mssql)
                     {
-                        var constraine = Properties.Resources.DropContraine.Replace("@tb", $"'{tableName.Name}'").Replace("@col", $"'{col.ColumnName}'").Replace("@schema", $"'{tableName.Schema ?? ""}'");
+                        var constraine = Properties.Resources.DropContraine
+                            .Replace("@tb", $"'{tableName.Name}'")
+                            .Replace("@col", $"'{col.ColumnName}'")
+                            .Replace("@schema", $"'{tableName.Schema ?? ""}'")
+                            .Replace("@TableName", "@" + counter++)
+                            .Replace("@ColumnName", "@" + counter++)
+                            .Replace("@fullName", "@" + counter++)
+                            .Replace("@DROP_COMMAND", "@" + counter++)
+                            .Replace("@FOREIGN_KEY_NAME", "@" + counter++);
+
                         colRemove.Sql.Append(constraine);
 
                     }
@@ -750,6 +797,7 @@ namespace EntityWorker.Core
 
         public void RemoveTable(Type tableType, List<Type> tableRemoved = null, bool remove = true)
         {
+
 
             if (tableRemoved == null)
                 tableRemoved = new List<Type>();

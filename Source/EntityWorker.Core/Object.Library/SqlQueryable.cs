@@ -214,7 +214,7 @@ namespace EntityWorker.Core.Object.Library
             var list = Expression.Parameter(typeof(IEnumerable<T>), "list");
             var funcType = typeof(Func<,>).MakeGenericType(typeof(T), prop.PropertyType);
             Expression exp = Expression.Lambda(funcType, field, param);
-            var orderByExp = Expression.Call(typeof(Enumerable), "OrderBy", new Type[] { typeof(T),prop.PropertyType }, list, exp);
+            var orderByExp = Expression.Call(typeof(Enumerable), "OrderBy", new Type[] { typeof(T), prop.PropertyType }, list, exp);
             _matches.Add(orderByExp);
             return this;
         }
@@ -310,7 +310,6 @@ namespace EntityWorker.Core.Object.Library
                 var result = new List<T>();
 
                 _expression.DataBaseTypes = _repository.DataBaseTypes;
-
                 foreach (var exp in _matches)
                     _expression.Translate(exp);
                 ParsedLinqToSql = _expression.Quary;
@@ -520,6 +519,6 @@ namespace EntityWorker.Core.Object.Library
             return await Task.FromResult<string>(Execute().ToXml());
         }
 
-     
+
     }
 }

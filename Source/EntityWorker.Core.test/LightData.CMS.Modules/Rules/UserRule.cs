@@ -15,5 +15,9 @@ namespace LightData.CMS.Modules.Rules
         {
 
         }
+
+        public void Delete(IRepository repository, User itemDbEntity)
+        {
+        }
     }
 }

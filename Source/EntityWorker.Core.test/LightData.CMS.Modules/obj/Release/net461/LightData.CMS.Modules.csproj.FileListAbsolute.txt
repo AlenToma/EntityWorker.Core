@@ -39,8 +39,8 @@ D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Module
 D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\bin\Release\net461\System.Data.SqlClient.dll
 E:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\bin\Release\net461\LightData.CMS.Modules.dll
 E:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\bin\Release\net461\LightData.CMS.Modules.pdb
-E:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\bin\Release\net461\EntityWorker.Core.dll
 E:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\bin\Release\net461\FastDeepCloner.dll
+E:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\bin\Release\net461\EntityWorker.Core.dll
 E:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\bin\Release\net461\EntityWorker.Core.pdb
 E:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\bin\Release\net461\EntityWorker.Core.xml
 E:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\obj\Release\net461\LightData.CMS.Modules.csprojAssemblyReference.cache

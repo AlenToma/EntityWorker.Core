@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using EntityWorker.Core.InterFace;
+using FastDeepCloner;
 
 namespace EntityWorker.Core
 {
@@ -52,7 +53,7 @@ namespace EntityWorker.Core
             var tType = type.GetActualType();
             var baseListType = typeof(List<>);
             var listType = baseListType.MakeGenericType(tType);
-            var iList = Activator.CreateInstance(listType) as IList;
+            var iList = listType.CreateInstance() as IList;
             foreach (var item in this)
             {
                 var tItem = item.ToObject(tType);
@@ -68,7 +69,7 @@ namespace EntityWorker.Core
             var tType = typeof(T).GetActualType();
             var baseListType = typeof(List<>);
             var listType = baseListType.MakeGenericType(tType);
-            var iList = Activator.CreateInstance(listType) as IList;
+            var iList = listType.CreateInstance() as IList;
             foreach (var item in this)
             {
                 var tItem = item.ToObject(tType);

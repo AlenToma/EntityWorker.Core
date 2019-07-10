@@ -11,7 +11,9 @@ namespace EntityWorker.Core.Object.Library.DbWrapper
         private readonly SafeValueType<DataBaseTypes, IFastDeepClonerProperty> _initialCatalog = new SafeValueType<DataBaseTypes, IFastDeepClonerProperty>();
         private readonly DbConnectionStringBuilder dbConnectionStringBuilder;
         public DataBaseTypes DataBaseType { get; private set; }
-        public string InitialCatalog { get => (string)_initialCatalog[DataBaseType].GetValue(dbConnectionStringBuilder); set => _initialCatalog[DataBaseType].SetValue(dbConnectionStringBuilder, value); }
+        public string InitialCatalog {
+            get => (string)_initialCatalog[DataBaseType].GetValue(dbConnectionStringBuilder);
+            set => _initialCatalog[DataBaseType].SetValue(dbConnectionStringBuilder, value); }
 
 
         public override string ToString()

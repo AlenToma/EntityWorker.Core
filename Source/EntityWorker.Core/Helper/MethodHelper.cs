@@ -95,7 +95,10 @@ namespace EntityWorker.Core.Helper
                 object str = exp.Value.TrimEnd(']').Substring(@"String\[".Length - 1);
                 sql = sql.Remove(exp.Index, exp.Value.Length);
                 sql = sql.Insert(exp.Index, col);
-                dicCols.TryAdd(col, new Tuple<object, SqlDbType>(str.ConvertValue<string>(), SqlDbType.NVarChar));
+                var v = str.ConvertValue<string>();
+                if (string.Equals(v, "null", StringComparison.OrdinalIgnoreCase))
+                    v = null;
+                dicCols.TryAdd(col, new Tuple<object, SqlDbType>(v, SqlDbType.NVarChar));
                 i++;
             }
 
@@ -164,7 +167,10 @@ namespace EntityWorker.Core.Helper
 
             var dbCommandExtended = new DbCommandExtended(cmd, repository);
             foreach (var dic in dicCols)
+            {
                 dbCommandExtended.AddInnerParameter(dic.Key, dic.Value.Item1);
+
+            }
             return dbCommandExtended;
         }
     }

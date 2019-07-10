@@ -466,12 +466,12 @@ namespace EntityWorker.Core
         /// <returns></returns>
         public T ToObject<T>()
         {
-            var o = FormatterServices.GetUninitializedObject(typeof(T)) is IList ? typeof(T).CreateInstance() : FormatterServices.GetUninitializedObject(typeof(T));
+            var o = typeof(T).CreateInstance();
             var obj = o is IList
                 ?
                     o.GetType().GetActualType().CreateInstance()
                 : typeof(T).CreateInstance();
-            foreach (var pr in FastDeepCloner.DeepCloner.GetFastDeepClonerProperties(obj.GetType()))
+            foreach (var pr in DeepCloner.GetFastDeepClonerProperties(obj.GetType()))
             {
                 var name = pr.GetPropertyName();
                 if (!Columns.ContainsKey(name) || !pr.CanRead)
@@ -538,7 +538,7 @@ namespace EntityWorker.Core
             var o = type.CreateInstance();
             var obj = type.GetActualType().CreateInstance();
 
-            foreach (var pr in FastDeepCloner.DeepCloner.GetFastDeepClonerProperties(obj?.GetType()))
+            foreach (var pr in DeepCloner.GetFastDeepClonerProperties(obj?.GetType()))
             {
                 var name = pr.GetPropertyName();
                 if (!Columns.ContainsKey(name) || !pr.CanRead)
@@ -559,7 +559,6 @@ namespace EntityWorker.Core
                         value = value?.ToString().FromJson(pr.PropertyType);
                     else if (pr.ContainAttribute<XmlDocument>())
                         value = value?.ToString().FromXml();
-
                     TypeValidation(ref value, pr.PropertyType, true);
                 }
                 else

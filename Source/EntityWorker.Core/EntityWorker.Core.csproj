@@ -3,9 +3,9 @@
     <TargetFrameworks>netcoreapp2.0;netstandard2.0;net451</TargetFrameworks>
     <PackageId>EntityWorker.Core</PackageId>
     <AssemblyName>EntityWorker.Core</AssemblyName>
-    <AssemblyVersion>3.0.3.3</AssemblyVersion>
-    <FileVersion>3.0.3.3</FileVersion>
-    <Version>3.0.3</Version>
+    <AssemblyVersion>3.0.3.7</AssemblyVersion>
+    <FileVersion>3.0.3.7</FileVersion>
+    <Version>3.0.7</Version>
     <Authors>Alen Toma</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageProjectUrl>https://github.com/AlenToma/EntityWorker.Core</PackageProjectUrl>
@@ -23,8 +23,8 @@ Please provide any information on bugs or improvement you may find or think of.
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <!--<TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeP2POutput;</TargetsForTfmSpecificBuildOutput>-->
     <!--<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);CustomContentTarget</TargetsForTfmSpecificContentInPackage>-->
-    <PackageReleaseNotes>Separation of Db providers package.
-Depending on which provider you use, you will have to install System.Data.SqlClient for mssql , Npgsql for pgsql and System.Data.SQLite for SQLite. You will be noticed when the providers package is missing</PackageReleaseNotes>
+    <PackageReleaseNotes>Adding OnDelete operation to IDbRuleTrigger
+Upgrade FastDeepCloner to 1.2.5</PackageReleaseNotes>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>7.2</LangVersion>
   </PropertyGroup>
@@ -35,6 +35,10 @@ Depending on which provider you use, you will have to install System.Data.SqlCli
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp2.0|x86'">
     <WarningsAsErrors>NU1605</WarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netcoreapp2.0|AnyCPU'">
+    <Optimize>false</Optimize>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
@@ -54,7 +58,7 @@ Depending on which provider you use, you will have to install System.Data.SqlCli
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FastDeepCloner" Version="1.2.0" />
+    <PackageReference Include="FastDeepCloner" Version="1.2.5" />
   </ItemGroup>
 
   <!--<ItemGroup Condition="'$(Configuration)'=='Debug'">

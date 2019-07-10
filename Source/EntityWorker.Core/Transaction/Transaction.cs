@@ -148,7 +148,7 @@ namespace EntityWorker.Core.Transaction
             var codeToDataBaseMergeCollection = new CodeToDataBaseMergeCollection(this);
             MethodHelper.GetDbEntitys(assembly ?? this.GetType().Assembly).ForEach(x =>
             {
-                if (!x.IsAbstract) // Ignore abstract classes by default
+                if (!x.IsAbstract && x.GetCustomAttribute<ExcludeFromAbstract>() == null) // Ignore abstract classes by default
                     _dbSchema.GetDatabase_Diff(x, codeToDataBaseMergeCollection);
             });
             return codeToDataBaseMergeCollection;
