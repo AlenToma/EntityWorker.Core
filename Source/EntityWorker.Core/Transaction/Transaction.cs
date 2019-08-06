@@ -33,7 +33,7 @@ namespace EntityWorker.Core.Transaction
 
         private static bool FirstRun;
 
-        private static object MigrationLocker = new object();
+        private static readonly object MigrationLocker = new object();
 
         internal readonly DbSchema _dbSchema;
 
@@ -1036,15 +1036,13 @@ namespace EntityWorker.Core.Transaction
         {
             if (package == null)
                 throw new EntityException("Package cant be null");
-            using (var mem = new MemoryStream())
-            {
-                using (var db = new LiteDB.LiteDatabase(mem))
-                {
-                    var packageCollection = db.GetCollection<T>("Packages");
-                    packageCollection.Insert(package);
-                    return GzipUtility.Compress(new ByteCipher(GlobalConfiguration.PackageDataEncode_Key, DataCipherKeySize.Key_128).Encrypt(mem.ToArray()));
-                }
-            }
+
+            var packageString = package.ToJson();
+
+            var bytes = System.Text.Encoding.UTF8.GetBytes(packageString);
+            return GzipUtility.Compress(new ByteCipher(GlobalConfiguration.PackageDataEncode_Key, DataCipherKeySize.Key_128).Encrypt(bytes));
+
+
         }
 
         /// <summary>
@@ -1058,15 +1056,8 @@ namespace EntityWorker.Core.Transaction
             try
             {
                 var uncompressedFile = GzipUtility.Decompress(package);
-                using (var msi = new MemoryStream(new ByteCipher(GlobalConfiguration.PackageDataEncode_Key, DataCipherKeySize.Key_128).Decrypt(uncompressedFile)))
-                {
-                    // now read the file
-                    using (var db = new LiteDB.LiteDatabase(msi))
-                    {
-                        var packageCollection = db.GetCollection<T>("Packages");
-                        return packageCollection.FindOne(x => x.Data != null || x.Files != null);
-                    }
-                }
+                var packageString = System.Text.Encoding.UTF8.GetString(new ByteCipher(GlobalConfiguration.PackageDataEncode_Key, DataCipherKeySize.Key_128).Decrypt(uncompressedFile));
+                return packageString.FromJson<T>();
 
             }
             catch (Exception exception)

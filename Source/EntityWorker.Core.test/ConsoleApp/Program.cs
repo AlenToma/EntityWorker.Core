@@ -41,7 +41,7 @@ namespace ConsoleApp1
 
         public static void Code()
         {
-            using (var rep = new Repository( DataBaseTypes.Sqllight))
+            using (var rep = new Repository(DataBaseTypes.Sqllight))
             {
                 Guid? c = null;
 
@@ -139,7 +139,7 @@ namespace ConsoleApp1
         {
             sw.Stop();
             Console.WriteLine("Time taken: {0}ms", sw.Elapsed.TotalMilliseconds);
-         
+
         }
 
         public static void execute(dynamic q, string identifier)
@@ -153,7 +153,7 @@ namespace ConsoleApp1
                 Console.WriteLine("Success Count:" + r.Count);
                 Console.WriteLine(" ");
                 var sql = q.ParsedLinqToSql;
-              
+
             }
             catch (Exception ex)
             {
@@ -173,6 +173,7 @@ namespace ConsoleApp1
                 var users = rep.Get<User>().LoadChildren().Execute();
                 var package = rep.CreatePackage(new Package() { Data = users.Cast<object>().ToList() });
                 var readerPackage = rep.GetPackage<Package>(package);
+                users = readerPackage.Data.Cast<User>().ToList();
                 Console.WriteLine((readerPackage.Data.Count <= 0 ? "Failed" : "Success"));
             }
         }

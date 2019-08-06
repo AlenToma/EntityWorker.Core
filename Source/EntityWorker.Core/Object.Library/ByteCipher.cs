@@ -10,14 +10,14 @@ namespace EntityWorker.Core.Object.Library
     {
         // This constant is used to determine the keysize of the encryption algorithm in bits.
         // We divide this by 8 within the code below to get the equivalent number of bytes.
-        private int _Keysize = (int)GlobalConfiguration.DataEncode_Key_Size;
+        private readonly int _Keysize = (int)GlobalConfiguration.DataEncode_Key_Size;
 
-        private byte[] saltStringBytes;
+        private readonly byte[] saltStringBytes;
 
-        private byte[] ivStringBytes;
+        private readonly byte[] ivStringBytes;
         // This constant determines the number of iterations for the password bytes generation function.
         private const int DerivationIterations = 1000;
-        private string _passPhrase = GlobalConfiguration.DataEncode_Key;
+        private readonly string _passPhrase = GlobalConfiguration.DataEncode_Key;
 
         private const string salt128 = "kljsdkkdlo4454GG";
         private const string salt256 = "kljsdkkdlo4454GG00155sajuklmbkdl";

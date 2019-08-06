@@ -1,7 +1,7 @@
 {
   "runtimeTarget": {
     "name": ".NETStandard,Version=v2.0/",
-    "signature": "e44d1af4248c8d0e1463d6630eba42e9bc5b6008"
+    "signature": "31db5ab9419b9ce8a9d2a2bf42a9e905abd84a83"
   },
   "compilationOptions": {},
   "targets": {
@@ -9,7 +9,7 @@
     ".NETStandard,Version=v2.0/": {
       "LightData.CMS.Modules/1.0.0": {
         "dependencies": {
-          "EntityWorker.Core": "3.0.2",
+          "EntityWorker.Core": "3.0.7",
           "NETStandard.Library": "2.0.3",
           "System.Configuration": "4.0.0.0"
         },
@@ -17,14 +17,14 @@
           "LightData.CMS.Modules.dll": {}
         }
       },
-      "FastDeepCloner/1.2.0": {
+      "FastDeepCloner/1.2.5": {
         "dependencies": {
           "System.Reflection.Emit": "4.3.0"
         },
         "runtime": {
           "lib/netstandard2.0/FastDeepCloner.dll": {
-            "assemblyVersion": "1.0.2.0",
-            "fileVersion": "1.0.2.0"
+            "assemblyVersion": "1.0.2.5",
+            "fileVersion": "1.0.2.5"
           }
         }
       },
@@ -108,9 +108,9 @@
           "System.Runtime": "4.3.0"
         }
       },
-      "EntityWorker.Core/3.0.2": {
+      "EntityWorker.Core/3.0.7": {
         "dependencies": {
-          "FastDeepCloner": "1.2.0",
+          "FastDeepCloner": "1.2.5",
           "System.Reflection.Emit": "4.3.0"
         },
         "runtime": {
@@ -141,12 +141,12 @@
       "serviceable": false,
       "sha512": ""
     },
-    "FastDeepCloner/1.2.0": {
+    "FastDeepCloner/1.2.5": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-CQGUKwu4gN2/QXAollyfx8IlW2FcBSm7rmUvHVPHL9nbqacPGorOT5G4dyKnH1NnVfh6+jHkvIyp7njjWbWbdA==",
-      "path": "fastdeepcloner/1.2.0",
-      "hashPath": "fastdeepcloner.1.2.0.nupkg.sha512"
+      "sha512": "sha512-HtR/jyfcR/UqQAWnteeyr4bdibHoTliPhRE1CuBK4Q+CnYwrSy9sadcnM4oZkhC4xgb7ffEmNH8aM3/RDNrWcw==",
+      "path": "fastdeepcloner/1.2.5",
+      "hashPath": "fastdeepcloner.1.2.5.nupkg.sha512"
     },
     "Microsoft.NETCore.Platforms/1.1.0": {
       "type": "package",
@@ -225,7 +225,7 @@
       "path": "system.threading.tasks/4.3.0",
       "hashPath": "system.threading.tasks.4.3.0.nupkg.sha512"
     },
-    "EntityWorker.Core/3.0.2": {
+    "EntityWorker.Core/3.0.7": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

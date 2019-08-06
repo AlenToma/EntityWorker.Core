@@ -328,7 +328,19 @@ namespace EntityWorker.Core.Object.Library.JSON
                 return val;
             else
             {
-                string s = t.AssemblyQualifiedName;
+                var s = "";
+                try
+                {
+                    var assName = t.Assembly.ManifestModule.ScopeName.Substring(0, t.Assembly.ManifestModule.ScopeName.ToLower().IndexOf(".dll"));
+                    var nameSpace = t.Namespace;
+                    var name = t.Name;
+                    s = $"{assName}:{nameSpace}.{name}";
+                }
+                catch
+                {
+                    s = t.AssemblyQualifiedName;
+                }
+                //string s = t.AssemblyQualifiedName;
                 _tyname.Add(t, s);
                 return s;
             }
@@ -341,7 +353,15 @@ namespace EntityWorker.Core.Object.Library.JSON
                 return val;
             else
             {
-                Type t = Type.GetType(typename);
+
+                Type t = null;
+                if (typename.Contains(":"))
+                {
+                    var assName = typename.Split(':').First();
+                    var fullTypeName = typename.Split(':').Last();
+                    t = fullTypeName.GetObjectType(assName);
+                }
+                else t = Type.GetType(typename);
 
                 if (RDBMode)
                 {

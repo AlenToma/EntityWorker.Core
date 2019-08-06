@@ -1,5 +1,4 @@
-﻿using EntityWorker.Core.LiteDB;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace EntityWorker.Core.Object.Library
 {
@@ -11,19 +10,9 @@ namespace EntityWorker.Core.Object.Library
     /// </summary>
     public abstract class PackageEntity
     {
-        ///// <summary>
-        ///// This is a default id leave it empty
-        ///// </summary>
-        public ObjectId Id { get; set; }
-
         /// <summary>
         /// Included items in package
         /// </summary>
         public abstract List<object> Data { get; set; }
-
-        /// <summary>
-        /// Included Files in Package
-        /// </summary>
-        public abstract List<byte[]> Files { get; set; }
     }
 }
