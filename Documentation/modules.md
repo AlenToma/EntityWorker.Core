@@ -85,6 +85,12 @@
             // the EntityWorker.Core will now know that it need to update the database agen.
             // it will detect the changes that has been made to the current object
         }
+        
+        // Handle Delete opreation
+        public void OnDelete(IRepository repository, User itemDbEntity, Guid objectId){
+        
+        // your code
+        }
     }
 
 ```
