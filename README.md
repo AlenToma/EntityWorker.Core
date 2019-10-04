@@ -29,6 +29,9 @@ EntityWorker.Core has its own provider called ISqlQueryable, which can handle al
 EndWith, Contains and so on
 See Code Example for more info.
 
+
+## Mssql database version
+14+
 ## Code Example
 
 * [GlobalConfiguration](https://github.com/AlenToma/EntityWorker.Core/blob/master/Documentation/GlobalConfiguration.md)
