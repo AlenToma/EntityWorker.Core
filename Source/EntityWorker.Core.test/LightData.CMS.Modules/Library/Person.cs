@@ -16,6 +16,6 @@ namespace LightData.CMS.Modules.Library
 
         public string SureName { get; set; }
 
-        public List<Address> Addresses { get; set; }
+        public List<Address> Addresses { get; set; } = new List<Address>();
     }
 }

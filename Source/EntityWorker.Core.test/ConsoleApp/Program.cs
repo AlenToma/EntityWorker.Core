@@ -19,12 +19,12 @@ namespace ConsoleApp1
             //{
             //    //Console.WriteLine((arg as Args).Data);
             //});
-            //Code();
-            DynamicLinq();
-            SaveJson();
-            PackageTest();
-            TestSave();
-            ExpressionTest();
+            Code();
+            //DynamicLinq();
+            //SaveJson();
+            //PackageTest();
+            //TestSave();
+            //ExpressionTest();
             Console.ReadLine();
             Console.Clear();
             Main(null);
@@ -46,8 +46,7 @@ namespace ConsoleApp1
                 Guid? c = null;
 
                 var k = c.ConvertValue<DateTime>();
-                var data = rep.Get<User>().Where(x => string.Equals(T, x.UserName, StringComparison.CurrentCultureIgnoreCase));
-                var users = data.Execute();
+                var data = rep.Get<User>().LoadChildren().Execute();
             }
         }
 

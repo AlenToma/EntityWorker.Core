@@ -187,12 +187,14 @@ namespace EntityWorker.Core
 
                         var propValue = prop.GetValue(item);
                         if (propValue != null)
+                            if (!(propValue is IList) || (propValue as IList).Any())
                             continue;
+
                         if (pathLoaded.ContainsKey(id) && pathLoaded[id].Any(x => x == path))
                             continue;
 
                         if (!pathLoaded.ContainsKey(id))
-                            pathLoaded.Add(id, new List<string>() { path });
+                             pathLoaded.Add(id, new List<string>() { path });
                         else if (pathLoaded[id].All(x => x != path)) pathLoaded[id].Add(path);
 
                         var propertyName = prop.Name;

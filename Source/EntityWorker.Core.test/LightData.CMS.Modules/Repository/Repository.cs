@@ -80,7 +80,7 @@ namespace LightData.CMS.Modules.Repository
         {
             return dbType == DataBaseTypes.Mssql ?
                 @"Server=DESKTOP-Q2EP00O\SQLEXPRESS;Trusted_Connection=false; Database=CMStest; User Id=root; Password=root;" :
-                  (dbType == DataBaseTypes.Sqllight ? @"Data Source=E:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\app_data\LightDataTabletest.db" :
+                  (dbType == DataBaseTypes.Sqllight ? @"Data Source=D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\app_data\LightDataTabletest.db" :
                   "Host=localhost;Username=postgres;Password=root;Database=mydatabase");
         }
     }
