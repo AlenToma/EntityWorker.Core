@@ -59,5 +59,8 @@ See Code Example for more info.
 
 ## Used library
 * [FastDeepCloner](https://www.nuget.org/packages/FastDeepCloner)
+* [System.Data.SQLite](https://www.nuget.org/packages/System.Data.SQLite/)
+* [System.Data.SqlClient](https://www.nuget.org/packages/System.Data.SqlClient/4.7.0-preview6.19303.8)
+* [Npgsql](https://www.nuget.org/packages/Npgsql/)
 ## Issues
 Please report any bugs or improvement you might find.
