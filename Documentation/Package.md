@@ -8,8 +8,6 @@ Note that this package can only be readed by EntityWorker.Core
     {
         // List of objects
         public override List<object> Data { get; set; }
-        // List of files
-        public override List<byte[]> Files { get; set; }
     }
     using (var rep = new Repository())
     {
