@@ -5,7 +5,9 @@ EntityWorker is an alternative to entityframwork. is more flexible and much fast
 ![screenshot](https://github.com/AlenToma/EntityWorker.Core/blob/master/EF_VS_EW.PNG?raw=true)
 
 ## CodeProject
-* [CodeProject](https://www.codeproject.com/Tips/1222424/EntityWorker-Core-An-Alternative-to-Entity-Framewo)
+* [CodeProject (Introduction)](https://www.codeproject.com/Tips/5254684/Introduction-to-EntityWorker)
+* [CodeProject (Detail)](https://www.codeproject.com/Tips/1222424/EntityWorker-Core-An-Alternative-to-Entity-Framewo)
+
 
 ## EntityWorker.Core in Action
 * [IProduct](https://github.com/AlenToma/IProduct)
