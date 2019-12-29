@@ -28,7 +28,7 @@ Depending on which provider you use, you will have to install [System.Data.SqlCl
 Yes, you can easily implement your existing modules and use attributes or IModuleBuilder to map all your Primary Keys and Foreign Key without even touching the database.
 ## Expression
 EntityWorker.Core has its own provider called ISqlQueryable, which can handle almost every expression like `Startwith`,
-`EndWiths`, `Contains` and `Any` and so on
+`EndWith`, `Contains` and `Any` and so on
 See Code Example for more info.
 
 
