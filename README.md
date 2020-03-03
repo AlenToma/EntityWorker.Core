@@ -5,7 +5,9 @@ EntityWorker is an alternative to entityframwork. is more flexible and much fast
 ![screenshot](https://github.com/AlenToma/EntityWorker.Core/blob/master/EF_VS_EW.PNG?raw=true)
 
 ## CodeProject
-* [CodeProject](https://www.codeproject.com/Tips/1222424/EntityWorker-Core-An-Alternative-to-Entity-Framewo)
+* [CodeProject (Introduction)](https://www.codeproject.com/Tips/5254684/Introduction-to-EntityWorker)
+* [CodeProject (Detail)](https://www.codeproject.com/Tips/1222424/EntityWorker-Core-An-Alternative-to-Entity-Framewo)
+
 
 ## EntityWorker.Core in Action
 * [IProduct](https://github.com/AlenToma/IProduct)
@@ -25,8 +27,8 @@ Depending on which provider you use, you will have to install [System.Data.SqlCl
 ## Can I use it to an existing database?
 Yes, you can easily implement your existing modules and use attributes or IModuleBuilder to map all your Primary Keys and Foreign Key without even touching the database.
 ## Expression
-EntityWorker.Core has its own provider called ISqlQueryable, which can handle almost every expression like Startwith,
-EndWith, Contains and so on
+EntityWorker.Core has its own provider called ISqlQueryable, which can handle almost every expression like `Startwith`,
+`EndWith`, `Contains` and `Any` and so on
 See Code Example for more info.
 
 
@@ -59,5 +61,8 @@ See Code Example for more info.
 
 ## Used library
 * [FastDeepCloner](https://www.nuget.org/packages/FastDeepCloner)
+* [System.Data.SQLite](https://www.nuget.org/packages/System.Data.SQLite/)
+* [System.Data.SqlClient](https://www.nuget.org/packages/System.Data.SqlClient/4.7.0-preview6.19303.8)
+* [Npgsql](https://www.nuget.org/packages/Npgsql/)
 ## Issues
 Please report any bugs or improvement you might find.
