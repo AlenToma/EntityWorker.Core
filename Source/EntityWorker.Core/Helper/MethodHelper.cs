@@ -83,6 +83,7 @@ namespace EntityWorker.Core.Helper
         private static Regex stringExp = new Regex(@"String\[.*?\]|String\[.?\]");
         private static Regex dateExp = new Regex(@"Date\[.*?\]|Date\[.?\]");
         private static Regex guidExp = new Regex(@"Guid\[.*?\]|Guid\[.?\]");
+        private static Regex decimalExp = new Regex(@"Decimal\[.*?\]|Decimal\[.?\]");
         internal static ISqlCommand ProcessSql(this IRepository repository, TransactionSqlConnection connection, IDbTransaction tran, string sql)
         {
             var i = 1;
@@ -121,6 +122,18 @@ namespace EntityWorker.Core.Helper
                 sql = sql.Remove(exp.Index, exp.Value.Length);
                 sql = sql.Insert(exp.Index, col);
                 dicCols.TryAdd(col, new Tuple<object, SqlDbType>(str.ConvertValue<Guid?>(), SqlDbType.UniqueIdentifier));
+                i++;
+            }
+
+
+            while ((matches = decimalExp.Matches(sql)).Count > 0)
+            {
+                var exp = matches[0];
+                var col = "@CO" + i + "L";
+                object str = exp.Value.TrimEnd(']').Substring(@"Decimal\[".Length - 1);
+                sql = sql.Remove(exp.Index, exp.Value.Length);
+                sql = sql.Insert(exp.Index, col);
+                dicCols.TryAdd(col, new Tuple<object, SqlDbType>(str.ConvertValue<decimal?>(), SqlDbType.Decimal));
                 i++;
             }
 

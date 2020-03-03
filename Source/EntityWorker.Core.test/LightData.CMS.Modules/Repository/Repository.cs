@@ -79,7 +79,7 @@ namespace LightData.CMS.Modules.Repository
         public static string GetConnectionString(DataBaseTypes dbType)
         {
             return dbType == DataBaseTypes.Mssql ?
-                @"Server=DESKTOP-Q2EP00O\SQLEXPRESS;Trusted_Connection=false; Database=CMStest; User Id=root; Password=root;" :
+                @"Server=DESKTOP-L46VLNA\SQLEXPRESS;Trusted_Connection=true; Database=CMStest; User Id=root; Password=root;" :
                   (dbType == DataBaseTypes.Sqllight ? @"Data Source=D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\app_data\LightDataTabletest.db" :
                   "Host=localhost;Username=postgres;Password=root;Database=mydatabase");
         }

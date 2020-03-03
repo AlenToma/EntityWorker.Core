@@ -41,12 +41,9 @@ namespace ConsoleApp1
 
         public static void Code()
         {
-            using (var rep = new Repository(DataBaseTypes.Sqllight))
+            using (var rep = new Repository(DataBaseTypes.Mssql))
             {
-                Guid? c = null;
-
-                var k = c.ConvertValue<DateTime>();
-                var data = rep.Get<User>().LoadChildren().Execute();
+                var perssonTest = rep.Get<User>().Where(x => x.Person.Salary > (decimal)100.231).Execute() ;
             }
         }
 

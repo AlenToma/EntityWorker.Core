@@ -37,7 +37,6 @@ D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Module
 D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\bin\Release\netstandard2.0\EntityWorker.Core.xml
 D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\bin\Release\netstandard2.0\System.Configuration.xml
 D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\bin\Release\netstandard2.0\System.Security.xml
-D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\obj\Release\netstandard2.0\LightData.CMS.Modules.csproj.CoreCompileInputs.cache
 D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\obj\Release\netstandard2.0\LightData.CMS.Modules.AssemblyInfoInputs.cache
 D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\obj\Release\netstandard2.0\LightData.CMS.Modules.AssemblyInfo.cs
 D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\obj\Release\netstandard2.0\LightData.CMS.Modules.csproj.CopyComplete

@@ -18,5 +18,7 @@ namespace LightData.CMS.Modules.Interface
         string SureName { get; set; }
 
         List<Address> Addresses { get; set; }
+
+        decimal Salary { get; set; }
     }
 }

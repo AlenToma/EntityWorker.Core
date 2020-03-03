@@ -60,6 +60,7 @@ namespace LightData.CMS.Modules.Migrations
                     FirstName = "Alen",
                     LastName = "Toma",
                     SureName = "Nather",
+                    Salary = (decimal)2001.522,
                     Addresses = new List<Address>()
                     {
                         new Address()

@@ -712,6 +712,10 @@ namespace EntityWorker.Core.SqlQuerys
                 }
                 return tValue.TrimEnd(',');
             }
+            else if (type == typeof(decimal) || type == typeof(decimal?) || type == typeof(float) || type == typeof(float?) || type == typeof(double) || type == typeof(double?))
+            {
+                return string.Format("Decimal[{0}]", value);
+            }
             else
             {
                 if (!singleValueToString)

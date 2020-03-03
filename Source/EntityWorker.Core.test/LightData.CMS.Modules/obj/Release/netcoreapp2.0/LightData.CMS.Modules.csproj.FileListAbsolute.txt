@@ -16,7 +16,6 @@ D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Module
 D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\bin\Release\netcoreapp2.0\EntityWorker.Core.dll
 D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\bin\Release\netcoreapp2.0\EntityWorker.Core.pdb
 D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\bin\Release\netcoreapp2.0\EntityWorker.Core.xml
-D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\obj\Release\netcoreapp2.0\LightData.CMS.Modules.csproj.CoreCompileInputs.cache
 D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\obj\Release\netcoreapp2.0\LightData.CMS.Modules.AssemblyInfoInputs.cache
 D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\obj\Release\netcoreapp2.0\LightData.CMS.Modules.AssemblyInfo.cs
 D:\Projects\EntityWorker.Core\Source\EntityWorker.Core.test\LightData.CMS.Modules\obj\Release\netcoreapp2.0\LightData.CMS.Modules.csproj.CopyComplete
