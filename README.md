@@ -4,6 +4,13 @@
 
 EntityWorker is an Object-Relational Mapper(ORM) that enables .NET developers to work with relational data using objects. It is a faster, more flexible alternative to EntityFramework.
 
+You can easily integrate EntityWorker with your existing database by using attributes or `IModuleBuilder` to map all of your primary/foreign keys without touching the existing database.
+
+EntityWorker.Core has its own provider called ISqlQueryable which can handle almost every expression like `Startwith`,
+`EndWith`, `Contains` and `Any` etc. 
+
+See Code Examples below for more info.
+
 ## EntityFramework vs EntityWorker.Core performance test
 ![screenshot](https://github.com/AlenToma/EntityWorker.Core/blob/master/EF_VS_EW.PNG?raw=true)
 
@@ -23,15 +30,6 @@ EntityWorker is an Object-Relational Mapper(ORM) that enables .NET developers to
 * .NETCoreApp 2.0
 * .NETFramework 4.5.1
 * .NETStandard 2.0
-
-## Can I use it to an existing database?
-
-Yes, you can easily implement your existing modules and use attributes or IModuleBuilder to map all of your primary/foreign keys without touching the existing database.
-
-## Expression
-
-EntityWorker.Core has its own provider called ISqlQueryable which can handle almost every expression like `Startwith`,
-`EndWith`, `Contains` and `Any` etc. See Code Examples below for more info.
 
 ## Code Examples
 
