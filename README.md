@@ -22,6 +22,7 @@ See Code Examples below for more info.
 * [IProduct](https://github.com/AlenToma/IProduct)
 
 ## Support for ADO.NET providers
+Depending on which provider you will be using, you will have to install one or more of the following provider.
 * MSSQL 14+ (via [System.Data.SqlClient](https://www.nuget.org/packages/System.Data.SqlClient/4.7.0-preview6.19303.8))
 * SQLite (via [System.Data.SQLite](https://www.nuget.org/packages/System.Data.SQLite/))
 * PostgreSQL (via [Npgsql](https://www.nuget.org/packages/Npgsql/))
