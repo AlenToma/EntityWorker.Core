@@ -21,8 +21,6 @@ namespace EntityWorker.Core
 
         internal static readonly SafeValueType<string, string> CachedSql = new SafeValueType<string, string>();
 
-        public static object ObjectLocker = new object();
-
         private readonly Transaction.Transaction _repository;
 
         private static ILightDataTable NotValidkeywords;
@@ -188,13 +186,13 @@ namespace EntityWorker.Core
                         var propValue = prop.GetValue(item);
                         if (propValue != null)
                             if (!(propValue is IList) || (propValue as IList).Any())
-                            continue;
+                                continue;
 
                         if (pathLoaded.ContainsKey(id) && pathLoaded[id].Any(x => x == path))
                             continue;
 
                         if (!pathLoaded.ContainsKey(id))
-                             pathLoaded.Add(id, new List<string>() { path });
+                            pathLoaded.Add(id, new List<string>() { path });
                         else if (pathLoaded[id].All(x => x != path)) pathLoaded[id].Add(path);
 
                         var propertyName = prop.Name;
@@ -243,10 +241,7 @@ namespace EntityWorker.Core
 
         public void DeleteAbstract(object o)
         {
-            lock (ObjectLocker)
-            {
-                DeleteAbstract(o, true);
-            }
+            DeleteAbstract(o, true);
         }
 
         private List<string> DeleteAbstract(object o, bool save)
@@ -365,10 +360,7 @@ namespace EntityWorker.Core
 
         public void Save(object o, List<string> ignoredProperties = null)
         {
-            lock (ObjectLocker)
-            {
-                Save(o, false, false, ignoredProperties);
-            }
+            Save(o, false, false, ignoredProperties);
         }
 
         private object Save(object o, bool isIndependentData, bool updateOnly = false, List<string> ignoredProperties = null, string lastProperty = null)

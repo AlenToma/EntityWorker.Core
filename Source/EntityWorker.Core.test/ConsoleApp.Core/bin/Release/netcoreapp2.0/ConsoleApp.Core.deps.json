@@ -8,7 +8,7 @@
     ".NETCoreApp,Version=v2.0": {
       "ConsoleApp.Core/1.0.0": {
         "dependencies": {
-          "EntityWorker.Core": "3.0.8",
+          "EntityWorker.Core": "3.0.9",
           "LightData.CMS.Modules": "1.0.0",
           "Npgsql": "4.0.7",
           "System.Data.SQLite": "1.0.111",
@@ -265,7 +265,7 @@
         }
       },
       "System.ValueTuple/4.5.0": {},
-      "EntityWorker.Core/3.0.8": {
+      "EntityWorker.Core/3.0.9": {
         "dependencies": {
           "FastDeepCloner": "1.2.5"
         },
@@ -275,7 +275,7 @@
       },
       "LightData.CMS.Modules/1.0.0": {
         "dependencies": {
-          "EntityWorker.Core": "3.0.8"
+          "EntityWorker.Core": "3.0.9"
         },
         "runtime": {
           "LightData.CMS.Modules.dll": {}
@@ -415,7 +415,7 @@
       "path": "system.valuetuple/4.5.0",
       "hashPath": "system.valuetuple.4.5.0.nupkg.sha512"
     },
-    "EntityWorker.Core/3.0.8": {
+    "EntityWorker.Core/3.0.9": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

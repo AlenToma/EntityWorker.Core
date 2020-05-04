@@ -8,7 +8,7 @@
     ".NETCoreApp,Version=v2.0": {
       "LightData.CMS.Modules/1.0.0": {
         "dependencies": {
-          "EntityWorker.Core": "3.0.8"
+          "EntityWorker.Core": "3.0.9"
         },
         "runtime": {
           "LightData.CMS.Modules.dll": {}
@@ -22,7 +22,7 @@
           }
         }
       },
-      "EntityWorker.Core/3.0.8": {
+      "EntityWorker.Core/3.0.9": {
         "dependencies": {
           "FastDeepCloner": "1.2.5"
         },
@@ -45,7 +45,7 @@
       "path": "fastdeepcloner/1.2.5",
       "hashPath": "fastdeepcloner.1.2.5.nupkg.sha512"
     },
-    "EntityWorker.Core/3.0.8": {
+    "EntityWorker.Core/3.0.9": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

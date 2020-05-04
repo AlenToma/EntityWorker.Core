@@ -206,7 +206,7 @@
           "build/netstandard2.0/NETStandard.Library.targets": {}
         }
       },
-      "EntityWorker.Core/3.0.8": {
+      "EntityWorker.Core/3.0.9": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v2.0",
         "dependencies": {
@@ -230,7 +230,7 @@
           "lib/net451/FastDeepCloner.dll": {}
         }
       },
-      "EntityWorker.Core/3.0.8": {
+      "EntityWorker.Core/3.0.9": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5.1",
         "dependencies": {
@@ -389,7 +389,7 @@
           "ref/netstandard1.3/System.Threading.Tasks.dll": {}
         }
       },
-      "EntityWorker.Core/3.0.8": {
+      "EntityWorker.Core/3.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -1575,7 +1575,7 @@
         "system.threading.tasks.nuspec"
       ]
     },
-    "EntityWorker.Core/3.0.8": {
+    "EntityWorker.Core/3.0.9": {
       "type": "project",
       "path": "../../EntityWorker.Core/EntityWorker.Core.csproj",
       "msbuildProject": "../../EntityWorker.Core/EntityWorker.Core.csproj"
@@ -1583,14 +1583,14 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.0": [
-      "EntityWorker.Core >= 3.0.8",
+      "EntityWorker.Core >= 3.0.9",
       "Microsoft.NETCore.App >= 2.0.0"
     ],
     ".NETFramework,Version=v4.6.1": [
-      "EntityWorker.Core >= 3.0.8"
+      "EntityWorker.Core >= 3.0.9"
     ],
     ".NETStandard,Version=v2.0": [
-      "EntityWorker.Core >= 3.0.8",
+      "EntityWorker.Core >= 3.0.9",
       "NETStandard.Library >= 2.0.3"
     ]
   },
